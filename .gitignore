@@ -1,2 +1,6 @@
 # Source code for WGCNA package with comments to serve as reference
-src-based/
+src-base/
+.Rproj.user
+.Rprofile
+.Rhistory
+*.Rproj
