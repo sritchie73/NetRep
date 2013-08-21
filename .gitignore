@@ -4,3 +4,4 @@ src-base/
 .Rprofile
 .Rhistory
 *.Rproj
+*.Rcheck/
