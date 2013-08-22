@@ -58,21 +58,92 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
   # and test pairs.
   preservation <- foreach (ref=1:nNets) %:% foreach(test=1:nNets) %do% {
     if ((ref %in% referenceSets) && (test %in% testSets)) {
-      # TODO: Get the genes in the reference modules which are present in the 
-      #   Test network.
+      # Get Information about the modules
+      # TODO: restrict to overlapping genes
+      modSizes <- table(refModLabels[[ref]])
+      modNames <- unique(refModLabels[[ref]])
+      modIndexes <- sapply(modNames, function(mod) { # hash by module name
+        which(modNames == mod)
+      })
       
       # TODO: Get the observed statistics for each of the modules
+      foreach(j=1:(length(modNames) + 1), .combine=rbind) %do% {
+        
+      }
       
       
       # TODO: Generate the null distribution for each statistic
-      permuted <- foreach(1:nPermutations, .combine=.bind3) %dopar% {
+      permuted <- foreach(i=1:nPermutations, .combine=.bind3) %dopar% {
         require(bigmemory)
         
       }
+      
+      # TODO: Calculate p-value for each statistic
+      
     } else {
       return(NULL)
     }
   }
+  return(preservation)
+}
+
+#' Calculates the preservation of a module between two networks using a wide
+#' range of statistics.
+#' 
+#' @details This is the actual guts of the calculation. This calculates the 
+#' preservation of each module based on the statistics outlined by Langfelder
+#' et al. (See Reference below) and implemented in their R package WGCNA.
+#' For each module the following are calculated depending on whether the 
+#' expression data, adjacency data, or both are provided:
+#' \itemize{
+#'  \item{Expression Data}{
+#'    \itemize{
+#'      \item{TODO:}{None Implemented yet}
+#'    }
+#'  }
+#'  \item{Network Adjacencies}{
+#'    \itemize{
+#'      \item{\code{\link{meanAdj}}:}{
+#'        The average edge weight of the module in the test network.
+#'      }
+#'    }
+#'  }
+#' }
+#'
+#' @references Langfelder, Peter; Luo, Rui; Oldham, Michael C.; and Horvath, 
+#'    Steve. Is My Network Module Preserved and Reproducible?. PLoS 
+#'    Computational Biology, 2011.
+#' 
+#' @param refExpr Expression matrix for the reference network.
+#' @param refAdj Adjacency matrix for the reference network.
+#' @param testExpr Expression matrix for the test network.
+#' @param refModNodes Nodes (genes) in the reference network for the module 
+#'    whose preservation is being measured.
+#' @param testModNodes Nodes (genes) in the test network for the module whose 
+#'    preservation is being measured.
+#' @return A vector of preservation scores for the module.
+#'   
+calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
+                                   refModNodes, testModNodes) {
+  # Basic Error Checking
+  stopifnot(length(refNodes) == length(testNodes))
+  # if provided, must be for both reference and test networks.
+  stopifnot(!xor(is.null(refExpr), is.null(testExpr)))
+  stopifnot(!xor(is.null(refAdj), is.null(testAdj)))
+  
+  exprPres <- NULL
+  adjPres <- NULL
+  if (!is.null(refExpr)) {
+ 
+  }
+  if (!is.null(refAdj)) {
+    adjNames <- c("meanAdj")
+    adjPres <- c(
+      meanAdj(testAdj, testModNodes)
+    )
+    names(adjPres) <- adjNames
+  }
+  preservation <- c(exprPres, adjPres)
   return(preservation)
 }
 
