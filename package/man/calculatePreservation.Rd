@@ -4,7 +4,7 @@
 range of statistics.}
 \usage{
   calculatePreservation(refExpr, refAdj, testExpr, testAdj,
-    refModNodes, testModNodes)
+    refModuleNodes, testModuleNodes)
 }
 \arguments{
   \item{refExpr}{Expression matrix for the reference
@@ -15,11 +15,14 @@ range of statistics.}
 
   \item{testExpr}{Expression matrix for the test network.}
 
-  \item{refModNodes}{Nodes (genes) in the reference network
-  for the module whose preservation is being measured.}
+  \item{testAdj}{Adjacency matrix for the test network.}
 
-  \item{testModNodes}{Nodes (genes) in the test network for
-  the module whose preservation is being measured.}
+  \item{refModuleNodes}{Nodes (genes) in the reference
+  network for the module whose preservation is being
+  measured.}
+
+  \item{testModuleNodes}{Nodes (genes) in the test network
+  for the module whose preservation is being measured.}
 }
 \value{
   A vector of preservation scores for the module.
@@ -35,7 +38,7 @@ range of statistics.}
   below) and implemented in their R package WGCNA. For each
   module the following are calculated depending on whether
   the expression data, adjacency data, or both are
-  provided: \itemize{ \item{**Expression Data**}{ \itemize{
+  provided: \itemize{ \item{Expression Data}{ \itemize{
   \item{TODO:}{None Implemented yet} } } \item{Network
   Adjacencies}{ \itemize{ \item{\code{\link{meanAdj}}:}{
   The average edge weight of the module in the test

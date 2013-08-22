@@ -14,7 +14,7 @@ library(abind)
 #' @param referenceSets 
 #' @param testSets
 #' @param nPermutations
-#' @param refModLabels
+#' @param moduleLabels
 #' @param verbose
 #' @param savePermuted
 #' @param permutedFile
@@ -22,6 +22,7 @@ library(abind)
 #' @export
 modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL, 
                                referenceSets, testSets, refModLabels,
+                               referenceSets, testSets, moduleLabels,
                                nPermutations=200, verbose=TRUE, save=TRUE,
                                permutedFile="permutedStatistics.rda") {
   # TODO: Check input arguments for errors and consistency
@@ -31,55 +32,51 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
   
   nNets <- length(adjacencySets)
   
-  # Change diagonals of Adjacency to NA for preservation statistics:
-  if (!is.null(adjacencySets)) {
-    lapply(adjacencySets, function(adj) { 
-      diag(adj) <- NA 
-    })
-  }
-  
-  # Convert to big.matrix descriptors so that the networks only have to be 
-  # loaded in memory once across all threads.
-  # expression/adjacencySets hold the actual big.matrix
-  # expression/adjacencyDesc hold the pointers for the threads to use.
-  # If i don't keep the Sets, the matrices will be garbage collected.
-  expressionDesc <- NULL
-  adjacencyDesc <- NULL
-  if (!is.null(expressionSets)) {
-    expressionSets <- lapply(expressionSets, .toBigMatrix)
-    expressionDesc <- lapply(expressionSets, describe)
-  }
-  if (!is.null(adjacencySets)) {
-    adjacencySets <- lapply(adjacencySets, .toBigMatrix)
-    adjacencyDesc <- lapply(adjacencySets, describe)
-  }
-  
   # Iterate over networks pairwise, and calculate preservation between reference
   # and test pairs.
   preservation <- foreach (ref=1:nNets) %:% foreach(test=1:nNets) %do% {
     if ((ref %in% referenceSets) && (test %in% testSets)) {
+      
       # Get Information about the modules
       # TODO: restrict to overlapping genes
-      modSizes <- table(refModLabels[[ref]])
-      modNames <- unique(refModLabels[[ref]])
-      modIndexes <- sapply(modNames, function(mod) { # hash by module name
-        which(modNames == mod)
+      moduleSizes <- table(moduleLabels[[ref]])
+      moduleNames <- unique(moduleLabels[[ref]])
+      
+      # TODO: Handle where no adjnet provided
+      nRefNodes <- ncol(adjacencySets[[ref]])
+      nTestNodes <- ncol(adjacencySets[[test]])
+      
+      # Create dictionary of module names -> nodes.
+      moduleIndices <- sapply(moduleNames, function(name) {
+        which(moduleLabels[[ref]] == name)
       })
       
-      # TODO: Get the observed statistics for each of the modules
-      foreach(j=1:(length(modNames) + 1), .combine=rbind) %do% {
-        
+      # Calculate observed preservation statistics for the modules.
+      # TODO: Handle modIndexing of testNetwork properly
+      observed <- foreach(module=moduleNames, .combine=rbind) %do% {
+        calculatePreservation(expressionSets[[ref]], adjacencySets[[ref]],
+                              expressionSets[[test]], adjacencySets[[test]],
+                              moduleIndices[[module]], moduleIndices[[module]])
       }
+      rownames(observed) <- moduleNames
       
-      
-      # TODO: Generate the null distribution for each statistic
+      # Calculate the null distribution for each of the preservation statistics.
       permuted <- foreach(i=1:nPermutations, .combine=.bind3) %dopar% {
-        require(bigmemory)
-        
+        thisPerm <- foreach(module=moduleNames, .combine=rbind) %do% {
+          # Generate permutation indices for this module
+          permutedIndices <- sample(1:nTestNodes, size=moduleSizes[module])
+          
+          calculatePreservation(expressionSets[[ref]], adjacencySets[[ref]],
+                                expressionSets[[test]], adjacencySets[[test]],
+                                moduleIndices[[module]], permutedIndices)
+        }
+        rownames(thisPerm) <- moduleNames
+        return(thisPerm)
       }
       
-      # TODO: Calculate p-value for each statistic
-      
+      # Calculate the p-value for the observed statistic based on the NULL 
+      # distribution
+      return(list(observed=observed, permuted=permuted, p.value=pvalue))
     } else {
       return(NULL)
     }
@@ -117,16 +114,17 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
 #' @param refExpr Expression matrix for the reference network.
 #' @param refAdj Adjacency matrix for the reference network.
 #' @param testExpr Expression matrix for the test network.
-#' @param refModNodes Nodes (genes) in the reference network for the module 
+#' @param testAdj Adjacency matrix for the test network.
+#' @param refModuleNodes Nodes (genes) in the reference network for the module 
 #'    whose preservation is being measured.
-#' @param testModNodes Nodes (genes) in the test network for the module whose 
+#' @param testModuleNodes Nodes (genes) in the test network for the module whose 
 #'    preservation is being measured.
 #' @return A vector of preservation scores for the module.
 #'   
 calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
-                                   refModNodes, testModNodes) {
+                                   refModuleNodes, testModuleNodes) {
   # Basic Error Checking
-  stopifnot(length(refNodes) == length(testNodes))
+  stopifnot(length(refModuleNodes) == length(testModuleNodes))
   # if provided, must be for both reference and test networks.
   stopifnot(!xor(is.null(refExpr), is.null(testExpr)))
   stopifnot(!xor(is.null(refAdj), is.null(testAdj)))
@@ -135,14 +133,14 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
   adjPres <- NULL
   if (!is.null(refExpr)) {
  
-  }
+  }  
   if (!is.null(refAdj)) {
     adjNames <- c("meanAdj")
     adjPres <- c(
-      meanAdj(testAdj, testModNodes)
+      meanAdj(testAdj, testModuleNodes)
     )
     names(adjPres) <- adjNames
-  }
+  }  
   preservation <- c(exprPres, adjPres)
   return(preservation)
 }
@@ -162,3 +160,6 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
     return(as.big.matrix(mat))
   }
 }
+
+#' @export
+fixSet <- function(set) { lapply(set, .toBigMatrix) }

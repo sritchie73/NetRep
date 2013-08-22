@@ -4,7 +4,7 @@
 \usage{
   modulePreservation(expressionSets = NULL,
     adjacencySets = NULL, referenceSets, testSets,
-    refModLabels, nPermutations = 200, verbose = TRUE,
+    moduleLabels, nPermutations = 200, verbose = TRUE,
     save = TRUE, permutedFile = "permutedStatistics.rda")
 }
 \arguments{
@@ -18,7 +18,7 @@
 
   \item{nPermutations}{}
 
-  \item{refModLabels}{}
+  \item{moduleLabels}{}
 
   \item{verbose}{}
 
