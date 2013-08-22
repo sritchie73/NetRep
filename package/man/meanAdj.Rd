@@ -5,13 +5,14 @@
   meanAdj(testNet, testIndices)
 }
 \arguments{
-  \item{testNet}{the adjacency matrix for the test network}
+  \item{testNet}{the adjacency matrix for the test
+  network.}
 
   \item{testIndices}{the indices on the nodes in the
-  module}
+  module.}
 }
 \value{
-  the mean edge weight of the module in the test network
+  The mean edge weight of the module in the test network.
 }
 \description{
   Calculates the mean edge weight of the module in the test
