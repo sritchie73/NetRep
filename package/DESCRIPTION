@@ -3,7 +3,7 @@ Title: Placeholder
 Description: Placeholder
 Version: 0.1
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
-Depends: R (>= 3.0.0), bigmemory, biganalytics, foreach, abind
+Depends: R (>= 3.0.0), bigmemory, biganalytics, foreach, abind, methods
 Suggests: doMC, doSNOW, WGCNA
 License: Placeholder
 LazyData: true
