@@ -70,6 +70,10 @@ pperm <- function(permuted, q, lower.tail = TRUE, log.p = FALSE) {
 #'  NOTE: It is possible for the quantile \code{p} to fall exactly halfway 
 #'  between two observations from the \code{permuted} distribution. In this case
 #'  both data points are returned and a warning is thrown.
+#'  It is up to the user to choose which observation to take, the conservative
+#'  approach would be to choose the first observation if \code{p} < 0.5, or the
+#'  second if \code{p} > 0.5. For large \code{permuted} distributions the 
+#'  interpretation will not change much.
 #' 
 #' @usage qperm(permuted, p, log.p = FALSE) 
 #' @rdname permutation
