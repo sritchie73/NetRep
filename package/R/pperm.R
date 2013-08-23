@@ -95,8 +95,8 @@ qperm <- function(permuted, p, log.p = FALSE) {
   p.diff <- abs(p.possible - p)
   p.closest <- p.possible[which(p.diff == min(p.diff))]
   if (length(p.closest) > 1) {
-    warning("Specified quantile", p, "is halfway between two points on the",
-            "permuted distribution!")
+    warning("Specified quantile ", p, " is halfway between two points on the",
+            " permuted distribution!")
   }
   p.index <- p.closest*(nPermutations + 1) - 1
   return(sort(permuted)[p.index])
