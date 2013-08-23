@@ -1,5 +1,5 @@
 # Source code for WGCNA package with comments to serve as reference
-src-base/
+src-*/
 .Rproj.user
 .Rprofile
 .Rhistory
