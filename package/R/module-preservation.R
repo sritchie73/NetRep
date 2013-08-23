@@ -21,7 +21,6 @@ library(abind)
 #' @return a
 #' @export
 modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL, 
-                               referenceSets, testSets, refModLabels,
                                referenceSets, testSets, moduleLabels,
                                nPermutations=200, verbose=TRUE, save=TRUE,
                                permutedFile="permutedStatistics.rda") {
@@ -76,7 +75,13 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
       
       # Calculate the p-value for the observed statistic based on the NULL 
       # distribution
-      return(list(observed=observed, permuted=permuted, p.value=pvalue))
+      p.values <- foreach(j=1:ncol(observed), .combine=cbind) %:% 
+                    foreach(i=1:nrow(observed), .combine=c) %do% {
+        pperm(permuted[i,j,], observed[i,j], lower.tail=FALSE)
+      }
+      dimnames(p.values) <- dimnames(observed)
+
+      return(list(observed=observed, permuted=permuted, p.value=p.values))
     } else {
       return(NULL)
     }
@@ -122,7 +127,7 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
 #' @return A vector of preservation scores for the module.
 #'   
 calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
-                                   refModuleNodes, testModuleNodes) {
+                                  refModuleNodes, testModuleNodes) {
   # Basic Error Checking
   stopifnot(length(refModuleNodes) == length(testModuleNodes))
   # if provided, must be for both reference and test networks.
@@ -132,11 +137,12 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
   exprPres <- NULL
   adjPres <- NULL
   if (!is.null(refExpr)) {
- 
+    
   }  
   if (!is.null(refAdj)) {
-    adjNames <- c("meanAdj")
+    adjNames <- c("meanAdj", "meanAdj2")
     adjPres <- c(
+      meanAdj(testAdj, testModuleNodes),
       meanAdj(testAdj, testModuleNodes)
     )
     names(adjPres) <- adjNames
