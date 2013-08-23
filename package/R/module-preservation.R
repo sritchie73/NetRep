@@ -35,7 +35,7 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
   # and test pairs.
   preservation <- foreach (ref=1:nNets) %:% foreach(test=1:nNets) %do% {
     if ((ref %in% referenceSets) && (test %in% testSets)) {
-      
+      cat("Calculating preservation for network pair ", ref, ", ", test, "\n")
       # Get Information about the modules
       # TODO: restrict to overlapping genes
       moduleSizes <- table(moduleLabels[[ref]])
@@ -52,6 +52,7 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
       
       # Calculate observed preservation statistics for the modules.
       # TODO: Handle modIndexing of testNetwork properly
+      cat("Calculating observed statistics...\n")
       observed <- foreach(module=moduleNames, .combine=rbind) %do% {
         calculatePreservation(expressionSets[[ref]], adjacencySets[[ref]],
                               expressionSets[[test]], adjacencySets[[test]],
@@ -61,6 +62,7 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
       
       # Calculate the null distribution for each of the preservation statistics.
       permuted <- foreach(i=1:nPermutations, .combine=.bind3) %dopar% {
+        cat("Permutation ", i, "\n")
         thisPerm <- foreach(module=moduleNames, .combine=rbind) %do% {
           # Generate permutation indices for this module
           permutedIndices <- sample(1:nTestNodes, size=moduleSizes[module])
@@ -142,8 +144,8 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
   if (!is.null(refAdj)) {
     adjNames <- c("meanAdj", "meanAdj2")
     adjPres <- c(
-      meanAdj(testAdj, testModuleNodes),
-      meanAdj(testAdj, testModuleNodes)
+      meanAdj(testAdj, testModuleNodes, 1),
+      meanAdj(testAdj, testModuleNodes, 1)
     )
     names(adjPres) <- adjNames
   }  
