@@ -5,29 +5,17 @@
 
 using namespace Rcpp;
 
-// BigColSums
-Rcpp::NumericVector BigColSums(SEXP pBigMat);
-RcppExport SEXP FastModPres_BigColSums(SEXP pBigMatSEXP) {
+// MeanAdj
+NumericVector MeanAdj(SEXP pAdjacency, IntegerVector moduleIndices, LogicalVector includeDiagonals);
+RcppExport SEXP FastModPres_MeanAdj(SEXP pAdjacencySEXP, SEXP moduleIndicesSEXP, SEXP includeDiagonalsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        SEXP pBigMat = Rcpp::as<SEXP >(pBigMatSEXP);
-        Rcpp::NumericVector __result = BigColSums(pBigMat);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP FastModPres_rcpp_hello_world() {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        List __result = rcpp_hello_world();
+        SEXP pAdjacency = Rcpp::as<SEXP >(pAdjacencySEXP);
+        IntegerVector moduleIndices = Rcpp::as<IntegerVector >(moduleIndicesSEXP);
+        LogicalVector includeDiagonals = Rcpp::as<LogicalVector >(includeDiagonalsSEXP);
+        NumericVector __result = MeanAdj(pAdjacency, moduleIndices, includeDiagonals);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

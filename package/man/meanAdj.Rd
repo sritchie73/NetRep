@@ -2,21 +2,18 @@
 \alias{meanAdj}
 \title{Calculate the meanAdj statistic of a module in a test network}
 \usage{
-  meanAdj(testNet, testIndices, diagonal = NA)
+  meanAdj(adjacency, moduleIndices, includeDiagonal)
 }
 \arguments{
-  \item{testNet}{the adjacency matrix for the test
-  network.}
+  \item{adjacency}{Adjacency matrix to calculate meanAdj of
+  module in.}
 
-  \item{testIndices}{the indices on the nodes in the
-  module.}
+  \item{moduleIndicies}{Where the nodes in the module are
+  located in the adjacency network.}
 
-  \item{diagonal}{How to handle diagonals in the adjacency
-  matrix: \itemize{ \item{NA }{An edge from a node to
-  itself is allowed and counted in the mean.} \item{numeric
-  }{The value the all diagonal entries of the adjacency
-  matrix have, to be removed in the calculation of the
-  mean.} }}
+  \item{includeDiagonal}{Logical, if FALSE, diagonal values
+  (edges between nodes and themselves) are not counted
+  towards the mean edge weight.}
 }
 \value{
   The mean edge weight of the module in the test network.
