@@ -1,1 +1,0 @@
-#' Package documentation goes here. Remember to do!

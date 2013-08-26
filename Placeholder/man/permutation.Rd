@@ -59,7 +59,11 @@
   quantile \code{p} to fall exactly halfway between two
   observations from the \code{permuted} distribution. In
   this case both data points are returned and a warning is
-  thrown.
+  thrown.  It is up to the user to choose which observation
+  to take, the conservative approach would be to choose the
+  first observation if \code{p} < 0.5, or the second if
+  \code{p} > 0.5. For large \code{permuted} distributions
+  the interpretation will not change much.
 }
 \examples{
 # A contrived example. For large n these results will be the same as qnorm,
@@ -67,7 +71,7 @@
 normData <- rnorm(n=10000)
 pperm(normData, -1.644854) # should be approximately 0.05
 qperm(normData, 0.95) # should be approximately 1.644854
-rperm(normData, 100) # should be similar to normData and rnorm(100)
+rperm(normData, 100) # should be similar to rnorm(100)
 }
 \references{
   Phipson, Belinda; and Smyth, Gordon. Permutation p-values

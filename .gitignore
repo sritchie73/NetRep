@@ -1,7 +1,15 @@
-# Source code for WGCNA package with comments to serve as reference
-src-*/
 .Rproj.user
-.Rprofile
 .Rhistory
+.Rprofile
+.RData
+.rda
 *.Rproj
-*.Rcheck/
+*.Rcheck
+
+# Compiled Rcpp code
+src/*.o
+src/*.so
+src/*.dll
+
+# Reference material for project.
+ref-*/

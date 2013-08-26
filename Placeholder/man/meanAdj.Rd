@@ -2,7 +2,7 @@
 \alias{meanAdj}
 \title{Calculate the meanAdj statistic of a module in a test network}
 \usage{
-  meanAdj(testNet, testIndices)
+  meanAdj(testNet, testIndices, diagonal = NA)
 }
 \arguments{
   \item{testNet}{the adjacency matrix for the test
@@ -10,6 +10,13 @@
 
   \item{testIndices}{the indices on the nodes in the
   module.}
+
+  \item{diagonal}{How to handle diagonals in the adjacency
+  matrix: \itemize{ \item{NA }{An edge from a node to
+  itself is allowed and counted in the mean.} \item{numeric
+  }{The value the all diagonal entries of the adjacency
+  matrix have, to be removed in the calculation of the
+  mean.} }}
 }
 \value{
   The mean edge weight of the module in the test network.
@@ -18,14 +25,6 @@
   Calculates the mean edge weight of the module in the test
   network. A high preservation score indicates preservation
   of the module's density.
-}
-\note{
-  Make sure to mark with NA edges that should not be
-  included in the calculation. This is done to minimise
-  computation. For example, gene coexpression adjacency
-  matrices from WGCNA should have their diagonal replaced
-  with NA. For sparse networks the user will need to
-  determine where NA or 0 is most appropriate.
 }
 \references{
   Langfelder, Peter; Luo, Rui; Oldham, Michael C.; and
