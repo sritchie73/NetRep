@@ -33,3 +33,8 @@ meanAdj <- function(testNet, testIndices, diagonal=NA) {
   }
   return(mean)
 }
+
+meanAdj.cpp <- function(adjacency, moduleIndices, moduleSize, includeDiagonal) {
+  # inline for now
+  src <- 
+}
