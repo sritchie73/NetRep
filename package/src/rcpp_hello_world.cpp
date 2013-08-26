@@ -2,6 +2,8 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+//' @export
+//' @useDynLib FastModPres
 // [[Rcpp::export]]
 List rcpp_hello_world() {
    

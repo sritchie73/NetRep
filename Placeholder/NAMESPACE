@@ -1,2 +1,0 @@
-useDynLib(FastModPres)
-exportPattern("^[[:alpha:]]+")

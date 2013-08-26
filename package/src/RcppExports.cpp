@@ -5,6 +5,21 @@
 
 using namespace Rcpp;
 
+// BigColSums
+Rcpp::NumericVector BigColSums(SEXP pBigMat);
+RcppExport SEXP FastModPres_BigColSums(SEXP pBigMatSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        SEXP pBigMat = Rcpp::as<SEXP >(pBigMatSEXP);
+        Rcpp::NumericVector __result = BigColSums(pBigMat);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // rcpp_hello_world
 List rcpp_hello_world();
 RcppExport SEXP FastModPres_rcpp_hello_world() {

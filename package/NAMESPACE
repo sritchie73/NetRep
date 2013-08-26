@@ -1,0 +1,8 @@
+export(modulePreservation)
+export(pperm)
+export(qperm)
+export(rcpp_hello_world)
+export(rperm)
+import(abind)
+import(foreach)
+useDynLib(FastModPres)

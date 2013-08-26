@@ -1,7 +1,5 @@
 # This is the core functionality of the package.
 
-library(bigmemory)
-library(biganalytics)
 library(foreach)
 library(abind)
 
@@ -19,6 +17,9 @@ library(abind)
 #' @param savePermuted
 #' @param permutedFile
 #' @return a
+#' 
+#' @import foreach
+#' @import abind
 #' @export
 modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL, 
                                referenceSets, testSets, moduleLabels,
@@ -161,13 +162,3 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
 
 # Bind two dimensional objects along a third dimension
 .bind3 <- function(...) { abind(..., along=3) }
-
-# Custom converter
-.toBigMatrix <- function(mat) { 
-  if(!is.big.matrix(mat)) {
-    return(as.big.matrix(mat))
-  }
-}
-
-#' @export
-fixSet <- function(set) { lapply(set, .toBigMatrix) }
