@@ -8,7 +8,7 @@
   \item{adjacency}{Adjacency matrix to calculate meanAdj of
   module in.}
 
-  \item{moduleIndicies}{Where the nodes in the module are
+  \item{moduleIndices}{Where the nodes in the module are
   located in the adjacency network.}
 
   \item{includeDiagonal}{Logical, if FALSE, diagonal values
