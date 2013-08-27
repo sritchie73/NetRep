@@ -3,8 +3,6 @@
  * big.matrix pointer.
  */
 
-
-
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -13,10 +11,6 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
-// For debugging
-#include <iostream>
-
-// Implementation of meanAdj
 NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
                       LogicalVector includeDiagonals) {
   MatrixAccessor<double> adjacency(*pAdjacency);
@@ -28,17 +22,19 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
   
   // Intermediate counters
   int NAcount = 0;
-  double total = 0.0; 
+  double total = 0.0;
+  NumericVector value = NumericVector(1);
   
   // Add to the total sum, handles NAs, and ignores the diagonal if asked.
   for (int i = 0; i < moduleSize; i++) {
     for (int j = 0; j < moduleSize; j++) {
       if ((i != j) || (includeDiagonals[0])) {
-        double value = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
-        if (any(is_na(NumericVector(value)))) {
+        value[0] = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
+        
+        if (any(is_na(value))) {
           NAcount += 1;
-        } else {
-           total += value;
+        } else { 
+          total += value[0];
         }
       }
     }
