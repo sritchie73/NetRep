@@ -93,12 +93,12 @@ qperm <- function(permuted, p, log.p = FALSE) {
     p.possible <- {0:(nPermutations - 1) + 1} / {nPermutations + 1} 
   }
   p.diff <- abs(p.possible - p)
-  p.closest <- p.possible[which.equal(p.diff, min(p.diff))]
-  if (length(p.closest) > 1) {
+  # Index/ices of the closest p-values to the given one
+  p.index <- which(is.equal(p.diff, min(p.diff)))
+  if (length(p.index) > 1) {
     warning("Specified quantile ", p, " is halfway between two points on the",
             " permuted distribution!")
   }
-  p.index <- p.closest*(nPermutations + 1)
   return(sort(permuted)[p.index])
 }
 
@@ -110,9 +110,8 @@ rperm <- function(permuted, n) {
   sample(permuted, size=n, replace=TRUE)
 }
 
-#' Finds elements in a vector which are equal to a specified floating point 
-#' value
-which.equal <- function(vector, value) {
+#' Tests elements in a vector for equality to a specified floating point value
+is.equal <- function(vector, value) {
   sapply(vector, function(element) {
     isTRUE(all.equal(element, value))
   })
