@@ -20,28 +20,38 @@ using namespace Rcpp;
 #include <iostream>
 
 // Implementation of meanAdj
-// TODO: Handle NA's in entries.
 NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
                       LogicalVector includeDiagonals) {
   MatrixAccessor<double> adjacency(*pAdjacency);
+  NumericVector mean = NumericVector(1);  // Return scalar
+  
+  // get some useful values
   int moduleSize = moduleIndices.size();
   int totalSize = pAdjacency->nrow()*pAdjacency->ncol();
-  NumericVector mean = NumericVector(1);
   
+  // Intermediate counters
+  int NAcount = 0;
   double total = 0.0; 
   
+  // Add to the total sum, handles NAs, and ignores the diagonal if asked.
   for (int i = 0; i < moduleSize; i++) {
     for (int j = 0; j < moduleSize; j++) {
       if ((i != j) || (includeDiagonals[0])) {
-        total += adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
+        double value = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
+        if (is_na(value)) {
+          NAcount += 1;
+        } else {
+           total += value;
+        }
       }
     }
   }
   
+  // Divide the total by the number of entries counted.
   if (includeDiagonals[0]) {
-    mean = total / totalSize;
+    mean = total / (totalSize - NAcount);
   } else {
-    mean = total / (totalSize - moduleSize);
+    mean = total / (totalSize - NAcount - moduleSize);
   }
   
   return mean;
