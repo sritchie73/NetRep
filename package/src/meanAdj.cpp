@@ -1,11 +1,8 @@
-/* This file contains the C++ implementations of the preservation statistics in
- * the corresponding R file, preservation-statistics.R.
- * This file is split into two logical sections: The first part contains 
- * the actual implementations. This is followed by overloaded wrapper functions 
- * whom are needed by Rcpp to generated the actual C++ code (it can't handle the
- * bigmemory dependency, so we hide that with the wrapper functions).
- * See: http://stackoverflow.com/questions/18438291/building-packages-with-rcpp-attributes-not-handled-correctly/
+/** 
+ * This file contains the C++ implementation of the meanAdj statistic on a 
+ * big.matrix pointer.
  */
+
 
 
 #include <Rcpp.h>
