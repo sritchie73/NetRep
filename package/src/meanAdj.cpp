@@ -18,7 +18,6 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
   
   // get some useful values
   int moduleSize = moduleIndices.size();
-  int totalSize = pAdjacency->nrow()*pAdjacency->ncol();
   
   // Intermediate counters
   int NAcount = 0;
@@ -38,12 +37,12 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
       }
     }
   }
-  
+
   // Divide the total by the number of entries counted.
   if (includeDiagonals[0]) {
-    mean = total / (totalSize - NAcount);
+    mean = total / (moduleSize * moduleSize - NAcount);
   } else {
-    mean = total / (totalSize - NAcount - moduleSize);
+    mean = total / (moduleSize * moduleSize  - moduleSize - NAcount);
   }
   
   return mean;
