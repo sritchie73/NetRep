@@ -11,7 +11,9 @@ Depends:
     Rcpp (>= 0.10.4),
     foreach,
     abind,
-    bigmemory
+    bigmemory,
+    methods,
+    testthat
 LinkingTo: Rcpp, bigmemory
 Collate:
     'big-matrix-extension.R'
