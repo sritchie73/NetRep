@@ -30,7 +30,6 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
     for (int j = 0; j < moduleSize; j++) {
       if ((i != j) || (includeDiagonals[0])) {
         value[0] = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
-        
         if (any(is_na(value))) {
           NAcount += 1;
         } else { 
