@@ -110,7 +110,7 @@ rperm <- function(permuted, n) {
   sample(permuted, size=n, replace=TRUE)
 }
 
-#' Tests elements in a vector for equality to a specified floating point value
+# Tests elements in a vector for equality to a specified floating point value
 is.equal <- function(vector, value) {
   sapply(vector, function(element) {
     isTRUE(all.equal(element, value))
