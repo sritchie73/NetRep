@@ -1,6 +1,7 @@
 context("Functions on Distributions from Permutation Testing")
 
 normData <- rnorm(n=10000)
+small <- sort(runif(4))
 approx <- function(...) { equals(..., tolerance=0.1)}
 
 test_that("pperm approximates normal for n=10000", {
@@ -20,14 +21,19 @@ test_that("qperm returns similar pvalues to pnorm for n=10000", {
 })
 
 test_that("qperm and pperm agree on p-values calculation", {
-  small <- sort(runif(4))
   ps <- sapply(small, function(x) { pperm(small, x) })
   qs <- sapply(ps, function(x) { qperm(small, x) })
 
   expect_identical(small, qs)
 })
 
-test_that("qperm handles multiple returns correctly", {
-  sparse <- runif(4)
-  
+test_that("qperm for range errors", {
+  expect_identical(qperm(small, 0.1), small[1])
+  expect_identical(qperm(small, 0.9), small[4])
+  expect_identical(qperm(small, log(0.1), log.p=TRUE), small[1])
+  expect_identical(qperm(small, log(0.9), log.p=TRUE), small[4])
+})
+
+test_that("qperm handles multiple returns correctly", {  
+  expect_warning(qperm(small, 0.5))
 })
