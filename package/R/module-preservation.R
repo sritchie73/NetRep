@@ -66,7 +66,7 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
         cat("Permutation ", i, "\n")
         thisPerm <- foreach(module=moduleNames, .combine=rbind) %do% {
           # Generate permutation indices for this module
-          permutedIndices <- sample(1:nTestNodes, size=moduleSizes[module])
+          permutedIndices <- sample(1:nRefNodes, size=moduleSizes[module])
           
           calculatePreservation(expressionSets[[ref]], adjacencySets[[ref]],
                                 expressionSets[[test]], adjacencySets[[test]],
@@ -145,8 +145,8 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
   if (!is.null(refAdj)) {
     adjNames <- c("meanAdj", "meanAdj2")
     adjPres <- c(
-      meanAdj(testAdj, testModuleNodes, 1),
-      meanAdj(testAdj, testModuleNodes, 1)
+      meanAdj(testAdj, refModuleNodes, FALSE),
+      meanAdj(testAdj, refModuleNodes, FALSE)
     )
     names(adjPres) <- adjNames
   }  
