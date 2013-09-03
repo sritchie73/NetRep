@@ -1,8 +1,3 @@
-# This file holds all the statistics to be calculated between networks
-# 
-# Note: come back and formally attribute the WGCNA package and authors.
-# 
-
 #' Calculate the meanAdj statistic of a module in a test network
 #' 
 #' Calculates the mean edge weight of the module in the test network.
