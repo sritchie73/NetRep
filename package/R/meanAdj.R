@@ -29,3 +29,14 @@ meanAdj <- function(adjacency, moduleIndices, includeDiagonal) {
   
   MeanAdj(adjacency@address, moduleIndices, includeDiagonal)
 }
+
+meanAdjR <- function(adjacency, moduleIndices, includeDiagonal) {
+  # R implementation of meanAdj. Used for testing correctness of C++
+  # implementation. Does not handle missingness unless diagonal included!
+  if(!includeDiagonal) {
+    meanAdj <- (sum(adjacency) - sum(diag(adjacency))) / (n*n - n)
+  } else {
+    meanAdj <- mean(adjacency[moduleIndices, moduleIndices], na.rm=TRUE)
+  }
+  return(meanAdj)
+}
