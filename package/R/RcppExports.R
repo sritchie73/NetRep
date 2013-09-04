@@ -9,10 +9,14 @@ SetDiag <- function(pBigMat, value) {
     invisible(.Call('FastModPres_SetDiag', PACKAGE = 'FastModPres', pBigMat, value))
 }
 
-#' @useDynLib FastModPres
-NULL
+KIM <- function(pAdjacency, moduleIndices, allNodes) {
+    .Call('FastModPres_KIM', PACKAGE = 'FastModPres', pAdjacency, moduleIndices, allNodes)
+}
 
 MeanAdj <- function(pAdjacency, moduleIndices) {
     .Call('FastModPres_MeanAdj', PACKAGE = 'FastModPres', pAdjacency, moduleIndices)
 }
+
+#' @useDynLib FastModPres
+NULL
 

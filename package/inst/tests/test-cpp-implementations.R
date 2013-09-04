@@ -17,3 +17,11 @@ test_that("MeanAdj implementation is correct", {
   expect_error(meanAdj(adjPtr, 0:1))
   expect_error(meanAdj(adjPtr, 11:12))
 })
+
+test_that("kIM implementation is correct", {
+  mod <- sample(1:10, 4)
+  expect_equal(kIMR(adj, 1:10, TRUE), kIM(adjPtr, 1:10, TRUE))
+  expect_equal(kIMR(spr, 1:10, TRUE), kIM(sprPtr, 1:10, TRUE))
+  expect_equal(kIMR(adj, mod, TRUE), kIM(adjPtr, mod, TRUE))
+  expect_equal(kIMR(adj, mod, FALSE), kIM(adjPtr, mod, FALSE))
+})

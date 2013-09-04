@@ -1,0 +1,31 @@
+\name{kIM}
+\alias{kIM}
+\title{Calculates the connectivity (kIM) of a module.}
+\usage{
+  kIM(adjacency, moduleIndices, allNodes)
+}
+\arguments{
+  \item{adjacency}{Adjacency matrix to calculate meanAdj of
+  module in.}
+
+  \item{moduleIndices}{Where the nodes in the module are
+  located in the adjacency network.}
+
+  \item{allNodes}{Logical; if FALSE, the connectivity is
+  calculated based only on nodes in the module, otherwise a
+  module's connectivity to all nodes is calculated.}
+}
+\value{
+  The connectivity for each node in the module.
+}
+\description{
+  Calculates the inter or intra modular connectivity of all
+  nodes in a given module. This is used for calculating
+  several preservation statistics.
+}
+\references{
+  Langfelder, Peter; Luo, Rui; Oldham, Michael C.; and
+  Horvath, Steve. Is My Network Module Preserved and
+  Reproducible?. PLoS Computational Biology, 2011.
+}
+

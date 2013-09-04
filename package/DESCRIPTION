@@ -19,5 +19,6 @@ Collate:
     'big-matrix-extension.R'
     'module-preservation.R'
     'pperm.R'
-    'preservation-statistics.R'
     'RcppExports.R'
+    'meanAdj.R'
+    'kIM.R'
