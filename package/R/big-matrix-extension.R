@@ -3,14 +3,9 @@
 library(foreach)
 
 setMethod("diag<-", signature("big.matrix"), function(x, value) {
-  foreach (i = 1:ncol(x)) %do% {
-    x[i,i] <- value
-  }
-  x
+  SetDiag(x@address, value)
 })
 
 setMethod("diag", signature("big.matrix"), function(x) {
-  foreach (i = 1:ncol(x), .combine=c) %do% {
-    x[i,i]
-  }
+  GetDiag(x@address)
 })
