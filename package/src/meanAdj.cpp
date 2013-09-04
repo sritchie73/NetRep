@@ -11,8 +11,7 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
-NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
-                      LogicalVector includeDiagonals) {
+NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices) {
   MatrixAccessor<double> adjacency(*pAdjacency);
   NumericVector mean = NumericVector(1);  // Return scalar
   
@@ -27,29 +26,21 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices,
   // Add to the total sum, handles NAs, and ignores the diagonal if asked.
   for (int i = 0; i < moduleSize; i++) {
     for (int j = 0; j < moduleSize; j++) {
-      if ((i != j) || (includeDiagonals[0])) {
-        value[0] = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
-        if (any(is_na(value))) {
-          NAcount += 1;
-        } else { 
-          total += value[0];
-        }
+      value[0] = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
+      if (any(is_na(value))) {
+        NAcount += 1;
+      } else { 
+        total += value[0];
       }
     }
   }
 
-  // Divide the total by the number of entries counted.
-  if (includeDiagonals[0]) {
-    mean = total / (moduleSize * moduleSize - NAcount);
-  } else {
-    mean = total / (moduleSize * moduleSize  - moduleSize - NAcount);
-  }
+  mean = total / (moduleSize * moduleSize - NAcount);
   
   return mean;
 }
 
 // [[Rcpp::export]]
-NumericVector MeanAdj(SEXP pAdjacency, IntegerVector moduleIndices, 
-                      LogicalVector includeDiagonals) {
-  return MeanAdj(XPtr<BigMatrix>(pAdjacency), moduleIndices, includeDiagonals);                  
+NumericVector MeanAdj(SEXP pAdjacency, IntegerVector moduleIndices) {
+  return MeanAdj(XPtr<BigMatrix>(pAdjacency), moduleIndices);                  
 }

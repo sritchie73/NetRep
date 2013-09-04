@@ -2,7 +2,7 @@
 \alias{meanAdj}
 \title{Calculate the meanAdj statistic of a module in a test network}
 \usage{
-  meanAdj(adjacency, moduleIndices, includeDiagonal)
+  meanAdj(adjacency, moduleIndices)
 }
 \arguments{
   \item{adjacency}{Adjacency matrix to calculate meanAdj of
@@ -10,10 +10,6 @@
 
   \item{moduleIndices}{Where the nodes in the module are
   located in the adjacency network.}
-
-  \item{includeDiagonal}{Logical, if FALSE, diagonal values
-  (edges between nodes and themselves) are not counted
-  towards the mean edge weight.}
 }
 \value{
   The mean edge weight of the module in the test network.

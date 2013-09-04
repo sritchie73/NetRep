@@ -145,8 +145,8 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
   if (!is.null(refAdj)) {
     adjNames <- c("meanAdj", "meanAdj2")
     adjPres <- c(
-      meanAdj(testAdj, refModuleNodes, FALSE),
-      meanAdj(testAdj, refModuleNodes, FALSE)
+      meanAdj(testAdj, refModuleNodes),
+      meanAdj(testAdj, refModuleNodes)
     )
     names(adjPres) <- adjNames
   }  
