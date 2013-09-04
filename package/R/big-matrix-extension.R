@@ -7,6 +7,7 @@ library(foreach)
 #' @exportMethod diag<-
 setMethod("diag<-", signature("big.matrix"), function(x, value) {
   SetDiag(x@address, value)
+  x
 })
 
 #' @aliases diag,big.matrix-method
