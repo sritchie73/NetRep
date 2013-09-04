@@ -14,15 +14,14 @@ using namespace Rcpp;
 #include "utilities.h"
 
 NumericVector safeAccessor(XPtr<BigMatrix> pBigMat, int row, int column) {
-    MatrixAccessor<double> mat(*pBigMat);
-    NumericVector value(1);
-    
-    if ((row >= 0) && (row < pBigMat->nrow()) && 
-        (column >= 0) && (column < pBigMat->ncol())) {
-      std::cout << "Value: " << mat[column][row] << "\n";
-      value = mat[column][row];
-      return value;
-    } else {
-      throw std::out_of_range("Requested index outside of range!");
-    }
+  MatrixAccessor<double> mat(*pBigMat);
+  NumericVector value(1);
+  
+  if ((row >= 0) && (row < pBigMat->nrow()) && 
+      (column >= 0) && (column < pBigMat->ncol())) {
+    value = mat[column][row];
+    return value;
+  } else {
+    throw std::out_of_range("Requested index outside of range!");
+  }
 }
