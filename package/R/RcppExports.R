@@ -13,10 +13,10 @@ KIM <- function(pAdjacency, moduleIndices, allNodes) {
     .Call('FastModPres_KIM', PACKAGE = 'FastModPres', pAdjacency, moduleIndices, allNodes)
 }
 
+#' @useDynLib FastModPres
+NULL
+
 MeanAdj <- function(pAdjacency, moduleIndices) {
     .Call('FastModPres_MeanAdj', PACKAGE = 'FastModPres', pAdjacency, moduleIndices)
 }
-
-#' @useDynLib FastModPres
-NULL
 
