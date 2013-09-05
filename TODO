@@ -1,6 +1,18 @@
+Assumptions on User:
+---------------------
+They will provide their matrices in the big.matrix format.
+  - Provide a conversion function?
+Diagonals will be set to NA if they don't want them included.
+  1. It's semantically better
+  2. massively cuts down on the code complexity, thus adds speed.
+
+
+
 TODO list:
 ------------
 Implement all statistics
 Error checking of input
+Restrict network comparison to overlapping nodes only.
+Investigate permuting reference vs. permuting test.
 Handle adjacency only vs. adjacency+expression.
 Handle option for kIMall
