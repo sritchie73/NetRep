@@ -25,7 +25,7 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices) {
   // Intermediate counters
   int NAcount = 0;
   double total = 0.0;
-  NumericVector value = NumericVector(1);
+  double value;
   
   // Make sure we're not indexing out of range.
   if (is_true(any(moduleIndices <= 0)) || is_true(any(moduleIndices > nrow)) ||
@@ -37,10 +37,10 @@ NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices) {
   for (int i = 0; i < moduleSize; i++) {
     for (int j = 0; j < moduleSize; j++) {
      value = adjacency[moduleIndices[i]-1][moduleIndices[j]-1];
-      if (any(is_na(value))) {
+      if (R_IsNA(value)) {
         NAcount += 1;
       } else { 
-        total += value[0];
+        total += value;
       }
     }
   }
