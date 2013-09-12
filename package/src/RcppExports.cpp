@@ -34,16 +34,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // KIM
-NumericVector KIM(SEXP pAdjacency, IntegerVector moduleIndices, LogicalVector allNodes);
-RcppExport SEXP FastModPres_KIM(SEXP pAdjacencySEXP, SEXP moduleIndicesSEXP, SEXP allNodesSEXP) {
+NumericVector KIM(SEXP pAdjacency, IntegerVector moduleIndices);
+RcppExport SEXP FastModPres_KIM(SEXP pAdjacencySEXP, SEXP moduleIndicesSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         SEXP pAdjacency = Rcpp::as<SEXP >(pAdjacencySEXP);
         IntegerVector moduleIndices = Rcpp::as<IntegerVector >(moduleIndicesSEXP);
-        LogicalVector allNodes = Rcpp::as<LogicalVector >(allNodesSEXP);
-        NumericVector __result = KIM(pAdjacency, moduleIndices, allNodes);
+        NumericVector __result = KIM(pAdjacency, moduleIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

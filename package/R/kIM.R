@@ -15,7 +15,12 @@
 #'  calculated.
 #' @return The connectivity for each node in the module.
 kIM <- function(adjacency, moduleIndices, allNodes) {
-  KIM(adjacency@address, moduleIndices, allNodes)
+  if (allNodes) {
+    # marginally faster than a C++ implementation.
+    return(colSums(adjacency[,moduleIndices], na.rm=TRUE)) 
+  } else { 
+    return(KIM(adjacency@address, moduleIndices))
+  }
 }
 
 kIMR <- function(adjacency, moduleIndices, allNodes) {
