@@ -10,6 +10,8 @@ setMethod("diag<-", signature("big.matrix"), function(x, value) {
   x
 })
 
+#' @name diag,big.matrix-method
+#' @title Extract and replace the diagonal of a big.matrix.
 #' @aliases diag,big.matrix-method
 #' @docType methods
 #' @exportMethod diag
