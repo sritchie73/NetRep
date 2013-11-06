@@ -22,3 +22,5 @@ Collate:
     'RcppExports.R'
     'meanAdj.R'
     'kIM.R'
+    'progress-logging.R'
+    'parallel-permute.R'
