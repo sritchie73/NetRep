@@ -8,7 +8,7 @@ Description: Placeholder
 License: Placeholder
 Depends:
     R (>= 3.0.0),
-    Rcpp (>= 0.10.4),
+    Rcpp (>= 0.10.6),
     foreach,
     abind,
     bigmemory,

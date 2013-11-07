@@ -12,7 +12,7 @@ BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        SEXP pBigMat = Rcpp::as<SEXP >(pBigMatSEXP);
+        Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP );
         NumericVector __result = GetDiag(pBigMat);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
@@ -26,8 +26,8 @@ RcppExport SEXP FastModPres_SetDiag(SEXP pBigMatSEXP, SEXP valueSEXP) {
 BEGIN_RCPP
     {
         Rcpp::RNGScope __rngScope;
-        SEXP pBigMat = Rcpp::as<SEXP >(pBigMatSEXP);
-        NumericVector value = Rcpp::as<NumericVector >(valueSEXP);
+        Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type value(valueSEXP );
         SetDiag(pBigMat, value);
     }
     return R_NilValue;
@@ -40,8 +40,8 @@ BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        SEXP pAdjacency = Rcpp::as<SEXP >(pAdjacencySEXP);
-        IntegerVector moduleIndices = Rcpp::as<IntegerVector >(moduleIndicesSEXP);
+        Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type moduleIndices(moduleIndicesSEXP );
         NumericVector __result = KIM(pAdjacency, moduleIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
@@ -56,8 +56,8 @@ BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        SEXP pAdjacency = Rcpp::as<SEXP >(pAdjacencySEXP);
-        IntegerVector moduleIndices = Rcpp::as<IntegerVector >(moduleIndicesSEXP);
+        Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type moduleIndices(moduleIndicesSEXP );
         NumericVector __result = MeanAdj(pAdjacency, moduleIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
