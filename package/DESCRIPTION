@@ -15,12 +15,3 @@ Depends:
     methods,
     testthat
 LinkingTo: Rcpp, bigmemory
-Collate:
-    'big-matrix-extension.R'
-    'module-preservation.R'
-    'pperm.R'
-    'RcppExports.R'
-    'meanAdj.R'
-    'kIM.R'
-    'progress-logging.R'
-    'parallel-permute.R'
