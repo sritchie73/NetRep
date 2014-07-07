@@ -10,9 +10,6 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
-//' @useDynLib FastModPres
-
-
 NumericVector MeanAdj(XPtr<BigMatrix> pAdjacency, IntegerVector moduleIndices) {
   NumericVector mean = NumericVector(1);  // Return scalar
   MatrixAccessor<double> adjacency(*pAdjacency);

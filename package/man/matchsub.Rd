@@ -2,12 +2,15 @@
 \name{matchsub}
 \alias{\%nin\%}
 \alias{\%sub_in\%}
+\alias{\%sub_nin\%}
 \alias{matchsub}
 \title{Value Matching and Subsetting}
 \usage{
 x \%nin\% table
 
 x \%sub_in\% table
+
+x \%sub_nin\% table
 }
 \arguments{
 \item{x}{vector or \code{NULL}: the values to be matched. \link[base]{Long vectors}

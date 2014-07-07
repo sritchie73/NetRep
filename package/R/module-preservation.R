@@ -1,8 +1,5 @@
 # This is the core functionality of the package.
 
-library(foreach)
-library(abind)
-
 #' Calculates pairwise between reference and test networks 
 #' 
 #' Description goes here
@@ -13,17 +10,19 @@ library(abind)
 #' @param testSets
 #' @param nPermutations
 #' @param moduleLabels
-#' @param verbose
+#' @param ignoreCol A vector of \code{moduleLabels} colors to ignore when
+#'  calculating preservation.
+#' @param verbose Logical; If \code{TRUE}, outputs message to file.
+#' @param logFile File to send output to, if \code{verbose} is \code{TRUE}.
 #' @param savePermuted
 #' @param permutedFile
 #' @return a
 #' 
-#' @import foreach
-#' @import abind
 #' @export
 modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL, 
-                               referenceSets, testSets, moduleLabels,
-                               nPermutations=200, verbose=TRUE, save=TRUE,
+                               referenceSets, testSets, moduleLabels, 
+                               ignoreCol = NULL, nPermutations=200, 
+                               verbose=TRUE, logFile='log.txt', save=TRUE,
                                permutedFile="permutedStatistics.rda") {
   # TODO: Check input arguments for errors and consistency
   if (is.null(expressionSets) && is.null(adjacencySets)) {
@@ -37,27 +36,43 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
   preservation <- foreach (ref=1:nNets) %:% foreach(test=1:nNets) %do% {
     if ((ref %in% referenceSets) && (test %in% testSets)) {
       cat("Calculating preservation for network pair ", ref, ", ", test, "\n")
-      # Get Information about the modules
-      # TODO: restrict to overlapping genes
-      moduleSizes <- table(moduleLabels[[ref]])
-      moduleNames <- unique(moduleLabels[[ref]])
+      # Restrict to overlapping genes between reference and test.
+      if (!is.null(adjacencySets)) {
+        refGenes <- rownames(adjacencySets[[ref]])
+        testGenes <- rownames(adjacencySets[[test]])
+      } else {
+        refGenes <- rownames(expressionSets[[ref]])
+        testGenes <- rownames(expressionSets[[test]])
+      }
+      overlapGenes <- intersect(refGenes, testGenes)
+      if(length(overlapGenes) == 0) {
+        warning("No overlap of genes between reference network", ref, 
+                "and test network", test, ". Skipping to next pair.")
+        return(NULL)
+      } else if (verbose) {
+        cat("Calculating preservation on overlap of", length(overlapGenes), "/",
+            length(refGenes), "genes between network pair.\n")
+      }
       
-      # TODO: Handle where no adjnet provided
-      nRefNodes <- ncol(adjacencySets[[ref]])
-      nTestNodes <- ncol(adjacencySets[[test]])
+      # Get Information about the modules
+      moduleSizes <- table(moduleLabels[[ref]])
+      overlapModSizes <- table(moduleLabels[[ref]][overlapGenes])
+      modOverlap <- overlapModSizes/moduleSizes
+      
+      moduleNames <- unique(moduleLabels[[ref]][overlapGenes])
+      moduleNames <- moduleNames[!(moduleNames %in% ignoreCol)]
       
       # Create dictionary of module names -> nodes.
       moduleIndices <- sapply(moduleNames, function(name) {
-        which(moduleLabels[[ref]] == name)
+        which(moduleLabels[[ref]][overlapGenes] == name)
       })
       
       # Calculate observed preservation statistics for the modules.
-      # TODO: Handle modIndexing of testNetwork properly
       cat("Calculating observed statistics...\n")
       observed <- foreach(module=moduleNames, .combine=rbind) %do% {
         calculatePreservation(expressionSets[[ref]], adjacencySets[[ref]],
                               expressionSets[[test]], adjacencySets[[test]],
-                              moduleIndices[[module]], moduleIndices[[module]])
+                              moduleIndices[[module]])
       }
       rownames(observed) <- moduleNames
       
@@ -65,12 +80,12 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
       permuted <- foreach(i=1:nPermutations, .combine=.bind3) %dopar% {
         cat("Permutation ", i, "\n")
         thisPerm <- foreach(module=moduleNames, .combine=rbind) %do% {
-          # Generate permutation indices for this module
-          permutedIndices <- sample(1:nRefNodes, size=moduleSizes[module])
+          # Randomise module assignments for each run
+          permuted <- sample(1:length(overlapGenes), size=moduleSizes[module])
           
           calculatePreservation(expressionSets[[ref]], adjacencySets[[ref]],
                                 expressionSets[[test]], adjacencySets[[test]],
-                                moduleIndices[[module]], permutedIndices)
+                                permuted)
         }
         rownames(thisPerm) <- moduleNames
         return(thisPerm)
@@ -78,13 +93,16 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
       
       # Calculate the p-value for the observed statistic based on the NULL 
       # distribution
+      cat("Calculating P-values...")
       p.values <- foreach(j=1:ncol(observed), .combine=cbind) %:% 
                     foreach(i=1:nrow(observed), .combine=c) %do% {
         pperm(permuted[i,j,], observed[i,j], lower.tail=FALSE)
       }
       dimnames(p.values) <- dimnames(observed)
 
-      return(list(observed=observed, permuted=permuted, p.value=p.values))
+      return(list(observed=observed, permuted=permuted, p.value=p.values,
+                  overlap=modOverlap[moduleNames], 
+                  overlapSize=overlapModSizes[moduleNames]))
     } else {
       return(NULL)
     }
@@ -123,16 +141,13 @@ modulePreservation <- function(expressionSets=NULL, adjacencySets=NULL,
 #' @param refAdj Adjacency matrix for the reference network.
 #' @param testExpr Expression matrix for the test network.
 #' @param testAdj Adjacency matrix for the test network.
-#' @param refModuleNodes Nodes (genes) in the reference network for the module 
+#' @param moduleNodes Nodes (genes) in the reference network for the module 
 #'    whose preservation is being measured.
-#' @param testModuleNodes Nodes (genes) in the test network for the module whose 
-#'    preservation is being measured.
 #' @return A vector of preservation scores for the module.
 #'   
 calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
-                                  refModuleNodes, testModuleNodes) {
-  # Basic Error Checking
-  stopifnot(length(refModuleNodes) == length(testModuleNodes))
+                                  moduleNodes) {
+
   # if provided, must be for both reference and test networks.
   stopifnot(!xor(is.null(refExpr), is.null(testExpr)))
   stopifnot(!xor(is.null(refAdj), is.null(testAdj)))
@@ -143,10 +158,11 @@ calculatePreservation <- function(refExpr, refAdj, testExpr, testAdj,
     
   }  
   if (!is.null(refAdj)) {
-    adjNames <- c("meanAdj", "meanAdj2")
+    adjNames <- c("meanAdj", "corKIM", "corKALL")
     adjPres <- c(
-      meanAdj(testAdj, refModuleNodes),
-      meanAdj(testAdj, refModuleNodes)
+      meanAdj(testAdj, moduleNodes),
+      cor(kIM(refAdj, moduleNodes, FALSE), kIM(testAdj, moduleNodes, FALSE), method="spearman"),
+      cor(kIM(refAdj, moduleNodes, TRUE), kIM(testAdj, moduleNodes, TRUE), method="spearman")
     )
     names(adjPres) <- adjNames
   }  

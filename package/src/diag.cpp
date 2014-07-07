@@ -45,11 +45,20 @@ void SetDiag(XPtr<BigMatrix> pBigMat, NumericVector value) {
   }
 }
 
+//' big.matrix diagonals
+//' 
+//' @param pBigMat a \code{numeric} \code{\link[bigmemory]{big.matrix}}
+//' @return a vector containing the diagonal of \code{pBigMat}
 // [[Rcpp::export]]
 NumericVector GetDiag(SEXP pBigMat) {
   return GetDiag(XPtr<BigMatrix>(pBigMat));                  
 }
 
+//' big.matrix diagonals
+//' 
+//' @param pBigMat a \code{numeric} \code{\link[bigmemory]{big.matrix}}
+//' @param value either a single \code{numeric} value or \code{numeric} vector 
+//'   of length equal to the current diagonal.
 // [[Rcpp::export]]
 void SetDiag(SEXP pBigMat, NumericVector value) {
   return SetDiag(XPtr<BigMatrix>(pBigMat), value);                  

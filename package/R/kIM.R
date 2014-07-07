@@ -32,3 +32,4 @@ kIMR <- function(adjacency, moduleIndices, allNodes) {
   }
   colSums(subset, na.rm=TRUE)
 }
+

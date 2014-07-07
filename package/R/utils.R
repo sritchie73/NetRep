@@ -41,3 +41,7 @@ NULL
 #'   \code{\link{cat}}
 #' @param ... arguments to pass to \code{\link{cat}}
 vCat <- function(verbose, ...) if(verbose) cat(..., "\n")
+
+#' Binds two dimensional arrays along the third dimension.
+#' @importFrom abind abind
+abind3 <- function(...) abind(..., along=3)

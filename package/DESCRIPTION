@@ -1,17 +1,23 @@
-Package: FastModPres
+Package: netrep
 Type: Package
-Title: Placeholder
-Version: 0.1
+Title: Network Replication
+Version: 0.2
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
-Description: Placeholder
-License: Placeholder
+Description: Functions for efficiently and accurately assessing whether the
+    topological properties of a component/module/cluster/subnetwork are
+    preserved or replicate across networks constructed from different datasets.
+License: GPL-2
 Depends:
     R (>= 3.0.0),
-    Rcpp (>= 0.10.6),
+    bigmemory
+Imports:
     foreach,
     abind,
     bigmemory,
-    methods,
+    itertools,
+    Rcpp (>= 0.11),
+    RcppArmadillo (>= 0.4)
+Suggests:
     testthat
-LinkingTo: Rcpp, bigmemory
+LinkingTo: Rcpp, RcppArmadillo, bigmemory

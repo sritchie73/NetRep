@@ -29,8 +29,8 @@
 #'    
 #'  
 #' @aliases pperm, qperm, rperm, permutation, permuted
-#'  
-
+#' @name permutation
+NULL
 
 #' @details P-values are calculated by \code{pperm} using proportions on the 
 #'  provided distribution (\code{permuted}). An observation, \code{q}'s, p-value 
@@ -110,9 +110,24 @@ rperm <- function(permuted, n) {
   sample(permuted, size=n, replace=TRUE)
 }
 
+#' How many permutations do I need
+#' 
+#' How many permutations do you need to run to be able to detect significance at
+#' a given threshold \code{alpha}?
+#' 
+#' @param alpha desired significance threshold
+#' @return The minimum number of permutations required to detect any significant
+#'  associations at the provided \code{alpha}
+#' @export
+requiredPower <- function(alpha) {
+  1/(alpha) - 1
+}
+
 # Tests elements in a vector for equality to a specified floating point value
 is.equal <- function(vector, value) {
   sapply(vector, function(element) {
     isTRUE(all.equal(element, value))
   })
 }
+
+
