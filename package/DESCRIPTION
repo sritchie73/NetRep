@@ -9,7 +9,7 @@ Description: Functions for efficiently and accurately assessing whether the
     preserved or replicate across networks constructed from different datasets.
 License: GPL-2
 Depends:
-    R (>= 3.0.0),
+    R (>= 3.1.0),
     bigmemory
 Imports:
     foreach,
@@ -17,7 +17,8 @@ Imports:
     bigmemory,
     itertools,
     Rcpp (>= 0.11),
-    RcppArmadillo (>= 0.4)
+    RcppArmadillo (>= 0.4),
+    BH
 Suggests:
     testthat
-LinkingTo: Rcpp, RcppArmadillo, bigmemory
+LinkingTo: Rcpp, RcppArmadillo, BH, bigmemory

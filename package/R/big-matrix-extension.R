@@ -18,7 +18,6 @@ NULL
 #' @export
 #' @rdname big.matrix-extensions
 setMethod("diag<-", signature("big.matrix"), function(x, value) {
-  if (typeof(x) != "double") stop("typeof big.matrix must be double")
   SetDiag(x@address, value)
   x
 })
@@ -26,6 +25,5 @@ setMethod("diag<-", signature("big.matrix"), function(x, value) {
 #' @export
 #' @rdname big.matrix-extensions
 setMethod("diag", signature("big.matrix"), function(x) {
-  if (typeof(x) != "double") stop("typeof big.matrix must be double")
   GetDiag(x@address)
 })

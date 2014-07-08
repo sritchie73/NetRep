@@ -4,4 +4,5 @@
 #' @name netrep
 #' @useDynLib netrep
 #' @importFrom Rcpp evalCpp
+#' @import BH
 NULL
