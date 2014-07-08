@@ -22,7 +22,15 @@ KIM <- function(pAdjacency, moduleIndices) {
     .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, moduleIndices)
 }
 
-MeanAdj <- function(pAdjacency, moduleIndices) {
-    .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, moduleIndices)
+#' Mean Adjacency Dispatch Function
+#' 
+#' Dispatch function for all types of big.matrix.
+#' 
+#' @param pAdjacency SEXP container for the pointer to the adjacency matrix
+#' @param subsetIndices indices of the subset of the network to calculate
+#'   the mean adjacency for.
+#' @return A single numeric value.
+MeanAdj <- function(pAdjacency, subsetIndices) {
+    .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
 

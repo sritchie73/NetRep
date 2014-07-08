@@ -51,15 +51,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // MeanAdj
-NumericVector MeanAdj(SEXP pAdjacency, IntegerVector moduleIndices);
-RcppExport SEXP netrep_MeanAdj(SEXP pAdjacencySEXP, SEXP moduleIndicesSEXP) {
+NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices);
+RcppExport SEXP netrep_MeanAdj(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type moduleIndices(moduleIndicesSEXP );
-        NumericVector __result = MeanAdj(pAdjacency, moduleIndices);
+        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
+        NumericVector __result = MeanAdj(pAdjacency, subsetIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
