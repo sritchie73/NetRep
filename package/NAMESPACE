@@ -3,6 +3,7 @@
 export("%nin%")
 export("%sub_in%")
 export("%sub_nin%")
+export(meanAdj)
 export(modulePreservation)
 export(pperm)
 export(qperm)

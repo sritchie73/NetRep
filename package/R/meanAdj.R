@@ -1,27 +1,32 @@
-#' Calculate the meanAdj statistic of a module in a test network
+#' Mean Adjacency of a Network
 #' 
-#' Calculates the mean edge weight of the module in the test network.
-#' A high preservation score indicates preservation of the module's density.
+#' The mean adjacency statistic measures how \emph{dense} a network is. It is
+#' simply the average edge weight of the given network, or network subset.
 #' 
 #' @references Langfelder, Peter; Luo, Rui; Oldham, Michael C.; and Horvath, 
 #'    Steve. Is My Network Module Preserved and Reproducible?. PLoS 
 #'    Computational Biology, 2011.
 #' 
-#' @param adjacency Adjacency matrix to calculate meanAdj of module in.
-#' @param moduleIndices Where the nodes in the module are located in the 
-#'  adjacency network.
-#' @return The mean edge weight of the module in the test network.
+#' @param adjacency Adjacency matrix.
+#' @param subsetIndices indices of the subset of nodes to calculate the mean
+#'   adjacency on.
+#' @return a single numeric value.
+#' @export
 meanAdj <- function(adjacency, moduleIndices) {
   # Error check inputs before passing to C++
   stopifnot(class(adjacency) == "big.matrix")
-  stopifnot(is.vector(moduleIndices))
-  stopifnot(class(moduleIndices) %in% c("numeric", "integer"))
   
-  MeanAdj(adjacency@address, moduleIndices)
+  MeanAdj(adjacency@address, subsetIndices)
 }
 
-meanAdjR <- function(adjacency, moduleIndices) {
-  # R implementation of meanAdj. Used for testing correctness of C++
-  # implementation. Does not handle missingness unless diagonal included!
-  mean(adjacency[moduleIndices, moduleIndices], na.rm=TRUE)
+#' Mean Adjacency of a Network, R Implementation.
+#' 
+#' Used to unit test the functionality of \code{\link{meanAdj}}.
+#' 
+#' @param adjacency Adjacency matrix.
+#' @param subsetIndices indices of the subset of nodes to calculate the mean
+#'   adjacency on.
+#' @return a single numeric value.
+meanAdjR <- function(adjacency, susbetIndices) {
+  mean(adjacency[subsetIndices, subsetIndices], na.rm=TRUE)
 }

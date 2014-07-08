@@ -5,8 +5,8 @@ Version: 0.2
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for efficiently and accurately assessing whether the
-    topological properties of a component/module/cluster/subnetwork are
-    preserved or replicate across networks constructed from different datasets.
+    topological properties of a network subset are preserved or replicate in
+    another dataset.
 License: GPL-2
 Depends:
     R (>= 3.1.0),
