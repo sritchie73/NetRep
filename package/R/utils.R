@@ -36,7 +36,7 @@ NULL
 #' 
 #' Concatenate and output the objects only if the \code{verbose} flag is set 
 #' to \code{TRUE}. Allows for indentation, adding a series of spaces to the 
-#' beginning of each line, 2 for every increment in \code{indLevel}. 
+#' beginning of each line, 2 for every increment in \code{ind}. 
 #' 
 #' @details
 #'  \code{vCat} is slightly more intelligent than regulat \code{cat} in the way
@@ -50,7 +50,7 @@ NULL
 #' @seealso \code{\link[base]{cat}}
 #' @param verbose logical. If \code{TRUE}, passes the rest of the arguments to
 #'   \code{\link{cat}}
-#' @param indLevel an integer corresponding to the level of indentation. Each
+#' @param ind an integer corresponding to the level of indentation. Each
 #'   indentation level corresponds to two spaces.
 #' @param ... Arguments to pass to \code{\link[base]{cat}}
 #' @param sep a character vector of strings to append after each element.
@@ -62,11 +62,11 @@ NULL
 #'   values are ignored, with a warning.
 #' @param labels character vector of labels for the lines printed. Ignored if 
 #'   fill is \code{FALSE}.
-vCat <- function(verbose, ..., indLevel=0, sep=" ", fill=TRUE, labels=NULL) {
+vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
   if(verbose) {
     # We need to format each line with the indendation level
-    if (indLevel > 0) {
-      indent <- paste(rep("  ", indLevel), collapse="")
+    if (ind > 0) {
+      indent <- paste(rep("  ", ind), collapse="")
     } else {
       indent = ""
     }

@@ -3,13 +3,13 @@
 \alias{vCat}
 \title{Verbose Concatenate and Print with Indentation}
 \usage{
-vCat(verbose, ..., indLevel = 0, sep = " ", fill = TRUE, labels = NULL)
+vCat(verbose, ind = 0, ..., sep = " ", fill = TRUE, labels = NULL)
 }
 \arguments{
 \item{verbose}{logical. If \code{TRUE}, passes the rest of the arguments to
 \code{\link{cat}}}
 
-\item{indLevel}{an integer corresponding to the level of indentation. Each
+\item{ind}{an integer corresponding to the level of indentation. Each
 indentation level corresponds to two spaces.}
 
 \item{...}{Arguments to pass to \code{\link[base]{cat}}}
@@ -29,7 +29,7 @@ fill is \code{FALSE}.}
 \description{
 Concatenate and output the objects only if the \code{verbose} flag is set
 to \code{TRUE}. Allows for indentation, adding a series of spaces to the
-beginning of each line, 2 for every increment in \code{indLevel}.
+beginning of each line, 2 for every increment in \code{ind}.
 }
 \details{
 \code{vCat} is slightly more intelligent than regulat \code{cat} in the way
