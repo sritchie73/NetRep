@@ -5,7 +5,7 @@
 #' 
 #' @param datSets A list of \code{\link{big.matrix}} the underlying data the 
 #'  networks are calculated from.
-#' @param netSets A list of \code{\link{big.matrix}}
+#' @param adjSets A list of \code{\link{big.matrix}}
 #' @param discoverySets A numeric vector
 #' @param testSets A numeric vector
 #' @param nodeLabelSets A list of vectors, one for each discovery data set, 
@@ -20,7 +20,7 @@
 #'  summary network.
 #"
 netRep <- function(
-    datSets, netSets, discoverySets, testSets, nodeLabelSets, ignoreSets,
+    datSets, adjSets, discoverySets, testSets, nodeLabelSets, ignoreSets,
     
     nPerm = 10000, verbose=TRUE, simplify=TRUE
   ) {
@@ -37,20 +37,20 @@ netRep <- function(
   #  5. Only the underlying data is provided.
   #
   # TODO: provide user-friendly error messages
-  if (!missing(datSets) & !missing(netSets) & 
-        all(!is.null(datSets)) & all(!is.null(netSets))) {
+  if (!missing(datSets) & !missing(adjSets) & 
+        all(!is.null(datSets)) & all(!is.null(adjSets))) {
     case = 1 # case is used for simplifying output 
-    checkNetSets(netSets)
+    checkadjSets(adjSets)
     checkDatSets(datSets)
     
     # Check concordance between networks and underlying data
-    stopifnot(length(datSets) == length(netSets))
-    stopifnot(sort(names(datSets)) == sort(names(netSets)))
+    stopifnot(length(datSets) == length(adjSets))
+    stopifnot(sort(names(datSets)) == sort(names(adjSets)))
 
-    nNets <- length(netSets)
-  } else if (!missing(netSets) & missing(datSets)) {
+    nNets <- length(adjSets)
+  } else if (!missing(adjSets) & missing(datSets)) {
     case = 2
-    nNets <- length(netSets)
+    nNets <- length(adjSets)
   }
   
 
@@ -75,34 +75,37 @@ netRep <- function(
 #'  arguments.  
 #'  
 #'  If \code{datSets} is \code{NULL}, then this function assumes a full list of
-#'  \code{netSets} has been provided for each dataset of interest. 
+#'  \code{adjSets} has been provided for each dataset of interest. 
 #'  
 #'  \code{ignoreSets} and \code{includeSets} should not overlap.
 #' 
 #' @param datSets \code{NULL}, or a list of \code{\link{big.matrix}}: one for 
 #'   each dataset. 
-#' @param netSets \code{NULL}, or a list of \code{\link{big.matrix}}: one for 
-#'   each dataset. Alternatively, if the list elements are \code{NULL}, then the
-#'   networks will be dynamically calculated using the provided 
-#'   \code{buildNetFun} on the corresponding \code{datSet}.
+#' @param adjSets \code{NULL}, or a list of \code{\link{big.matrix}}: one for 
+#'   each dataset, corresponding to the adjacency matrix of edge weights between
+#'   each pair of nodes in the network. Alternatively, if the list elements 
+#'   are \code{NULL}, then the networks will be dynamically calculated using the 
+#'   provided \code{buildNetFun} on the corresponding \code{datSet}.
 #' @param nodeLabelSets a list, whose elements are \code{NULL} for each 
 #'   \emph{test} dataset, and a vector for each \emph{discovery} dataset 
 #'   assigning each node to a sub-network/cluster/module/component.
 #' @param discovery a numeric vector indicating which elements of
-#'   \code{datSets} and/or \code{netSets} are to be treated as the 
+#'   \code{datSets} and/or \code{adjSets} are to be treated as the 
 #'   \emph{discovery} datasets.
 #' @param test a numeric vector indicating which elements of \code{datSets}
-#'   and/or \code{netSets} are to be treated as the \emph{test} datasets.
+#'   and/or \code{adjSets} are to be treated as the \emph{test} datasets.
 #' @param nPerm number of permutations to use.
 #' @param buildNetFun A function for constructing a network from the 
 #'   \code{datSets}. This is used only where a pre-constructed network is not 
-#'   provided in \code{netSets}.
+#'   provided in \code{adjSets}.
 #' @param ignoreSets An optional list, where the elments for each 
 #'   \emph{discovery} data set are vectors specifying which sub-networks to 
 #'   skip.
 #' @param includeSets An optional list, where the elments for each 
 #'   \emph{discovery} data set are vectors specifying which sub-networks to 
 #'   include.
+#' @param ignoreDiag logical; ignore the diagonal of the adjacency matrix when
+#'   assessing network subset preservation. Defaults to \code{TRUE}.
 #' @param verbose logical; print output while the function is running 
 #'   (\code{TRUE} by default).
 #' @param ident numeric; a positive value indicating the indent level to start
@@ -112,8 +115,8 @@ netRep <- function(
 #' @import foreach
 #' @importFrom itertools isplitIndices
 netRep.core <- function(
-    datSets=NULL, netSets=NULL, nodeLabelSets, discovery, test, nPerm=10000,
-    buildNetFun, ignoreSets=NULL, includeSets=NULL,
+    datSets=NULL, adjSets=NULL, nodeLabelSets, discovery, test, nPerm=10000,
+    buildNetFun, ignoreSets=NULL, includeSets=NULL, ignoreDiag=TRUE,
     verbose=TRUE, indent=0
   ) {
   
@@ -133,18 +136,18 @@ netRep.core <- function(
       
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
-      if (is.null(netSets[[di]])) {
-        if(is.null(netSets[[ti]])) {
+      if (is.null(adjSets[[di]])) {
+        if(is.null(adjSets[[ti]])) {
           oNodes <- rownames(datSets[[di]]) %sub_in% rownames(datSets[[ti]])
           tnodes
         } else {
-          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(netSets[[ti]])
+          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(adjSets[[ti]])
         }
       } else {
-        if(is.null(netSets[[ti]])) {
-          oNodes <- rownames(netSets[[di]]) %sub_in% rownames(datSets[[ti]])
+        if(is.null(adjSets[[ti]])) {
+          oNodes <- rownames(adjSets[[di]]) %sub_in% rownames(datSets[[ti]])
         } else {
-          oNodes <- rownames(netSets[[di]]) %sub_in% rownames(netSets[[ti]])
+          oNodes <- rownames(adjSets[[di]]) %sub_in% rownames(adjSets[[ti]])
         }
       }
       if (length(oNodes) == 0) {
@@ -154,11 +157,18 @@ netRep.core <- function(
       }
       
       # TODO: Handle cases where we are building the networks on the fly
-      if (is.null(netSets[[di]])) {
+      if (is.null(adjSets[[di]])) {
         stop("not implemented yet")
       }
-      if (is.null(netSets[[ti]])) {
+      if (is.null(adjSets[[ti]])) {
         stop("not implemented yet")
+      }
+      
+      # Set the diagonals to NA if we're ignoring them in our calculations
+      if (ignoreDiag) {
+        oldDiags <- list(diag(adjSets[[di]]), diag(adjSets[[ti]]))
+        diag(adjSets[[di]]) <- NA
+        diag(adjSets[[ti]]) <- NA
       }
       
       # Compute information about the network subsets, their size, and what 
@@ -192,9 +202,9 @@ netRep.core <- function(
         # dataset/network
         datTypeDict <- list(
             discData = match(ons, rownames(datSets[[di]])),
-            discNet = match(ons, rownames(netSets[[di]])),
+            discNet = match(ons, rownames(adjSets[[di]])),
             testData = match(ons, rownames(datSets[[ti]])),
-            testNet = match(ons, rownames(netSets[[ti]]))
+            testNet = match(ons, rownames(adjSets[[ti]]))
           )
         datTypeDict <- lapply(datTypeDict, `names<-`, ons)
       })
@@ -205,7 +215,7 @@ netRep.core <- function(
       vCat(verbose, indent+1, "Calculating observed test statistics...")
       
       observed <- foreach(ss=subsets, .combine=rbind) %do% {
-        calcReplStats(datSets[[di]], netSets[[di]], datSets[[ti]], netSets[[ti]], 
+        calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], adjSets[[ti]], 
                       subsetDict[[ss]])
       }
       rownames(observed) <- subsets
@@ -220,10 +230,10 @@ netRep.core <- function(
           permuted <- sample(oNodes, size=oSizes[ss])
           subsetDict[[ss]][c("testData", "testNet")] <- list(
               match(permuted, rownames(datSets[[ti]])),
-              match(permuted, rownames(netSets[[ti]]))
+              match(permuted, rownames(adjSets[[ti]]))
             )
-          calcReplStats(datSets[[di]], netSets[[di]], datSets[[ti]], 
-                        netSets[[ti]], subsetDict[[ss]])
+          calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], 
+                        adjSets[[ti]], subsetDict[[ss]])
         }
       }
       dimnames(nulls)[[1]] <- subsets
@@ -239,6 +249,12 @@ netRep.core <- function(
       }
       dimnames(p.values) <- dimnames(observed)
       vCat(verbose, ident+1, "Done!")
+      
+      # Reset the diagonals to their old values
+      if (ignoreDiag) {
+        diag(adjSets[[di]]) <- oldDiags[[1]]
+        diag(adjSets[[ti]]) <- oldDiags[[2]]
+      }
       
       # Collate results
       return(list(observed=observed, null=null, p.value=p.values,

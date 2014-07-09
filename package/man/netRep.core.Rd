@@ -3,35 +3,36 @@
 \alias{netRep.core}
 \title{Core Function for Assessing Network Replication}
 \usage{
-netRep.core(datSets = NULL, netSets = NULL, nodeLabelSets, discovery, test,
+netRep.core(datSets = NULL, adjSets = NULL, nodeLabelSets, discovery, test,
   nPerm = 10000, buildNetFun, ignoreSets = NULL, includeSets = NULL,
-  verbose = TRUE, indent = 0)
+  ignoreDiag = TRUE, verbose = TRUE, indent = 0)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
 each dataset.}
 
-\item{netSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
-each dataset. Alternatively, if the list elements are \code{NULL}, then the
-networks will be dynamically calculated using the provided
-\code{buildNetFun} on the corresponding \code{datSet}.}
+\item{adjSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
+each dataset, corresponding to the adjacency matrix of edge weights between
+each pair of nodes in the network. Alternatively, if the list elements
+are \code{NULL}, then the networks will be dynamically calculated using the
+provided \code{buildNetFun} on the corresponding \code{datSet}.}
 
 \item{nodeLabelSets}{a list, whose elements are \code{NULL} for each
 \emph{test} dataset, and a vector for each \emph{discovery} dataset
 assigning each node to a sub-network/cluster/module/component.}
 
 \item{discovery}{a numeric vector indicating which elements of
-\code{datSets} and/or \code{netSets} are to be treated as the
+\code{datSets} and/or \code{adjSets} are to be treated as the
 \emph{discovery} datasets.}
 
 \item{test}{a numeric vector indicating which elements of \code{datSets}
-and/or \code{netSets} are to be treated as the \emph{test} datasets.}
+and/or \code{adjSets} are to be treated as the \emph{test} datasets.}
 
 \item{nPerm}{number of permutations to use.}
 
 \item{buildNetFun}{A function for constructing a network from the
 \code{datSets}. This is used only where a pre-constructed network is not
-provided in \code{netSets}.}
+provided in \code{adjSets}.}
 
 \item{ignoreSets}{An optional list, where the elments for each
 \emph{discovery} data set are vectors specifying which sub-networks to
@@ -40,6 +41,9 @@ skip.}
 \item{includeSets}{An optional list, where the elments for each
 \emph{discovery} data set are vectors specifying which sub-networks to
 include.}
+
+\item{ignoreDiag}{logical; ignore the diagonal of the adjacency matrix when
+assessing network subset preservation. Defaults to \code{TRUE}.}
 
 \item{verbose}{logical; print output while the function is running
 (\code{TRUE} by default).}
@@ -59,7 +63,7 @@ Any function argument ending in "Sets" expects a list, where each element
  arguments.
 
  If \code{datSets} is \code{NULL}, then this function assumes a full list of
- \code{netSets} has been provided for each dataset of interest.
+ \code{adjSets} has been provided for each dataset of interest.
 
  \code{ignoreSets} and \code{includeSets} should not overlap.
 }
