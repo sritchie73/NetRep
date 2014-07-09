@@ -54,6 +54,7 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 //'   the mean adjacency for.
 //' @return A vector containing the intramodular connectivity (degree) of 
 //'   each node. 
+//' @rdname kIM-cpp
 // [[Rcpp::export]]
 NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices) {
   //  Dispatch function for all types of big.matrix.

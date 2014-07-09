@@ -60,6 +60,7 @@ NumericVector MeanAdj(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 //' @param subsetIndices indices of the subset of the network to calculate
 //'   the mean adjacency for.
 //' @return A single numeric value.
+//' @rdname meanAdj-cpp
 // [[Rcpp::export]]
 NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices) {
   //  Dispatch function for all types of big.matrix.

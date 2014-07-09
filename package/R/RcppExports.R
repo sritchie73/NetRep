@@ -27,6 +27,7 @@ SetDiag <- function(pBigMat, value) {
 #'   the mean adjacency for.
 #' @return A vector containing the intramodular connectivity (degree) of 
 #'   each node. 
+#' @rdname kIM-cpp
 KIM <- function(pAdjacency, subsetIndices) {
     .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
@@ -39,6 +40,7 @@ KIM <- function(pAdjacency, subsetIndices) {
 #' @param subsetIndices indices of the subset of the network to calculate
 #'   the mean adjacency for.
 #' @return A single numeric value.
+#' @rdname meanAdj-cpp
 MeanAdj <- function(pAdjacency, subsetIndices) {
     .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
