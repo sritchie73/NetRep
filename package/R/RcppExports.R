@@ -18,8 +18,17 @@ SetDiag <- function(pBigMat, value) {
     invisible(.Call('netrep_SetDiag', PACKAGE = 'netrep', pBigMat, value))
 }
 
-KIM <- function(pAdjacency, moduleIndices) {
-    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, moduleIndices)
+#' C++ implementation of Intramodular Connectivity (Degree).
+#' 
+#' See the \link[=kIM]{wrapper function} for documentation.
+#' 
+#' @param pAdjacency SEXP container for the pointer to the adjacency matrix
+#' @param subsetIndices indices of the subset of the network to calculate
+#'   the mean adjacency for.
+#' @return A vector containing the intramodular connectivity (degree) of 
+#'   each node. 
+KIM <- function(pAdjacency, subsetIndices) {
+    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
 
 #' C++ implementation of Mean Adjacency
