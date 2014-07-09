@@ -123,7 +123,15 @@ requiredPower <- function(alpha) {
   1/(alpha) - 1
 }
 
-# Tests elements in a vector for equality to a specified floating point value
+#' Floating Point Comparison
+#'
+#' Tests elements in a vector for equality to a specified floating point value.
+#' 
+#' @param vector a numeric vector of doubles
+#' @param value a double
+#' @return logical; \code{TRUE} where an element is equal to \code{value}, 
+#'   \code{NA} where a comparison is made with an \code{NA}, and \code{FALSE}
+#'   otherwise.
 is.equal <- function(vector, value) {
   sapply(vector, function(element) {
     isTRUE(all.equal(element, value))
