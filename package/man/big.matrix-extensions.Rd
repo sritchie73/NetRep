@@ -20,12 +20,6 @@
 \description{
 Extract or replace the diagonal of a \code{\link[bigmemory]{big.matrix}}
 }
-\details{
-These methods are not supplied by the \code{\link[bigmemory]{bigmemory}}
- package. In this package we provide limited support for replacement and
- extraction of the diagonal of \code{big.matrix} objects,
- provided they are \code{numeric}.
-}
 \section{Additional Notes}{
 
  Unlike \code{\link[base]{diag}} for \code{\link[base]{matrix}} objects, you
