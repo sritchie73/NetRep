@@ -4,7 +4,8 @@
 \title{Core Function for Assessing Network Replication}
 \usage{
 netRep.core(datSets = NULL, netSets = NULL, nodeLabelSets, discovery, test,
-  buildNetFun, ignoreSets, includeSets)
+  nPerm = 10000, buildNetFun, ignoreSets = NULL, includeSets = NULL,
+  verbose = TRUE, indent = 0)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
@@ -26,6 +27,8 @@ assigning each node to a sub-network/cluster/module/component.}
 \item{test}{a numeric vector indicating which elements of \code{datSets}
 and/or \code{netSets} are to be treated as the \emph{test} datasets.}
 
+\item{nPerm}{number of permutations to use.}
+
 \item{buildNetFun}{A function for constructing a network from the
 \code{datSets}. This is used only where a pre-constructed network is not
 provided in \code{netSets}.}
@@ -35,8 +38,15 @@ provided in \code{netSets}.}
 skip.}
 
 \item{includeSets}{An optional list, where the elments for each
-  \emph{discovery} data set are vectors specifying which sub-networks to
-  include.}
+\emph{discovery} data set are vectors specifying which sub-networks to
+include.}
+
+\item{verbose}{logical; print output while the function is running
+(\code{TRUE} by default).}
+
+\item{ident}{numeric; a positive value indicating the indent level to start
+  the output at. Defaults to 0. Each indent level adds two spaces to the
+  start of each line of output.}
 }
 \description{
 This function provides the main functionality, but requires well formed

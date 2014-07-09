@@ -93,6 +93,7 @@ netRep <- function(
 #'   \emph{discovery} datasets.
 #' @param test a numeric vector indicating which elements of \code{datSets}
 #'   and/or \code{netSets} are to be treated as the \emph{test} datasets.
+#' @param nPerm number of permutations to use.
 #' @param buildNetFun A function for constructing a network from the 
 #'   \code{datSets}. This is used only where a pre-constructed network is not 
 #'   provided in \code{netSets}.
@@ -101,56 +102,150 @@ netRep <- function(
 #'   skip.
 #' @param includeSets An optional list, where the elments for each 
 #'   \emph{discovery} data set are vectors specifying which sub-networks to 
-#'   include. 
+#'   include.
+#' @param verbose logical; print output while the function is running 
+#'   (\code{TRUE} by default).
+#' @param ident numeric; a positive value indicating the indent level to start
+#'   the output at. Defaults to 0. Each indent level adds two spaces to the 
+#'   start of each line of output.
 #'
 #' @import foreach
 #' @importFrom itertools isplitIndices
 netRep.core <- function(
-    datSets=NULL, netSets=NULL, nodeLabelSets, discovery, test, 
-    buildNetFun, ignoreSets, includeSets) {
-
+    datSets=NULL, netSets=NULL, nodeLabelSets, discovery, test, nPerm=10000,
+    buildNetFun, ignoreSets=NULL, includeSets=NULL,
+    verbose=TRUE, indent=0
+  ) {
   
   nCores <- getDoParWorkers()
-  vCat(verbose, "Running on", nCores, "cores.")
+  vCat(verbose, "Running on", nCores, "cores.", indent)
+  
+  nNets <- length(nodeLabelSets)
   
   # Iterate pairwise over data-sets, comparing those marked "discovery"
   # with each marked as "replication".
-  res <- foreach(disc=1:nNets) %:% foreach(test=1:nNets) %do% {
-    if ((disc %in% discIndices) & (test %in% testIndices) & (test != disc)) {
-      vCat(verbose, "Calculating preservation of networks from dataset", 
-           discNames[disc], ", in dataset ", testNames[test])
-      # Get a list of the discovery network nodes that are also in the test
-      # network
-      if (case == 1) {
-        discNodes <- rownames(netSets[[disc]]) %sub_in% rownames(netSets[[test]])
-      }
+  foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
+    if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
+      # di: index of the discovery network
+      # ti: index of the test network
+      vCat(verbose, "Calculating preservation of network subsets from dataset", 
+           discNames[di], ", in dataset ", testNames[ti], indent)
       
-      if (length(discNodes)) {
-        warning("No nodes in dataset ", discNames[disc], 
-                " are present in dataset ", testNames[test], ", skipping.")
+      # Get a vector of nodes which are present in both datasets. Depends on 
+      # the combination of data input provided.
+      if (is.null(netSets[[di]])) {
+        if(is.null(netSets[[ti]])) {
+          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(datSets[[ti]])
+          tnodes
+        } else {
+          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(netSets[[ti]])
+        }
+      } else {
+        if(is.null(netSets[[ti]])) {
+          oNodes <- rownames(netSets[[di]]) %sub_in% rownames(datSets[[ti]])
+        } else {
+          oNodes <- rownames(netSets[[di]]) %sub_in% rownames(netSets[[ti]])
+        }
+      }
+      if (length(oNodes) == 0) {
+        warning("No nodes in dataset", discNames[di], 
+                "are present in dataset ", testNames[ti], ", skipping.")
         return(NULL)
       }
       
-      # Get information about the sub-networks.
-      sizes <- table(nodeLabelSets[[disc]][discNodes])
-      overlap <- sizes/table(nodeLabelSets[[disc]])
-      subnets <- unique(nodeLabelSets[[disc]][discNodes])
+      # TODO: Handle cases where we are building the networks on the fly
+      if (is.null(netSets[[di]])) {
+        stop("not implemented yet")
+      }
+      if (is.null(netSets[[ti]])) {
+        stop("not implemented yet")
+      }
       
-      # Create dictionary of sub-nets to -> nodes.
-      moduleIndices <- sapply(subnets, function(name) {
-        which(nodeLabelSets[[disc]][discNodes] == name)
+      # Compute information about the network subsets, their size, and what 
+      # proportion of each is overlapping the test network.
+      dSizes <- table(nodeLabelSets[[di]])
+      dSubsets <- unique(nodeLabelSets[[di]])
+      oSubsets <- unique(nodeLabelSets[[di]][oNodes])
+      # Only look at subsets of interest, if specified:
+      if (!is.null(ignoreSets[[di]])) {
+        dSubsets <- dSubsets %sub_nin% ignoreSets[[di]]
+        oSubsets <- oSubsets %sub_nin% ignoreSets[[di]]
+      }
+      if (!is.null(includeSets[[di]])) {
+        dSubsets <- dSubsets %sub_in% includeSets[[di]]
+        oSubsets <- oSubsets %sub_in% includeSets[[di]]
+      }
+      # most of this code is to deal with subsets who have no nodes in the test
+      # network.
+      oSizes <- table(nodeLabelSets[[di]][oNodes])
+      oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
+      names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
+      overlap <- oSizes[names(dSizes)]/dSizes
+      
+      # Create dictionary of network subsets labels to individual nodes. While
+      # we only care about nodes in both networks, we need to know where those
+      # nodes are located in both networks/datasets.
+      subsetDict <- lapply(oSubsets, function(ss) {
+        # get all overlapping nodes in this subset
+        ons <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+        # Now get a mapping for these nodes to their respective indices in each
+        # dataset/network
+        datTypeDict <- list(
+            discData = match(ons, rownames(datSets[[di]])),
+            discNet = match(ons, rownames(netSets[[di]])),
+            testData = match(ons, rownames(datSets[[ti]])),
+            testNet = match(ons, rownames(netSets[[ti]]))
+          )
+        datTypeDict <- lapply(datTypeDict, `names<-`, ons)
       })
+      names(subsetDict) <- oSubsets
       
       # Calculate observed network statistics across datasets for each 
       # sub-network
-      vCat(verbose, "Calculating observed statistics...")
-      observed <- foreach(net=subnets, .combine=rbind) %do% {
-        calculatePreservation(datSets[[disc]], netSets[[disc]],
-                              datSets[[disc]], netSets[[test]],
-                              moduleIndices[[module]])
-      }
-      rownames(observed) <- moduleNames
+      vCat(verbose, indent+1, "Calculating observed test statistics...")
       
+      observed <- foreach(ss=subsets, .combine=rbind) %do% {
+        calcReplStats(datSets[[di]], netSets[[di]], datSets[[ti]], netSets[[ti]], 
+                      subsetDict[[ss]])
+      }
+      rownames(observed) <- subsets
+      vCat(verbose,  indent+1, "Done!")
+      
+      vCat(verbose,  indent+1, "Calculating null distributions with", 
+           nPerm, "permutations...")
+      # Calculate the null distribution for each of the statistics
+      nulls <- foreach(chunk=isplitIndices(nPerm, chunks=nCores), .combine=abind3) %dopar% {
+        foreach(i=chunk, .combine=abind3) %:% foreach(ss=subsets, .combine=rbind) %do% {
+          # Randomise module assignments for each run.
+          permuted <- sample(oNodes, size=oSizes[ss])
+          subsetDict[[ss]][c("testData", "testNet")] <- list(
+              match(permuted, rownames(datSets[[ti]])),
+              match(permuted, rownames(netSets[[ti]]))
+            )
+          calcReplStats(datSets[[di]], netSets[[di]], datSets[[ti]], 
+                        netSets[[ti]], subsetDict[[ss]])
+        }
+      }
+      dimnames(nulls)[[1]] <- subsets
+      dimnames(nulls)[[2]] <- colnames(observed)
+      dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
+      
+      # Calculate the p-value for the observed statistic based on the null 
+      # distribution
+      vCat(verbose, indent+1, "Calculating P-values...")
+      p.values <- foreach(j=seq_len(ncol(observed)), .combine=cbind) %:% 
+        foreach(i=seq_len(nrow(observed)), .combine=c) %do% {
+          pperm(permuted[i,j,], observed[i,j], lower.tail=FALSE)
+      }
+      dimnames(p.values) <- dimnames(observed)
+      vCat(verbose, ident+1, "Done!")
+      
+      # Collate results
+      return(list(observed=observed, null=null, p.value=p.values,
+                  overlap=overlap, overlapSize=oSizes))
+    } else {
+      # We are not currently comparing these two datasets.
+      return(NULL)
     }
   }
 }
