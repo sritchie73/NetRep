@@ -19,7 +19,7 @@
 #'  will be regular: that is, a list of lists, where the top level indicates a
 #'  summary network.
 #"
-networkReplication <- function(
+netRep <- function(
     datSets, netSets, discoverySets, testSets, nodeLabelSets, ignoreSets,
     
     nPerm = 10000, verbose=TRUE, simplify=TRUE
@@ -105,7 +105,7 @@ networkReplication <- function(
 #'
 #' @import foreach
 #' @importFrom itertools isplitIndices
-networkReplicationCore <- function(
+netRep.core <- function(
     datSets=NULL, netSets=NULL, nodeLabelSets, discovery, test, 
     buildNetFun, ignoreSets, includeSets) {
 
