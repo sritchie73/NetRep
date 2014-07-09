@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 /* Implementation of Mean Adjacency
  * 
- * @param adjProp External Pointer for the adjacency matrix.
+ * @param xpAdj External Pointer for the adjacency matrix.
  * @param adj Matrix Accessor for the adjacency matrix.
  * @param subsetIndices indices of the network subset to compute the mean 
  *   adjacency on
@@ -52,9 +52,9 @@ NumericVector MeanAdj(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
   return mean;
 }
 
-//' Mean Adjacency Dispatch Function
+//' C++ implementation of Mean Adjacency
 //' 
-//' Dispatch function for all types of big.matrix.
+//' See the \link[=meanAdj]{wrapper function} for documentation.
 //' 
 //' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 //' @param subsetIndices indices of the subset of the network to calculate
@@ -62,6 +62,7 @@ NumericVector MeanAdj(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 //' @return A single numeric value.
 // [[Rcpp::export]]
 NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices) {
+  //  Dispatch function for all types of big.matrix.
   XPtr<BigMatrix> xpAdj(pAdjacency);
   switch(xpAdj->matrix_type()) {
     case 1:

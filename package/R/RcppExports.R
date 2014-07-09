@@ -22,9 +22,9 @@ KIM <- function(pAdjacency, moduleIndices) {
     .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, moduleIndices)
 }
 
-#' Mean Adjacency Dispatch Function
+#' C++ implementation of Mean Adjacency
 #' 
-#' Dispatch function for all types of big.matrix.
+#' See the \link[=meanAdj]{wrapper function} for documentation.
 #' 
 #' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 #' @param subsetIndices indices of the subset of the network to calculate
