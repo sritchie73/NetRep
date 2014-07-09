@@ -67,7 +67,7 @@ netRep <- function(
 #' 
 #' This function provides the main functionality, but requires well formed 
 #' input. A wrapper function has been provided for usability purposes, see 
-#' \code{\link{networkReplication}} for details.
+#' \code{\link{netRep}} for details.
 #' 
 #' @details
 #'  Any function argument ending in "Sets" expects a list, where each element
@@ -108,7 +108,7 @@ netRep <- function(
 #'   assessing network subset preservation. Defaults to \code{TRUE}.
 #' @param verbose logical; print output while the function is running 
 #'   (\code{TRUE} by default).
-#' @param ident numeric; a positive value indicating the indent level to start
+#' @param indent numeric; a positive value indicating the indent level to start
 #'   the output at. Defaults to 0. Each indent level adds two spaces to the 
 #'   start of each line of output.
 #'
@@ -125,6 +125,14 @@ netRep.core <- function(
   
   nNets <- length(nodeLabelSets)
   
+  # Set up names for more informative output, if the datasets and their 
+  # corresponding networks have been given names.
+  if (is.null(names(nodeLabelSets))) {
+    setNames <- 1:nNets
+  } else {
+    setNames <- names(nodeLabelSets)
+  }
+  
   # Iterate pairwise over data-sets, comparing those marked "discovery"
   # with each marked as "replication".
   foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
@@ -132,14 +140,13 @@ netRep.core <- function(
       # di: index of the discovery network
       # ti: index of the test network
       vCat(verbose, "Calculating preservation of network subsets from dataset", 
-           discNames[di], ", in dataset ", testNames[ti], indent)
+           setNames[di], ", in dataset ", setNames[ti], indent)
       
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
       if (is.null(adjSets[[di]])) {
         if(is.null(adjSets[[ti]])) {
           oNodes <- rownames(datSets[[di]]) %sub_in% rownames(datSets[[ti]])
-          tnodes
         } else {
           oNodes <- rownames(datSets[[di]]) %sub_in% rownames(adjSets[[ti]])
         }
@@ -151,8 +158,8 @@ netRep.core <- function(
         }
       }
       if (length(oNodes) == 0) {
-        warning("No nodes in dataset", discNames[di], 
-                "are present in dataset ", testNames[ti], ", skipping.")
+        warning("No nodes in dataset", setNames[di],  "are present in dataset ", 
+                setNames[ti], ", skipping.")
         return(NULL)
       }
       
@@ -243,12 +250,12 @@ netRep.core <- function(
       # Calculate the p-value for the observed statistic based on the null 
       # distribution
       vCat(verbose, indent+1, "Calculating P-values...")
-      p.values <- foreach(j=seq_len(ncol(observed)), .combine=cbind) %:% 
-        foreach(i=seq_len(nrow(observed)), .combine=c) %do% {
-          pperm(permuted[i,j,], observed[i,j], lower.tail=FALSE)
+      p.values <- foreach(stat=seq_len(ncol(observed)), .combine=cbind) %:% 
+        foreach(subset=seq_len(nrow(observed)), .combine=c) %do% {
+          pperm(permuted[subset,stat,], observed[subset,stat], lower.tail=FALSE)
       }
       dimnames(p.values) <- dimnames(observed)
-      vCat(verbose, ident+1, "Done!")
+      vCat(verbose, indent+1, "Done!")
       
       # Reset the diagonals to their old values
       if (ignoreDiag) {
@@ -257,7 +264,7 @@ netRep.core <- function(
       }
       
       # Collate results
-      return(list(observed=observed, null=null, p.value=p.values,
+      return(list(observed=observed, null=nulls, p.value=p.values,
                   overlap=overlap, overlapSize=oSizes))
     } else {
       # We are not currently comparing these two datasets.

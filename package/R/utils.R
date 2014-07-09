@@ -43,7 +43,7 @@ NULL
 #'  it formats the output and breaks it into lines. As a result, \code{fill} is
 #'  set to \code{TRUE} by default. The other notable difference from \code{cat}
 #'  is the way newline objects are handled. For example, the call:
-#'  \code{cat("hello", "world", "\n", "foo", "bar")} won't wrap the newline 
+#'  \code{cat("hello", "world", "\\n", "foo", "bar")} won't wrap the newline 
 #'  character with spaces. This avoids the need to set \code{sep} to \code{""} 
 #'  and embed multiple \code{paste} calls.
 #' 
@@ -56,7 +56,7 @@ NULL
 #' @param sep a character vector of strings to append after each element.
 #' @param fill a logical or (positive) numeric controlling how the output is 
 #'   broken into successive lines. If \code{FALSE}, only newlines created 
-#'   explicitly by "\n" are printed. Otherwise, the output is broken into lines
+#'   explicitly by "\\n" are printed. Otherwise, the output is broken into lines
 #'   with print width equal to the option width if fill is \code{TRUE} 
 #'   (default), or the value of fill if this is numeric. Non-positive fill 
 #'   values are ignored, with a warning.
@@ -129,6 +129,11 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
   }
 }
 
+#' Combine two-dimensional arrays
+#' 
 #' Binds two dimensional arrays along the third dimension.
+#' 
+#' @param ... any number of two dimensional objects, to be bound together along
+#'   the third dimension.
 #' @importFrom abind abind
 abind3 <- function(...) abind(..., along=3)

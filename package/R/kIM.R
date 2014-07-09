@@ -1,34 +1,51 @@
-#' Calculates the connectivity (kIM) of a module.
+#' Node Connectivity (weighted degree)
 #' 
-#' Calculates the inter or intra modular connectivity of all nodes in a given
-#' module. This is used for calculating several preservation statistics.
+#' If \code{allNodes} is \code{FALSE}, then the \emph{intramodular connectivity}
+#' (kIM) is calculated: this is the sum of the edgeweights for each node in the
+#' network subset, to all other nodes in that network subset. 
+#' If instead we specify \code{allNodes = TRUE}, then the 
+#' \emph{whole network connectivity} for those nodes is calculated.
 #' 
 #' @references Langfelder, Peter; Luo, Rui; Oldham, Michael C.; and Horvath, 
 #'    Steve. Is My Network Module Preserved and Reproducible?. PLoS 
 #'    Computational Biology, 2011.
 #' 
-#' @param adjacency Adjacency matrix to calculate meanAdj of module in.
-#' @param moduleIndices Where the nodes in the module are located in the 
-#'  adjacency network.
+#' @param adjacency Adjacency matrix representation of the network
+#' @param subsetIndices row/column indices in the provided \code{adjacency} that
+#'   correspond to the network subset of interest.
 #' @param allNodes Logical; if FALSE, the connectivity is calculated based only
 #'  on nodes in the module, otherwise a module's connectivity to all nodes is 
 #'  calculated.
-#' @return The connectivity for each node in the module.
-kIM <- function(adjacency, moduleIndices, allNodes) {
+#' @return 
+#'  The connectivity (weighted degree) for each node in the network subset
+#' @export
+kIM <- function(adjacency, subsetIndices, allNodes) {
   if (allNodes) {
     # marginally faster than a C++ implementation.
-    return(colSums(adjacency[,moduleIndices], na.rm=TRUE)) 
+    return(colSums(adjacency[,subsetIndices], na.rm=TRUE)) 
   } else { 
-    return(KIM(adjacency@address, moduleIndices))
+    return(KIM(adjacency@address, subsetIndices))
   }
 }
 
-kIMR <- function(adjacency, moduleIndices, allNodes) {
+#' Node Connectivity (weighted degree), R Implementation
+#' 
+#' Used to unit test the C++ functionality of \code{\link{kIM}}.
+#' 
+#' @param adjacency Adjacency matrix representation of the network
+#' @param subsetIndices row/column indices in the provided \code{adjacency} that
+#'   correspond to the network subset of interest.
+#' @param allNodes Logical; if FALSE, the connectivity is calculated based only
+#'  on nodes in the module, otherwise a module's connectivity to all nodes is 
+#'  calculated.
+#' @return 
+#'  The connectivity (weighted degree) for each node in the network subset
+kIMR <- function(adjacency, subsetIndices, allNodes) {
   # For testing equivalence in R.
   if (allNodes) {
-    subset <- adjacency[,moduleIndices]
+    subset <- adjacency[,subsetIndices]
   } else {
-    subset <- adjacency[moduleIndices, moduleIndices]
+    subset <- adjacency[subsetIndices, subsetIndices]
   }
   colSums(subset, na.rm=TRUE)
 }

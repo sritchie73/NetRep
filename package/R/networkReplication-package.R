@@ -5,4 +5,5 @@
 #' @useDynLib netrep
 #' @importFrom Rcpp evalCpp
 #' @import BH
+#' @import bigmemory
 NULL

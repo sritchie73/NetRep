@@ -1,4 +1,4 @@
-context("Testing C++ implementations for validity")
+context("Testing C++ Implementations of statistics for validity")
 
 # Complete Adjacency
 adj <- matrix(rnorm(100), 10, 10)
@@ -8,17 +8,6 @@ adjPtr <- as.big.matrix(adj)
 spr <- adj
 spr[sample(1:100, 25)] <- NA
 sprPtr <- as.big.matrix(spr)
-
-test_that("diag and diag<- are correct") {
-  expect_that(diag(adjPtr) == diag(adj))
-  expect_that(diag(sprPtr) == diag(spr))
-  diag(adj) <- 2
-  diag(adjPtr) <- 2
-  expect_that(all(adjPtr[] == adj))
-  diag(adj) <- 1:10
-  diag(adjPtr) <- 1:10
-  expect_that(all(adjPtr[] == adj))
-}
 
 test_that("MeanAdj implementation is correct", {
   mod <- sample(1:10, 4)

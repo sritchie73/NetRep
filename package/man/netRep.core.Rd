@@ -48,14 +48,14 @@ assessing network subset preservation. Defaults to \code{TRUE}.}
 \item{verbose}{logical; print output while the function is running
 (\code{TRUE} by default).}
 
-\item{ident}{numeric; a positive value indicating the indent level to start
+\item{indent}{numeric; a positive value indicating the indent level to start
   the output at. Defaults to 0. Each indent level adds two spaces to the
   start of each line of output.}
 }
 \description{
 This function provides the main functionality, but requires well formed
 input. A wrapper function has been provided for usability purposes, see
-\code{\link{networkReplication}} for details.
+\code{\link{netRep}} for details.
 }
 \details{
 Any function argument ending in "Sets" expects a list, where each element

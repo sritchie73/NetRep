@@ -3,13 +3,13 @@
 \alias{meanAdj}
 \title{Mean Adjacency of a Network}
 \usage{
-meanAdj(adjacency, moduleIndices)
+meanAdj(adjacency, subsetIndices)
 }
 \arguments{
 \item{adjacency}{Adjacency matrix.}
 
-\item{subsetIndices}{indices of the subset of nodes to calculate the mean
-adjacency on.}
+\item{subsetIndices}{row/column indices in the provided \code{adjacency} that
+correspond to the network subset of interest.}
 }
 \value{
 a single numeric value.

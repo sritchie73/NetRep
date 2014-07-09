@@ -3,18 +3,18 @@
 \alias{meanAdjR}
 \title{Mean Adjacency of a Network, R Implementation.}
 \usage{
-meanAdjR(adjacency, susbetIndices)
+meanAdjR(adjacency, subsetIndices)
 }
 \arguments{
 \item{adjacency}{Adjacency matrix.}
 
-\item{subsetIndices}{indices of the subset of nodes to calculate the mean
-adjacency on.}
+\item{subsetIndices}{row/column indices in the provided \code{adjacency} that
+correspond to the network subset of interest.}
 }
 \value{
 a single numeric value.
 }
 \description{
-Used to unit test the functionality of \code{\link{meanAdj}}.
+Used to unit test the C++ functionality of \code{\link{meanAdj}}.
 }
 

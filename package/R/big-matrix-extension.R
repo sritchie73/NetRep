@@ -7,6 +7,7 @@
 #'  cannot use \code{diag} to construct a new \code{big.matrix}.
 #' 
 #' @name big.matrix-extensions
+#' @import methods
 NULL
 
 #' @export

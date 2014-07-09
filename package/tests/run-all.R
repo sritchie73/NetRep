@@ -1,4 +1,4 @@
 library(testthat)
-library(FastModPres)
+library(netrep)
 
-test_package("FastModPres")
+test_package("netrep")

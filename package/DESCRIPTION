@@ -1,7 +1,7 @@
 Package: netrep
 Type: Package
 Title: Network Replication
-Version: 0.2
+Version: 0.3
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for efficiently and accurately assessing whether the
@@ -14,12 +14,11 @@ Depends:
 Imports:
     foreach,
     abind,
-    bigmemory,
     itertools,
     Rcpp (>= 0.11),
-    RcppArmadillo (>= 0.4),
+    methods,
     BH
 Suggests:
     testthat
-LinkingTo: Rcpp, RcppArmadillo, BH, bigmemory
+LinkingTo: Rcpp, BH, bigmemory
 SystemRequirements: C++11
