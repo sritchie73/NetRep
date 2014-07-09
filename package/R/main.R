@@ -154,16 +154,3 @@ netRep.core <- function(
     }
   }
 }
-
-# Helper function for checking input sanity
-checkNetSets <- function(netSets) {
-  stopifnot(sapply(netSets, class) %in% c("big.matrix", "NULL"))
-  stopifnot(sapply(netSets[!is.null(netSets)], function(x) !is.null(rownames(x))))
-  stopifnot(sapply(netSets[!is.null(netSets)], function(x) !is.null(colnames(x))))
-}
-
-# Helper function for checking input sanity
-checkDatSets <- function(datSets) {
-  stopifnot(sapply(datSets, class) %in% c("big.matrix", "NULL"))
-  stopifnot(sapply(datSets[!is.null(datSets)], function(x) !is.null(rownames(x))))
-}
