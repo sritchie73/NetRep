@@ -66,13 +66,31 @@ netRep <- function(
 #' Core Function for Assessing Network Replication
 #' 
 #' This function provides the main functionality, but requires well formed 
-#' input. A wrapper function has been provided for usability purposes, see 
-#' \code{\link{netRep}} for details.
+#' input. See details for instructions on usage. A wrapper function has been 
+#' provided for usability purposes, see \code{\link{netRep}} for details.
 #' 
 #' @details
-#'  Any function argument ending in "Sets" expects a list, where each element
-#'  corresponds to a dataset. The order of the datasets should match across all
-#'  arguments.  
+#'  Any function argument ending in \code{"Sets"} expects a list, where each 
+#'  element corresponds to a dataset. \code{adjSets} should contain a list of 
+#'  adjacency matrices, one for each dataset. \code{datSets} should contain a 
+#'  list of \code{big.matrix} objects, which hold the underlying data the 
+#'  corresponding lement of the \code{adjSets} list (for example, a matrix of 
+#'  gene expression data). Here, we expect the rows of each element of 
+#'  \code{datSets} to correspond to a node in the network.
+#'
+#'  Providing \code{datSets} is optional, if not provided, only statistics 
+#'  computable on the adjacency matrices will be calculated. If the underlying
+#'  data is provided for any dataset, the corresponding element \code{adjSet}
+#'  can be left as \code{NULL}, and the adjacency matrix will be constructed 
+#'  using the provided \code{buildNetFun} on the corresponding element of 
+#'  \code{datSet}.
+#'
+#'  The elements of \code{nodeLabelSets} should be \code{NULL}, if its 
+#'  corresponding dataset is not a \emph{"discovery"} dataset, or contain a 
+#'  vector assigning each node in the network to a cluster/module/subnetwork 
+#'  etc. \code{netRep} will test each of these network subsets in the 
+#'  
+#'  The order of the datasets should match across all \code{"Sets"}.
 #'  
 #'  If \code{datSets} is \code{NULL}, then this function assumes a full list of
 #'  \code{adjSets} has been provided for each dataset of interest. 
