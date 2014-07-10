@@ -129,6 +129,10 @@ netRep <- function() {
 #' @param includeSets An optional list, where the elments for each 
 #'   \emph{discovery} data set are vectors specifying which sub-networks to 
 #'   include.
+#' @param null the type of null model, either "overlap" or "all". If "overlap"
+#'   (default) only the nodes present in both the discovery and test networks
+#'   will be used to draw the null distribution for each statistic. If "all", 
+#'   all nodes in the test network will be used to draw the null distribution.
 #' @param ignoreDiag logical; ignore the diagonal of the adjacency matrix when
 #'   assessing network subset preservation. Defaults to \code{TRUE}.
 #' @param verbose logical; print output while the function is running 
@@ -154,6 +158,12 @@ netRep.core <- function(
   i <- NULL # current permutation number.
   stat <- NULL # column index for each statistic computed in the null 3D array.
   
+  # Identify the null model to use 
+  nullModels <- c("overlap", "all")
+  if (is.na(pmatch(null, nullModels))) {
+    stop("overlap must match one of ", paste(nullModels, collapse=" "))
+  }
+  model <- pmatch(null, nullModels)
   
   nCores <- getDoParWorkers()
   vCat(verbose, indent, "Running on", nCores, "cores.")
@@ -276,9 +286,14 @@ netRep.core <- function(
         pb <- setupParProgressLogs(chunk)
         on.exit(close(pb))
         foreach(i=chunk, .combine=abind3) %:% foreach(ss=oSubsets, .combine=rbind) %do% {
-          # Randomise module assignments for each run.
           on.exit(updateParProgress(pb, i))
-          permuted <- sample(oNodes, size=oSizes[ss])
+          # Randomise module assignments for each run.
+          if (model == "overlap") {
+            permuted <- sample(oNodes, size=oSizes[ss])
+          } else {
+            permuted <- sample(tNodes, size=oSizes[ss])
+          }
+          
           subsetDict[[ss]][c("testData", "testNet")] <- list(
               match(permuted, rownames(datSets[[ti]])),
               match(permuted, rownames(adjSets[[ti]]))
