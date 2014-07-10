@@ -39,14 +39,16 @@ NULL
 #' beginning of each line, 2 for every increment in \code{ind}. 
 #' 
 #' @details
-#'  \code{vCat} is slightly more intelligent than regulat \code{cat} in the way
-#'  it formats the output and breaks it into lines. As a result, \code{fill} is
-#'  set to \code{TRUE} by default. The other notable difference from \code{cat}
-#'  is the way newline objects are handled. For example, the call:
+#'  \code{vCat} is slightly more intelligent than regulat \code{cat} in the way 
+#'  it formats the output and breaks it into lines. As a result, \code{fill} is 
+#'  set to \code{TRUE} by default. Another notable difference from \code{cat} is
+#'  the way newline objects are handled. For example, the call: 
 #'  \code{cat("hello", "world", "\\n", "foo", "bar")} won't wrap the newline 
 #'  character with spaces. This avoids the need to set \code{sep} to \code{""} 
-#'  and embed multiple \code{paste} calls.
-#' 
+#'  and embed multiple \code{paste} calls. Finally, a newline character is 
+#'  appended to the end of the whole message, avoiding the need to manually 
+#'  specify this when calling \code{vCat}.
+#'  
 #' @seealso \code{\link[base]{cat}}
 #' @param verbose logical. If \code{TRUE}, passes the rest of the arguments to
 #'   \code{\link{cat}}
