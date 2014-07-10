@@ -1,69 +1,76 @@
 
 
 
-#' Are my networks preserved and reproducible?
+# Are my networks preserved and reproducible?
+# 
+# @param datSets A list of \code{\link{big.matrix}} the underlying data the 
+#  networks are calculated from.
+# @param adjSets A list of \code{\link{big.matrix}}
+# @param discoverySets A numeric vector
+# @param testSets A numeric vector
+# @param nodeLabelSets A list of vectors, one for each discovery data set, 
+#  assigning each node in the discovery dataset to a subnetwork.
+# @param ignoreSets An optional list of vectors, one for each discovery data 
+#  set, specifying which subnetworks to ignore. 
+# @param nPerm number of permutations to use.
+# @param verbose logical indicating whether to print detailed output about the
+#  function's execution.
+# @param simplify logical. If \code{FALSE} the structure of the returned list
+#  will be regular: that is, a list of lists, where the top level indicates a
+#  summary network.
+
+#' TODO
 #' 
-#' @param datSets A list of \code{\link{big.matrix}} the underlying data the 
-#'  networks are calculated from.
-#' @param adjSets A list of \code{\link{big.matrix}}
-#' @param discoverySets A numeric vector
-#' @param testSets A numeric vector
-#' @param nodeLabelSets A list of vectors, one for each discovery data set, 
-#'  assigning each node in the discovery dataset to a subnetwork.
-#' @param ignoreSets An optional list of vectors, one for each discovery data 
-#'  set, specifying which subnetworks to ignore. 
-#' @param nPerm number of permutations to use.
-#' @param verbose logical indicating whether to print detailed output about the
-#'  function's execution.
-#' @param simplify logical. If \code{FALSE} the structure of the returned list
-#'  will be regular: that is, a list of lists, where the top level indicates a
-#'  summary network.
-#"
-netRep <- function(
-    datSets, adjSets, discoverySets, testSets, nodeLabelSets, ignoreSets,
-    
-    nPerm = 10000, verbose=TRUE, simplify=TRUE
-  ) {
-
-  
-  # Sanity Check Input, and set up data for the five different cases we have to
-  # deal with:
-  #  1. Underlying Data and Networks provided for all.
-  #  2. Only the networks are provided, with no underlying data.
-  #  3. Only the discovery network provided, and underlying data 
-  #     for all others.
-  #  4. Only the discovery network provided, and underlying data provided 
-  #     for all.
-  #  5. Only the underlying data is provided.
-  #
-  # TODO: provide user-friendly error messages
-  if (!missing(datSets) & !missing(adjSets) & 
-        all(!is.null(datSets)) & all(!is.null(adjSets))) {
-    case = 1 # case is used for simplifying output 
-    checkadjSets(adjSets)
-    checkDatSets(datSets)
-    
-    # Check concordance between networks and underlying data
-    stopifnot(length(datSets) == length(adjSets))
-    stopifnot(sort(names(datSets)) == sort(names(adjSets)))
-
-    nNets <- length(adjSets)
-  } else if (!missing(adjSets) & missing(datSets)) {
-    case = 2
-    nNets <- length(adjSets)
-  }
-  
-
-  if (simplify) {
-    # TODO
-    return(res)
-  } else {
-    return(res)
-  }
-  
+#' @export
+netRep <- function() {
+  NULL
 }
 
-#' Core Function for Assessing Network Replication
+# netRep <- function(
+#     datSets, adjSets, discoverySets, testSets, nodeLabelSets, ignoreSets,
+#     
+#     nPerm = 10000, verbose=TRUE, simplify=TRUE
+#   ) {
+# 
+#   
+#   # Sanity Check Input, and set up data for the five different cases we have to
+#   # deal with:
+#   #  1. Underlying Data and Networks provided for all.
+#   #  2. Only the networks are provided, with no underlying data.
+#   #  3. Only the discovery network provided, and underlying data 
+#   #     for all others.
+#   #  4. Only the discovery network provided, and underlying data provided 
+#   #     for all.
+#   #  5. Only the underlying data is provided.
+#   #
+#   # TODO: provide user-friendly error messages
+#   if (!missing(datSets) & !missing(adjSets) & 
+#         all(!is.null(datSets)) & all(!is.null(adjSets))) {
+#     case = 1 # case is used for simplifying output 
+#     checkadjSets(adjSets)
+#     checkDatSets(datSets)
+#     
+#     # Check concordance between networks and underlying data
+#     stopifnot(length(datSets) == length(adjSets))
+#     stopifnot(sort(names(datSets)) == sort(names(adjSets)))
+# 
+#     nNets <- length(adjSets)
+#   } else if (!missing(adjSets) & missing(datSets)) {
+#     case = 2
+#     nNets <- length(adjSets)
+#   }
+#   
+# 
+#   if (simplify) {
+#     # TODO
+#     return(res)
+#   } else {
+#     return(res)
+#   }
+#   
+# }
+
+#' Assessing Network Replication
 #' 
 #' This function provides the main functionality, but requires well formed 
 #' input. See details for instructions on usage. A wrapper function has been 
@@ -137,9 +144,18 @@ netRep.core <- function(
     buildNetFun, ignoreSets=NULL, includeSets=NULL, ignoreDiag=TRUE,
     verbose=TRUE, indent=0
   ) {
+  # The following declarations are for iterators declared inside each foreach 
+  # loop. Declarations are required to satisfy NOTES generated by R CMD check, 
+  # and also serve as useful documentation for the reader of the source code.
+  di <- NULL # discovery dataset index in the "Sets" lists.
+  ti <- NULL # test dataset index in the "Sets" lists.
+  ss <- NULL # an individual network subset label or index.
+  chunk <- NULL # chunk of permutations to run on a core.
+  stat <- NULL # column index for each statistic computed in the null 3D array.
+  
   
   nCores <- getDoParWorkers()
-  vCat(verbose, "Running on", nCores, "cores.", indent)
+  vCat(verbose, indent, "Running on", nCores, "cores.")
   
   nNets <- length(nodeLabelSets)
   
@@ -155,10 +171,8 @@ netRep.core <- function(
   # with each marked as "replication".
   foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
     if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
-      # di: index of the discovery network
-      # ti: index of the test network
-      vCat(verbose, "Calculating preservation of network subsets from dataset", 
-           setNames[di], ", in dataset ", setNames[ti], indent)
+      vCat(verbose, indent, "Calculating preservation of network subsets from",
+           "dataset", setNames[di], ", in dataset ", setNames[ti])
       
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
@@ -181,7 +195,8 @@ netRep.core <- function(
         return(NULL)
       }
       
-      # TODO: Handle cases where we are building the networks on the fly
+      # TODO: 
+      # Set up empty big.matices where we are building the networks on the fly
       if (is.null(adjSets[[di]])) {
         stop("not implemented yet")
       }
@@ -198,7 +213,6 @@ netRep.core <- function(
       
       # Compute information about the network subsets, their size, and what 
       # proportion of each is overlapping the test network.
-      dSizes <- table(nodeLabelSets[[di]])
       dSubsets <- unique(nodeLabelSets[[di]])
       oSubsets <- unique(nodeLabelSets[[di]][oNodes])
       # Only look at subsets of interest, if specified:
@@ -210,9 +224,14 @@ netRep.core <- function(
         dSubsets <- dSubsets %sub_in% includeSets[[di]]
         oSubsets <- oSubsets %sub_in% includeSets[[di]]
       }
-      # most of this code is to deal with subsets who have no nodes in the test
-      # network.
+      # Get the size of each of the subsets of interest in the discovery dataset
+      dSizes <- table(nodeLabelSets[[di]])
+      dSizes <- dSizes[names(dSizes) %in% dSubsets] 
+      # Get the size of the overlap of each of the subsets of interest between
+      # the discovery and test datasets.
       oSizes <- table(nodeLabelSets[[di]][oNodes])
+      oSizes <- oSizes[names(oSizes) %in% oSubsets]
+      # Need to handle the case where a subset of interest has no overlap.
       oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
       names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
       overlap <- oSizes[names(dSizes)]/dSizes
@@ -239,18 +258,18 @@ netRep.core <- function(
       # sub-network
       vCat(verbose, indent+1, "Calculating observed test statistics...")
       
-      observed <- foreach(ss=subsets, .combine=rbind) %do% {
+      observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
         calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], adjSets[[ti]], 
                       subsetDict[[ss]])
       }
-      rownames(observed) <- subsets
-      vCat(verbose,  indent+1, "Done!")
+      rownames(observed) <- oSubsets
+      vCat(verbose, indent+1, "Done!")
       
-      vCat(verbose,  indent+1, "Calculating null distributions with", 
+      vCat(verbose, indent+1, "Calculating null distributions with", 
            nPerm, "permutations...")
       # Calculate the null distribution for each of the statistics
       nulls <- foreach(chunk=isplitIndices(nPerm, chunks=nCores), .combine=abind3) %dopar% {
-        foreach(i=chunk, .combine=abind3) %:% foreach(ss=subsets, .combine=rbind) %do% {
+        foreach(i=chunk, .combine=abind3) %:% foreach(ss=oSubsets, .combine=rbind) %do% {
           # Randomise module assignments for each run.
           permuted <- sample(oNodes, size=oSizes[ss])
           subsetDict[[ss]][c("testData", "testNet")] <- list(
@@ -261,7 +280,7 @@ netRep.core <- function(
                         adjSets[[ti]], subsetDict[[ss]])
         }
       }
-      dimnames(nulls)[[1]] <- subsets
+      dimnames(nulls)[[1]] <- oSubsets
       dimnames(nulls)[[2]] <- colnames(observed)
       dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
       
@@ -269,8 +288,8 @@ netRep.core <- function(
       # distribution
       vCat(verbose, indent+1, "Calculating P-values...")
       p.values <- foreach(stat=seq_len(ncol(observed)), .combine=cbind) %:% 
-        foreach(subset=seq_len(nrow(observed)), .combine=c) %do% {
-          pperm(permuted[subset,stat,], observed[subset,stat], lower.tail=FALSE)
+        foreach(ss=seq_len(nrow(observed)), .combine=c) %do% {
+          pperm(permuted[ss,stat,], observed[ss,stat], lower.tail=FALSE)
       }
       dimnames(p.values) <- dimnames(observed)
       vCat(verbose, indent+1, "Done!")
