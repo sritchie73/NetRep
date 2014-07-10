@@ -112,7 +112,7 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
       })
       lines <- strsplit(paste(formatted, collapse="\n"), "\n")[[1]]
     }
-    str <- paste0(lines, collapse="\n")
+    str <- paste0(lines, "\n", collapse="")
     if (is.null(named)) {
       cat(str)
     } else {
