@@ -151,6 +151,7 @@ netRep.core <- function(
   ti <- NULL # test dataset index in the "Sets" lists.
   ss <- NULL # an individual network subset label or index.
   chunk <- NULL # chunk of permutations to run on a core.
+  i <- NULL # current permutation number.
   stat <- NULL # column index for each statistic computed in the null 3D array.
   
   
@@ -265,12 +266,18 @@ netRep.core <- function(
       rownames(observed) <- oSubsets
       vCat(verbose, indent+1, "Done!")
       
-      vCat(verbose, indent+1, "Calculating null distributions with", 
-           nPerm, "permutations...")
-      # Calculate the null distribution for each of the statistics
+      # Calculate the null distribution for each of the statistics.
+      vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
+           "permutations...")
+      # To log progress, we will write our progress to a file for each chunk,
+      # which can be monitored from the terminal, or another R session 
+      dir.create("run-progress") 
       nulls <- foreach(chunk=isplitIndices(nPerm, chunks=nCores), .combine=abind3) %dopar% {
+        pb <- setupParProgressLogs(chunk)
+        on.exit(close(pb))
         foreach(i=chunk, .combine=abind3) %:% foreach(ss=oSubsets, .combine=rbind) %do% {
           # Randomise module assignments for each run.
+          on.exit(updateParProgress(pb, i))
           permuted <- sample(oNodes, size=oSizes[ss])
           subsetDict[[ss]][c("testData", "testNet")] <- list(
               match(permuted, rownames(datSets[[ti]])),
@@ -283,6 +290,7 @@ netRep.core <- function(
       dimnames(nulls)[[1]] <- oSubsets
       dimnames(nulls)[[2]] <- colnames(observed)
       dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
+      unlink("run-progress", recursive=TRUE) # Remove progress logs
       
       # Calculate the p-value for the observed statistic based on the null 
       # distribution

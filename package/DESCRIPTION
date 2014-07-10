@@ -17,6 +17,7 @@ Imports:
     itertools,
     Rcpp (>= 0.11),
     methods,
+    utils,
     BH
 Suggests:
     testthat
