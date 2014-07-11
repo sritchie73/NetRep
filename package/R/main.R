@@ -203,18 +203,20 @@ netRep.core <- function(
       
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
-      if (is.null(adjSets[[di]])) {
-        if(is.null(adjSets[[ti]])) {
+      if (is.null(adjSets[[ti]])) {
+        if(is.null(adjSets[[di]])) {
           oNodes <- rownames(datSets[[di]]) %sub_in% rownames(datSets[[ti]])
         } else {
-          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(adjSets[[ti]])
-        }
-      } else {
-        if(is.null(adjSets[[ti]])) {
           oNodes <- rownames(adjSets[[di]]) %sub_in% rownames(datSets[[ti]])
+        }
+        tNodes <- rownames(datSets[[ti]])
+      } else {
+        if(is.null(adjSets[[di]])) {
+          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(adjSets[[ti]])
         } else {
           oNodes <- rownames(adjSets[[di]]) %sub_in% rownames(adjSets[[ti]])
         }
+        tNodes <- rownames(adjSets[[ti]])
       }
       if (length(oNodes) == 0) {
         warning("No nodes in dataset", setNames[di],  "are present in dataset ", 
@@ -302,24 +304,30 @@ netRep.core <- function(
       # To log progress, we will write our progress to a file for each chunk,
       # which can be monitored from the terminal, or another R session 
       dir.create("run-progress") 
-      nulls <- foreach(chunk=isplitIndices(nPerm, chunks=nCores), .combine=abind3) %dopar% {
-        pb <- setupParProgressLogs(chunk)
+      nulls <- foreach(
+        chunk=isplitIndices(nPerm, chunks=nCores), 
+        .combine=abind3
+      ) %dopar% {
+        pb <- setupParProgressLogs(chunk, nCores)
         on.exit(close(pb))
-        foreach(i=chunk, .combine=abind3) %:% foreach(ss=oSubsets, .combine=rbind) %do% {
-          on.exit(updateParProgress(pb, i))
-          # Randomise module assignments for each run.
-          if (model == "overlap") {
-            permuted <- sample(oNodes, size=oSizes[ss])
-          } else {
-            permuted <- sample(tNodes, size=oSizes[ss])
-          }
-          
-          subsetDict[[ss]][c("testData", "testNet")] <- list(
-              match(permuted, rownames(datSets[[ti]])),
-              match(permuted, rownames(adjSets[[ti]]))
-            )
-          calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], 
-                        adjSets[[ti]], subsetDict[[ss]])
+        foreach(i=chunk, .combine=abind3) %:% 
+          foreach(ss=oSubsets, .combine=rbind) %do% {
+            on.exit(updateParProgress(pb, i))
+            # Randomise module assignments for each run.
+            if (model == "overlap") {
+              permuted <- sample(oNodes, size=oSizes[ss])
+            } else {
+              permuted <- sample(tNodes, size=oSizes[ss])
+            }
+            # Here we sort, because sequential memory access is faster.  
+            permuted <- as.integer(sort(permuted))
+            
+            subsetDict[[ss]][c("testData", "testNet")] <- list(
+                match(permuted, rownames(datSets[[ti]])),
+                match(permuted, rownames(adjSets[[ti]]))
+              )
+            calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], 
+                          adjSets[[ti]], subsetDict[[ss]], observed)
         }
       }
       dimnames(nulls)[[1]] <- oSubsets
