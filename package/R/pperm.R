@@ -6,9 +6,19 @@
 #'  testing of some statistic.
 #'  
 #' @rdname permutation
-#' @references Phipson, Belinda; and Smyth, Gordon. Permutation p-values should
-#'  never be zero: calculating exact p-values when permutations are randomly
-#'  drawn. Statistical Applications in Genetics and Molecular Biology (9), 2010.
+#' @references 
+#'   \enumerate{
+#'     \item{
+#'       Phipson, B. & Smyth, G. K. \emph{Permutation P-values should never be 
+#'       zero: calculating exact P-values when permutations are randomly drawn.}
+#'       Stat. Appl. Genet. Mol. Biol. \strong{9}, Article39 (2010). 
+#'     }
+#'     \item{
+#'       Knijnenburg, T. A., Wessels, L. F. A., Reinders, M. J. T. & Shmulevich, 
+#'       I. \emph{Fewer permutations, more accurate P-values}. Bioinformatics 
+#'       \strong{25}, i161–8 (2009). 
+#'     }
+#'   }
 #'  
 #' @param permuted vector of values making up the empirical distribution.
 #' @param q vector of quantiles.
@@ -16,25 +26,30 @@
 #' @param n number of observations. If \code{length(n) > 1}, the length is 
 #'  taken to be the number required. 
 #' @param log.p logicial; if TRUE, probabilities p are given as log(p)
-#' @param lower.tail logical; if TRUE (default), probabilities are 
-#'    \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.   
 #'  
 #' @examples
-#' # A contrived example. For large n these results will be the same as qnorm, 
-#' # rnorm, pnorm.
-#' normData <- rnorm(n=10000)
-#' pperm(normData, -1.644854) # should be approximately 0.05
-#' qperm(normData, 0.95) # should be approximately 1.644854
-#' rperm(normData, 100) # should be similar to rnorm(100)
+#'  # A contrived example. For large n these results will be the same as qnorm, 
+#'  # rnorm, pnorm.
+#'  normData <- rnorm(n=10000)
+#'  pperm(normData, -1.644854) # should be approximately 0.05
+#'  qperm(normData, 0.95) # should be approximately 1.644854
+#'  rperm(normData, 100) # should be similar to rnorm(100)
 #'    
 #'  
-#' @aliases pperm, qperm, rperm, permutation, permuted
+#' @aliases permutation permuted
 #' @name permutation
 NULL
 
+#' @param tailApprox logical; if \code{TRUE}, the tail approximation method from
+#'   (\emph{2}) is used to obtain an estimated p-value for network statistics
+#'   which are more extreme than the null distribution obtained through the 
+#'   permutation procedure.
+#' @param lower.tail logical; if TRUE (default), probabilities are 
+#'    \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.   
+#' 
 #' @details P-values are calculated by \code{pperm} using proportions on the 
-#'  provided distribution (\code{permuted}). An observation, \code{q}'s, p-value 
-#'  is the proportion of data from \code{permuted} whom are more extreme than 
+#'  provided distribution (\emph{permuted}). An observation, \code{q}'s, p-value 
+#'  is the proportion of data from \emph{permuted} whom are more extreme than 
 #'  \code{q}. This is accurate strictly when:
 #'  \enumerate{
 #'    \item Each permutation is independent.
@@ -46,7 +61,12 @@ NULL
 #' @usage pperm(permuted, q, lower.tail = TRUE, log.p = FALSE) 
 #' @rdname permutation
 #' @export
-pperm <- function(permuted, q, lower.tail = TRUE, log.p = FALSE) {
+pperm <- function(permuted, q, tailApprox=FALSE, lower.tail = TRUE, 
+                  log.p = FALSE) {
+  if (tailApprox) {
+    # TODO:
+    warning("Tail approximation not yet implemented.")
+  }
   if (lower.tail) {
     more.extreme <- length(permuted[permuted < q])
   } else {
@@ -64,16 +84,18 @@ pperm <- function(permuted, q, lower.tail = TRUE, log.p = FALSE) {
   return(p.value)
 }
 
-#' @details It is rarely possible to give an accurate value for \code{qperm} 
+#' @details 
+#'   It is rarely possible to give an accurate value for \code{qperm} 
 #'  since there is no theoretical distribution to draw from. Instead the closest
 #'  possible observation from the data is returned.
-#'  NOTE: It is possible for the quantile \code{p} to fall exactly halfway 
-#'  between two observations from the \code{permuted} distribution. In this case
-#'  both data points are returned and a warning is thrown.
-#'  It is up to the user to choose which observation to take, the conservative
-#'  approach would be to choose the first observation if \code{p} < 0.5, or the
-#'  second if \code{p} > 0.5. For large \code{permuted} distributions the 
-#'  interpretation will not change much.
+#'  
+#' @note
+#'  It is possible for the quantile \code{p} to fall exactly halfway 
+#'  between two observations from the \emph{permuted} distribution. In this case
+#'  both data points are returned and a warning is generated. It is up to the 
+#'  user to choose which observation to take: the conservative approach is to 
+#'  choose the first observation if \code{p} < 0.5, or the second observation if
+#'  \code{p} > 0.5.
 #' 
 #' @usage qperm(permuted, p, log.p = FALSE) 
 #' @rdname permutation
@@ -110,14 +132,14 @@ rperm <- function(permuted, n) {
   sample(permuted, size=n, replace=TRUE)
 }
 
-#' How many permutations do I need
+#' @description
+#'   If the tail approximation is not being used, how many permutations do I 
+#'   need to be able to detect significance at a given threshold \code{alpha}?
 #' 
-#' How many permutations do you need to run to be able to detect significance at
-#' a given threshold \code{alpha}?
-#' 
-#' @param alpha desired significance threshold
+#' @param alpha desired significance threshold.
 #' @return The minimum number of permutations required to detect any significant
-#'  associations at the provided \code{alpha}
+#'  associations at the provided \code{alpha}.
+#' @rdname permutation
 #' @export
 requiredPower <- function(alpha) {
   1/(alpha) - 1
