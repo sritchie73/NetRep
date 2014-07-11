@@ -32,12 +32,12 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 
   int subsetSize = subsetIndices.size();
 
-  for (int i = 0; i < subsetSize; i++) {
-    kIM[i] = 0;
-    for (int j = 0; j < subsetSize; j++) {
-      value = adj[subsetIndices[i]-1][subsetIndices[j]-1];
+  for (int jj = 0; jj < subsetSize; jj++) {
+    kIM[jj] = 0;
+    for (int ii = 0; ii < subsetSize; ii++) {
+      value = adj[subsetIndices[ii]-1][subsetIndices[jj]-1];
       if (all(!is_na(value))) {
-        kIM[i] += value[0]; // Ignore NAs
+        kIM[jj] += value[0]; // Ignore NAs
       }
     }
   }

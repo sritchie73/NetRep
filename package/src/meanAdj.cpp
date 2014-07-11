@@ -36,9 +36,9 @@ NumericVector MeanAdj(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
   }
   
   // Add to the total sum while handling NAs
-  for (int i = 0; i < subsetSize; i++) {
-    for (int j = 0; j < subsetSize; j++) {
-     value = adj[subsetIndices[i]-1][subsetIndices[j]-1];
+  for (int jj = 0; jj < subsetSize; jj++) {
+    for (int ii = 0; ii < subsetSize; ii++) {
+     value = adj[subsetIndices[ii]-1][subsetIndices[jj]-1];
       if (R_IsNA(value)) {
         NAcount += 1;
       } else { 
