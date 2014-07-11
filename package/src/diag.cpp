@@ -27,8 +27,8 @@ template <typename T>
 NumericVector GetDiag(XPtr<BigMatrix> pMat, MatrixAccessor<T> mat) {
   int diagLength = GetDiagLength(pMat);
   NumericVector resultsVector(diagLength);
-  for (int i = 0; i < diagLength; i++) {
-      resultsVector[i] = mat[i][i];
+  for (int ii = 0; ii < diagLength; ii++) {
+      resultsVector[ii] = mat[ii][ii];
   }
   return resultsVector;
 }
