@@ -5,13 +5,15 @@
 \alias{updateParProgress}
 \title{Log Progress to File for Parallel Processes}
 \usage{
-setupParProgressLogs(chunk)
+setupParProgressLogs(chunk, nChunks)
 
 updateParProgress(pb, i)
 }
 \arguments{
 \item{chunk}{The chunk of indices for the current parallel instance of the
 \code{foreach} loop.}
+
+\item{nChunks}{The total number of chunks.}
 
 \item{pb}{an object of class "\code{txtProgressBar}"}
 

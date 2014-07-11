@@ -155,20 +155,27 @@ abind3 <- function(...) abind(..., along=3)
 #' @name parProgress
 NULL
 
+
 #' @param chunk The chunk of indices for the current parallel instance of the 
 #'   \code{foreach} loop.
+#' @param nChunks The total number of chunks.
 #' @return
 #'   an object of class "\code{txtProgressBar}"
 #' @rdname parProgress
 #' @importFrom utils txtProgressBar
-setupParProgressLogs <- function(chunk) {
+setupParProgressLogs <- function(chunk, nChunks) {
   chunkNum <- ceiling(chunk[1]/length(chunk))
   min <- chunk[1] - 1
   max <- chunk[length(chunk)]
   logFile <- file.path("run-progress", paste0("chunk", chunkNum, ".log"))
   file.create(logFile)
+  # In our monitoring code, we will rotate through each chunk, printing out 
+  # something along the lines of: 
+  #  Chunk N:  |========                 | 30%
+  progWidth = options(width) - nchar("Chunks ") - nchar(nChunks) - 1
   txtProgressBar(
-      min, max, min, char=".", width=79, style=3, file=file(logFile, open="wt")
+      min, max, min, char="=", width=progWidth, style=3, 
+      file=file(logFile, open="wt")
     )
 }
 
