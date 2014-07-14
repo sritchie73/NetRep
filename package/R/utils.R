@@ -187,3 +187,41 @@ updateParProgress <- function(pb, i) {
   setTxtProgressBar(pb, i)
 }
 
+#' Monitor Parallel Progress
+#' 
+#' Monitor the progress of null distribution calculation. 
+#' 
+#' @details
+#'   This must be run in a new R session.
+#' 
+#' @note
+#'  If you see the message \emph{"Waiting for parallel code to start..."} and 
+#'  \code{\link{netRep}} is already calculating the null distributions, your R
+#'  session has been initialized in the wrong directory.
+#'  
+#' @param updateFreq number or seconds to wait between chunk switches.
+#' 
+#' @export
+monitorProgress <- function(updateFreq=2) {
+  if(!file.exists("run-progress")) {
+    vCat(TRUE, 0, "Waiting for parallel code to start...")
+  }
+  files <- list.files("run-progress")
+  if (nChunks == 0) {
+    nChunks <- length(files)
+  }
+  while(TRUE) {
+    if (!file.exists("run-progress")) {
+      break
+    }
+    for (file in files) {
+      num <- gsub("Chunk|.log", "", file)
+      progress <- readLines(file, warn=FALSE)
+      nSpaces <- nchar(nChunks) - nchar(num)
+      cat(sep="", "\rChunk ", rep(" ", nSpaces), num, ": ", prog)
+      Sys.sleep(updateFreq)
+    }
+  }
+  vCat(TRUE, 0, "\nAll Done!")
+  invisible() # Nothing to return
+}
