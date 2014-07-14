@@ -5,7 +5,8 @@
 \usage{
 netRep.core(datSets = NULL, adjSets = NULL, nodeLabelSets, discovery, test,
   nPerm = 10000, buildNetFun, ignoreSets = NULL, includeSets = NULL,
-  ignoreDiag = TRUE, verbose = TRUE, indent = 0)
+  ignoreDiag = TRUE, null = "overlap", tailApprox = TRUE,
+  verbose = TRUE, indent = 0)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
@@ -44,6 +45,16 @@ include.}
 
 \item{ignoreDiag}{logical; ignore the diagonal of the adjacency matrix when
 assessing network subset preservation. Defaults to \code{TRUE}.}
+
+\item{null}{the type of null model, either "overlap" or "all". If "overlap"
+(default) only the nodes present in both the discovery and test networks
+will be used to draw the null distribution for each statistic. If "all",
+all nodes in the test network will be used to draw the null distribution.}
+
+\item{tailApprox}{logical; if \code{TRUE}, the tail approximation method from
+(\emph{2}) is used to obtain an estimated p-value for network statistics
+which are more extreme than the null distribution obtained through the
+permutation procedure.}
 
 \item{verbose}{logical; print output while the function is running
 (\code{TRUE} by default).}
@@ -84,5 +95,19 @@ Any function argument ending in \code{"Sets"} expects a list, where each
  \code{adjSets} has been provided for each dataset of interest.
 
  \code{ignoreSets} and \code{includeSets} should not overlap.
+}
+\references{
+\enumerate{
+    \item{
+      Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
+      network module preserved and reproducible?} PLoS Comput. Biol.
+      \strong{7}, e1001057 (2011).
+    }
+    \item{
+      Knijnenburg, T. A., Wessels, L. F. A., Reinders, M. J. T. & Shmulevich,
+      I. \emph{Fewer permutations, more accurate P-values}. Bioinformatics
+      \strong{25}, i161–8 (2009).
+    }
+  }
 }
 
