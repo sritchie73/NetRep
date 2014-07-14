@@ -140,88 +140,73 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
 #' @importFrom abind abind
 abind3 <- function(...) abind(..., along=3)
 
-#' Log Progress to File for Parallel Processes
+#' Iterator with master worker
 #' 
-#' Update progress of a parallel \code{\link[foreach]{foreach}} process to
-#' files.
+#' Create an iterator of chunks of indices from 1 to \code{n}, along with an 
+#' initial element that designates the master worker. You can specify either the
+#' number of pieces, using the \code{chunks} argument, or the maximum size of
+#' the pieces, using the \code{chunkSize} argument.
 #' 
 #' @details
-#'   When running code in parallel using \code{foreach}, new R
-#'   instances will be spawned, one for each core as setup by the parallel
-#'   backend. As a result no output will be sent back to the main R process
-#'   until the \code{foreach} loop has finished running.
+#'  If \code{verbose} is \code{FALSE}, the returned iterator is exactly the 
+#'  same as if calling \code{\link[itertools]{isplitIndices}}. If \code{TRUE},
+#'  then the iterator is prepended with a -1. This allows for a 
+#'  \code{\link[foreach]{foreach}} loop to easily operate on chunks of tasks, 
+#'  while also designating one worker thread as the master of reporting 
+#'  progress (see \code{\link[=parProgress]{monitorProgress}}).
 #' 
-#' @seealso \code{\link[utils]{txtProgressBar}}
-#' @name parProgress
-NULL
-
-
-#' @param chunk The chunk of indices for the current parallel instance of the 
-#'   \code{foreach} loop.
-#' @param nChunks The total number of chunks.
+#' @seealso 
+#'  \code{\link[itertools]{isplitIndices}} \code{\link[itertools]{idiv}}
+#'  \code{\link[=parProgress]{monitorProgress}}
+#' @param verbose logical. Controls the type of iterator returned, see details.
+#' @param n Maximum index to generate.
+#' @param ... Passed as the second and subsequent arguments to the
+#'  \code{\link[itertools]{idiv}} function.  Currently, \code{idiv} accepts 
+#'  either a value for \code{chunks} or \code{chunkSize}.
 #' @return
-#'   an object of class "\code{txtProgressBar}"
-#' @rdname parProgress
-#' @importFrom utils txtProgressBar
-setupParProgressLogs <- function(chunk, nChunks) {
-  chunkNum <- ceiling(chunk[1]/length(chunk))
-  min <- chunk[1] - 1
-  max <- chunk[length(chunk)]
-  logFile <- file.path("run-progress", paste0("chunk", chunkNum, ".log"))
-  file.create(logFile)
-  # In our monitoring code, we will rotate through each chunk, printing out 
-  # something along the lines of: 
-  #  Chunk N:  |========                 | 30%
-  progWidth = options(width) - nchar("Chunks ") - nchar(nChunks) - 1
-  txtProgressBar(
-      min, max, min, char="=", width=progWidth, style=3, 
-      file=file(logFile, open="wt")
-    )
+#'  An iterator that returns -1 (for the master worker), and vectors of indices 
+#'  from 1 to \code{n} for the other worker threads.
+#' @importFrom itertools idiv
+#' @importFrom itertools isplitIndices
+ichunkTasks <- function(verbose, n, ...) {
+  if (verbose) {
+    it <- idiv(n, ...)
+    i <- 1L
+    first = TRUE
+    nextEl <- function() {
+      if (first) {
+        first <<- FALSE
+        -1L
+      } else {
+        m <- as.integer(nextElem(it))
+        j <- i
+        i <<- i + m
+        seq(j, length=m)
+      }
+    }
+    object <- list(nextElem = nextEl)
+    class(object) <- c("abstractiter", "iter")
+    object
+  } else {
+    isplitIndices(n, ...)
+  }
 }
 
-#' @param pb an object of class "\code{txtProgressBar}"
-#' @param i new value for the progress bar.
-#' @importFrom utils setTxtProgressBar
-#' @rdname parProgress
-updateParProgress <- function(pb, i) {
-  setTxtProgressBar(pb, i)
-}
-
-#' Monitor Parallel Progress
+#' Maybe do parallel 
 #' 
-#' Monitor the progress of null distribution calculation. 
+#' Suppresses warnings from \code{\link[foreach]{\%dopar\%}} when no parallel
+#' backend is registered, using \code{\link[foreach]{\%do\%}} instead.
 #' 
-#' @details
-#'   This must be run in a new R session.
-#' 
-#' @note
-#'  If you see the message \emph{"Waiting for parallel code to start..."} and 
-#'  \code{\link{netRep}} is already calculating the null distributions, your R
-#'  session has been initialized in the wrong directory.
-#'  
-#' @param updateFreq number or seconds to wait between chunk switches.
-#' 
-#' @export
-monitorProgress <- function(updateFreq=2) {
-  if(!file.exists("run-progress")) {
-    vCat(TRUE, 0, "Waiting for parallel code to start...")
+#' @seealso \code{\link{foreach}}
+#' @param obj \code{foreach} object used to control the evaluation of \code{ex}.
+#' @param ex the R expression to evaluate.
+#' @import foreach
+#' @name foreach
+`%maybe_do_par%` <- function(obj, ex) {
+  if (getDoParWorkers() == 1) {
+    e <- foreach:::getDoSeq()
+  } else {
+    e <- foreach:::getDoPar()
   }
-  files <- list.files("run-progress")
-  if (nChunks == 0) {
-    nChunks <- length(files)
-  }
-  while(TRUE) {
-    if (!file.exists("run-progress")) {
-      break
-    }
-    for (file in files) {
-      num <- gsub("Chunk|.log", "", file)
-      progress <- readLines(file, warn=FALSE)
-      nSpaces <- nchar(nChunks) - nchar(num)
-      cat(sep="", "\rChunk ", rep(" ", nSpaces), num, ": ", prog)
-      Sys.sleep(updateFreq)
-    }
-  }
-  vCat(TRUE, 0, "\nAll Done!")
-  invisible() # Nothing to return
+  e$fun(obj, substitute(ex), parent.frame(), e$data)
 }
