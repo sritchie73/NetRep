@@ -1,4 +1,3 @@
-// [[Rcpp::depends(BH)]]
 #include <Rcpp.h>
 using namespace Rcpp;
 
