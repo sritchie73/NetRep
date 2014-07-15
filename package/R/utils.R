@@ -166,6 +166,7 @@ abind3 <- function(...) abind(..., along=3)
 #'  An iterator that returns -1 (for the master worker), and vectors of indices 
 #'  from 1 to \code{n} for the other worker threads.
 #' @importFrom iterators idiv
+#' @importFrom iterators nextElem
 #' @importFrom itertools isplitIndices
 ichunkTasks <- function(verbose, n, chunks) {
   if (verbose & (chunks > 1)) {
