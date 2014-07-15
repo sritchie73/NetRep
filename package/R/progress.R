@@ -1,4 +1,4 @@
-#' Log Progress to File for Parallel Processes
+#' Monitor Parallel Process Progress
 #' 
 #' Update progress of a parallel \code{\link[foreach]{foreach}} process to
 #' files.
@@ -18,7 +18,7 @@ NULL
 #' @param chunk The chunk of indices for the current parallel instance of the 
 #'   \code{foreach} loop.
 #' @return
-#'   an object of class "\code{txtProgressBar}"
+#'   \code{setupParProgressLogs}: an object of class "\code{txtProgressBar}"
 #' @rdname parProgress
 #' @importFrom utils txtProgressBar
 setupParProgressLogs <- function(chunk, nChunks, ind) {
@@ -49,7 +49,8 @@ updateParProgress <- function(pb, i) {
   setTxtProgressBar(pb, i)
 }
 
-#' @description Monitor the progress of parallel workers.
+#' @description 
+#'  \code{monitorProgress}: Monitor the progress of parallel workers.
 #' @rdname parProgress
 monitorProgress <- function(nChunks, ind) {
   init <- FALSE
@@ -77,7 +78,8 @@ monitorProgress <- function(nChunks, ind) {
   invisible() # Nothing to return
 }
 
-#' @description Report the progress of a sequential loop.
+#' @description 
+#'  \code{reportProgress}: Report the progress of a sequential loop.
 #' @rdname parProgress
 reportProgress <- function(ind) {
   progress <- readLines(

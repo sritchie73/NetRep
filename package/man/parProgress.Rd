@@ -5,7 +5,7 @@
 \alias{reportProgress}
 \alias{setupParProgressLogs}
 \alias{updateParProgress}
-\title{Log Progress to File for Parallel Processes}
+\title{Monitor Parallel Process Progress}
 \usage{
 setupParProgressLogs(chunk, nChunks, ind)
 
@@ -29,15 +29,15 @@ indentation level corresponds to two spaces.}
 \item{i}{new value for the progress bar.}
 }
 \value{
-an object of class "\code{txtProgressBar}"
+\code{setupParProgressLogs}: an object of class "\code{txtProgressBar}"
 }
 \description{
 Update progress of a parallel \code{\link[foreach]{foreach}} process to
 files.
 
-Monitor the progress of parallel workers.
+\code{monitorProgress}: Monitor the progress of parallel workers.
 
-Report the progress of a sequential loop.
+\code{reportProgress}: Report the progress of a sequential loop.
 }
 \details{
 When running code in parallel using \code{foreach}, new R
