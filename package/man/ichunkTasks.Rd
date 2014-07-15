@@ -3,16 +3,15 @@
 \alias{ichunkTasks}
 \title{Iterator with master worker}
 \usage{
-ichunkTasks(verbose, n, ...)
+ichunkTasks(verbose, n, chunks)
 }
 \arguments{
 \item{verbose}{logical. Controls the type of iterator returned, see details.}
 
 \item{n}{Maximum index to generate.}
 
-\item{...}{Passed as the second and subsequent arguments to the
-\code{\link[itertools]{idiv}} function.  Currently, \code{idiv} accepts
-either a value for \code{chunks} or \code{chunkSize}.}
+\item{chunks}{the number of pieces that \code{n} should be divided into. This
+is useful when you know the number of pieces that you want.}
 }
 \value{
 An iterator that returns -1 (for the master worker), and vectors of indices
@@ -33,7 +32,7 @@ If \code{verbose} is \code{FALSE}, the returned iterator is exactly the
  progress (see \code{\link[=parProgress]{monitorProgress}}).
 }
 \seealso{
-\code{\link[itertools]{isplitIndices}} \code{\link[itertools]{idiv}}
+\code{\link[itertools]{isplitIndices}} \code{\link[iterators]{idiv}}
  \code{\link[=parProgress]{monitorProgress}}
 }
 

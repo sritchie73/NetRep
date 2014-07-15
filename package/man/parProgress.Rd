@@ -2,6 +2,7 @@
 \name{parProgress}
 \alias{monitorProgress}
 \alias{parProgress}
+\alias{reportProgress}
 \alias{setupParProgressLogs}
 \alias{updateParProgress}
 \title{Log Progress to File for Parallel Processes}
@@ -11,6 +12,8 @@ setupParProgressLogs(chunk, nChunks, ind)
 updateParProgress(pb, i)
 
 monitorProgress(nChunks, ind)
+
+reportProgress(ind)
 }
 \arguments{
 \item{ind}{an integer corresponding to the level of indentation. Each
@@ -31,6 +34,10 @@ an object of class "\code{txtProgressBar}"
 \description{
 Update progress of a parallel \code{\link[foreach]{foreach}} process to
 files.
+
+Monitor the progress of parallel workers.
+
+Report the progress of a sequential loop.
 }
 \details{
 When running code in parallel using \code{foreach}, new R

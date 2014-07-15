@@ -95,6 +95,12 @@ Any function argument ending in \code{"Sets"} expects a list, where each
  \code{adjSets} has been provided for each dataset of interest.
 
  \code{ignoreSets} and \code{includeSets} should not overlap.
+
+ If \code{verbose} is \code{TRUE} and a parallel backend has been registered,
+ then one of the cores will be reserved for reporting the function's progress.
+ You may register more "cores" than are physically have on the machine, since
+ this master core has relatively low overhead. Note that if only 2 cores have
+ been registered, this is the same as running sequentially, since
 }
 \references{
 \enumerate{

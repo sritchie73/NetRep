@@ -101,6 +101,13 @@ netRep <- function() {
 #'  
 #'  \code{ignoreSets} and \code{includeSets} should not overlap.
 #' 
+#'  If \code{verbose} is \code{TRUE} and a parallel backend has been registered,
+#'  then one of the cores will be reserved for reporting the function's progress.
+#'  You may register more "cores" than are physically have on the machine, since
+#'  this master core has relatively low overhead. Note that if only 2 cores have
+#'  been registered, this is the same as running sequentially, since
+#'  
+#'  
 #' @references
 #'   \enumerate{
 #'     \item{
@@ -181,8 +188,17 @@ netRep.core <- function(
   }
   model <- pmatch(null, nullModels)
   
+  # Determine set up of worker nodes (if applicable)
   nCores <- getDoParWorkers()
-  vCat(verbose, indent, "Running on", nCores, "cores.")
+  if (verbose & nWorkers > 1) {
+    vCat(verbose, indent, "Verbose output is TRUE; reserving one core as the", 
+         "master, to report the progress of the worker cores who do the bulk",
+         "of the calculation.")
+    nWorkers <- nWorkers - 1
+  } else {
+    nWorkers <- nCores
+  }
+  vCat(verbose, indent, "Running with", nWorkers, "worker cores.")
   
   nNets <- length(nodeLabelSets)
   
@@ -194,8 +210,8 @@ netRep.core <- function(
     setNames <- names(nodeLabelSets)
   }
   
-  # Iterate pairwise over data-sets, comparing those marked "discovery"
-  # with each marked as "replication".
+  # Iterate pairwise over datasets, comparing those marked "discovery"
+  # with each marked as "test".
   foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
     if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
       vCat(verbose, indent, "Calculating preservation of network subsets from",
@@ -301,33 +317,48 @@ netRep.core <- function(
       # Calculate the null distribution for each of the statistics.
       vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
            "permutations...")
-      # To log progress, we will write our progress to a file for each chunk,
-      # which can be monitored from the terminal, or another R session 
-      dir.create("run-progress") 
+      if(verbose) {
+        # To log progress, we will write our progress to a file for each chunk,
+        # which can be monitored from the terminal, or another R session
+        dir.create("run-progress") 
+      }
       nulls <- foreach(
-        chunk=isplitIndices(nPerm, chunks=nCores), 
+        chunk=ichunkTasks(verbose, nPerm, chunks=nWorkers),
         .combine=abind3
-      ) %dopar% {
-        pb <- setupParProgressLogs(chunk, nCores)
-        on.exit(close(pb))
-        foreach(i=chunk, .combine=abind3) %:% 
-          foreach(ss=oSubsets, .combine=rbind) %do% {
-            on.exit(updateParProgress(pb, i))
-            # Randomise module assignments for each run.
-            if (model == "overlap") {
-              permuted <- sample(oNodes, size=oSizes[ss])
-            } else {
-              permuted <- sample(tNodes, size=oSizes[ss])
-            }
-            # Here we sort, because sequential memory access is faster.  
-            permuted <- as.integer(sort(permuted))
-            
-            subsetDict[[ss]][c("testData", "testNet")] <- list(
+      ) %maybe_do_par% {
+        if (verbose & length(chunk) == 1 & chunk == -1) {
+          monitorProgress(nWorkers, indent)
+          NULL
+        } else {
+          if (verbose) {
+            pb <- setupParProgressLogs(chunk, nWorkers, indent+2)
+            on.exit(close(pb))
+          } 
+          foreach(i=chunk, .combine=abind3) %:% 
+            foreach(ss=oSubsets, .combine=rbind) %do% {
+              # Update the progress on exit
+              on.exit({
+                updateParProgress(pb, i);
+                if (nCores == 1) {
+                  reportProgress(indent+2)
+                }
+              })
+              # Randomise module assignments for each run.
+              if (model == "overlap") {
+                permuted <- sample(oNodes, size=oSizes[ss])
+              } else {
+                permuted <- sample(tNodes, size=oSizes[ss])
+              }
+              # Here we sort, because sequential memory access is faster.  
+              permuted <- as.integer(sort(permuted))
+              
+              subsetDict[[ss]][c("testData", "testNet")] <- list(
                 match(permuted, rownames(datSets[[ti]])),
                 match(permuted, rownames(adjSets[[ti]]))
               )
-            calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], 
-                          adjSets[[ti]], subsetDict[[ss]], observed)
+              calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], 
+                            adjSets[[ti]], subsetDict[[ss]])
+          }
         }
       }
       dimnames(nulls)[[1]] <- oSubsets

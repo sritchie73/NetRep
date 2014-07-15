@@ -14,6 +14,7 @@ Depends:
 Imports:
     foreach,
     abind,
+    iterators,
     itertools,
     Rcpp (>= 0.11),
     methods,

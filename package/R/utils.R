@@ -156,21 +156,20 @@ abind3 <- function(...) abind(..., along=3)
 #'  progress (see \code{\link[=parProgress]{monitorProgress}}).
 #' 
 #' @seealso 
-#'  \code{\link[itertools]{isplitIndices}} \code{\link[itertools]{idiv}}
+#'  \code{\link[itertools]{isplitIndices}} \code{\link[iterators]{idiv}}
 #'  \code{\link[=parProgress]{monitorProgress}}
 #' @param verbose logical. Controls the type of iterator returned, see details.
 #' @param n Maximum index to generate.
-#' @param ... Passed as the second and subsequent arguments to the
-#'  \code{\link[itertools]{idiv}} function.  Currently, \code{idiv} accepts 
-#'  either a value for \code{chunks} or \code{chunkSize}.
+#' @param chunks the number of pieces that \code{n} should be divided into. This
+#'  is useful when you know the number of pieces that you want.
 #' @return
 #'  An iterator that returns -1 (for the master worker), and vectors of indices 
 #'  from 1 to \code{n} for the other worker threads.
-#' @importFrom itertools idiv
+#' @importFrom iterators idiv
 #' @importFrom itertools isplitIndices
-ichunkTasks <- function(verbose, n, ...) {
-  if (verbose) {
-    it <- idiv(n, ...)
+ichunkTasks <- function(verbose, n, chunks) {
+  if (verbose & (chunks > 1)) {
+    it <- idiv(n, chunks=chunks)
     i <- 1L
     first = TRUE
     nextEl <- function() {
@@ -188,7 +187,7 @@ ichunkTasks <- function(verbose, n, ...) {
     class(object) <- c("abstractiter", "iter")
     object
   } else {
-    isplitIndices(n, ...)
+    isplitIndices(n, chunks=chunks)
   }
 }
 
