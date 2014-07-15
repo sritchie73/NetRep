@@ -112,7 +112,7 @@ Any function argument ending in \code{"Sets"} expects a list, where each
     \item{
       Knijnenburg, T. A., Wessels, L. F. A., Reinders, M. J. T. & Shmulevich,
       I. \emph{Fewer permutations, more accurate P-values}. Bioinformatics
-      \strong{25}, i161–8 (2009).
+      \strong{25}, i161-8 (2009).
     }
   }
 }
