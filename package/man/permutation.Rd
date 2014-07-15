@@ -8,7 +8,7 @@
 \alias{rperm}
 \title{Distribution from Permutations}
 \usage{
-pperm(permuted, q, lower.tail = TRUE, log.p = FALSE)
+pperm(permuted, q, tailApprox = FALSE, lower.tail = TRUE, log.p = FALSE)
 
 qperm(permuted, p, log.p = FALSE)
 
@@ -28,10 +28,8 @@ taken to be the number required.}
 
 \item{log.p}{logicial; if TRUE, probabilities p are given as log(p)}
 
-\item{tailApprox}{logical; if \code{TRUE}, the tail approximation method from
-(\emph{2}) is used to obtain an estimated p-value for network statistics
-which are more extreme than the null distribution obtained through the
-permutation procedure.}
+\item{tailApprox}{logical; if \code{TRUE}, use the tail approximation
+algorithm to estimate extreme p-values (see details).}
 
 \item{lower.tail}{logical; if TRUE (default), probabilities are
    \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.}
@@ -48,24 +46,28 @@ Distribution function, quantile function, and random generation
  argument. These distributions are typically drawn through permutation
  testing of some statistic.
 
-If the tail approximation is not being used, how many permutations do I
-  need to be able to detect significance at a given threshold \code{alpha}?
+\code{requiredPower}: If the tail approximation is not being used, how many
+ permutations do I need to be able to detect significance at a given
+ threshold \code{alpha}?
 }
 \details{
-P-values are calculated by \code{pperm} using proportions on the
- provided distribution (\emph{permuted}). An observation, \code{q}'s, p-value
- is the proportion of data from \emph{permuted} whom are more extreme than
- \code{q}. This is accurate strictly when:
+P-values are calculated by \code{pperm} using proportions on the provided
+ distribution (\emph{permuted}). An observation, \code{q}'s, p-value
+ is the proportion of \emph{permuted} whom are more extreme than \code{q}.
+ This is accurate strictly when:
  \enumerate{
    \item Each permutation is independent.
    \item Permutations are sampled without replacement.
  }
- For our purposes this calculation is a good enough approximation, but when
- more accuracy is required see the package \code{rperm}.
+ While these assumptions may not necessarily always be true, for our purposes
+ they are a reasonable approximation. If \code{q} is more extreme than the
+ \code{permuted}, the tail approximation method from \emph{(2)} can be used
+ to estimate the p-value of \code{q} by setting \code{tailApprox} to
+ \code{TRUE}.
 
-It is rarely possible to give an accurate value for \code{qperm}
- since there is no theoretical distribution to draw from. Instead the closest
- possible observation from the data is returned.
+ It is rarely possible to give an accurate value for \code{qperm} since there
+ is no theoretical distribution to draw from. Instead the closest possible
+ observation from the data is returned.
 }
 \note{
 It is possible for the quantile \code{p} to fall exactly halfway
@@ -93,7 +95,7 @@ It is possible for the quantile \code{p} to fall exactly halfway
     \item{
       Knijnenburg, T. A., Wessels, L. F. A., Reinders, M. J. T. & Shmulevich,
       I. \emph{Fewer permutations, more accurate P-values}. Bioinformatics
-      \strong{25}, i161–8 (2009).
+      \strong{25}, i161-8 (2009).
     }
   }
 }
