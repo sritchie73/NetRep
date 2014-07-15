@@ -285,42 +285,39 @@ netRep.core <- function(
       names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
       overlap <- oSizes[names(dSizes)]/dSizes
       
-      # Create dictionary of network subsets labels to individual nodes. While
-      # we only care about nodes in both networks, we need to know where those
-      # nodes are located in both networks/datasets.
-      subsetDict <- lapply(oSubsets, function(ss) {
-        # get all overlapping nodes in this subset
-        ons <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-        # Now get a mapping for these nodes to their respective indices in each
-        # dataset/network
-        datTypeDict <- list(
-            discData = match(ons, rownames(datSets[[di]])),
-            discNet = match(ons, rownames(adjSets[[di]])),
-            testData = match(ons, rownames(datSets[[ti]])),
-            testNet = match(ons, rownames(adjSets[[ti]]))
-          )
-        datTypeDict <- lapply(datTypeDict, `names<-`, ons)
-      })
-      names(subsetDict) <- oSubsets
-      
-      # Calculate observed network statistics across datasets for each 
-      # sub-network
       vCat(verbose, indent+1, "Calculating observed test statistics...")
-      
+      # Obtain the topological properties for each network subset in the
+      # discovery dataset, we only want to calculate these once!
+      discProps <- foreach(ss=oSubsets, .combine=rbind) %do% {
+        subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+        # get the indices in the underlying data and adjacency matrices for 
+        # the subset nodes. Sorted, because sequential memory access is faster.
+        datInd <- sort(match(subsetNodes, rownames(datSets[[di]])))
+        adjInd <- sort(match(subsetNodes, rownames(adjSets[[di]])))
+        subsetProps(datSets[[di]], datInd, adjSets[[di]], adjInd)
+      }
+      names(discProps) <- oSubsets
+      # Now calculate the observed value for each network statistic
       observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
-        calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], adjSets[[ti]], 
-                      subsetDict[[ss]])
+        subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+        datInd <- sort(match(subsetNodes, rownames(datSets[[ti]])))
+        adjInd <- sort(match(subsetNodes, rownames(adjSets[[ti]])))
+        testProps <- subsetProps(datSets[[ti]], datInd, adjSets[[ti]], adjInd)
+        subsetTestStats(discProps[[ss]], testProps)
       }
       rownames(observed) <- oSubsets
       vCat(verbose, indent+1, "Done!")
+      
+      # We no longer need the subset's indices in the test network, so lets not
+      # unnecessarily pass them around
+      subsetDict <- lapply(subsetDict, function(x) x[c("discData", "discAdj")])
       
       # Calculate the null distribution for each of the statistics.
       vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
            "permutations...")
       if(verbose) {
-        # To log progress, we will write our progress to a file for each chunk,
-        # which can be monitored from the terminal, or another R session
-        dir.create("run-progress") 
+        # To log progress, we will write our progress to a file for each chunk
+        dir.create("run-progress")
       }
       nulls <- foreach(
         chunk=ichunkTasks(verbose, nPerm, chunks=nWorkers),
@@ -336,28 +333,27 @@ netRep.core <- function(
           } 
           foreach(i=chunk, .combine=abind3) %:% 
             foreach(ss=oSubsets, .combine=rbind) %do% {
-              # Update the progress on exit
+              # Update the progress at the end of the loop.
               on.exit({
                 updateParProgress(pb, i);
                 if (nCores == 1) {
                   reportProgress(indent+2)
                 }
               })
-              # Randomise module assignments for each run.
+              # Select a random subset of nodes of the same size as the subset 
+              # ss, depending on our null model.
               if (model == "overlap") {
-                permuted <- sample(oNodes, size=oSizes[ss])
+                permNames <- sample(oNodes, size=oSizes[ss])
               } else {
-                permuted <- sample(tNodes, size=oSizes[ss])
+                permNames <- sample(tNodes, size=oSizes[ss])
               }
-              # Here we sort, because sequential memory access is faster.  
-              permuted <- as.integer(sort(permuted))
+              permDatInd <- sort(match(permNames, rownames(datSets[[ti]])))
+              permAdjInd <- sort(match(permNames, rownames(adjSets[[ti]])))
               
-              subsetDict[[ss]][c("testData", "testNet")] <- list(
-                match(permuted, rownames(datSets[[ti]])),
-                match(permuted, rownames(adjSets[[ti]]))
+              testProps <- subsetProps(
+                datSets[[ti]], permDatInd, adjSets[[ti]], permAdjInd
               )
-              calcReplStats(datSets[[di]], adjSets[[di]], datSets[[ti]], 
-                            adjSets[[ti]], subsetDict[[ss]])
+              subsetTestStats(discProps[[ss]], testProps)
           }
         }
       }
