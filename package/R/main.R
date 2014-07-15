@@ -190,11 +190,11 @@ netRep.core <- function(
   
   # Determine set up of worker nodes (if applicable)
   nCores <- getDoParWorkers()
-  if (verbose & nWorkers > 1) {
+  if (verbose & nCores > 1) {
     vCat(verbose, indent, "Verbose output is TRUE; reserving one core as the", 
          "master, to report the progress of the worker cores who do the bulk",
          "of the calculation.")
-    nWorkers <- nWorkers - 1
+    nWorkers <- nCores - 1
   } else {
     nWorkers <- nCores
   }
