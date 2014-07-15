@@ -340,7 +340,7 @@ netRep.core <- function(
       vCat(verbose, indent+1, "Calculating P-values...")
       p.values <- foreach(stat=seq_len(ncol(observed)), .combine=cbind) %:% 
         foreach(ss=seq_len(nrow(observed)), .combine=c) %do% {
-          pperm(permuted[ss,stat,], observed[ss,stat], tailApprox,
+          pperm(nulls[ss,stat,], observed[ss,stat], tailApprox, 
                 lower.tail=FALSE)
       }
       dimnames(p.values) <- dimnames(observed)
