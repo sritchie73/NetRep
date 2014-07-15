@@ -33,10 +33,10 @@ setupParProgressLogs <- function(chunk, nChunks, ind) {
   #  Chunk N: |========                 | 30%
   # The 2 corresponds to ": "
   if (nChunks > 1) {
-    progWidth = options(width) - ind*2 - nchar("Chunks ") - nchar(nChunks) - 2
+    progWidth = options("width") - ind*2 - nchar("Chunks ") - nchar(nChunks) - 2
   } else {
     # If only one worker/core, no need to prepend with "Chunk N: "
-    progWidth = options(width) - ind*2 
+    progWidth = options("width") - ind*2 
   }
   txtProgressBar(min, max, min, width=progWidth, style=3)
 }
@@ -85,5 +85,5 @@ reportProgress <- function(ind) {
   progress <- readLines(
       file.path("run-progress", file="Chunk1.log"), warn=FALSE
     )
-  cat(sep="", "\r", rep("  ", ind), prog, file=stdout())
+  cat(sep="", "\r", rep("  ", ind), progress, file=stdout())
 }
