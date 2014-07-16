@@ -294,7 +294,7 @@ netRep.core <- function(
         # the subset nodes. Sorted, because sequential memory access is faster.
         datInd <- sort(match(subsetNodes, rownames(datSets[[di]])))
         adjInd <- sort(match(subsetNodes, rownames(adjSets[[di]])))
-        subsetProps(datSets[[di]], datInd, adjSets[[di]], adjInd)
+        subsetProps(adjSets[[di]], adjInd, datSets[[di]], datInd)
       }
       names(discProps) <- oSubsets
       # Now calculate the observed value for each network statistic
@@ -351,7 +351,7 @@ netRep.core <- function(
               permAdjInd <- sort(match(permNames, rownames(adjSets[[ti]])))
               
               testProps <- subsetProps(
-                datSets[[ti]], permDatInd, adjSets[[ti]], permAdjInd
+                adjSets[[ti]], permAdjInd, datSets[[ti]], permDatInd
               )
               subsetTestStats(discProps[[ss]], testProps)
           }
