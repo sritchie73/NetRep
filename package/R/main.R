@@ -217,6 +217,7 @@ netRep.core <- function(
       vCat(verbose, indent, sep="", 
            "Calculating preservation of network subsets from dataset ",
            setNames[di], ", in dataset ", setNames[ti], ".")
+      on.exit(vCat(verbose, indent, "Done!"))
       
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
