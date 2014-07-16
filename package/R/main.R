@@ -309,10 +309,6 @@ netRep.core <- function(
       rownames(observed) <- oSubsets
       vCat(verbose, indent+1, "Done!")
       
-      # We no longer need the subset's indices in the test network, so lets not
-      # unnecessarily pass them around
-      subsetDict <- lapply(subsetDict, function(x) x[c("discData", "discAdj")])
-      
       # Calculate the null distribution for each of the statistics.
       vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
            "permutations...")
