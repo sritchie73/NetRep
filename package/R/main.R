@@ -215,7 +215,7 @@ netRep.core <- function(
   foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
     if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
       vCat(verbose, indent, sep="", 
-           "Calculating preservation of network subsets from dataset",
+           "Calculating preservation of network subsets from dataset ",
            setNames[di], ", in dataset ", setNames[ti], ".")
       
       # Get a vector of nodes which are present in both datasets. Depends on 
