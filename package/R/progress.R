@@ -18,28 +18,34 @@ NULL
 #' @param chunk The chunk of indices for the current parallel instance of the 
 #'   \code{foreach} loop.
 #' @return
-#'   \code{setupParProgressLogs}: an object of class "\code{txtProgressBar}"
+#'   \code{setupParProgressLogs}: a list with an object of class 
+#'   "\code{txtProgressBar}", along with the connection to the logfile (this is
+#'   returned so it can be closed properly later.)
 #' @rdname parProgress
 #' @importFrom utils txtProgressBar
 setupParProgressLogs <- function(chunk, nChunks, ind) {
   chunkNum <- ceiling(chunk[1]/length(chunk))
-  min <- chunk[1] - 1
-  max <- chunk[length(chunk)]
+  
+  # Setup log file
   filename <- file.path("run-progress", paste0("chunk", chunkNum, ".log"))
   file.create(filename)
   logfile <- file(filename, open="wt")
-  # In our monitoring code, we will rotate through each chunk, printing out 
-  # something along the lines of: 
-  #  Chunk N: |========                 | 30%
-  # The 2 corresponds to ": "
+  
+  # Define progress bar boundaries
+  min <- chunk[1] - 1
+  max <- chunk[length(chunk)]
+  
+  # Set width of the bar based on the predicted level of indentation etc.
   width <- options("width")[[1]]
   if (nChunks > 1) {
-    progWidth = width - ind*2 - nchar("Chunks ") - nchar(nChunks) - 2
+    # Multiple worker cores, prepend with "Worker N:"
+    progWidth = width - ind*2 - nchar("Worker ") - nchar(nChunks) - 1
   } else {
-    # If only one worker/core, no need to prepend with "Chunk N: "
+    # If only one worker core, no need to prepend with "Worker N:"
     progWidth = width - ind*2 
   }
-  txtProgressBar(min, max, min, width=progWidth, style=3)
+  pb <- txtProgressBar(min, max, min, width=progWidth, style=3, file=logfile)
+  list(pb, logfile)
 }
 
 #' @param pb an object of class "\code{txtProgressBar}"
@@ -53,7 +59,9 @@ updateParProgress <- function(pb, i) {
 #' @description 
 #'  \code{monitorProgress}: Monitor the progress of parallel workers.
 #' @rdname parProgress
+#' @import foreach
 monitorProgress <- function(nChunks, ind) {
+  f <- NULL # Definition to turn off R CMD check NOTE
   init <- FALSE
   while(TRUE) {
     files <- list.files("run-progress")
@@ -62,17 +70,34 @@ monitorProgress <- function(nChunks, ind) {
     } else {
       init <- TRUE
     }
-    for (file in files) {
-      num <- gsub("Chunk|.log", "", file)
-      progress <- readLines(file.path("run-progress", file), warn=FALSE)
+    # The use of foreach allows us to make use of on.exit for handling 
+    # connection closure.
+    foreach (f = files) %do% {
+      # Get progress from file
+      conn <- file(file.path("run-progress", f), open="rt")
+      on.exit(close(conn)) # close regardless of function success
+      progress <- tail(readLines(conn, warn=FALSE), 1)
+      # This on.exit overwrites previous, so need to close(conn) again.
+      # Remove the progress file when we complete, so that monitorProgress
+      # doesn't run forever.
+      on.exit({ 
+        close(conn)
+        if (grepl("100%", progress)) {
+          file.remove(file.path("run-progress", f))
+        }
+      })
+      
+      # Output sensibly
+      num <- gsub("chunk|.log", "", f)
+      indent <- rep("  ", ind)
       if (nChunks > 1) {
         nSpaces <- nchar(nChunks) - nchar(num)
-        cat(sep="", "\r", rep("  ", ind), "Chunk ", rep(" ", nSpaces), num, 
-            ": ", progress, file=stdout())       
+        cat(sep="", "\r", indent, "Worker ", rep(" ", nSpaces), num, ":", 
+            progress, file=stdout())       
       } else {
-        cat(sep="", "\r", rep("  ", ind), progress, file=stdout())
+        cat(sep="", "\r", indent, progress, file=stdout())
       }
-      Sys.sleep(2)
+      Sys.sleep(1)
     }
   }
   cat("\n")
@@ -83,8 +108,18 @@ monitorProgress <- function(nChunks, ind) {
 #'  \code{reportProgress}: Report the progress of a sequential loop.
 #' @rdname parProgress
 reportProgress <- function(ind) {
-  progress <- readLines(
-      file.path("run-progress", file="Chunk1.log"), warn=FALSE
-    )
+  # Get progress from file
+  conn <- file(file.path("run-progress", file="chunk1.log"), open="rt")
+  on.exit(close(conn))
+  progress <- tail(readLines(conn, warn=FALSE), 1)
+  on.exit({ 
+    close(conn)
+    if (grepl("100%", progress)) {
+      file.remove(file.path("run-progress", "chunk1.log"))
+      cat("\n")
+    }
+  })
+  
+  # Output sensibly
   cat(sep="", "\r", rep("  ", ind), progress, file=stdout())
 }

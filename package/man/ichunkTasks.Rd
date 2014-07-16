@@ -3,15 +3,16 @@
 \alias{ichunkTasks}
 \title{Iterator with master worker}
 \usage{
-ichunkTasks(verbose, n, chunks)
+ichunkTasks(verbose, n, cores)
 }
 \arguments{
 \item{verbose}{logical. Controls the type of iterator returned, see details.}
 
 \item{n}{Maximum index to generate.}
 
-\item{chunks}{the number of pieces that \code{n} should be divided into. This
-is useful when you know the number of pieces that you want.}
+\item{cores}{the number of cores to divide \code{n} across. If \code{verbose}
+is \code{TRUE}, \code{n} is distributed over \code{cores - 1}, while 1 core
+is reserved as the task monitor.}
 }
 \value{
 An iterator that returns -1 (for the master worker), and vectors of indices

@@ -315,34 +315,36 @@ netRep.core <- function(
            "permutations...")
       if(verbose) {
         # To log progress, we will write our progress to a file for each chunk
-        dir.create("run-progress")
-        on.exit(unlink("run-progress", recursive=TRUE))
+        dir.create("run-progress", showWarnings=FALSE)
+        on.exit({
+          #closeAllConnections()
+          unlink("run-progress", recursive=TRUE)
+        })
       }
       nulls <- foreach(
-        chunk=ichunkTasks(verbose, nPerm, chunks=nWorkers),
+        chunk=ichunkTasks(verbose, nPerm, nCores),
         .combine=abind3
       ) %maybe_do_par% {
         if (verbose & length(chunk) == 1) {
           if (chunk == -1) {
-            monitorProgress(nWorkers, indent)
+            monitorProgress(nWorkers, indent+2)
             NULL
           }
         } else {
           if (verbose) {
-            pb <- setupParProgressLogs(chunk, nWorkers, indent+2)
-            on.exit(close(pb))
+            conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
+            progressBar <- conns[[1]]
+            on.exit(lapply(conns, close))
           } 
-          foreach(i=chunk, .combine=abind3) %:% 
+          foreach(i=chunk, .combine=abind3) %do% { 
+            # Update the progress at the end of the loop.
+            if (verbose) {
+              on.exit({
+                updateParProgress(progressBar, i)
+                if (nCores == 1) reportProgress(indent+2)
+              })                
+            }
             foreach(ss=oSubsets, .combine=rbind) %do% {
-              # Update the progress at the end of the loop.
-              if (verbose) {
-                on.exit({
-                  updateParProgress(pb, i)
-                  if (nCores == 1) {
-                    reportProgress(indent+2)
-                  }
-                })                
-              }
               # Select a random subset of nodes of the same size as the subset 
               # ss, depending on our null model.
               if (model == "overlap") {
@@ -357,6 +359,7 @@ netRep.core <- function(
                 adjSets[[ti]], permAdjInd, datSets[[ti]], permDatInd
               )
               subsetTestStats(discProps[[as.character(ss)]], testProps)
+            }
           }
         }
       }

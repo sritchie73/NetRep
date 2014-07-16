@@ -29,7 +29,9 @@ indentation level corresponds to two spaces.}
 \item{i}{new value for the progress bar.}
 }
 \value{
-\code{setupParProgressLogs}: an object of class "\code{txtProgressBar}"
+\code{setupParProgressLogs}: a list with an object of class
+  "\code{txtProgressBar}", along with the connection to the logfile (this is
+  returned so it can be closed properly later.)
 }
 \description{
 Update progress of a parallel \code{\link[foreach]{foreach}} process to

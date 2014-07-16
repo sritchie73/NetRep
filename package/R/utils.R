@@ -160,17 +160,18 @@ abind3 <- function(...) abind(..., along=3)
 #'  \code{\link[=parProgress]{monitorProgress}}
 #' @param verbose logical. Controls the type of iterator returned, see details.
 #' @param n Maximum index to generate.
-#' @param chunks the number of pieces that \code{n} should be divided into. This
-#'  is useful when you know the number of pieces that you want.
+#' @param cores the number of cores to divide \code{n} across. If \code{verbose}
+#'  is \code{TRUE}, \code{n} is distributed over \code{cores - 1}, while 1 core
+#'  is reserved as the task monitor.
 #' @return
 #'  An iterator that returns -1 (for the master worker), and vectors of indices 
 #'  from 1 to \code{n} for the other worker threads.
 #' @importFrom iterators idiv
 #' @importFrom iterators nextElem
 #' @importFrom itertools isplitIndices
-ichunkTasks <- function(verbose, n, chunks) {
-  if (verbose & (chunks > 1)) {
-    it <- idiv(n, chunks=chunks)
+ichunkTasks <- function(verbose, n, cores) {
+  if (verbose & (cores > 1)) {
+    it <- idiv(n, chunks=cores-1)
     i <- 1L
     first = TRUE
     nextEl <- function() {
@@ -188,7 +189,7 @@ ichunkTasks <- function(verbose, n, chunks) {
     class(object) <- c("abstractiter", "iter")
     object
   } else {
-    isplitIndices(n, chunks=chunks)
+    isplitIndices(n, chunks=cores)
   }
 }
 
