@@ -315,14 +315,17 @@ netRep.core <- function(
       if(verbose) {
         # To log progress, we will write our progress to a file for each chunk
         dir.create("run-progress")
+        on.exit(unlink("run-progress", recursive=TRUE))
       }
       nulls <- foreach(
         chunk=ichunkTasks(verbose, nPerm, chunks=nWorkers),
         .combine=abind3
       ) %maybe_do_par% {
-        if (verbose & length(chunk) == 1 & chunk == -1) {
-          monitorProgress(nWorkers, indent)
-          NULL
+        if (verbose & length(chunk) == 1) {
+          if (chunk == -1) {
+            monitorProgress(nWorkers, indent)
+            NULL
+          }
         } else {
           if (verbose) {
             pb <- setupParProgressLogs(chunk, nWorkers, indent+2)
@@ -331,12 +334,14 @@ netRep.core <- function(
           foreach(i=chunk, .combine=abind3) %:% 
             foreach(ss=oSubsets, .combine=rbind) %do% {
               # Update the progress at the end of the loop.
-              on.exit({
-                updateParProgress(pb, i);
-                if (nCores == 1) {
-                  reportProgress(indent+2)
-                }
-              })
+              if (verbose) {
+                on.exit({
+                  updateParProgress(pb, i);
+                  if (nCores == 1) {
+                    reportProgress(indent+2)
+                  }
+                })                
+              }
               # Select a random subset of nodes of the same size as the subset 
               # ss, depending on our null model.
               if (model == "overlap") {
@@ -357,7 +362,6 @@ netRep.core <- function(
       dimnames(nulls)[[1]] <- oSubsets
       dimnames(nulls)[[2]] <- colnames(observed)
       dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
-      unlink("run-progress", recursive=TRUE) # Remove progress logs
       
       # Calculate the p-value for the observed statistic based on the null 
       # distribution
