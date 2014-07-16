@@ -70,6 +70,9 @@ monitorProgress <- function(nChunks, ind) {
     } else {
       init <- TRUE
     }
+    # Sort numerically, for aesthetic purposes
+    files <- files[order(as.integer(gsub("chunk|.log", "", files)))]
+    
     # The use of foreach allows us to make use of on.exit for handling 
     # connection closure.
     foreach (f = files) %do% {
@@ -84,6 +87,8 @@ monitorProgress <- function(nChunks, ind) {
         close(conn)
         if (grepl("100%", progress)) {
           file.remove(file.path("run-progress", f))
+        } else {
+          Sys.sleep(1)
         }
       })
       
@@ -97,7 +102,7 @@ monitorProgress <- function(nChunks, ind) {
       } else {
         cat(sep="", "\r", indent, progress, file=stdout())
       }
-      Sys.sleep(1)
+      
     }
   }
   cat("\n")
