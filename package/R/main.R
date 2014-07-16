@@ -337,7 +337,7 @@ netRep.core <- function(
               # Update the progress at the end of the loop.
               if (verbose) {
                 on.exit({
-                  updateParProgress(pb, i);
+                  updateParProgress(pb, i)
                   if (nCores == 1) {
                     reportProgress(indent+2)
                   }
