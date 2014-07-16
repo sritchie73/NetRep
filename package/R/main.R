@@ -289,7 +289,7 @@ netRep.core <- function(
       vCat(verbose, indent+1, "Calculating observed test statistics...")
       # Obtain the topological properties for each network subset in the
       # discovery dataset, we only want to calculate these once!
-      discProps <- foreach(ss=oSubsets, .combine=list) %do% {
+      discProps <- foreach(ss=oSubsets) %do% {
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
         # get the indices in the underlying data and adjacency matrices for 
         # the subset nodes. Sorted, because sequential memory access is faster.
