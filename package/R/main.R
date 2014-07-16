@@ -305,7 +305,7 @@ netRep.core <- function(
         datInd <- sort(match(subsetNodes, rownames(datSets[[ti]])))
         adjInd <- sort(match(subsetNodes, rownames(adjSets[[ti]])))
         testProps <- subsetProps(adjSets[[ti]], adjInd, datSets[[ti]], datInd)
-        subsetTestStats(discProps[[ss]], testProps)
+        subsetTestStats(discProps[[as.character(ss)]], testProps)
       }
       rownames(observed) <- oSubsets
       vCat(verbose, indent+1, "Done!")
@@ -356,7 +356,7 @@ netRep.core <- function(
               testProps <- subsetProps(
                 adjSets[[ti]], permAdjInd, datSets[[ti]], permDatInd
               )
-              subsetTestStats(discProps[[ss]], testProps)
+              subsetTestStats(discProps[[as.character(ss)]], testProps)
           }
         }
       }
