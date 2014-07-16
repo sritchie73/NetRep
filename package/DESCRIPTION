@@ -19,7 +19,9 @@ Imports:
     Rcpp (>= 0.11),
     methods,
     utils,
-    BH
+    BH,
+    gPdtest,
+    fExtremes
 Suggests:
     testthat
 LinkingTo: Rcpp, BH, bigmemory

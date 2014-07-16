@@ -72,25 +72,44 @@ NULL
   
 #' @rdname permutation
 #' @export
-pperm <- function(permuted, q, tailApprox=FALSE, lower.tail = TRUE, 
-                  log.p = FALSE) {
-  if (tailApprox) {
-    # TODO:
-    warning("Tail approximation not yet implemented.")
-  }
+#' @import gPdtest
+#' @importFrom fExtremes pgpd
+pperm <- function(permuted, q, tailApprox=FALSE, lower.tail=TRUE, log.p=FALSE) {
+  permuted <- sort(permuted)
   if (lower.tail) {
     more.extreme <- length(permuted[permuted < q])
   } else {
     more.extreme <- length(permuted[permuted > q])
   }
-
-  nPermutations <- length(permuted)
-  # Addition of 1 to both numerator and denominator makes it impossible to get
-  # a p-value of 0. See the @reference reading.
-  if (log.p) {
-    p.value <- log(more.extreme + 1) - log(nPermutations + 1)
+  if (tailApprox & more.extreme < 10) {
+    # Starting with 250 exceedances, decrease by 10, until we have a good fit to
+    # a GPD (p > 0.05)
+    nExc <- 250
+    while (nExc > 0) {
+      test <- gpd.test(tail(permuted, nExc))
+      ifelse(test$boot.test$p.value > 0.05, break, nExc <- nExc - 10)
+    }
+    if (nExc == 0) {
+      warning("unable to fit a generalized pareto distribution to the permuted",
+              " data!")
+      p.value <- pperm(permuted, q, FALSE, lower.tail, log.p)
+    } else {
+      fit <- gpd.fit(tail(permuted, nExc), method="amle")
+      p.value <- pgpd(q, xi=fit[[1]], beta=fit[[2]], lower.tail=lower.tail)
+      p.value <- as.numeric(p.value) # get rid of extra attributes
+      if (log.p) {
+        p.value <- log(p.value)
+      }
+    }
   } else {
-    p.value <- {more.extreme + 1} / {nPermutations + 1}
+    # If we're using tail approximation, no need for the pseudocount (2)
+    pCount <- ifelse(tailApprox, 0, 1)
+    nPerm <- length(permuted)
+    if (log.p) {
+      p.value <- log(more.extreme + pCount) - log(nPerm + pCount)
+    } else {
+      p.value <- (more.extreme + pCount) / (nPerm + pCount)
+    }
   }
   return(p.value)
 }
