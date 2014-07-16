@@ -3,7 +3,7 @@
 \alias{subsetProps}
 \title{Network subset topology}
 \usage{
-subsetProps(adj, adjInd, dat, datInd)
+subsetProps(adj, adjInd, dat = NULL, datInd = NULL)
 }
 \arguments{
 \item{adj}{Adjacency matrix for the network.}

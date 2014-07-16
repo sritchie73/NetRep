@@ -59,16 +59,24 @@ subsetTestStats <- function(discProps, testProps) {
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=subsetTestStats]{Between-network statistics}}
 #' @export
-subsetProps <- function(adj, adjInd, dat, datInd) {
+subsetProps <- function(adj, adjInd, dat=NULL, datInd=NULL) {
   # Sanity check user input.
   stopifnot(class(adj) %in% c("big.matrix"))
   stopifnot(is.vector(adjInd) & class(adjInd) %in% c("integer", "numeric"))
-  if (xor(missing(dat), missing(datInd))) {
-    stop("Either dat and datInd must both be provided, or neither.")
-  }
-  if (!missing(dat) | !missing(datInd))
   stopifnot(class(dat) %in% c("big.matrix", "NULL"))
-  stopifnot(is.vector(datInd) & class(datInd) %in% c("integer", "numeric"))
+  if (is.null(dat)) {
+    if (length(datInd) > 1) {
+      warning("datInd provided, but dat is NULL, ignoring.")
+    }
+  }
+  if (length(datInd) == 0) {
+    if(!is.null(dat)) {
+      stop("dat provided, but no indices for the network subset provided.",
+           " aborting.")
+    }
+  } else {
+    stopifnot(is.vector(datInd) & class(datInd) %in% c("integer", "numeric"))
+  }
   
   # TODO: on the fly network construction.
   
