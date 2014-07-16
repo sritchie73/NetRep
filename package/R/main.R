@@ -236,8 +236,8 @@ netRep.core <- function(
         tNodes <- rownames(adjSets[[ti]])
       }
       if (length(oNodes) == 0) {
-        warning("No nodes in dataset", setNames[di],  "are present in dataset ", 
-                setNames[ti], ", skipping.")
+        warning("No nodes in dataset ", setNames[di],  
+                " are present in dataset ", setNames[ti], ", skipping.")
         return(NULL)
       }
       
