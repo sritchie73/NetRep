@@ -82,19 +82,19 @@ pperm <- function(permuted, q, tailApprox=FALSE, lower.tail=TRUE, log.p=FALSE) {
     more.extreme <- length(permuted[permuted > q])
   }
   if (tailApprox & more.extreme < 10) {
-    # Starting with 250 exceedances, decrease by 10, until we have a good fit to
-    # a GPD (p > 0.05)
-    nExc <- 250
-    while (nExc > 0) {
-      test <- gpd.test(tail(permuted, nExc))
-      ifelse(test$boot.test$p.value > 0.05, break, nExc <- nExc - 10)
+    # Starting with the 250 most extreme observations (exceedances) , decrease 
+    # by 10, until we have a good fit to a GPD (p > 0.05), see (2).
+    topn <- 250
+    while (topn > 0) {
+      test <- gpd.test(tail(permuted, topn))
+      ifelse(test$boot.test$p.value > 0.05, break, topn <- topn - 10)
     }
-    if (nExc == 0) {
+    if (topn == 0) {
       warning("unable to fit a generalized pareto distribution to the permuted",
               " data!")
       p.value <- pperm(permuted, q, FALSE, lower.tail, log.p)
     } else {
-      fit <- gpd.fit(tail(permuted, nExc), method="amle")
+      fit <- gpd.fit(tail(permuted, topn), method="amle")
       p.value <- pgpd(q, xi=fit[[1]], beta=fit[[2]], lower.tail=lower.tail)
       p.value <- as.numeric(p.value) # get rid of extra attributes
       if (log.p) {
