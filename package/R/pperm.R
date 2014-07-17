@@ -17,7 +17,7 @@
 #'  While these assumptions may not necessarily always be true, for our purposes
 #'  they are a reasonable approximation. If \code{q} is more extreme than the 
 #'  \code{permuted}, the tail approximation method from \emph{(2)} can be used
-#'  to estimate the p-value of \code{q} by setting \code{tailApprox} to 
+#'  to estimate the p-value of \code{q} by setting \code{tail.approx} to 
 #'  \code{TRUE}.
 #'  
 #'  It is rarely possible to give an accurate value for \code{qperm} since there
@@ -52,7 +52,7 @@
 #' @param n number of observations. If \code{length(n) > 1}, the length is 
 #'  taken to be the number required. 
 #' @param log.p logicial; if TRUE, probabilities p are given as log(p)
-#' @param tailApprox logical; if \code{TRUE}, use the tail approximation 
+#' @param tail.approx logical; if \code{TRUE}, use the tail approximation 
 #'  algorithm to estimate extreme p-values (see details).
 #' @param lower.tail logical; if TRUE (default), probabilities are 
 #'    \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.   
@@ -74,19 +74,20 @@ NULL
 #' @export
 #' @import gPdtest
 #' @importFrom fExtremes pgpd
-pperm <- function(permuted, q, tailApprox=FALSE, lower.tail=TRUE, log.p=FALSE) {
+pperm <- function(permuted, q, tail.approx=TRUE, lower.tail=FALSE, log.p=FALSE) {
   permuted <- sort(permuted)
   if (lower.tail) {
     more.extreme <- length(permuted[permuted < q])
   } else {
     more.extreme <- length(permuted[permuted > q])
   }
-  if (tailApprox & more.extreme < 10) {
+  if (tail.approx & more.extreme < 10) {
     # Starting with the 250 most extreme observations (exceedances) , decrease 
     # by 10, until we have a good fit to a GPD (p > 0.05), see (2).
     topn <- 250
     while (topn > 0) {
-      test <- gpd.test(tail(permuted, topn))
+      exc <- ifelse(lower.tail, head(permuted, topn), tail(permuted), topn)
+      test <- gpd.test(exc)
       ifelse(test$boot.test$p.value > 0.05, break, topn <- topn - 10)
     }
     if (topn == 0) {
@@ -94,7 +95,7 @@ pperm <- function(permuted, q, tailApprox=FALSE, lower.tail=TRUE, log.p=FALSE) {
               " data!")
       p.value <- pperm(permuted, q, FALSE, lower.tail, log.p)
     } else {
-      fit <- gpd.fit(tail(permuted, topn), method="amle")
+      fit <- gpd.fit(exc, method="amle")
       p.value <- pgpd(q, xi=fit[[1]], beta=fit[[2]], lower.tail=lower.tail)
       p.value <- as.numeric(p.value) # get rid of extra attributes
       if (log.p) {
@@ -103,7 +104,7 @@ pperm <- function(permuted, q, tailApprox=FALSE, lower.tail=TRUE, log.p=FALSE) {
     }
   } else {
     # If we're using tail approximation, no need for the pseudocount (2)
-    pCount <- ifelse(tailApprox, 0, 1)
+    pCount <- ifelse(tail.approx, 0, 1)
     nPerm <- length(permuted)
     if (log.p) {
       p.value <- log(more.extreme + pCount) - log(nPerm + pCount)
