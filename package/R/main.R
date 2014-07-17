@@ -317,7 +317,6 @@ netRep.core <- function(
         # To log progress, we will write our progress to a file for each chunk
         dir.create("run-progress", showWarnings=FALSE)
         on.exit({
-          #closeAllConnections()
           unlink("run-progress", recursive=TRUE)
         })
       }
