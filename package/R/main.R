@@ -219,22 +219,51 @@ netRep.core <- function(
            setNames[di], ", in dataset ", setNames[ti], ".")
       on.exit(vCat(verbose, indent, "Done!"))
       
+      # Attach relevant matrices
+      # TODO: 
+      # Set up empty big.matices where we are building the networks on the fly
+      if (is.null(adjSets[[di]])) {
+        stop("not implemented yet")
+      } else {
+        discAdj <- attach.big.matrix(adjSets[[di]])
+      }
+      if (is.null(adjSets[[ti]])) {
+        stop("not implemented yet")
+      } else {
+        testAdj <- attach.big.matrix(adjSets[[ti]])
+      }
+      if (!is.null(datSets[[di]])) {
+        discDat <- attach.big.matrix(datSets[[di]])
+      } else {
+        discDat <- NULL
+      }
+      if (!is.null(datSets[[ti]])) {
+        testDat <- attach.big.matrix(datSets[[ti]])
+      } else {
+        testDat <- NULL
+      }
+      on.exit({
+        rm(discAdj, testAdj, discDat, testDat)
+        gc()
+      }, add = TRUE)
+      
+      
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
-      if (is.null(adjSets[[ti]])) {
-        if(is.null(adjSets[[di]])) {
-          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(datSets[[ti]])
+      if (is.null(testAdj)) {
+        if(is.null(discAdj)) {
+          oNodes <- rownames(discDat) %sub_in% rownames(testDat)
         } else {
-          oNodes <- rownames(adjSets[[di]]) %sub_in% rownames(datSets[[ti]])
+          oNodes <- rownames(discAdj) %sub_in% rownames(testDat)
         }
-        tNodes <- rownames(datSets[[ti]])
+        tNodes <- rownames(testDat)
       } else {
-        if(is.null(adjSets[[di]])) {
-          oNodes <- rownames(datSets[[di]]) %sub_in% rownames(adjSets[[ti]])
+        if(is.null(discAdj)) {
+          oNodes <- rownames(discDat) %sub_in% rownames(testAdj)
         } else {
-          oNodes <- rownames(adjSets[[di]]) %sub_in% rownames(adjSets[[ti]])
+          oNodes <- rownames(discAdj) %sub_in% rownames(testAdj)
         }
-        tNodes <- rownames(adjSets[[ti]])
+        tNodes <- rownames(testAdj)
       }
       if (length(oNodes) == 0) {
         warning("No nodes in dataset ", setNames[di],  
@@ -242,23 +271,15 @@ netRep.core <- function(
         return(NULL)
       }
       
-      # TODO: 
-      # Set up empty big.matices where we are building the networks on the fly
-      if (is.null(adjSets[[di]])) {
-        stop("not implemented yet")
-      }
-      if (is.null(adjSets[[ti]])) {
-        stop("not implemented yet")
-      }
       
       # Set the diagonals to NA if we're ignoring them in our calculations
       if (ignoreDiag) {
-        oldDiags <- list(diag(adjSets[[di]]), diag(adjSets[[ti]]))
-        diag(adjSets[[di]]) <- NA
-        diag(adjSets[[ti]]) <- NA
+        oldDiags <- list(diag(discAdj), diag(testAdj))
+        diag(discAdj) <- NA
+        diag(testAdj) <- NA
         on.exit({
-          diag(adjSets[[di]]) <- oldDiags[[1]]
-          diag(adjSets[[ti]]) <- oldDiags[[2]]
+          diag(discAdj) <- oldDiags[[1]]
+          diag(testAdj) <- oldDiags[[2]]
         })
       }
       
@@ -294,17 +315,17 @@ netRep.core <- function(
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
         # get the indices in the underlying data and adjacency matrices for 
         # the subset nodes. Sorted, because sequential memory access is faster.
-        datInd <- sort(match(subsetNodes, rownames(datSets[[di]])))
-        adjInd <- sort(match(subsetNodes, rownames(adjSets[[di]])))
-        subsetProps(adjSets[[di]], adjInd, datSets[[di]], datInd)
+        datInd <- sort(match(subsetNodes, rownames(discDat)))
+        adjInd <- sort(match(subsetNodes, rownames(discAdj)))
+        subsetProps(discAdj, adjInd, discDat, datInd)
       }
       names(discProps) <- oSubsets
       # Now calculate the observed value for each network statistic
       observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-        datInd <- sort(match(subsetNodes, rownames(datSets[[ti]])))
-        adjInd <- sort(match(subsetNodes, rownames(adjSets[[ti]])))
-        testProps <- subsetProps(adjSets[[ti]], adjInd, datSets[[ti]], datInd)
+        datInd <- sort(match(subsetNodes, rownames(testDat)))
+        adjInd <- sort(match(subsetNodes, rownames(testAdj)))
+        testProps <- subsetProps(testAdj, adjInd, testDat, datInd)
         subsetTestStats(discProps[[as.character(ss)]], testProps)
       }
       rownames(observed) <- oSubsets
@@ -351,11 +372,11 @@ netRep.core <- function(
               } else {
                 permNames <- sample(tNodes, size=oSizes[ss])
               }
-              permDatInd <- sort(match(permNames, rownames(datSets[[ti]])))
-              permAdjInd <- sort(match(permNames, rownames(adjSets[[ti]])))
+              permDatInd <- sort(match(permNames, rownames(testDat)))
+              permAdjInd <- sort(match(permNames, rownames(testAdj)))
               
               testProps <- subsetProps(
-                adjSets[[ti]], permAdjInd, datSets[[ti]], permDatInd
+                testAdj, permAdjInd, testDat, permDatInd
               )
               subsetTestStats(discProps[[as.character(ss)]], testProps)
             }
