@@ -17,10 +17,10 @@ template <typename T>
 NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj, 
                   IntegerVector subsetIndices) {
   // Results vector
-  NumericVector kIM = NumericVector(subsetIndices.size());
+  NumericVector kIM(subsetIndices.size(), 0.0);
   
   // temporary value holder
-  NumericVector value = NumericVector(1); 
+  double value; 
   
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) || 
@@ -32,11 +32,10 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
   int subsetSize = subsetIndices.size();
 
   for (int jj = 0; jj < subsetSize; jj++) {
-    kIM[jj] = 0;
     for (int ii = 0; ii < subsetSize; ii++) {
       value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
-      if (all(!is_na(value))) {
-        kIM[jj] += value[0]; // Ignore NAs
+      if (!R_IsNA(value)) {
+        kIM[jj] += value; // Ignore NAs
       }
     }
   }
