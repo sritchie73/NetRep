@@ -190,4 +190,47 @@ is.equal <- function(vector, value) {
   })
 }
 
-
+#' Visual Sanity Check of pperm
+#' 
+#' Generate a qqplot of the observed p-values from \code{\link{pperm}}, vs the
+#' p-values we would expect from the theoretical distribution the 
+#' \code{permuted} observations were drawn from (given in \code{tfunc}).
+#' 
+#' @note
+#'  For internal testing purposes.
+#' 
+#' @param permuted vector of values making up the empirical distribution.
+#' @param q vector of quantiles to test.
+#' @param tfunc a probability function to use to get the expected p-values. This
+#'  should correspond to the theortical distribution \code{permuted} was drawn
+#'  from.
+#' @param tail.approx logical; if \code{TRUE}, use the tail approximation 
+#'  algorithm to estimate extreme p-values (see details).
+#' @param lower.tail logical; if TRUE (default), probabilities are 
+#'  \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.
+#' @param ... other arguments to pass to \code{\link[graphics]{plot}}. Note that
+#'   providing \code{xlab}, \code{ylab}, \code{xlim}, or \code{ylim} will result
+#'   in an error. 
+#' @importFrom graphics plot
+#' @export
+qqperm <- function(permuted, q, tfunc, tail.approx=TRUE, lower.tail=FALSE, ...) {
+  permuted <- sort(permuted)
+  expected <- do.call(tfunc, list(q=q, lower.tail=lower.tail))
+  observed <- sapply(q, function(x) {
+    pperm(permuted, x, lower.tail=lower.tail, tail.approx=tail.approx)
+  })
+  min <- min(c(-log10(expected), -log10(observed)))
+  max <- max(c(-log10(expected), -log10(observed)))
+  plot(-log10(expected), -log10(observed), xlab="expected", ylab="observed",
+       xlim=c(min, max), ylim=c(min, max), ...)
+  abline(0, 1)
+  # Color p-values that have been estimated using the tail approximation method
+  if (tail.approx) {
+    if (lower.tail) {
+      tai <- which(q < permuted[11])
+    } else {
+      tai <- which(q > tail(permuted, 11)[1])
+    }
+    points(-log10(expected[tai]), -log10(observed[tai]), col="red")
+  } 
+}

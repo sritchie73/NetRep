@@ -21,7 +21,8 @@ Imports:
     utils,
     BH,
     gPdtest,
-    fExtremes
+    fExtremes,
+    graphics
 Suggests:
     testthat
 LinkingTo: Rcpp, BH, bigmemory
