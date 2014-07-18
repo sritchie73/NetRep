@@ -5,7 +5,7 @@
 \usage{
 netRep.core(datSets = NULL, adjSets = NULL, nodeLabelSets, discovery, test,
   nPerm = 10000, buildNetFun, ignoreSets = NULL, includeSets = NULL,
-  ignoreDiag = TRUE, null = "overlap", tailApprox = TRUE,
+  ignoreDiag = TRUE, null = "overlap", tailApprox = FALSE,
   verbose = TRUE, indent = 0)
 }
 \arguments{
