@@ -8,7 +8,7 @@
 \alias{rperm}
 \title{Distribution from Permutations}
 \usage{
-pperm(permuted, q, tailApprox = FALSE, lower.tail = TRUE, log.p = FALSE)
+pperm(permuted, q, tail.approx = FALSE, lower.tail = TRUE, log.p = FALSE)
 
 qperm(permuted, p, log.p = FALSE)
 
@@ -28,7 +28,7 @@ taken to be the number required.}
 
 \item{log.p}{logicial; if TRUE, probabilities p are given as log(p)}
 
-\item{tailApprox}{logical; if \code{TRUE}, use the tail approximation
+\item{tail.approx}{logical; if \code{TRUE}, use the tail approximation
 algorithm to estimate extreme p-values (see details).}
 
 \item{lower.tail}{logical; if TRUE (default), probabilities are
@@ -62,7 +62,7 @@ P-values are calculated by \code{pperm} using proportions on the provided
  While these assumptions may not necessarily always be true, for our purposes
  they are a reasonable approximation. If \code{q} is more extreme than the
  \code{permuted}, the tail approximation method from \emph{(2)} can be used
- to estimate the p-value of \code{q} by setting \code{tailApprox} to
+ to estimate the p-value of \code{q} by setting \code{tail.approx} to
  \code{TRUE}.
 
  It is rarely possible to give an accurate value for \code{qperm} since there

@@ -74,7 +74,7 @@ NULL
 #' @export
 #' @import gPdtest
 #' @importFrom fExtremes pgpd
-pperm <- function(permuted, q, tail.approx=TRUE, lower.tail=FALSE, log.p=FALSE) {
+pperm <- function(permuted, q, tail.approx=FALSE, lower.tail=TRUE, log.p=FALSE) {
   permuted <- sort(permuted)
   if (lower.tail) {
     more.extreme <- length(permuted[permuted < q])
@@ -86,14 +86,26 @@ pperm <- function(permuted, q, tail.approx=TRUE, lower.tail=FALSE, log.p=FALSE) 
     # by 10, until we have a good fit to a GPD (p > 0.05), see (2).
     topn <- 250
     while (topn > 0) {
-      exc <- ifelse(lower.tail, head(permuted, topn), tail(permuted), topn)
-      test <- gpd.test(exc)
-      ifelse(test$boot.test$p.value > 0.05, break, topn <- topn - 10)
+      if (lower.tail) {
+        exc <- head(permuted, topn)
+      } else {
+        exc <- tail(permuted, topn)
+      }
+      if (all(exc < 0)) {
+        warning("unable to fit a generalized pareto distribution for this test",
+                " because the extremities are negative")
+        return(pperm(permuted, q, FALSE, lower.tail, log.p))
+      } else if (any(exc < 0)) {
+        topn <- topn - 10
+      } else {
+        test <- gpd.test(exc)
+        ifelse(test$boot.test$p.value > 0.05, break, topn <- topn - 10)
+      }
     }
     if (topn == 0) {
       warning("unable to fit a generalized pareto distribution to the permuted",
               " data!")
-      p.value <- pperm(permuted, q, FALSE, lower.tail, log.p)
+      return(pperm(permuted, q, FALSE, lower.tail, log.p))
     } else {
       fit <- gpd.fit(exc, method="amle")
       p.value <- pgpd(q, xi=fit[[1]], beta=fit[[2]], lower.tail=lower.tail)
