@@ -242,11 +242,6 @@ netRep.core <- function(
       } else {
         testDat <- NULL
       }
-      on.exit({
-        rm(discAdj, testAdj, discDat, testDat)
-        gc()
-      }, add = TRUE)
-      
       
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
@@ -271,7 +266,6 @@ netRep.core <- function(
         return(NULL)
       }
       
-      
       # Set the diagonals to NA if we're ignoring them in our calculations
       if (ignoreDiag) {
         oldDiags <- list(diag(discAdj), diag(testAdj))
@@ -280,7 +274,7 @@ netRep.core <- function(
         on.exit({
           diag(discAdj) <- oldDiags[[1]]
           diag(testAdj) <- oldDiags[[2]]
-        })
+        }, add = TRUE)
       }
       
       # Compute information about the network subsets, their size, and what 
@@ -331,6 +325,12 @@ netRep.core <- function(
       rownames(observed) <- oSubsets
       vCat(verbose, indent+1, "Done!")
       
+      # Clean up objects
+      on.exit({
+        rm(discAdj, testAdj, discDat, testDat)
+        gc()
+      }, add = TRUE)
+      
       # Calculate the null distribution for each of the statistics.
       vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
            "permutations...")
@@ -339,7 +339,7 @@ netRep.core <- function(
         dir.create("run-progress", showWarnings=FALSE)
         on.exit({
           unlink("run-progress", recursive=TRUE)
-        })
+        }, add=TRUE)
       }
       nulls <- foreach(
         chunk=ichunkTasks(verbose, nPerm, nCores),
