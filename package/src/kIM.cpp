@@ -57,18 +57,19 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices) {
   //  Dispatch function for all types of big.matrix.
   XPtr<BigMatrix> xpAdj(pAdjacency);
-  switch(xpAdj->matrix_type()) {
-    case 1:
-      return KIM(xpAdj, MatrixAccessor<char>(*xpAdj), subsetIndices);
-    case 2:
-      return KIM(xpAdj, MatrixAccessor<short>(*xpAdj), subsetIndices);
-    case 4:
-      return KIM(xpAdj, MatrixAccessor<int>(*xpAdj), subsetIndices);
-    case 8:
-      return KIM(xpAdj, MatrixAccessor<double>(*xpAdj), subsetIndices);
-    default:
-      /* We should never get here, unless the underlying implementation of 
-         bigmemory changes */
-      throw Rcpp::exception("Undefined type for provided big.matrix");
-  }          
+  //  Dispatch function for all types of big.matrix.
+  unsigned short type = xpAdj->matrix_type();
+  if (type == 1) {
+    return KIM(xpAdj, MatrixAccessor<char>(*xpAdj), subsetIndices, undirected);
+  } else if (type == 2) {
+    return KIM(xpAdj, MatrixAccessor<short>(*xpAdj), subsetIndices, undirected);
+  } else if (type == 4) {
+    return KIM(xpAdj, MatrixAccessor<int>(*xpAdj), subsetIndices, undirected);
+  } else if (type == 8) {
+    return KIM(xpAdj, MatrixAccessor<double>(*xpAdj), subsetIndices, undirected);
+  } else {
+    /* We should never get here, unless the underlying implementation of 
+    bigmemory changes */
+    throw Rcpp::exception("Undefined type for provided big.matrix");
+  }      
 }
