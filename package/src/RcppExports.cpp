@@ -34,15 +34,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // KIM
-NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices);
-RcppExport SEXP netrep_KIM(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
+NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices, LogicalVector undirected);
+RcppExport SEXP netrep_KIM(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP, SEXP undirectedSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        NumericVector __result = KIM(pAdjacency, subsetIndices);
+        Rcpp::traits::input_parameter< LogicalVector >::type undirected(undirectedSEXP );
+        NumericVector __result = KIM(pAdjacency, subsetIndices, undirected);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

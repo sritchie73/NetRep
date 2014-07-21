@@ -3,7 +3,7 @@
 \alias{kIMR}
 \title{Node Connectivity (weighted degree), R Implementation}
 \usage{
-kIMR(adjacency, subsetIndices, allNodes)
+kIMR(adjacency, subsetIndices, allNodes, undirected)
 }
 \arguments{
 \item{adjacency}{Adjacency matrix representation of the network}
@@ -11,12 +11,16 @@ kIMR(adjacency, subsetIndices, allNodes)
 \item{subsetIndices}{row/column indices in the provided \code{adjacency} that
 correspond to the network subset of interest.}
 
-\item{allNodes}{Logical; if FALSE, the connectivity is calculated based only
-on nodes in the module, otherwise a module's connectivity to all nodes is
-calculated.}
+\item{allNodes}{Logical; if \code{FALSE}, the connectivity is calculated
+based only on nodes in the module, otherwise a module's connectivity to all
+nodes is calculated.}
+
+\item{undirected}{Logical; if \code{TRUE}, only the lower half of the
+symmetric adjacency matrix will be used in the calculations.}
 }
 \value{
-The connectivity (weighted degree) for each node in the network subset
+The connectivity (weighted degree) for each node in the network
+subset
 }
 \description{
 Used to unit test the C++ functionality of \code{\link{kIM}}.

@@ -25,11 +25,13 @@ SetDiag <- function(pBigMat, value) {
 #' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 #' @param subsetIndices indices of the subset of the network to calculate
 #'   the mean adjacency for.
+#' @param undirected logical; If \code{TRUE}, then only the lower half of the
+#'   \code{pAdjacency} is used for the calculations.
 #' @return A vector containing the intramodular connectivity (degree) of 
 #'   each node. 
 #' @rdname kIM-cpp
-KIM <- function(pAdjacency, subsetIndices) {
-    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices)
+KIM <- function(pAdjacency, subsetIndices, undirected) {
+    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
 }
 
 #' C++ implementation of Mean Adjacency

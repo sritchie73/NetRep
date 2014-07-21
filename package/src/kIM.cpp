@@ -16,17 +16,26 @@ using namespace Rcpp;
  * @return a length one NumericVector
  */
 template <typename T>
-NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj, 
-                  IntegerVector subsetIndices) {
+NumericVector KIM(
+  XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj, IntegerVector subsetIndices, 
+  LogicalVector undirected
+) {
   // Results vector
   NumericVector kIM(subsetIndices.size(), 0.0);
   
+  // get some useful values
+  int subsetSize = subsetIndices.size();
+  int type = xpAdj->matrix_type();
+  
   // temporary value holder
   double value; 
-  int subsetSize = subsetIndices.size();
 
-  for (int jj = 0; jj < subsetSize; jj++) {
-    for (int ii = 0; ii < subsetSize; ii++) {
+  for (unsigned int jj = 0; jj < subsetSize; jj++) {
+    unsigned int ii = 0;
+    if (undirected[0]) {
+      ii = jj;
+    }
+    for (; ii < subsetSize; ii++) {
       value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
       if (type == 1 && !(value == NA_CHAR)) {
         kIM[jj] += abs(value);
@@ -50,12 +59,15 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 //' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 //' @param subsetIndices indices of the subset of the network to calculate
 //'   the mean adjacency for.
+//' @param undirected logical; If \code{TRUE}, then only the lower half of the
+//'   \code{pAdjacency} is used for the calculations.
 //' @return A vector containing the intramodular connectivity (degree) of 
 //'   each node. 
 //' @rdname kIM-cpp
 // [[Rcpp::export]]
-NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices) {
-  //  Dispatch function for all types of big.matrix.
+NumericVector KIM(
+  SEXP pAdjacency, IntegerVector subsetIndices, LogicalVector undirected
+) {
   XPtr<BigMatrix> xpAdj(pAdjacency);
   
   // Make sure we're not indexing out of range.
@@ -63,6 +75,13 @@ NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices) {
       is_true(any(subsetIndices > xpAdj->ncol())) ||
       is_true(any(subsetIndices > xpAdj->nrow()))) {
     throw std::out_of_range("Requested index outside of range!");
+  }
+  
+  // Generate appropriate warnings
+  if (undirected.size() > 1) {
+    Function warning("warning");
+    warning("The argument 'undirected' has length > 1 and ony the first ",
+            "element will be used.");
   }
   
   //  Dispatch function for all types of big.matrix.
