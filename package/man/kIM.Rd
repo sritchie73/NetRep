@@ -3,7 +3,7 @@
 \alias{kIM}
 \title{Node Connectivity (weighted degree)}
 \usage{
-kIM(adjacency, subsetIndices, allNodes, undirected)
+kIM(adjacency, subsetIndices, allNodes)
 }
 \arguments{
 \item{adjacency}{Adjacency matrix representation of the network}
