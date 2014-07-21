@@ -5,7 +5,7 @@
 \usage{
 netRep.core(datSets = NULL, adjSets = NULL, nodeLabelSets, discovery, test,
   nPerm = 10000, buildNetFun, ignoreSets = NULL, includeSets = NULL,
-  ignoreDiag = TRUE, null = "overlap", tailApprox = FALSE,
+  undirected = TRUE, null = "overlap", tailApprox = FALSE,
   verbose = TRUE, indent = 0)
 }
 \arguments{
@@ -42,9 +42,6 @@ skip.}
 \item{includeSets}{An optional list, where the elments for each
 \emph{discovery} data set are vectors specifying which sub-networks to
 include.}
-
-\item{ignoreDiag}{logical; ignore the diagonal of the adjacency matrix when
-assessing network subset preservation. Defaults to \code{TRUE}.}
 
 \item{null}{the type of null model, either "overlap" or "all". If "overlap"
 (default) only the nodes present in both the discovery and test networks
