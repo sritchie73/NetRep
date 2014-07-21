@@ -10,11 +10,13 @@
 #' @param adjacency Adjacency matrix.
 #' @param subsetIndices row/column indices in the provided \code{adjacency} that
 #'   correspond to the network subset of interest.
+#' @param undirected Logical; if \code{TRUE}, only the lower half of the 
+#'   symmetric adjacency matrix will be used in the calculations.
 #' @return a single numeric value.
 #' @export
-meanAdj <- function(adjacency, subsetIndices) {
+meanAdj <- function(adjacency, subsetIndices, undirected) {
   stopifnot(class(adjacency) == "big.matrix")
-  MeanAdj(adjacency@address, subsetIndices)
+  MeanAdj(adjacency@address, subsetIndices, undirected)
 }
 
 #' Mean Adjacency of a Network, R Implementation.

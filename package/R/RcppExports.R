@@ -25,13 +25,11 @@ SetDiag <- function(pBigMat, value) {
 #' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 #' @param subsetIndices indices of the subset of the network to calculate
 #'   the mean adjacency for.
-#' @param undirected logical; If \code{TRUE}, then only the lower half of the
-#'   \code{pAdjacency} is used for the calculations.
 #' @return A vector containing the intramodular connectivity (degree) of 
 #'   each node. 
 #' @rdname kIM-cpp
-KIM <- function(pAdjacency, subsetIndices, undirected) {
-    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
+KIM <- function(pAdjacency, subsetIndices) {
+    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
 
 #' C++ implementation of Mean Adjacency
@@ -41,9 +39,12 @@ KIM <- function(pAdjacency, subsetIndices, undirected) {
 #' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 #' @param subsetIndices indices of the subset of the network to calculate
 #'   the mean adjacency for.
+#' @param undirected logical; If \code{TRUE}, only the lower half of the 
+#'   adjacency matrix is used to calculate the \code{meanAdj}, halving the 
+#'   calculation time.
 #' @return A single numeric value.
 #' @rdname meanAdj-cpp
-MeanAdj <- function(pAdjacency, subsetIndices) {
-    .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices)
+MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
+    .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
 }
 

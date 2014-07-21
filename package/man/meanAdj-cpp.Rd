@@ -3,13 +3,17 @@
 \alias{MeanAdj}
 \title{C++ implementation of Mean Adjacency}
 \usage{
-MeanAdj(pAdjacency, subsetIndices)
+MeanAdj(pAdjacency, subsetIndices, undirected)
 }
 \arguments{
 \item{pAdjacency}{SEXP container for the pointer to the adjacency matrix}
 
 \item{subsetIndices}{indices of the subset of the network to calculate
 the mean adjacency for.}
+
+\item{undirected}{logical; If \code{TRUE}, only the lower half of the
+adjacency matrix is used to calculate the \code{meanAdj}, halving the
+calculation time.}
 }
 \value{
 A single numeric value.

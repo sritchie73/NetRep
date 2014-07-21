@@ -3,13 +3,16 @@
 \alias{meanAdj}
 \title{Mean Adjacency of a Network}
 \usage{
-meanAdj(adjacency, subsetIndices)
+meanAdj(adjacency, subsetIndices, undirected)
 }
 \arguments{
 \item{adjacency}{Adjacency matrix.}
 
 \item{subsetIndices}{row/column indices in the provided \code{adjacency} that
 correspond to the network subset of interest.}
+
+\item{undirected}{Logical; if \code{TRUE}, only the lower half of the
+symmetric adjacency matrix will be used in the calculations.}
 }
 \value{
 a single numeric value.

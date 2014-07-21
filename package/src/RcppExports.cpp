@@ -34,16 +34,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // KIM
-NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices, LogicalVector undirected);
-RcppExport SEXP netrep_KIM(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP, SEXP undirectedSEXP) {
+NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices);
+RcppExport SEXP netrep_KIM(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type undirected(undirectedSEXP );
-        NumericVector __result = KIM(pAdjacency, subsetIndices, undirected);
+        NumericVector __result = KIM(pAdjacency, subsetIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -51,15 +50,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // MeanAdj
-NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices);
-RcppExport SEXP netrep_MeanAdj(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
+NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices, LogicalVector undirected);
+RcppExport SEXP netrep_MeanAdj(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP, SEXP undirectedSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        NumericVector __result = MeanAdj(pAdjacency, subsetIndices);
+        Rcpp::traits::input_parameter< LogicalVector >::type undirected(undirectedSEXP );
+        NumericVector __result = MeanAdj(pAdjacency, subsetIndices, undirected);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
