@@ -21,14 +21,6 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
   
   // temporary value holder
   double value; 
-  
-  // Make sure we're not indexing out of range.
-  if (is_true(any(subsetIndices <= 0)) || 
-      is_true(any(subsetIndices > xpAdj->ncol())) ||
-      is_true(any(subsetIndices > xpAdj->nrow()))) {
-    throw std::out_of_range("Requested index outside of range!");
-  }
-
   int subsetSize = subsetIndices.size();
 
   for (int jj = 0; jj < subsetSize; jj++) {
@@ -57,6 +49,14 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices) {
   //  Dispatch function for all types of big.matrix.
   XPtr<BigMatrix> xpAdj(pAdjacency);
+  
+  // Make sure we're not indexing out of range.
+  if (is_true(any(subsetIndices <= 0)) || 
+      is_true(any(subsetIndices > xpAdj->ncol())) ||
+      is_true(any(subsetIndices > xpAdj->nrow()))) {
+    throw std::out_of_range("Requested index outside of range!");
+  }
+  
   //  Dispatch function for all types of big.matrix.
   unsigned short type = xpAdj->matrix_type();
   if (type == 1) {
