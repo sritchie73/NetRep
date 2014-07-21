@@ -54,12 +54,14 @@ subsetTestStats <- function(discProps, testProps) {
 #' @param adjInd Indices of the network subset in \code{adj}
 #' @param dat (Optional) Underlying data for the network.
 #' @param datInd (Optional) Indices of the network subset in \code{dat}
+#' @param undirected logical; If \code{TRUE}, only the lower half of \code{adj}
+#'   is used to calculate some propertiest (where applicable).
 #'
 #' @return
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=subsetTestStats]{Between-network statistics}}
 #' @export
-subsetProps <- function(adj, adjInd, dat=NULL, datInd=NULL) {
+subsetProps <- function(adj, adjInd, dat=NULL, datInd=NULL, undirected=FALSE) {
   # Sanity check user input.
   stopifnot(class(adj) %in% c("big.matrix"))
   stopifnot(is.vector(adjInd) & class(adjInd) %in% c("integer", "numeric"))
@@ -81,7 +83,7 @@ subsetProps <- function(adj, adjInd, dat=NULL, datInd=NULL) {
   # TODO: on the fly network construction.
   
   props <- list(
-    meanAdj = meanAdj(adj, adjInd),
+    meanAdj = meanAdj(adj, adjInd, undirected),
     kIM = kIM(adj, adjInd, FALSE),
     kALL = kIM(adj, adjInd, TRUE)
   )

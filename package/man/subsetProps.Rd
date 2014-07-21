@@ -3,7 +3,7 @@
 \alias{subsetProps}
 \title{Network subset topology}
 \usage{
-subsetProps(adj, adjInd, dat = NULL, datInd = NULL)
+subsetProps(adj, adjInd, dat = NULL, datInd = NULL, undirected = FALSE)
 }
 \arguments{
 \item{adj}{Adjacency matrix for the network.}
@@ -13,6 +13,9 @@ subsetProps(adj, adjInd, dat = NULL, datInd = NULL)
 \item{dat}{(Optional) Underlying data for the network.}
 
 \item{datInd}{(Optional) Indices of the network subset in \code{dat}}
+
+\item{undirected}{logical; If \code{TRUE}, only the lower half of \code{adj}
+  is used to calculate some propertiest (where applicable).}
 }
 \value{
 A list of topological properties for the given network subset
