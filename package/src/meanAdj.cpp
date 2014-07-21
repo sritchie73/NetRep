@@ -5,6 +5,8 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
+#include <cmath>
+
 /* Implementation of Mean Adjacency
  * 
  * @param xpAdj External Pointer for the adjacency matrix.
@@ -20,28 +22,27 @@ NumericVector MeanAdj(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
   
   // get some useful values
   int subsetSize = subsetIndices.size();
-  int ncol = xpAdj->ncol();
-  int nrow = xpAdj->nrow();
+  int type = xpAdj->matrix_type();
   
   // Intermediate counters
   int NAcount = 0;
   double total = 0.0;
   double value;
   
-  // Make sure we're not indexing out of range.
-  if (is_true(any(subsetIndices <= 0)) || is_true(any(subsetIndices > nrow)) ||
-      is_true(any(subsetIndices > ncol))) {
-    throw std::out_of_range("Requested index outside of range!");
-  }
-  
   // Add to the total sum while handling NAs
   for (int jj = 0; jj < subsetSize; jj++) {
     for (int ii = 0; ii < subsetSize; ii++) {
-     value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
-      if (R_IsNA(value)) {
+      value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
+      if (type == 1 && !(value == NA_CHAR)) {
+        total += abs(value);
+      } else if (type == 2 && !(value == NA_SHORT)) {
+        total += abs(value);
+      } else if (type == 4 && !(value == NA_INTEGER)) {
+        total += abs(value);
+      } else if (type == 8 && !ISNA(value) && !ISNAN(value)) {
+        total += abs(value);
+      } else {
         NAcount += 1;
-      } else { 
-        total += value;
       }
     }
   }
@@ -62,8 +63,16 @@ NumericVector MeanAdj(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
 //' @rdname meanAdj-cpp
 // [[Rcpp::export]]
 NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices) {
-  //  Dispatch function for all types of big.matrix.
   XPtr<BigMatrix> xpAdj(pAdjacency);
+  
+    // Make sure we're not indexing out of range.
+  if (is_true(any(subsetIndices <= 0)) || 
+      is_true(any(subsetIndices > xpAdj->ncol())) ||
+      is_true(any(subsetIndices > xpAdj->nrow()))) {
+    throw std::out_of_range("Requested index outside of range!");
+  }
+  
+  //  Dispatch function for all types of big.matrix.
   switch(xpAdj->matrix_type()) {
     case 1:
       return MeanAdj(xpAdj, MatrixAccessor<char>(*xpAdj), subsetIndices);
@@ -77,5 +86,5 @@ NumericVector MeanAdj(SEXP pAdjacency, IntegerVector subsetIndices) {
       /* We should never get here, unless the underlying implementation of 
          bigmemory changes */
       throw Rcpp::exception("Undefined type for provided big.matrix");
-  }   
+  }          
 }

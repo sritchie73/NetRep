@@ -26,5 +26,5 @@ meanAdj <- function(adjacency, subsetIndices) {
 #'   correspond to the network subset of interest.
 #' @return a single numeric value.
 meanAdjR <- function(adjacency, subsetIndices) {
-  mean(adjacency[subsetIndices, subsetIndices], na.rm=TRUE)
+  mean(abs(adjacency[subsetIndices, subsetIndices]), na.rm=TRUE)
 }
