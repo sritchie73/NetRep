@@ -5,6 +5,8 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
+#include <cmath>
+
 /* Implementation of Intramodular Connectivity
  * 
  * @param xpAdj External Pointer for the adjacency matrix.
@@ -26,9 +28,15 @@ NumericVector KIM(XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj,
   for (int jj = 0; jj < subsetSize; jj++) {
     for (int ii = 0; ii < subsetSize; ii++) {
       value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
-      if (!R_IsNA(value)) {
-        kIM[jj] += value; // Ignore NAs
-      }
+      if (type == 1 && !(value == NA_CHAR)) {
+        kIM[jj] += abs(value);
+      } else if (type == 2 && !(value == NA_SHORT)) {
+        kIM[jj] += abs(value);
+      } else if (type == 4 && !(value == NA_INTEGER)) {
+        kIM[jj] += abs(value);
+      } else if (type == 8 && !ISNA(value) && !ISNAN(value)) {
+        kIM[jj] += abs(value);
+      }  
     }
   }
   
