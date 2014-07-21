@@ -19,12 +19,12 @@
 #' @return The connectivity (weighted degree) for each node in the network
 #' subset
 #' @export
-kIM <- function(adjacency, subsetIndices, allNodes, undirected) {
+kIM <- function(adjacency, subsetIndices, allNodes) {
   if (allNodes) {
     # marginally faster than a C++ implementation.
     return(colSums(abs(adjacency[,subsetIndices]), na.rm=TRUE))
   } else { 
-    return(KIM(adjacency@address, subsetIndices, undirected))
+    return(KIM(adjacency@address, subsetIndices))
   }
 }
 
