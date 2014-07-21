@@ -14,9 +14,6 @@ correspond to the network subset of interest.}
 \item{allNodes}{Logical; if \code{FALSE}, the connectivity is calculated
 based only on nodes in the module, otherwise a module's connectivity to all
 nodes is calculated.}
-
-\item{undirected}{Logical; if \code{TRUE}, only the lower half of the
-symmetric adjacency matrix will be used in the calculations.}
 }
 \value{
 The connectivity (weighted degree) for each node in the network

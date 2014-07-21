@@ -17,8 +17,7 @@ using namespace Rcpp;
  */
 template <typename T>
 NumericVector KIM(
-  XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj, IntegerVector subsetIndices, 
-  LogicalVector undirected
+  XPtr<BigMatrix> xpAdj, MatrixAccessor<T> adj, IntegerVector subsetIndices
 ) {
   // Results vector
   NumericVector kIM(subsetIndices.size(), 0.0);
@@ -31,11 +30,7 @@ NumericVector KIM(
   double value; 
 
   for (unsigned int jj = 0; jj < subsetSize; jj++) {
-    unsigned int ii = 0;
-    if (undirected[0]) {
-      ii = jj;
-    }
-    for (; ii < subsetSize; ii++) {
+    for (unsigned int ii = 0; ii < subsetSize; ii++) {
       value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
       if (type == 1 && !(value == NA_CHAR)) {
         kIM[jj] += abs(value);
@@ -45,7 +40,7 @@ NumericVector KIM(
         kIM[jj] += abs(value);
       } else if (type == 8 && !ISNA(value) && !ISNAN(value)) {
         kIM[jj] += abs(value);
-      }  
+      }
     }
   }
   
@@ -59,15 +54,11 @@ NumericVector KIM(
 //' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 //' @param subsetIndices indices of the subset of the network to calculate
 //'   the mean adjacency for.
-//' @param undirected logical; If \code{TRUE}, then only the lower half of the
-//'   \code{pAdjacency} is used for the calculations.
 //' @return A vector containing the intramodular connectivity (degree) of 
 //'   each node. 
 //' @rdname kIM-cpp
 // [[Rcpp::export]]
-NumericVector KIM(
-  SEXP pAdjacency, IntegerVector subsetIndices, LogicalVector undirected
-) {
+NumericVector KIM(SEXP pAdjacency, IntegerVector subsetIndices) {
   XPtr<BigMatrix> xpAdj(pAdjacency);
   
   // Make sure we're not indexing out of range.
@@ -76,27 +67,20 @@ NumericVector KIM(
       is_true(any(subsetIndices > xpAdj->nrow()))) {
     throw std::out_of_range("Requested index outside of range!");
   }
-  
-  // Generate appropriate warnings
-  if (undirected.size() > 1) {
-    Function warning("warning");
-    warning("The argument 'undirected' has length > 1 and ony the first ",
-            "element will be used.");
-  }
-  
+
   //  Dispatch function for all types of big.matrix.
   unsigned short type = xpAdj->matrix_type();
   if (type == 1) {
-    return KIM(xpAdj, MatrixAccessor<char>(*xpAdj), subsetIndices, undirected);
+    return KIM(xpAdj, MatrixAccessor<char>(*xpAdj), subsetIndices);
   } else if (type == 2) {
-    return KIM(xpAdj, MatrixAccessor<short>(*xpAdj), subsetIndices, undirected);
+    return KIM(xpAdj, MatrixAccessor<short>(*xpAdj), subsetIndices);
   } else if (type == 4) {
-    return KIM(xpAdj, MatrixAccessor<int>(*xpAdj), subsetIndices, undirected);
+    return KIM(xpAdj, MatrixAccessor<int>(*xpAdj), subsetIndices);
   } else if (type == 8) {
-    return KIM(xpAdj, MatrixAccessor<double>(*xpAdj), subsetIndices, undirected);
+    return KIM(xpAdj, MatrixAccessor<double>(*xpAdj), subsetIndices);
   } else {
     /* We should never get here, unless the underlying implementation of 
     bigmemory changes */
     throw Rcpp::exception("Undefined type for provided big.matrix");
-  }      
+  }
 }

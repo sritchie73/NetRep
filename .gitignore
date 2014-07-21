@@ -3,8 +3,10 @@
 .Rprofile
 .RData
 .rda
+.gitignore
 *.Rproj
 *.Rcheck
+*.png
 
 # Compiled Rcpp code
 src/*.o

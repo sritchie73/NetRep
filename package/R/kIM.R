@@ -16,19 +16,13 @@
 #' @param allNodes Logical; if \code{FALSE}, the connectivity is calculated
 #'   based only on nodes in the module, otherwise a module's connectivity to all
 #'   nodes is calculated.
-#' @param undirected Logical; if \code{TRUE}, only the lower half of the 
-#'   symmetric adjacency matrix will be used in the calculations.
 #' @return The connectivity (weighted degree) for each node in the network
 #' subset
 #' @export
 kIM <- function(adjacency, subsetIndices, allNodes, undirected) {
   if (allNodes) {
     # marginally faster than a C++ implementation.
-    sums <- colSums(abs(adjacency[,subsetIndices]), na.rm=TRUE)
-    if (undirected) {
-      sums <- sums/2
-    }
-    return(sums) 
+    return(colSums(abs(adjacency[,subsetIndices]), na.rm=TRUE))
   } else { 
     return(KIM(adjacency@address, subsetIndices, undirected))
   }
@@ -44,21 +38,15 @@ kIM <- function(adjacency, subsetIndices, allNodes, undirected) {
 #' @param allNodes Logical; if \code{FALSE}, the connectivity is calculated
 #'   based only on nodes in the module, otherwise a module's connectivity to all
 #'   nodes is calculated.
-#' @param undirected Logical; if \code{TRUE}, only the lower half of the 
-#'   symmetric adjacency matrix will be used in the calculations.
 #' @return The connectivity (weighted degree) for each node in the network
 #' subset
-kIMR <- function(adjacency, subsetIndices, allNodes, undirected) {
+kIMR <- function(adjacency, subsetIndices, allNodes) {
   # For testing equivalence in R.
   if (allNodes) {
     subset <- adjacency[,subsetIndices]
   } else {
     subset <- adjacency[subsetIndices, subsetIndices]
   }
-  sums <- colSums(abs(subset), na.rm=TRUE)
-  if (undirected) {
-    sums <- sums/2
-  }
-  sums
+  colSums(abs(subset), na.rm=TRUE)
 }
 

@@ -3,16 +3,13 @@
 \alias{KIM}
 \title{C++ implementation of Intramodular Connectivity (Degree).}
 \usage{
-KIM(pAdjacency, subsetIndices, undirected)
+KIM(pAdjacency, subsetIndices)
 }
 \arguments{
 \item{pAdjacency}{SEXP container for the pointer to the adjacency matrix}
 
 \item{subsetIndices}{indices of the subset of the network to calculate
 the mean adjacency for.}
-
-\item{undirected}{logical; If \code{TRUE}, then only the lower half of the
-\code{pAdjacency} is used for the calculations.}
 }
 \value{
 A vector containing the intramodular connectivity (degree) of
