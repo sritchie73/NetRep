@@ -1,6 +1,10 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// [[Rcpp::depends(BH, bigmemory)]]
+#include <bigmemory/MatrixAccessor.hpp>
+#include <numeric>
+
 //' Network subset eigenvector and proportion of variance explained in C++
 //' 
 //' @param pAdjacency SEXP container for the pointer to the adjacency matrix
