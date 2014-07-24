@@ -5,8 +5,25 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
+/* Implementation for SvdProps
+ *
+ * @param xpDat External Pointer for the data matrix.
+ * @param dat Matrix Accessor for the data matrix.
+ * @param subsetIndices indices of the network subset in 'dat'.
+ * @return
+ *  A List containing two 'NumericVector's (the first eigenvector of the network 
+ *  subset in 'dat', and the proportion of variance in 'dat' it explains).
+ */
+template <typename T>
+List SvdProps(
+  XPtr<BigMatrix> xpDat, MatrixAccessor<T> dat, IntegerVector subsetIndices
+) {
+  
+} 
+
 //' Network subset eigenvector and proportion of variance explained in C++
 //' 
+//' C++ Dispatch Function
 //' 
 //' @param pDat SEXP container for the pointer to the data matrix used in 
 //'   network construction.
@@ -44,5 +61,19 @@ List SvdProps(
     );
   }
   
-  
+  // Dispatch function for all types of big.matrix.
+  unsigned short datType = xpDat->matrix_type();
+  if (datType == 1) {
+    return SvdProps(xpDat, MatrixAccessor<char>(*xpDat), subsetIndices);
+  } else if (datType == 2) {
+    return SvdProps(xpDat, MatrixAccessor<short>(*xpDat), subsetIndices);
+  } else if (datType == 4) {
+    return SvdProps(xpDat, MatrixAccessor<int>(*xpDat), subsetIndices);
+  } else if (datType == 8) {
+    return SvdProps(xpDat, MatrixAccessor<double>(*xpDat), subsetIndices);
+  } else {
+    /* We should never get here, unless the underlying implementation of 
+    bigmemory changes */
+    throw Rcpp::exception("Undefined type for provided data big.matrix");
+  }
 }
