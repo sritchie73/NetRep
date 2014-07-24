@@ -30,5 +30,25 @@ using namespace Rcpp;
 NumericVector SvdProps(
   SEXP pAdjacency, SEXP pDat, IntegerVector adjIndices, IntegerVector datIndices
 ) {
-
+  XPtr<BigMatrix> xpAdj(pAdjacency);
+  XPtr<BigMatrix> xpDat(pDat);
+  
+  // Make sure we're not indexing out of range.
+  if (is_true(any(adjIndices <= 0)) || 
+      is_true(any(adjIndices > xpAdj->ncol())) ||
+      is_true(any(adjIndices > xpAdj->nrow()))) {
+    throw std::out_of_range(
+      "Some of the requested indices for network subset are outside of the "
+      "given adjacency matrix."
+    );
+  }
+  if (is_true(any(datIndices <= 0)) || 
+      is_true(any(datIndices > xpDat->ncol()))) {
+    throw std::out_of_range(
+      "Some of the requested indices for network subset are outside of the "
+      "given data matrix."
+    );
+  }
+  
+  
 }
