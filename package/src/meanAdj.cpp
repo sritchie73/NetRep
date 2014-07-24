@@ -34,12 +34,12 @@ NumericVector MeanAdj(
   double value;
   
   // Add to the total sum while handling NAs
-  for (int jj = 0; jj < subsetSize; jj++) {
+  for (unsigned int jj = 0; jj < subsetSize; jj++) {
     unsigned int ii = 0;
     if (undirected[0]) {
       ii = jj+1;
     }
-    for (int ii = 0; ii < subsetSize; ii++) {
+    for ( ; ii < subsetSize; ii++) {
       value = adj[subsetIndices[jj]-1][subsetIndices[ii]-1];
       if (type == 1 && !(value == NA_CHAR)) {
         total += abs(value);
