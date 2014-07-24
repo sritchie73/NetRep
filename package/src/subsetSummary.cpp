@@ -1,7 +1,7 @@
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 using namespace Rcpp;
 
-// [[Rcpp::depends(BH, bigmemory)]]
+// [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/MatrixAccessor.hpp>
 #include <numeric>
 
@@ -45,6 +45,8 @@ List SvdProps(
 //'  the calculation of the proportion of variance requires much of the same
 //'  underlying intermediate calculations that obtaining the first eigenvector
 //'  requires.
+//' 
+//' @import RcppArmadillo
 //'  
 // [[Rcpp::export]]
 List SvdProps(
