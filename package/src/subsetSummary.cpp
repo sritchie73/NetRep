@@ -31,7 +31,7 @@ using namespace Rcpp;
 //'  requires.
 //'  
 // [[Rcpp::export]]
-NumericVector SvdProps(
+List SvdProps(
   SEXP pAdjacency, SEXP pDat, IntegerVector adjIndices, IntegerVector datIndices
 ) {
   XPtr<BigMatrix> xpAdj(pAdjacency);
