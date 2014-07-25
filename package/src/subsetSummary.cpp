@@ -38,7 +38,7 @@ List SvdProps(
   
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) || 
-      is_true(any(subsetIndices > xpDat->ncol()))) {
+      is_true(any(subsetIndices > xpDat->nrow()))) {
     throw std::out_of_range("Some of requested indices are outside of range!");
   }
   
@@ -48,7 +48,8 @@ List SvdProps(
     mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
     mat U, V;
     vec S;
-    svd_econ(U, S, V, aDat.cols(as<uvec>(subsetIndices) - 1), "right", "dc");
+    uvec subsetRows = as<uvec>(subsetIndices) - 1;
+    svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
     
     vec summary(V.col(1));
     return List::create(
