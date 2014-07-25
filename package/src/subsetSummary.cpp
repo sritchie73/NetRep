@@ -46,6 +46,14 @@ List SvdProps(
   if (xpDat->matrix_type() == 8) {
     // Cast the BigMatrix to an arma::Mat<double>
     mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
+    mat U, V;
+    vec S;
+    svd_econ(U, S, V, aDat.cols(as<uvec>(subsetIndices) - 1), "right", "dc");
+    
+    vec summary(V.col(1));
+    return List::create(
+        NumericVector(summary.begin(), summary.end)
+      );
   } else {
     throw Rcpp::exception(
       "SVD can only be calculated on a big.matrix whose underlying type is"
