@@ -39,10 +39,7 @@ List SvdProps(
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) || 
       is_true(any(subsetIndices > xpDat->ncol()))) {
-    throw std::out_of_range(
-      "Some of the requested indices for network subset are outside of the "
-      "given data matrix."
-    );
+    throw std::out_of_range("Some of requested indices are outside of range!");
   }
   
   // Dispatch function for all types of big.matrix.
