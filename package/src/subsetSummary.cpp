@@ -1,5 +1,6 @@
 #include <RcppArmadillo.h>
 using namespace Rcpp;
+using namespace arma;
 
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/BigMatrix.h>
@@ -64,22 +65,22 @@ List SvdProps(
   unsigned short datType = xpDat->matrix_type();
   if (datType == 1) {
     return SvdProps(
-      arma::Mat<char>((char *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      Mat<char>((char *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
       subsetIndices
     );
   } else if (datType == 2) {
     return SvdProps(
-      arma::Mat<short>((short *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      Mat<short>((short *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
       subsetIndices
     );  
   } else if (datType == 4) {
     return SvdProps(
-      arma::Mat<int>((int *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      Mat<int>((int *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
       subsetIndices
     );
   } else if (datType == 8) {
     return SvdProps(
-      arma::Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
       subsetIndices
     );
   } else {
