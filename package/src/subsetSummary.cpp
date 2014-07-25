@@ -2,8 +2,8 @@
 using namespace Rcpp;
 
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
-#include <bigmemory/MatrixAccessor.hpp>
-#include <numeric>
+#include <bigmemory/BigMatrix.h>
+
 
 /* Implementation for SvdProps
  *
@@ -15,10 +15,8 @@ using namespace Rcpp;
  *  subset in 'dat', and the proportion of variance in 'dat' it explains).
  */
 template <typename T>
-List SvdProps(
-  XPtr<BigMatrix> xpDat, MatrixAccessor<T> dat, IntegerVector subsetIndices
-) {
-  
+List SvdProps(const arma::Mat<T>& aDat, IntegerVector subsetIndices) {
+  return List::create(CharacterVector("Success"));
 } 
 
 //' Network subset eigenvector and proportion of variance explained in C++
@@ -66,13 +64,25 @@ List SvdProps(
   // Dispatch function for all types of big.matrix.
   unsigned short datType = xpDat->matrix_type();
   if (datType == 1) {
-    return SvdProps(xpDat, MatrixAccessor<char>(*xpDat), subsetIndices);
+    return SvdProps(
+      arma::Mat<char>((char *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );
   } else if (datType == 2) {
-    return SvdProps(xpDat, MatrixAccessor<short>(*xpDat), subsetIndices);
+    return SvdProps(
+      arma::Mat<short>((short *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );  
   } else if (datType == 4) {
-    return SvdProps(xpDat, MatrixAccessor<int>(*xpDat), subsetIndices);
+    return SvdProps(
+      arma::Mat<int>((int *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );
   } else if (datType == 8) {
-    return SvdProps(xpDat, MatrixAccessor<double>(*xpDat), subsetIndices);
+    return SvdProps(
+      arma::Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );
   } else {
     /* We should never get here, unless the underlying implementation of 
     bigmemory changes */
