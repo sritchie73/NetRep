@@ -53,7 +53,7 @@ List SvdProps(
     
     vec summary(V.col(1));
     return List::create(
-        NumericVector(summary.begin(), summary.end())
+        Named("summaryProfile") = NumericVector(summary.begin(), summary.end())
       );
   } else {
     throw Rcpp::exception(
