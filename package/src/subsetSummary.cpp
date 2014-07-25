@@ -7,7 +7,6 @@ using namespace Rcpp;
 
 /* Implementation for SvdProps
  *
- * @param xpDat External Pointer for the data matrix.
  * @param dat Matrix Accessor for the data matrix.
  * @param subsetIndices indices of the network subset in 'dat'.
  * @return

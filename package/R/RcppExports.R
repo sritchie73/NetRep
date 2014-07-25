@@ -48,3 +48,34 @@ MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
     .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
 }
 
+#' Network subset eigenvector and proportion of variance explained in C++
+#' 
+#' C++ Dispatch Function
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix used in 
+#'   network construction.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#' 
+#' @return
+#'  A list whose first element is the first eigenvector of the singular value
+#'  decomposition for the network subset, and whose second element is the 
+#'  proportion of the variance in the corresponding subset of \code{pDat} the 
+#'  eigenvector explains.
+#'  
+#' @details
+#'  The sign of the returned eigenvector is modified to match the average of
+#'  \code{pDat}. This is to match the behaviour of 
+#'  \code{\link[WGCNA]{moduleEigengenes}} in the \code{\link{WGCNA}} package.
+#'  
+#'  The two returned properties are bundled together into one function because
+#'  the calculation of the proportion of variance requires much of the same
+#'  underlying intermediate calculations that obtaining the first eigenvector
+#'  requires.
+#' 
+#' @import RcppArmadillo
+#'  
+SvdProps <- function(pDat, subsetIndices) {
+    .Call('netrep_SvdProps', PACKAGE = 'netrep', pDat, subsetIndices)
+}
+
