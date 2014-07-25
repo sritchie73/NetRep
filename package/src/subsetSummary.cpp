@@ -52,8 +52,19 @@ List SvdProps(
     svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
     
     vec summary(V.col(1));
+    
+    // The proportion of variance explained is the sum of the squared 
+    // correlation between the network subset summary profile, and each of the 
+    // variables in the data that correspond to nodes in the network subset.
+    mat p = cor(summary, aDat.rows(subsetRows).t());
+    for (unsigned int ii = 0; ii < subsetIndices.size(); ii++) {
+      p(ii) *= p(ii);
+    }
+    vec pve(mean(p, 1));
+    
     return List::create(
         Named("summaryProfile") = NumericVector(summary.begin(), summary.end())
+        Named("propVarExpl") = NumericVector(pve.begin(), pve.end())
       );
   } else {
     throw Rcpp::exception(
