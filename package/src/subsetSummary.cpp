@@ -49,9 +49,38 @@ List SvdProps(
     mat U, V;
     vec S;
     uvec subsetRows = as<uvec>(subsetIndices) - 1;
-    svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
     
+    // Get the summary profile for the network subset from the SVD.
+    svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
     vec summary(V.col(1));
+    
+    // Make sure the orientation of the eigenvector matches the orientation of
+    // the data
+    vec meanExpr(mean(aDat.rows(subsetRows), 1));
+    vec sdExpr(stddev(aDat.rows(subsetRows), 0, 1));
+
+    // Scale data in place
+    for (unsigned int jj = 0; jj < subsetIndices.size(); jj++) {
+      for (unsigned int ii = 0; ii < subsetIndices.size(); ii++) {
+        aDat(subsetRows(ii), jj) -= meanExpr(ii);
+        aDat(subsetRows(ii), jj) /= sdExpr(ii);
+      }   
+    }   
+
+    mat ap = cor(mean(aDat.rows(subsetRows)), summary);
+    if (ap(0,0) < 0) {                                                                                                                                                                                                                        
+      for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
+        summary(jj) *= -1; 
+      }   
+    }   
+
+    // Unscale data
+    for (unsigned int jj = 0; jj < subsetIndices.size(); jj++) {
+      for (unsigned int ii = 0; ii < subsetIndices.size(); ii++) {
+        aDat(subsetRows(ii), jj) *= sdExpr(ii);
+        aDat(subsetRows(ii), jj) += meanExpr(ii);
+      }   
+    }   
     
     // The proportion of variance explained is the sum of the squared 
     // correlation between the network subset summary profile, and each of the 
