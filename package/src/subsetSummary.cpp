@@ -92,7 +92,7 @@ List SvdProps(
     vec pve(mean(p, 1));
     
     return List::create(
-        Named("summaryProfile") = NumericVector(summary.begin(), summary.end())
+        Named("summaryProfile") = NumericVector(summary.begin(), summary.end()),
         Named("propVarExpl") = NumericVector(pve.begin(), pve.end())
       );
   } else {
