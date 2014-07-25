@@ -50,8 +50,6 @@ MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
 
 #' Network subset eigenvector and proportion of variance explained in C++
 #' 
-#' C++ Dispatch Function
-#' 
 #' @param pDat SEXP container for the pointer to the data matrix used in 
 #'   network construction.
 #' @param subsetIndices indices of the network subset of interest in 

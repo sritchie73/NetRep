@@ -19,7 +19,7 @@ A list whose first element is the first eigenvector of the singular value
  eigenvector explains.
 }
 \description{
-C++ Dispatch Function
+Network subset eigenvector and proportion of variance explained in C++
 }
 \details{
 The sign of the returned eigenvector is modified to match the average of
