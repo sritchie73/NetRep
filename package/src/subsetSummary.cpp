@@ -5,23 +5,7 @@ using namespace arma;
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/BigMatrix.h>
 
-
-/* Implementation for SvdProps
- *
- * @param dat Matrix Accessor for the data matrix.
- * @param subsetIndices indices of the network subset in 'dat'.
- * @return
- *  A List containing two 'NumericVector's (the first eigenvector of the network 
- *  subset in 'dat', and the proportion of variance in 'dat' it explains).
- */
-template <typename T>
-List SvdProps(const arma::Mat<T>& aDat, IntegerVector subsetIndices) {
-  return List::create(CharacterVector("Success"));
-} 
-
 //' Network subset eigenvector and proportion of variance explained in C++
-//' 
-//' C++ Dispatch Function
 //' 
 //' @param pDat SEXP container for the pointer to the data matrix used in 
 //'   network construction.
@@ -62,30 +46,13 @@ List SvdProps(
   }
   
   // Dispatch function for all types of big.matrix.
-  unsigned short datType = xpDat->matrix_type();
-  if (datType == 1) {
-    return SvdProps(
-      Mat<char>((char *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
-      subsetIndices
-    );
-  } else if (datType == 2) {
-    return SvdProps(
-      Mat<short>((short *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
-      subsetIndices
-    );  
-  } else if (datType == 4) {
-    return SvdProps(
-      Mat<int>((int *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
-      subsetIndices
-    );
-  } else if (datType == 8) {
-    return SvdProps(
-      Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
-      subsetIndices
-    );
+  if (xpDat->matrix_type() == 8) {
+    // Cast the BigMatrix to an arma::Mat<double>
+    mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
   } else {
-    /* We should never get here, unless the underlying implementation of 
-    bigmemory changes */
-    throw Rcpp::exception("Undefined type for provided data big.matrix");
+    throw Rcpp::exception(
+      "SVD can only be calculated on a big.matrix whose underlying type is"
+      "'double'."
+    );
   }
 }
