@@ -73,7 +73,8 @@ List DataSummary(
     bool success = svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
     if (!success) {
       Function warning("warning");
-      warning("SVD failed to converge, returning NA.");
+      warning("SVD failed to converge, does your data contain missing or"
+              "infinite values?");
       return List::create(
         Named("summaryProfile") = NumericVector(1, NA_REAL),
         Named("propVarExpl") = NumericVector(1, NA_REAL)
