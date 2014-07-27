@@ -1,3 +1,6 @@
+#define ARMA_USE_LAPACK
+#define ARMA_NO_DEBUG
+
 #include <RcppArmadillo.h>
 using namespace Rcpp;
 using namespace arma;
