@@ -12,6 +12,8 @@ using namespace arma;
 //' 
 //' @param pDat SEXP container for the pointer to the data matrix used in 
 //'   network construction.
+//' @param pScaledDat SEXP container for the pointer to a scaled version of the 
+//'   data matrix used to construct the network.
 //' @param subsetIndices indices of the network subset of interest in 
 //'   \code{pDat}.
 //' 
@@ -35,14 +37,27 @@ using namespace arma;
 //'  
 // [[Rcpp::export]]
 List DataSummary(
-  SEXP pDat, IntegerVector subsetIndices
+  SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices
 ) {
   XPtr<BigMatrix> xpDat(pDat);
+  XPtr<BigMatrix> xspDat(pScaledDat);
   
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) || 
       is_true(any(subsetIndices > xpDat->nrow()))) {
     throw std::out_of_range("Some of requested indices are outside of range!");
+  }
+  // Make sure pScaledDat corresponds to pDat
+    if (xpDat->ncol() != xspDat->ncol() ||
+      xpDat->nrow() != xspDat->nrow()) {
+    throw Rcpp::exception(
+        "The results matrix must have the same dimensions as the data matrix!"
+      );
+  }
+  if (xpDat->matrix_type() != xspDat->matrix_type()) {
+    throw Rcpp::exception(
+        "The results matrix must have the same 'type' as the data matrix."
+      );
   }
   
   // Dispatch function for all types of big.matrix.
@@ -64,32 +79,15 @@ List DataSummary(
       );
     }
     vec summary(V.col(1));
-    
-    // Make sure the orientation of the eigenvector matches the orientation of
-    // the data
-    vec meanExpr(mean(aDat.rows(subsetRows), 1));
-    vec sdExpr(stddev(aDat.rows(subsetRows), 0, 1));
 
-    // Scale data in place
-    for (unsigned int jj = 0; jj < subsetIndices.size(); jj++) {
-      for (unsigned int ii = 0; ii < subsetIndices.size(); ii++) {
-        aDat(subsetRows(ii), jj) -= meanExpr(ii);
-        aDat(subsetRows(ii), jj) /= sdExpr(ii);
-      }   
-    }   
-
-    mat ap = cor(mean(aDat.rows(subsetRows)), summary);
+    // Flip the sign of the summary profile so that the eigenvector is 
+    // positively correlated with the average scaled value of the underlying
+    // data for the network subset.
+    mat asDat((double *)xspDat->matrix(), xspDat->nrow(), xspDat->ncol(), false);
+    mat ap = cor(mean(asDat.rows(subsetRows)), summary);
     if (ap(0,0) < 0) {                                                                                                                                                                                                                        
       for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
         summary(jj) *= -1; 
-      }   
-    }   
-
-    // Unscale data
-    for (unsigned int jj = 0; jj < subsetIndices.size(); jj++) {
-      for (unsigned int ii = 0; ii < subsetIndices.size(); ii++) {
-        aDat(subsetRows(ii), jj) *= sdExpr(ii);
-        aDat(subsetRows(ii), jj) += meanExpr(ii);
       }   
     }   
     
