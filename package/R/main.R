@@ -244,6 +244,12 @@ netRep.core <- function(
       on.exit({ gc() }, add = TRUE) # clean up memory after run
       vCat(verbose, ident+1, "Done!")
       
+      # TODO:
+      # Make sure there are no NAs in the data.
+      
+      # TODO:
+      # Create (temporary) scaled dataSets
+      
       # Set the diagonals to NA so the network properties are calculated 
       # correctly.
       oldDiags <- list(diag(discAdj), diag(testAdj))
