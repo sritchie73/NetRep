@@ -31,7 +31,7 @@ using namespace arma;
 //' @import RcppArmadillo
 //'  
 // [[Rcpp::export]]
-List SvdProps(
+List DataSummary(
   SEXP pDat, IntegerVector subsetIndices
 ) {
   XPtr<BigMatrix> xpDat(pDat);
