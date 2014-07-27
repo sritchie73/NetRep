@@ -48,10 +48,23 @@ MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
     .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
 }
 
+#' Scale a matrix by its rows
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param spDat SEXP container for the pointer to the pre-initialised
+#'   \code{\link[bigmemory]{big.matrix}} that the scaled version of \code{pDat}
+#'   will be stored in.
+#' @rdname scale-cpp
+Scale <- function(pDat, spDat) {
+    invisible(.Call('netrep_Scale', PACKAGE = 'netrep', pDat, spDat))
+}
+
 #' Network subset eigenvector and proportion of variance explained in C++
 #' 
 #' @param pDat SEXP container for the pointer to the data matrix used in 
 #'   network construction.
+#' @param pScaledDat SEXP container for the pointer to a scaled version of the 
+#'   data matrix used to construct the network.
 #' @param subsetIndices indices of the network subset of interest in 
 #'   \code{pDat}.
 #' 
@@ -72,8 +85,9 @@ MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
 #'  requires.
 #' 
 #' @import RcppArmadillo
+#' @rdname dataSummary-cpp
 #'  
-SvdProps <- function(pDat, subsetIndices) {
-    .Call('netrep_SvdProps', PACKAGE = 'netrep', pDat, subsetIndices)
+DataSummary <- function(pDat, pScaledDat, subsetIndices) {
+    .Call('netrep_DataSummary', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices)
 }
 

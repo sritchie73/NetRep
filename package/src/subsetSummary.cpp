@@ -34,6 +34,7 @@ using namespace arma;
 //'  requires.
 //' 
 //' @import RcppArmadillo
+//' @rdname dataSummary-cpp
 //'  
 // [[Rcpp::export]]
 List DataSummary(

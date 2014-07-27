@@ -13,8 +13,8 @@ using namespace arma;
 //' @param spDat SEXP container for the pointer to the pre-initialised
 //'   \code{\link[bigmemory]{big.matrix}} that the scaled version of \code{pDat}
 //'   will be stored in.
-//'   
-// [[Rcpp:export]]
+//' @rdname scale-cpp
+// [[Rcpp::export]]
 void Scale(SEXP pDat, SEXP spDat) {
   XPtr<BigMatrix> xpDat(pDat);
   XPtr<BigMatrix> xspDat(spDat);
