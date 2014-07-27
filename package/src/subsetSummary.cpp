@@ -51,7 +51,15 @@ List DataSummary(
     uvec subsetRows = as<uvec>(subsetIndices) - 1;
     
     // Get the summary profile for the network subset from the SVD.
-    svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
+    bool success = svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
+    if (!success) {
+      Function warning("warning");
+      warning("SVD failed to converge");
+      return List::create(
+        Named("summaryProfile") = NumericVector(1, NA_REAL),
+        Named("propVarExpl") = NumericVector(1, NA_REAL)
+      );
+    }
     vec summary(V.col(1));
     
     // Make sure the orientation of the eigenvector matches the orientation of
