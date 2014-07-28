@@ -56,7 +56,7 @@ using namespace arma;
 //' @rdname dataSummary-cpp
 //'  
 // [[Rcpp::export]]
-List DataSummary(
+List DataProps(
   SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices
 ) {
   XPtr<BigMatrix> xpDat(pDat);
