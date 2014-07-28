@@ -16,9 +16,11 @@ using namespace arma;
  *   adjacency on
  * @return
  *    A List containing:
- *     - The mean absolute edge weight of the network subset.
- *     - The weighted within-subset degree for each node.
- *     - The maximum adjacency ratio for each node.
+ *     - The weighted within-subset degree for each node (kIM).
+ *     - The maximum adjacency ratio for each node (MAR).
+ *     - The mean absolute edge weight of the network subset (meanAdj).
+ *     - The mean within-subset degree (meanKIM).
+ *     - The mean maximum adjacency ratio (meanMAR).
  */
 template <typename T>
 List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
@@ -29,6 +31,7 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   // the absolute value.
   Col<T> dg = diagvec(adj);
   Row<T> colSums = sum(abs(adj(nodeIdx, nodeIdx))) - abs(dg(nodeIdx)).t();
+  Row<T> meanKIM = mean(colSums, 1); // This will be length 1
 
   Row<T> sqSums = sum(square(adj(nodeIdx, nodeIdx))) - square(dg(nodeIdx)).t();
   Row<T> MAR = sqSums / colSums;
@@ -38,9 +41,10 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   double meanAdj = (double)sum(colSums) / (n*n - n);
 
   return List::create(
-    Named("meanAdj") = NumericVector(1, meanAdj),
     Named("kIM") = NumericVector(colSums.begin(), colSums.end()),
     Named("MAR") = NumericVector(MAR.begin(), MAR.end()),
+    Named("meanAdj") = NumericVector(1, meanAdj),
+    Named("meanKIM") = NumericVector(meanKIM.begin(), meanKIM.end()),
     Named("meanMAR") = NumericVector(meanMAR.begin(), meanMAR.end())
   );  
 }                                                                                                                                                                                                                                          
@@ -54,10 +58,11 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 //' @return
 //'   A List containing:
 //'   \enumerate{
-//'     \item{The mean absolute edge weight of the network subset.}
-//'     \item{The weighted within-subset degree for each node.}
-//'     \item{The maximum adjacency ratio for each node.}
-//'     \item{The mean maximum adjacency ratio for the network subset.}
+//'     \item{The weighted within-subset degree for each node (kIM).}
+//'     \item{The maximum adjacency ratio for each node (MAR).}
+//'     \item{The mean absolute edge weight of the network subset (meanAdj).}
+//'     \item{The mean within-subset degree (meanKIM).}
+//'     \item{The mean maximum adjacency ratio (meanMAR).}
 //'   }
 //' @rdname netProps-cpp
 // [[Rcpp::export]]

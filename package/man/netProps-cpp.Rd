@@ -14,10 +14,11 @@ NetProps(pAdjacency, subsetIndices)
 \value{
 A List containing:
   \enumerate{
-    \item{The mean absolute edge weight of the network subset.}
-    \item{The weighted within-subset degree for each node.}
-    \item{The maximum adjacency ratio for each node.}
-    \item{The mean maximum adjacency ratio for the network subset.}
+    \item{The weighted within-subset degree for each node (kIM).}
+    \item{The maximum adjacency ratio for each node (MAR).}
+    \item{The mean absolute edge weight of the network subset (meanAdj).}
+    \item{The mean within-subset degree (meanKIM).}
+    \item{The mean maximum adjacency ratio (meanMAR).}
   }
 }
 \description{
