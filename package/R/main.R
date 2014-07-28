@@ -252,7 +252,6 @@ netRep.core <- function(
       } else {
         testDat <- NULL
       }
-      vCat(verbose, ident+1, "Done!")
       
       # Check data for missingness and create scaled data 
       if (!is.null(datSets[[di]])) {
@@ -341,7 +340,6 @@ netRep.core <- function(
       oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
       names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
       overlap <- oSizes[names(dSizes)]/dSizes
-      vCat(verbose, indent+1, "Done!")
       
       vCat(verbose, indent+1, "Calculating observed test statistics...")
       # Obtain the topological properties for each network subset in the
@@ -364,7 +362,6 @@ netRep.core <- function(
         subsetTestStats(discProps[[as.character(ss)]], testProps)
       }
       rownames(observed) <- oSubsets
-      vCat(verbose, indent+1, "Done!")
       
       # Calculate the null distribution for each of the statistics.
       vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
@@ -431,7 +428,6 @@ netRep.core <- function(
                 lower.tail=FALSE)
       }
       dimnames(p.values) <- dimnames(observed)
-      vCat(verbose, indent+1, "Done!")
       
       # Collate results
       return(list(observed=observed, null=nulls, p.value=p.values,
