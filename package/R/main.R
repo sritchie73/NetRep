@@ -284,17 +284,6 @@ netRep.core <- function(
       }
       on.exit({ gc() }, add=TRUE) # clean up memory after run
       
-      # Set the diagonals to NA so the network properties are calculated 
-      # correctly.
-      oldDiags <- list(diag(discAdj), diag(testAdj))
-      diag(discAdj) <- NA
-      diag(testAdj) <- NA
-      # but we want to restore the diagonals when we're finished.
-      on.exit({
-        diag(discAdj) <- oldDiags[[1]]
-        diag(testAdj) <- oldDiags[[2]]
-      }, add = TRUE)
-      
       # Get a vector of nodes which are present in both datasets. Depends on 
       # the combination of data input provided.
       vCat(verbose, indent+1, "Extracting information about node overlap...")
