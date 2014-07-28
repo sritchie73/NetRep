@@ -111,6 +111,27 @@ MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
     .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
 }
 
+#' Calculate Network Properties
+#'
+#' @param pAdjacency SEXP container for the pointer to the adjacency matrix
+#' @param subsetIndices indices of the subset of the network to calculate
+#'   the mean adjacency for.
+#' @param undirected logical; If \code{TRUE}, only the lower half of the
+#'   adjacency matrix is used to calculate the \code{meanAdj}, halving the
+#'   calculation time.
+#' @return
+#'   A List containing:
+#'   \enumerate {
+#'     \item{The mean absolute edge weight of the network subset.}
+#'     \item{The weighted within-subset degree for each node.}
+#'     \item{The maximum adjacency ratio for each node.}
+#'     \item{The mean maximum adjacency ratio for the network subset.}
+#'   }
+#' @rdname netProps-cpp
+NetProps <- function(pAdjacency, subsetIndices) {
+    .Call('netrep_NetProps', PACKAGE = 'netrep', pAdjacency, subsetIndices)
+}
+
 #' Scale a matrix by its rows
 #' 
 #' @param pDat SEXP container for the pointer to the data matrix to be scaled.

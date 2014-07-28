@@ -99,6 +99,22 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// NetProps
+List NetProps(SEXP pAdjacency, IntegerVector subsetIndices);
+RcppExport SEXP netrep_NetProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
+        List __result = NetProps(pAdjacency, subsetIndices);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // Scale
 void Scale(SEXP pDat, SEXP spDat);
 RcppExport SEXP netrep_Scale(SEXP pDatSEXP, SEXP spDatSEXP) {
