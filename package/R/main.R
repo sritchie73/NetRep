@@ -283,9 +283,6 @@ netRep.core <- function(
         on.exit({ rm(scaledTest) }, add=TRUE)
       }
       on.exit({ gc() }, add=TRUE) # clean up memory after run
-
-      # TODO:
-      # Make sure there are no NAs in the data.
       
       # Set the diagonals to NA so the network properties are calculated 
       # correctly.
