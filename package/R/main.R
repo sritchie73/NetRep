@@ -259,7 +259,7 @@ netRep.core <- function(
           descriptor <- paste0("scaled", di, ".desc")
           backing <- paste0("scaled", di, ".bin")
           scaledDisc <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
-          scaledSets[[di]] <- file.path(".temp-objects", descriptor))
+          scaledSets[[di]] <- file.path(".temp-objects", descriptor)
         } else {
           scaledDisc <- attach.big.matrix(scaledSets[[di]])
         }
@@ -270,7 +270,7 @@ netRep.core <- function(
           descriptor <- paste0("scaled", ti, ".desc")
           backing <- paste0("scaled", ti, ".bin")
           scaledTest <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
-          scaledSets[[ti]] <- file.path(".temp-objects", descriptor))
+          scaledSets[[ti]] <- file.path(".temp-objects", descriptor)
         } else {
           scaledTest <- attach.big.matrix(scaledSets[[ti]])
         }
