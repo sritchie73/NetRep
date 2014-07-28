@@ -22,8 +22,8 @@ Imports:
     BH,
     gPdtest,
     fExtremes,
-    graphics
+    graphics,
+    RcppArmadillo (>= 0.4)
 Suggests:
     testthat
-LinkingTo: Rcpp, BH, bigmemory
-SystemRequirements: C++11
+LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo

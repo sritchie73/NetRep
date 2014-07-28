@@ -1,0 +1,59 @@
+#' Network Subset Data Summary
+#'
+#' For a given network subset, returns the correlation between each node and 
+#' the summary profile for that subset from the underlying data (see details),
+#' along with the proportion of the variance in the underlying data that summary
+#' profile explains.
+#' 
+#' @param data a \code{\link[bigmemory]{big.matrix}}: containing the data matrix 
+#'  used to construct the network. Rows are the variables (nodes) and columns
+#'  are the samples.
+#' @param scaledData a \code{\link[bigmemory]{big.matrix}}: containing 
+#'  \code{data} where each row (node) has been scaled. See 
+#'  \code{\link{scaleBigMatrix}}.
+#' @param subsetIndices a vector of integers giving the row indices for the 
+#'  network subset of interest in \code{data} and \code{scaledData}
+#' @return
+#'  A list whose first element is the subset membership for each node (see 
+#'  details), and whose second element is the proportion of the variance
+#'  explained by the subset's summary vector (see details).
+#'  
+#' @details
+#'  First, the underlying data for a network subset is summarised using the 
+#'  first right singular vector (or eigenvector from the first principal 
+#'  component \emph{(1)}) from a singular value decomposition. 
+#'  
+#' The \code{scaledData} is used to orient this vector so that its direction is 
+#' in alignment with the underlying data, as the SVD will sometimes return a 
+#' vector which is strongly negatively correlated, rather than positively 
+#' correlated, with the data. 
+#'  
+#' The network subset membership for each node is thus calculated as the 
+#' correlation between each node (in the underlying data) and the summary 
+#' vector.
+#' 
+#' The proportion of the variance explained by the summary vector is calculated
+#' as the mean square of the network subset membership.
+#' 
+#' @section Warning:
+#' A SVD cannot be calculated if there are any \code{NA}, \code{NaN}, or 
+#' \code{Inf} in the supplied data. For speed reasons, this function does not
+#' check the supplied data. If there are any non finite values in the data, 
+#' the function will run for a long time, and fail, print the following 
+#' message:
+#'  \code{error: svd_econ(): failed to converge}
+#' throw a warning, and return a list of \code{NA}s. 
+#' 
+#' @references
+#'   \enumerate{
+#'     \item{
+#'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
+#'       network module preserved and reproducible?} PLoS Comput. Biol. 
+#'       \strong{7}, e1001057 (2011). 
+#'     }
+#'  }
+#'  
+#' @export
+dataSummary <- function(data, scaledData, subsetIndices) {
+  return(DataSummary(data@address, scaledData@address, subsetIndices))
+}

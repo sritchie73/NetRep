@@ -208,6 +208,17 @@ netRep.core <- function(
     setNames <- names(nodeLabelSets)
   }
   
+  # Set up temporary directory for working big.matrix objects
+  scaledSets <- NULL
+  if (!is.null(datSets)) {
+    dir.create(".temp-objects", showWarnings=FALSE)
+    on.exit({
+      unlink(".temp-objects", recursive=TRUE)
+    }, add=TRUE)
+    
+    scaledSets <- list() 
+  }
+  
   # Iterate pairwise over datasets, comparing those marked "discovery"
   # with each marked as "test".
   foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
@@ -241,8 +252,40 @@ netRep.core <- function(
       } else {
         testDat <- NULL
       }
-      on.exit({ gc() }, add = TRUE) # clean up memory after run
-      vCat(verbose, ident+1, "Done!")
+        
+      # Create scaled data 
+      if (!is.null(discDat)) {
+        vCat(verbose, indent+1, "Checking discovery dataset for missing values...")
+        stopifnot(allFinite(discDat))
+        vCat(verbose, indent+1, "Creating temporary scaled dataset...")
+        if (is.null(scaledSets[[di]])) {
+          descriptor <- paste0("scaled", di, ".desc")
+          backing <- paste0("scaled", di, ".bin")
+          scaledDisc <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
+          scaledSets[[di]] <- file.path(".temp-objects", descriptor)
+        } else {
+          scaledDisc <- attach.big.matrix(scaledSets[[di]])
+        }
+        on.exit({ rm(scaledDisc) }, add=TRUE)
+      }
+      if (!is.null(testDat)) {
+        vCat(verbose, indent+1, "Checking test dataset for missing values...")
+        stopifnot(allFinite(testDat))
+        vCat(verbose, indent+1, "Creating temporary scaled dataset...")
+        if (is.null(scaledSets[[ti]])) {
+          descriptor <- paste0("scaled", ti, ".desc")
+          backing <- paste0("scaled", ti, ".bin")
+          scaledTest <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
+          scaledSets[[ti]] <- file.path(".temp-objects", descriptor)
+        } else {
+          scaledTest <- attach.big.matrix(scaledSets[[ti]])
+        }
+        on.exit({ rm(scaledTest) }, add=TRUE)
+      }
+      on.exit({ gc() }, add=TRUE) # clean up memory after run
+
+      # TODO:
+      # Make sure there are no NAs in the data.
       
       # Set the diagonals to NA so the network properties are calculated 
       # correctly.
@@ -303,7 +346,6 @@ netRep.core <- function(
       oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
       names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
       overlap <- oSizes[names(dSizes)]/dSizes
-      vCat(verbose, indent+1, "Done!")
       
       vCat(verbose, indent+1, "Calculating observed test statistics...")
       # Obtain the topological properties for each network subset in the
@@ -326,7 +368,6 @@ netRep.core <- function(
         subsetTestStats(discProps[[as.character(ss)]], testProps)
       }
       rownames(observed) <- oSubsets
-      vCat(verbose, indent+1, "Done!")
       
       # Calculate the null distribution for each of the statistics.
       vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
@@ -393,7 +434,6 @@ netRep.core <- function(
                 lower.tail=FALSE)
       }
       dimnames(p.values) <- dimnames(observed)
-      vCat(verbose, indent+1, "Done!")
       
       # Collate results
       return(list(observed=observed, null=nulls, p.value=p.values,

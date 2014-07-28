@@ -36,3 +36,29 @@ test_that("diag<- is correct", {
   diag(ns2Ptr) <- 1:3
   expect_equal(ns2Ptr[], ns2)
 })
+
+test_that("scaleBigMatrix is correct", {
+  m <- matrix(1:9, 3)
+  bigm <- as.big.matrix(m, type="double")
+  expect_equivalent(scaleBigMatrix(bigm)[,], t(scale(t(m))))
+})
+
+test_that("allFinite is correct", {
+  set.seed(1)
+  options(bigmemory.typecast.warning=FALSE)
+  m1 <- matrix(sample(c(1:4, NA), 9, TRUE), 3)
+  m2 <- matrix(sample(c(1:4, Inf), 9, TRUE), 3)
+  m3 <- matrix(sample(c(1:4, NaN), 9, TRUE), 3)
+  m4 <- matrix(sample(c(1:4), 9, TRUE), 3)
+  types <- c("char", "short", "integer", "double")
+  for (i in 1:4) {
+    bigm1 <- as.big.matrix(m1, type=types[i])
+    bigm4 <- as.big.matrix(m4, type=types[i])
+    expect_false(allFinite(bigm1))
+    expect_true(allFinite(bigm4))
+  }
+  bigm2 <- as.big.matrix(m2, type="double")
+  bigm3 <- as.big.matrix(m3, type="double")
+  expect_false(allFinite(bigm2))
+  expect_false(allFinite(bigm3))
+})
