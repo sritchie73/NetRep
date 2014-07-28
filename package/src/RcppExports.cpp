@@ -6,6 +6,23 @@
 
 using namespace Rcpp;
 
+// DataSummary
+List DataSummary(SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices);
+RcppExport SEXP netrep_DataSummary(SEXP pDatSEXP, SEXP pScaledDatSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
+        Rcpp::traits::input_parameter< SEXP >::type pScaledDat(pScaledDatSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
+        List __result = DataSummary(pDat, pScaledDat, subsetIndices);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // GetDiag
 NumericVector GetDiag(SEXP pBigMat);
 RcppExport SEXP netrep_GetDiag(SEXP pBigMatSEXP) {
@@ -78,22 +95,5 @@ BEGIN_RCPP
         Scale(pDat, spDat);
     }
     return R_NilValue;
-END_RCPP
-}
-// DataSummary
-List DataSummary(SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices);
-RcppExport SEXP netrep_DataSummary(SEXP pDatSEXP, SEXP pScaledDatSEXP, SEXP subsetIndicesSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
-        Rcpp::traits::input_parameter< SEXP >::type pScaledDat(pScaledDatSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        List __result = DataSummary(pDat, pScaledDat, subsetIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
 END_RCPP
 }

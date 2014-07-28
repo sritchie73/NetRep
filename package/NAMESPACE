@@ -3,6 +3,7 @@
 export("%nin%")
 export("%sub_in%")
 export("%sub_nin%")
+export(dataSummary)
 export(kIM)
 export(meanAdj)
 export(netRep)
