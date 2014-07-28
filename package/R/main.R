@@ -208,6 +208,17 @@ netRep.core <- function(
     setNames <- names(nodeLabelSets)
   }
   
+  # Set up temporary directory for working big.matrix objects
+  scaledSets <- NULL
+  if (!is.null(datSets)) {
+    dir.create(".temp-objects", showWarnings=FALSE)
+    on.exit({
+      unlink(".temp-objects", recursive=TRUE)
+    }, add=TRUE)
+    
+    scaledSets <- list() 
+  }
+  
   # Iterate pairwise over datasets, comparing those marked "discovery"
   # with each marked as "test".
   foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
@@ -241,14 +252,35 @@ netRep.core <- function(
       } else {
         testDat <- NULL
       }
-      on.exit({ gc() }, add = TRUE) # clean up memory after run
       vCat(verbose, ident+1, "Done!")
       
+      # Check data for missingness and create scaled data 
+      if (!is.null(datSets[[di]])) {
+        if (is.null(scaledSets[[di]])) {
+          descriptor <- paste0("scaled", di, ".desc")
+          backing <- paste0("scaled", di, ".bin")
+          scaledDisc <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
+          scaledSets[[di]] <- file.path(".temp-objects", descriptor))
+        } else {
+          scaledDisc <- attach.big.matrix(scaledSets[[di]])
+        }
+        on.exit({ rm(scaledDisc) }, add=TRUE)
+      }
+      if (!is.null(datSets[[ti]])) {
+        if (is.null(scaledSets[[ti]])) {
+          descriptor <- paste0("scaled", ti, ".desc")
+          backing <- paste0("scaled", ti, ".bin")
+          scaledTest <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
+          scaledSets[[ti]] <- file.path(".temp-objects", descriptor))
+        } else {
+          scaledTest <- attach.big.matrix(scaledSets[[ti]])
+        }
+        on.exit({ rm(scaledTest) }, add=TRUE)
+      }
+      on.exit({ gc() }, add=TRUE) # clean up memory after run
+
       # TODO:
       # Make sure there are no NAs in the data.
-      
-      # TODO:
-      # Create (temporary) scaled dataSets
       
       # Set the diagonals to NA so the network properties are calculated 
       # correctly.
