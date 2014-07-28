@@ -16,18 +16,27 @@ data matrix used to construct the network.}
   \code{pDat}.}
 }
 \value{
-A list whose first element is the first eigenvector of the singular value
- decomposition for the network subset, and whose second element is the
- proportion of the variance in the corresponding subset of \code{pDat} the
- eigenvector explains.
+A list whose first element is the subset membership for each node (see
+ details), and whose second element is the proportion of the variance
+ explained by the subset's summary vector (see details).
 }
 \description{
 Network subset eigenvector and proportion of variance explained in C++
 }
 \details{
-The sign of the returned eigenvector is modified to match the average of
- \code{pDat}. This is to match the behaviour of
+First, a summary vector is calculated for the network subset from the
+ underlying data. This is the first right singular vector from a singular
+ value decomposition (also the eigenvector of the first principal component
+ \emph{(1)}). The sign of the returned eigenvector is modified to match the
+ average of \code{pDat}. This is to match the behaviour of
  \emph{moduleEigengenes} in the \code{WGCNA} package.
+
+ Using this summary vector, the subset membership of each node is quantified
+ as the correlation between that node's data, and the summary vector.
+
+ The proportion of variance explained by this summary vector is quantified
+ as the average square of the subset memberships for all nodes in the
+ network subset.
 
  The two returned properties are bundled together into one function because
  the calculation of the proportion of variance requires much of the same

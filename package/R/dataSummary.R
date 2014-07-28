@@ -1,9 +1,9 @@
 #' Network Subset Data Summary
 #'
-#' Network subset eigenvector and proportion of variance explained in C++
-#' For a given network subset, returns a vector that summarises the underlying
-#' data that network subset was constructed from, along with the proportion of
-#' the variance in the underlying data it explains.
+#' For a given network subset, returns the correlation between each node and 
+#' the summary profile for that subset from the underlying data (see details),
+#' along with the proportion of the variance in the underlying data that summary
+#' profile explains.
 #' 
 #' @param data a \code{\link[bigmemory]{big.matrix}}: containing the data matrix 
 #'  used to construct the network. Rows are the variables (nodes) and columns
@@ -13,19 +13,27 @@
 #'  \code{\link{scaleBigMatrix}}.
 #' @param subsetIndices a vector of integers giving the row indices for the 
 #'  network subset of interest in \code{data} and \code{scaledData}
-#' 
+#' @return
+#'  A list whose first element is the subset membership for each node (see 
+#'  details), and whose second element is the proportion of the variance
+#'  explained by the subset's summary vector (see details).
+#'  
 #' @details
-#' This returned vector is the first right singular vector from a singular value
-#' decomposition. The vector returned may differ from that obtained through R's
-#' \code{\link[base]{svd}} due to different C/C++ libraries being used.
-#' 
-#' Only \code{\link[bigmemory]{big.matrix}} objects of \code{type = "double"} 
-#' can be used.
-#' 
+#'  First, the underlying data for a network subset is summarised using the 
+#'  first right singular vector (or eigenvector from the first principal 
+#'  component \emph{(1)}) from a singular value decomposition. 
+#'  
 #' The \code{scaledData} is used to orient this vector so that its direction is 
 #' in alignment with the underlying data, as the SVD will sometimes return a 
 #' vector which is strongly negatively correlated, rather than positively 
-#' correlated, with the data.
+#' correlated, with the data. 
+#'  
+#' The network subset membership for each node is thus calculated as the 
+#' correlation between each node (in the underlying data) and the summary 
+#' vector.
+#' 
+#' The proportion of the variance explained by the summary vector is calculated
+#' as the mean square of the network subset membership.
 #' 
 #' @section Warning:
 #' A SVD cannot be calculated if there are any \code{NA}, \code{NaN}, or 
