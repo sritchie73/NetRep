@@ -54,3 +54,13 @@ scaleBigMatrix <- function(
   Scale(x@address, res@address)
   res
 }
+
+#' Check if all entries of a `big.matrix` are Finite
+#' 
+#' @param x a \code{\link[bigmemory]{big.matrix}}
+#' @return
+#'  \code{FALSE} if \code{x} contains any of: \code{NA}, \code{NaN}, \code{Inf},
+#'  of \code{-Inf}, and \code{TRUE} otherwise.
+allFinite <- function(x) {
+  AllFinite(x@address)
+}

@@ -252,9 +252,12 @@ netRep.core <- function(
       } else {
         testDat <- NULL
       }
-      
-      # Check data for missingness and create scaled data 
-      if (!is.null(datSets[[di]])) {
+        
+      # Create scaled data 
+      if (!is.null(discDat)) {
+        vCat(verbose, indent+1, "Checking discovery dataset for missing values...")
+        stopifnot(allFinite(discDat))
+        vCat(verbose, indent+1, "Creating temporary scaled dataset...")
         if (is.null(scaledSets[[di]])) {
           descriptor <- paste0("scaled", di, ".desc")
           backing <- paste0("scaled", di, ".bin")
@@ -265,7 +268,10 @@ netRep.core <- function(
         }
         on.exit({ rm(scaledDisc) }, add=TRUE)
       }
-      if (!is.null(datSets[[ti]])) {
+      if (!is.null(testDat)) {
+        vCat(verbose, indent+1, "Checking test dataset for missing values...")
+        stopifnot(allFinite(testDat))
+        vCat(verbose, indent+1, "Creating temporary scaled dataset...")
         if (is.null(scaledSets[[ti]])) {
           descriptor <- paste0("scaled", ti, ".desc")
           backing <- paste0("scaled", ti, ".bin")

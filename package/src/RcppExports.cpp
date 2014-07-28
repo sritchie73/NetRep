@@ -6,6 +6,21 @@
 
 using namespace Rcpp;
 
+// AllFinite
+LogicalVector AllFinite(SEXP pDat);
+RcppExport SEXP netrep_AllFinite(SEXP pDatSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
+        LogicalVector __result = AllFinite(pDat);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // DataSummary
 List DataSummary(SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices);
 RcppExport SEXP netrep_DataSummary(SEXP pDatSEXP, SEXP pScaledDatSEXP, SEXP subsetIndicesSEXP) {
