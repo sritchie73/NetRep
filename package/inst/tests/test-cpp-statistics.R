@@ -1,6 +1,7 @@
 context("Testing C++ Implementations of statistics for validity")
 
 # Complete Adjacency
+set.seed(1)
 adj <- matrix(rnorm(100), 10, 10)
 adjPtr <- as.big.matrix(adj)
 
