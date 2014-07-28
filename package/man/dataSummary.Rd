@@ -12,12 +12,10 @@ are the samples.}
 
 \item{scaledData}{a \code{\link[bigmemory]{big.matrix}}: containing
 \code{data} where each row (node) has been scaled. See
-\code{\link[=scale-cpp]{scaleBigMatrix}}.}
+\code{\link{scaleBigMatrix}}.}
 
 \item{subsetIndices}{a vector of integers giving the row indices for the
  network subset of interest in \code{data} and \code{scaledData}}
-
-\item{data}{}
 }
 \description{
 Network subset eigenvector and proportion of variance explained in C++
@@ -26,10 +24,9 @@ data that network subset was constructed from, along with the proportion of
 the variance in the underlying data it explains.
 }
 \details{
-This returned vector is the first right singular vector from a
-\link[base][=svd]{singular value decomposition}. The vector returned may
-differ from that obtained through R's \code{\link[base]{svd}} due to
-different C/C++ libraries being used.
+This returned vector is the first right singular vector from a singular value
+decomposition. The vector returned may differ from that obtained through R's
+\code{\link[base]{svd}} due to different C/C++ libraries being used.
 
 Only \code{\link[bigmemory]{big.matrix}} objects of \code{type = "double"}
 can be used.
@@ -48,5 +45,14 @@ the function will run for a long time, and fail, print the following
 message:
  \code{error: svd_econ(): failed to converge}
 throw a warning, and return a list of \code{NA}s.
+}
+\references{
+\enumerate{
+    \item{
+      Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
+      network module preserved and reproducible?} PLoS Comput. Biol.
+      \strong{7}, e1001057 (2011).
+    }
+ }
 }
 

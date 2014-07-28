@@ -27,11 +27,20 @@ Network subset eigenvector and proportion of variance explained in C++
 \details{
 The sign of the returned eigenvector is modified to match the average of
  \code{pDat}. This is to match the behaviour of
- \code{\link[WGCNA]{moduleEigengenes}} in the \code{\link{WGCNA}} package.
+ \emph{moduleEigengenes} in the \code{WGCNA} package.
 
  The two returned properties are bundled together into one function because
  the calculation of the proportion of variance requires much of the same
  underlying intermediate calculations that obtaining the first eigenvector
  requires.
+}
+\references{
+\enumerate{
+    \item{
+      Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
+      network module preserved and reproducible?} PLoS Comput. Biol.
+      \strong{7}, e1001057 (2011).
+    }
+ }
 }
 
