@@ -27,4 +27,3 @@ Imports:
 Suggests:
     testthat
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
-SystemRequirements: C++11
