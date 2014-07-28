@@ -18,11 +18,11 @@ LogicalVector AllFinite(XPtr<BigMatrix> xpDat, MatrixAccessor<T> dat) {
   for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
     for (unsigned int ii = 0; ii < xpDat->nrow(); ii++) {
       value = dat[jj][ii];
-      if (type == 1 && !(value == NA_CHAR)) {
+      if (type == 1 && (value == NA_CHAR)) {
         return wrap(false);
-      } else if (type == 2 && !(value == NA_SHORT)) {
+      } else if (type == 2 && (value == NA_SHORT)) {
         return wrap(false);
-      } else if (type == 4 && !(value == NA_INTEGER)) {
+      } else if (type == 4 && (value == NA_INTEGER)) {
         return wrap(false);
       } else if (type == 8 && !R_FINITE(value)) {
         return wrap(false);
