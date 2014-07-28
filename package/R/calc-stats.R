@@ -46,6 +46,7 @@ subsetTestStats <- function(discProps, testProps) {
       cor.kME = cor(discProps[["membership"]], testProps[["membership"]])
     )
   }
+  stats
 }
 
 #' Network subset topology

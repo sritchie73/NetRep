@@ -216,7 +216,7 @@ netRep.core <- function(
       unlink(".temp-objects", recursive=TRUE)
     }, add=TRUE)
     
-    scaledSets <- list() 
+    scaledSets <- rep(list(NULL), length(datSets))
   }
   
   # Iterate pairwise over datasets, comparing those marked "discovery"
@@ -261,7 +261,7 @@ netRep.core <- function(
         if (is.null(scaledSets[[di]])) {
           descriptor <- paste0("scaled", di, ".desc")
           backing <- paste0("scaled", di, ".bin")
-          scaledDisc <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
+          scaledDisc <- scaleBigMatrix(discDat, backing, ".temp-objects", descriptor)
           scaledSets[[di]] <- file.path(".temp-objects", descriptor)
         } else {
           scaledDisc <- attach.big.matrix(scaledSets[[di]])
@@ -275,7 +275,7 @@ netRep.core <- function(
         if (is.null(scaledSets[[ti]])) {
           descriptor <- paste0("scaled", ti, ".desc")
           backing <- paste0("scaled", ti, ".bin")
-          scaledTest <- scaleBigMatrix(dat, backing, descriptor, ".temp-objects")
+          scaledTest <- scaleBigMatrix(testDat, backing, ".temp-objects", descriptor)
           scaledSets[[ti]] <- file.path(".temp-objects", descriptor)
         } else {
           scaledTest <- attach.big.matrix(scaledSets[[ti]])
