@@ -32,7 +32,7 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 
   Row<T> sqSums = sum(square(adj(nodeIdx, nodeIdx))) - square(dg(nodeIdx)).t();
   Row<T> MAR = sqSums / colSums;
-  double meanMAR = (double)mean(MAR, 1);
+  Row<T> meanMAR = mean(MAR, 1); // This will be length 1
   
   int n = subsetIndices.size();
   double meanAdj = (double)sum(colSums) / (n*n - n);
@@ -41,7 +41,7 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
     Named("meanAdj") = NumericVector(1, meanAdj),
     Named("kIM") = NumericVector(colSums.begin(), colSums.end()),
     Named("MAR") = NumericVector(MAR.begin(), MAR.end()),
-    Named("meanMAR") = NumericVector(1, meanMAR)
+    Named("meanMAR") = NumericVector(meanMAR.begin(), meanMAR.end())
   );  
 }                                                                                                                                                                                                                                          
 
