@@ -5,8 +5,7 @@
 \usage{
 netRep.core(datSets = NULL, adjSets = NULL, nodeLabelSets, discovery, test,
   nPerm = 10000, buildNetFun, ignoreSets = NULL, includeSets = NULL,
-  undirected = TRUE, null = "overlap", tailApprox = FALSE,
-  verbose = TRUE, indent = 0)
+  null = "overlap", tailApprox = FALSE, verbose = TRUE, indent = 0)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for

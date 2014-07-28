@@ -50,12 +50,10 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 //' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 //' @param subsetIndices indices of the subset of the network to calculate
 //'   the mean adjacency for.
-//' @param undirected logical; If \code{TRUE}, only the lower half of the
-//'   adjacency matrix is used to calculate the \code{meanAdj}, halving the
-//'   calculation time.
+//'   
 //' @return
 //'   A List containing:
-//'   \enumerate {
+//'   \enumerate{
 //'     \item{The mean absolute edge weight of the network subset.}
 //'     \item{The weighted within-subset degree for each node.}
 //'     \item{The maximum adjacency ratio for each node.}

@@ -60,8 +60,8 @@ AllFinite <- function(pDat) {
 #' @import RcppArmadillo
 #' @rdname dataSummary-cpp
 #'  
-DataSummary <- function(pDat, pScaledDat, subsetIndices) {
-    .Call('netrep_DataSummary', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices)
+DataProps <- function(pDat, pScaledDat, subsetIndices) {
+    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices)
 }
 
 #' big.matrix diagonals
@@ -81,47 +81,15 @@ SetDiag <- function(pBigMat, value) {
     invisible(.Call('netrep_SetDiag', PACKAGE = 'netrep', pBigMat, value))
 }
 
-#' C++ implementation of Intramodular Connectivity (Degree).
-#' 
-#' See the \link[=kIM]{wrapper function} for documentation.
-#' 
-#' @param pAdjacency SEXP container for the pointer to the adjacency matrix
-#' @param subsetIndices indices of the subset of the network to calculate
-#'   the mean adjacency for.
-#' @return A vector containing the intramodular connectivity (degree) of 
-#'   each node. 
-#' @rdname kIM-cpp
-KIM <- function(pAdjacency, subsetIndices) {
-    .Call('netrep_KIM', PACKAGE = 'netrep', pAdjacency, subsetIndices)
-}
-
-#' C++ implementation of Mean Adjacency
-#' 
-#' See the \link[=meanAdj]{wrapper function} for documentation.
-#' 
-#' @param pAdjacency SEXP container for the pointer to the adjacency matrix
-#' @param subsetIndices indices of the subset of the network to calculate
-#'   the mean adjacency for.
-#' @param undirected logical; If \code{TRUE}, only the lower half of the 
-#'   adjacency matrix is used to calculate the \code{meanAdj}, halving the 
-#'   calculation time.
-#' @return A single numeric value.
-#' @rdname meanAdj-cpp
-MeanAdj <- function(pAdjacency, subsetIndices, undirected) {
-    .Call('netrep_MeanAdj', PACKAGE = 'netrep', pAdjacency, subsetIndices, undirected)
-}
-
 #' Calculate Network Properties
 #'
 #' @param pAdjacency SEXP container for the pointer to the adjacency matrix
 #' @param subsetIndices indices of the subset of the network to calculate
 #'   the mean adjacency for.
-#' @param undirected logical; If \code{TRUE}, only the lower half of the
-#'   adjacency matrix is used to calculate the \code{meanAdj}, halving the
-#'   calculation time.
+#'   
 #' @return
 #'   A List containing:
-#'   \enumerate {
+#'   \enumerate{
 #'     \item{The mean absolute edge weight of the network subset.}
 #'     \item{The weighted within-subset degree for each node.}
 #'     \item{The maximum adjacency ratio for each node.}

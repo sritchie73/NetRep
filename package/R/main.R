@@ -49,7 +49,7 @@ netRep <- function() {
 #     
 #     # Check concordance between networks and underlying data
 #     stopifnot(length(datSets) == length(adjSets))
-#     stopifnot(sort(names(datSets)) == sort(names(adjSets)))
+#     stopifnot(names(datSets)) == names(adjSets)))
 # 
 #     nNets <- length(adjSets)
 #   } else if (!missing(adjSets) & missing(datSets)) {
@@ -166,7 +166,7 @@ netRep <- function() {
 #' @importFrom itertools isplitIndices
 netRep.core <- function(
   datSets=NULL, adjSets=NULL, nodeLabelSets, discovery, test, nPerm=10000,
-  buildNetFun, ignoreSets=NULL, includeSets=NULL, undirected=TRUE, 
+  buildNetFun, ignoreSets=NULL, includeSets=NULL,
   null="overlap", tailApprox=FALSE, verbose=TRUE, indent=0
 ) {
   # The following declarations are for iterators declared inside each foreach 
@@ -340,17 +340,18 @@ netRep.core <- function(
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
         # get the indices in the underlying data and adjacency matrices for 
         # the subset nodes. Sorted, because sequential memory access is faster.
-        datInd <- sort(match(subsetNodes, rownames(discDat)))
-        adjInd <- sort(match(subsetNodes, rownames(discAdj)))
-        subsetProps(discAdj, adjInd, discDat, datInd, undirected)
+        datInd <- match(subsetNodes, rownames(discDat))
+        adjInd <- match(subsetNodes, rownames(discAdj))
+        subsetProps(discAdj, adjInd, discDat, scaledDisc, datInd)
       }
       names(discProps) <- oSubsets
+      
       # Now calculate the observed value for each network statistic
       observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-        datInd <- sort(match(subsetNodes, rownames(testDat)))
-        adjInd <- sort(match(subsetNodes, rownames(testAdj)))
-        testProps <- subsetProps(testAdj, adjInd, testDat, datInd, undirected)
+        datInd <- match(subsetNodes, rownames(testDat))
+        adjInd <- match(subsetNodes, rownames(testAdj))
+        testProps <- subsetProps(testAdj, adjInd, testDat, scaledTest, datInd)
         subsetTestStats(discProps[[as.character(ss)]], testProps)
       }
       rownames(observed) <- oSubsets
@@ -396,11 +397,11 @@ netRep.core <- function(
               } else {
                 permNames <- sample(tNodes, size=oSizes[ss])
               }
-              permDatInd <- sort(match(permNames, rownames(testDat)))
-              permAdjInd <- sort(match(permNames, rownames(testAdj)))
+              permDatInd <- match(permNames, rownames(testDat))
+              permAdjInd <- match(permNames, rownames(testAdj))
               
               testProps <- subsetProps(
-                testAdj, permAdjInd, testDat, permDatInd, undirected
+                testAdj, permAdjInd, testDat, scaledTest, permDatInd
               )
               subsetTestStats(discProps[[as.character(ss)]], testProps)
             }

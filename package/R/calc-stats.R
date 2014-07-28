@@ -36,59 +36,35 @@ subsetTestStats <- function(discProps, testProps) {
   
   stats <- c(
     meanAdj = testProps[["meanAdj"]],
-    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]], method="pearson"),
-    cor.kALL = cor(discProps[["kALL"]], testProps[["kALL"]], method="pearson")
+    meanMAR = testProps[["meanMAR"]],
+    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]]),
+    cor.MAR = cor(discProps[["MAR"]], testProps[["MAR"]])
   )
+  if ("propVarExpl" %in% names(testProps)) {
+    stats <- c(stats,
+      propVarExpl = testProps[["propVarExpl"]],
+      cor.kME = cor(discProps[["membership"]], testProps[["membership"]])
+    )
+  }
 }
 
 #' Network subset topology
 #' 
 #' Calculate the topological characteristics of a network subset.
 #'  
-#' @references 
-#'  Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my network
-#'  module preserved and reproducible?} PLoS Comput. Biol. \strong{7}, e1001057
-#'  (2011).
-#'  
 #' @param adj Adjacency matrix for the network.
-#' @param adjInd Indices of the network subset in \code{adj}
+#' @param adjInd Indices of the network subset in \code{adj}.
 #' @param dat (Optional) Underlying data for the network.
-#' @param datInd (Optional) Indices of the network subset in \code{dat}
-#' @param undirected logical; If \code{TRUE}, only the lower half of \code{adj}
-#'   is used to calculate some propertiest (where applicable).
+#' @param scaled (Optional) a row scaled \code{big.matrix} of \code{dat}.
+#' @param datInd (Optional) Indices of the network subset in \code{dat}.
 #'
 #' @return
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=subsetTestStats]{Between-network statistics}}
-#' @export
-subsetProps <- function(adj, adjInd, dat=NULL, datInd=NULL, undirected=FALSE) {
-  # Sanity check user input.
-  stopifnot(class(adj) %in% c("big.matrix"))
-  stopifnot(is.vector(adjInd) & class(adjInd) %in% c("integer", "numeric"))
-  stopifnot(class(dat) %in% c("big.matrix", "NULL"))
-  if (is.null(dat)) {
-    if (length(datInd) > 1) {
-      warning("datInd provided, but dat is NULL, ignoring.")
-    }
-  }
-  if (length(datInd) == 0) {
-    if(!is.null(dat)) {
-      stop("dat provided, but no indices for the network subset provided.",
-           " aborting.")
-    }
-  } else {
-    stopifnot(is.vector(datInd) & class(datInd) %in% c("integer", "numeric"))
-  }
-  
-  # TODO: on the fly network construction.
-  
-  props <- list(
-    meanAdj = meanAdj(adj, adjInd, undirected),
-    kIM = kIM(adj, adjInd, FALSE),
-    kALL = kIM(adj, adjInd, TRUE)
-  )
-  if (!missing(dat)) {
-    # TODO:
+subsetProps <- function(adj, adjInd, dat=NULL, scaled=NULL, datInd=NULL) {
+  props <- NetProps(adj@address, sort(adjInd))
+  if (!is.null(dat)) {
+    props <- c(props, DataProps(dat@address, scaled@address, datInd))
   }
   props
 }

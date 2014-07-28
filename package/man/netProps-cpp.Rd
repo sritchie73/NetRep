@@ -9,15 +9,11 @@ NetProps(pAdjacency, subsetIndices)
 \item{pAdjacency}{SEXP container for the pointer to the adjacency matrix}
 
 \item{subsetIndices}{indices of the subset of the network to calculate
-the mean adjacency for.}
-
-\item{undirected}{logical; If \code{TRUE}, only the lower half of the
-adjacency matrix is used to calculate the \code{meanAdj}, halving the
-calculation time.}
+  the mean adjacency for.}
 }
 \value{
 A List containing:
-  \enumerate {
+  \enumerate{
     \item{The mean absolute edge weight of the network subset.}
     \item{The weighted within-subset degree for each node.}
     \item{The maximum adjacency ratio for each node.}

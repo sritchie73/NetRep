@@ -3,30 +3,24 @@
 \alias{subsetProps}
 \title{Network subset topology}
 \usage{
-subsetProps(adj, adjInd, dat = NULL, datInd = NULL, undirected = FALSE)
+subsetProps(adj, adjInd, dat = NULL, scaled = NULL, datInd = NULL)
 }
 \arguments{
 \item{adj}{Adjacency matrix for the network.}
 
-\item{adjInd}{Indices of the network subset in \code{adj}}
+\item{adjInd}{Indices of the network subset in \code{adj}.}
 
 \item{dat}{(Optional) Underlying data for the network.}
 
-\item{datInd}{(Optional) Indices of the network subset in \code{dat}}
+\item{scaled}{(Optional) a row scaled \code{big.matrix} of \code{dat}.}
 
-\item{undirected}{logical; If \code{TRUE}, only the lower half of \code{adj}
-  is used to calculate some propertiest (where applicable).}
+\item{datInd}{(Optional) Indices of the network subset in \code{dat}.}
 }
 \value{
 A list of topological properties for the given network subset
 }
 \description{
 Calculate the topological characteristics of a network subset.
-}
-\references{
-Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my network
- module preserved and reproducible?} PLoS Comput. Biol. \strong{7}, e1001057
- (2011).
 }
 \seealso{
 \code{\link[=subsetTestStats]{Between-network statistics}}
