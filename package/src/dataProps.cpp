@@ -122,7 +122,7 @@ List DataProps(
     vec pve(mean(square(p), 1));
     
     return List::create(
-        Named("summaryProfile") = NumericVector(kSummary.begin(), kSummary.end()),
+        Named("membership") = NumericVector(kSummary.begin(), kSummary.end()),
         Named("propVarExpl") = NumericVector(pve.begin(), pve.end())
       );
   } else {
