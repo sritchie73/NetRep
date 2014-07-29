@@ -235,7 +235,6 @@ netRep.core <- function(
         vCat(verbose, indent, sep="", 
              "Calculating preservation of network subsets from dataset ",
              setNames[di], ", in dataset ", setNames[ti], ".")
-        on.exit(vCat(verbose, indent, "Done!"))
 
         # Attach relevant matrices
         vCat(verbose, indent+1, "Attaching matrices...")
@@ -276,7 +275,6 @@ netRep.core <- function(
           } else {
             scaledDisc <- attach.big.matrix(scaledSets[[di]])
           }
-          on.exit({ rm(scaledDisc) }, add=TRUE)
         }
         if (!is.null(testDat)) {
           vCat(verbose, indent+1, "Checking test dataset for missing values...")
@@ -292,9 +290,7 @@ netRep.core <- function(
           } else {
             scaledTest <- attach.big.matrix(scaledSets[[ti]])
           }
-          on.exit({ rm(scaledTest) }, add=TRUE)
         }
-        on.exit({ gc() }, add=TRUE)
         
         # Get a vector of nodes which are present in both datasets. Depends on 
         # the combination of data input provided.
@@ -380,9 +376,6 @@ netRep.core <- function(
         if(verbose) {
           # To log progress, we will write our progress to a file for each chunk
           dir.create("run-progress", showWarnings=FALSE)
-          on.exit({
-            unlink("run-progress", recursive=TRUE)
-          }, add=TRUE)
         }
         nulls <- foreach(
           chunk=ichunkTasks(verbose, nPerm, nCores),
@@ -452,6 +445,12 @@ netRep.core <- function(
         res[[di]][[ti]][[5]] <- oSizes
         names(res[[di]][[ti]]) <- c("null", "observed", "p.value", 
                                                   "overlapProp", "overlapSize")
+        
+        vCat(verbose, indent+1, "Cleaning up temporary objects...")
+        unlink("run-progress", recursive=TRUE)
+        rm(discDat, scaledDisc, discAdj, testDat, scaledTest, testAdj)
+        gc()
+        vCat(verbose, indent, "Done!")
       }
     }
   }
