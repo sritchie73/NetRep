@@ -116,7 +116,7 @@ List DataProps(
     if (!success) {
       Function warning("warning");
       warning("SVD failed to converge, does your data contain missing or"
-              "infinite values?");
+              " infinite values?");
       return List::create(
         Named("membership") = NumericVector(1, NA_REAL),
         Named("propVarExpl") = NumericVector(1, NA_REAL),
