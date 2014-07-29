@@ -106,11 +106,9 @@ List DataProps(
     // data for the network subset.
     mat asDat((double *)xspDat->matrix(), xspDat->nrow(), xspDat->ncol(), false);
     mat ap = cor(mean(asDat.rows(subsetRows)), summary);
-    if (ap(0,0) < 0) {                                                                                                                                                                                                                        
-      for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
-        summary(jj) *= -1; 
-      }   
-    }   
+    if (ap(0,0) < 0) {
+      summary *= -1; 
+    }
     
     // We want the correlation between each variable (node) in the underlying
     // data and the summary profile for that network subset.
