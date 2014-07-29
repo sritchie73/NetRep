@@ -57,7 +57,8 @@ using namespace arma;
 //'  
 // [[Rcpp::export]]
 List DataProps(
-  SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices
+  SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices, 
+  NumericVector discMembership = NumericVector::create()
 ) {
   XPtr<BigMatrix> xpDat(pDat);
   XPtr<BigMatrix> xspDat(pScaledDat);
@@ -80,7 +81,15 @@ List DataProps(
       );
   }
   
-  // Dispatch function for all types of big.matrix.
+  if (discMembership.size() != 0 && discMembership.size() != subsetIndices.size()){
+    throw Rcpp::exception(
+        "Length of provided network subset membership does not match the size"
+        " of this network subset!"
+      );
+  }
+  
+  // We can only work with BigMatrix objects of type double here due to SVD 
+  // requirements.
   if (xpDat->matrix_type() == 8) {
     // Cast the BigMatrix to an arma::Mat<double>
     mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
@@ -96,7 +105,8 @@ List DataProps(
               "infinite values?");
       return List::create(
         Named("membership") = NumericVector(1, NA_REAL),
-        Named("propVarExpl") = NumericVector(1, NA_REAL)
+        Named("propVarExpl") = NumericVector(1, NA_REAL),
+        Named("meanKME") = NumericVector(1, NA_REAL)
       );
     }
     vec summary(V.col(1));
@@ -119,9 +129,16 @@ List DataProps(
     // variables in the data that correspond to nodes in the network subset.
     vec pve(mean(square(p), 1));
     
+//    NumericVector meanKME(NA_REAL);
+//    if (discMembership.size() != 0) {
+//      vec signedKME = sign(as<vec>(discMembership)) * kSummary;
+//      meanKME = NumericVector(mean(signedKME));
+//    } 
+    
     return List::create(
         Named("membership") = NumericVector(kSummary.begin(), kSummary.end()),
-        Named("propVarExpl") = NumericVector(pve.begin(), pve.end())
+        Named("propVarExpl") = NumericVector(pve.begin(), pve.end()),
+        Named("meanKME") = meanKME
       );
   } else {
     throw Rcpp::exception(
