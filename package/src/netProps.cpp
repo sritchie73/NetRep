@@ -9,7 +9,7 @@ using namespace arma;
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/BigMatrix.h>
 
-/* Implementation of Mean Adjacency
+/* Implementation of NetProps
  *
  * @param adj the armadillo compatible adjacency matrix
  * @param subsetIndices indices of the network subset to compute the mean
