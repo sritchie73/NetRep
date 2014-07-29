@@ -22,8 +22,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // DataProps
-List DataProps(SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices);
-RcppExport SEXP netrep_DataProps(SEXP pDatSEXP, SEXP pScaledDatSEXP, SEXP subsetIndicesSEXP) {
+List DataProps(SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices, NumericVector discMembership = NumericVector::create());
+RcppExport SEXP netrep_DataProps(SEXP pDatSEXP, SEXP pScaledDatSEXP, SEXP subsetIndicesSEXP, SEXP discMembershipSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -31,7 +31,8 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
         Rcpp::traits::input_parameter< SEXP >::type pScaledDat(pScaledDatSEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        List __result = DataProps(pDat, pScaledDat, subsetIndices);
+        Rcpp::traits::input_parameter< NumericVector >::type discMembership(discMembershipSEXP );
+        List __result = DataProps(pDat, pScaledDat, subsetIndices, discMembership);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

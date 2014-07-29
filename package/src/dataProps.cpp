@@ -17,11 +17,25 @@ using namespace arma;
 //'   data matrix used to construct the network.
 //' @param subsetIndices indices of the network subset of interest in 
 //'   \code{pDat}.
+//' @param discMembership (optional) a vector containing the network subset 
+//'   membership for each node in the discovery network.
 //' 
 //' @return
-//'  A list whose first element is the subset membership for each node (see 
-//'  details), and whose second element is the proportion of the variance
-//'  explained by the subset's summary vector (see details).
+//'  A list containing:
+//'  \enumerate{
+//'   \item{\emph{"membership"}:}{
+//'     The subset membership for each node  (see details).
+//'   }
+//'   \item{\emph{"propVarExplained"}:}{
+//'     The proportion of the variance explained by the subset's summary
+//'     vector (see details).
+//'   }
+//'   \item{\emph{"meanKME"}:}{
+//'     \code{NA} if \code{discMembership} was not provided, or the mean subset 
+//'     membership multiplied by the sign of the subset if \code{discMembership} 
+//'     was provided.
+//'   }
+//'  }
 //'
 //' @references
 //'   \enumerate{
@@ -47,13 +61,13 @@ using namespace arma;
 //'  as the average square of the subset memberships for all nodes in the 
 //'  network subset.
 //'  
-//'  The two returned properties are bundled together into one function because
-//'  the calculation of the proportion of variance requires much of the same
-//'  underlying intermediate calculations that obtaining the first eigenvector
-//'  requires.
+//'  If \code{discMembership} is provided, then an additional statistic is 
+//'  returned: the \emph{meanKME}. This is the mean of the sign of the 
+//'  membership in the discovery data multiplied by the membership in the 
+//'  test dat \emph{(2)}.
 //' 
 //' @import RcppArmadillo
-//' @rdname dataSummary-cpp
+//' @rdname dataProps-cpp
 //'  
 // [[Rcpp::export]]
 List DataProps(
@@ -129,11 +143,12 @@ List DataProps(
     // variables in the data that correspond to nodes in the network subset.
     vec pve(mean(square(p), 1));
     
-//    NumericVector meanKME(NA_REAL);
-//    if (discMembership.size() != 0) {
-//      vec signedKME = sign(as<vec>(discMembership)) * kSummary;
-//      meanKME = NumericVector(mean(signedKME));
-//    } 
+    NumericVector meanKME(1, NA_REAL);
+    if (discMembership.size() != 0) {
+      vec signedKME = sign(as<vec>(discMembership)) % kSummary;
+      double mKME = mean(signedKME); // This will be length 1
+      meanKME(0) = mKME;
+    }
     
     return List::create(
         Named("membership") = NumericVector(kSummary.begin(), kSummary.end()),

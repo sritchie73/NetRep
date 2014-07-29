@@ -22,11 +22,25 @@ AllFinite <- function(pDat) {
 #'   data matrix used to construct the network.
 #' @param subsetIndices indices of the network subset of interest in 
 #'   \code{pDat}.
+#' @param discMembership (optional) a vector containing the network subset 
+#'   membership for each node in the discovery network.
 #' 
 #' @return
-#'  A list whose first element is the subset membership for each node (see 
-#'  details), and whose second element is the proportion of the variance
-#'  explained by the subset's summary vector (see details).
+#'  A list containing:
+#'  \enumerate{
+#'   \item{\emph{"membership"}:}{
+#'     The subset membership for each node  (see details).
+#'   }
+#'   \item{\emph{"propVarExplained"}:}{
+#'     The proportion of the variance explained by the subset's summary
+#'     vector (see details).
+#'   }
+#'   \item{\emph{"meanKME"}:}{
+#'     \code{NA} if \code{discMembership} was not provided, or the mean subset 
+#'     membership multiplied by the sign of the subset if \code{discMembership} 
+#'     was provided.
+#'   }
+#'  }
 #'
 #' @references
 #'   \enumerate{
@@ -52,16 +66,16 @@ AllFinite <- function(pDat) {
 #'  as the average square of the subset memberships for all nodes in the 
 #'  network subset.
 #'  
-#'  The two returned properties are bundled together into one function because
-#'  the calculation of the proportion of variance requires much of the same
-#'  underlying intermediate calculations that obtaining the first eigenvector
-#'  requires.
+#'  If \code{discMembership} is provided, then an additional statistic is 
+#'  returned: the \emph{meanKME}. This is the mean of the sign of the 
+#'  membership in the discovery data multiplied by the membership in the 
+#'  test dat \emph{(2)}.
 #' 
 #' @import RcppArmadillo
-#' @rdname dataSummary-cpp
+#' @rdname dataProps-cpp
 #'  
-DataProps <- function(pDat, pScaledDat, subsetIndices) {
-    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices)
+DataProps <- function(pDat, pScaledDat, subsetIndices, discMembership = as.numeric( c())) {
+    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices, discMembership)
 }
 
 #' big.matrix diagonals

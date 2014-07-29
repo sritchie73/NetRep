@@ -3,7 +3,7 @@
 \alias{DataProps}
 \title{Network subset eigenvector and proportion of variance explained in C++}
 \usage{
-DataProps(pDat, pScaledDat, subsetIndices)
+DataProps(pDat, pScaledDat, subsetIndices, discMembership = as.numeric(c()))
 }
 \arguments{
 \item{pDat}{SEXP container for the pointer to the data matrix used in
@@ -13,12 +13,27 @@ network construction.}
 data matrix used to construct the network.}
 
 \item{subsetIndices}{indices of the network subset of interest in
-  \code{pDat}.}
+\code{pDat}.}
+
+\item{discMembership}{(optional) a vector containing the network subset
+  membership for each node in the discovery network.}
 }
 \value{
-A list whose first element is the subset membership for each node (see
- details), and whose second element is the proportion of the variance
- explained by the subset's summary vector (see details).
+A list containing:
+ \enumerate{
+  \item{\emph{"membership"}:}{
+    The subset membership for each node  (see details).
+  }
+  \item{\emph{"propVarExplained"}:}{
+    The proportion of the variance explained by the subset's summary
+    vector (see details).
+  }
+  \item{\emph{"meanKME"}:}{
+    \code{NA} if \code{discMembership} was not provided, or the mean subset
+    membership multiplied by the sign of the subset if \code{discMembership}
+    was provided.
+  }
+ }
 }
 \description{
 Network subset eigenvector and proportion of variance explained in C++
@@ -38,10 +53,10 @@ First, a summary vector is calculated for the network subset from the
  as the average square of the subset memberships for all nodes in the
  network subset.
 
- The two returned properties are bundled together into one function because
- the calculation of the proportion of variance requires much of the same
- underlying intermediate calculations that obtaining the first eigenvector
- requires.
+ If \code{discMembership} is provided, then an additional statistic is
+ returned: the \emph{meanKME}. This is the mean of the sign of the
+ membership in the discovery data multiplied by the membership in the
+ test dat \emph{(2)}.
 }
 \references{
 \enumerate{
