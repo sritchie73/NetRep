@@ -3,7 +3,7 @@
 \alias{DataProps}
 \title{Network subset eigenvector and proportion of variance explained in C++}
 \usage{
-DataProps(pDat, pScaledDat, subsetIndices, discMembership = as.numeric(c()))
+DataProps(pDat, pScaledDat, subsetIndices)
 }
 \arguments{
 \item{pDat}{SEXP container for the pointer to the data matrix used in
@@ -15,23 +15,18 @@ data matrix used to construct the network.}
 \item{subsetIndices}{indices of the network subset of interest in
 \code{pDat}.}
 
-\item{discMembership}{(optional) a vector containing the network subset
-  membership for each node in the discovery network.}
+\item{disckME}{(optional) a vector containing the network subset
+  kME for each node in the discovery network.}
 }
 \value{
 A list containing:
  \enumerate{
-  \item{\emph{"membership"}:}{
-    The subset membership for each node  (see details).
+  \item{\emph{"kME"}:}{
+    The subset kME for each node  (see details).
   }
   \item{\emph{"propVarExplained"}:}{
     The proportion of the variance explained by the subset's summary
     vector (see details).
-  }
-  \item{\emph{"meanKME"}:}{
-    \code{NA} if \code{discMembership} was not provided, or the mean subset
-    membership multiplied by the sign of the subset if \code{discMembership}
-    was provided.
   }
  }
 }
@@ -46,17 +41,12 @@ First, a summary vector is calculated for the network subset from the
  average of \code{pDat}. This is to match the behaviour of
  \emph{moduleEigengenes} in the \code{WGCNA} package.
 
- Using this summary vector, the subset membership of each node is quantified
+ Using this summary vector, the subset kME of each node is quantified
  as the correlation between that node's data, and the summary vector.
 
  The proportion of variance explained by this summary vector is quantified
- as the average square of the subset memberships for all nodes in the
+ as the average square of the subset kMEs for all nodes in the
  network subset.
-
- If \code{discMembership} is provided, then an additional statistic is
- returned: the \emph{meanKME}. This is the mean of the sign of the
- membership in the discovery data multiplied by the membership in the
- test dat \emph{(2)}.
 }
 \references{
 \enumerate{

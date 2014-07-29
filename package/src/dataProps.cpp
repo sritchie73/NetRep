@@ -17,23 +17,18 @@ using namespace arma;
 //'   data matrix used to construct the network.
 //' @param subsetIndices indices of the network subset of interest in 
 //'   \code{pDat}.
-//' @param discMembership (optional) a vector containing the network subset 
-//'   membership for each node in the discovery network.
+//' @param disckME (optional) a vector containing the network subset 
+//'   kME for each node in the discovery network.
 //' 
 //' @return
 //'  A list containing:
 //'  \enumerate{
-//'   \item{\emph{"membership"}:}{
-//'     The subset membership for each node  (see details).
+//'   \item{\emph{"kME"}:}{
+//'     The subset kME for each node  (see details).
 //'   }
 //'   \item{\emph{"propVarExplained"}:}{
 //'     The proportion of the variance explained by the subset's summary
 //'     vector (see details).
-//'   }
-//'   \item{\emph{"meanKME"}:}{
-//'     \code{NA} if \code{discMembership} was not provided, or the mean subset 
-//'     membership multiplied by the sign of the subset if \code{discMembership} 
-//'     was provided.
 //'   }
 //'  }
 //'
@@ -54,25 +49,19 @@ using namespace arma;
 //'  average of \code{pDat}. This is to match the behaviour of
 //'  \emph{moduleEigengenes} in the \code{WGCNA} package.
 //'  
-//'  Using this summary vector, the subset membership of each node is quantified
+//'  Using this summary vector, the subset kME of each node is quantified
 //'  as the correlation between that node's data, and the summary vector.
 //'  
 //'  The proportion of variance explained by this summary vector is quantified
-//'  as the average square of the subset memberships for all nodes in the 
+//'  as the average square of the subset kMEs for all nodes in the 
 //'  network subset.
-//'  
-//'  If \code{discMembership} is provided, then an additional statistic is 
-//'  returned: the \emph{meanKME}. This is the mean of the sign of the 
-//'  membership in the discovery data multiplied by the membership in the 
-//'  test dat \emph{(2)}.
 //' 
 //' @import RcppArmadillo
 //' @rdname dataProps-cpp
 //'  
 // [[Rcpp::export]]
 List DataProps(
-  SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices, 
-  NumericVector discMembership = NumericVector::create()
+  SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices
 ) {
   XPtr<BigMatrix> xpDat(pDat);
   XPtr<BigMatrix> xspDat(pScaledDat);
@@ -95,13 +84,6 @@ List DataProps(
       );
   }
   
-  if (discMembership.size() != 0 && discMembership.size() != subsetIndices.size()){
-    throw Rcpp::exception(
-        "Length of provided network subset membership does not match the size"
-        " of this network subset!"
-      );
-  }
-  
   // We can only work with BigMatrix objects of type double here due to SVD 
   // requirements.
   if (xpDat->matrix_type() == 8) {
@@ -118,10 +100,9 @@ List DataProps(
       warning("SVD failed to converge, does your data contain missing or"
               " infinite values?");
       return List::create(
-        Named("membership") = NumericVector(1, NA_REAL),
-        Named("propVarExpl") = NumericVector(1, NA_REAL),
-        Named("meanKME") = NumericVector(1, NA_REAL)
-      );
+          Named("kME") = NumericVector(1, NA_REAL),
+          Named("propVarExpl") = NumericVector(1, NA_REAL)
+        );
     }
     vec summary(V.col(1));
 
@@ -137,23 +118,16 @@ List DataProps(
     // We want the correlation between each variable (node) in the underlying
     // data and the summary profile for that network subset.
     mat p = cor(summary, aDat.rows(subsetRows).t());
-    vec kSummary(p.t());
+    vec kME(p.t());
+    
     // The proportion of variance explained is the sum of the squared 
     // correlation between the network subset summary profile, and each of the 
     // variables in the data that correspond to nodes in the network subset.
     vec pve(mean(square(p), 1));
     
-    NumericVector meanKME(1, NA_REAL);
-    if (discMembership.size() != 0) {
-      vec signedKME = sign(as<vec>(discMembership)) % kSummary;
-      double mKME = mean(signedKME); // This will be length 1
-      meanKME(0) = mKME;
-    }
-    
     return List::create(
-        Named("membership") = NumericVector(kSummary.begin(), kSummary.end()),
-        Named("propVarExpl") = NumericVector(pve.begin(), pve.end()),
-        Named("meanKME") = meanKME
+        Named("kME") = NumericVector(kME.begin(), kME.end()),
+        Named("propVarExpl") = NumericVector(pve.begin(), pve.end())
       );
   } else {
     throw Rcpp::exception(

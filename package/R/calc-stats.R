@@ -44,7 +44,8 @@ subsetTestStats <- function(discProps, testProps) {
   if ("propVarExpl" %in% names(testProps)) {
     stats <- c(stats,
       propVarExpl = testProps[["propVarExpl"]],
-      cor.kME = cor(discProps[["membership"]], testProps[["membership"]])
+      mean.KME = mean(sign(discProps[["kME"]]) * testProps[["kME"]]),
+      cor.kME = cor(discProps[["kME"]], testProps[["kME"]])
     )
   }
   stats
