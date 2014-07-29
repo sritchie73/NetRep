@@ -29,24 +29,23 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 
   // We do not want a negative weight to cancel out a positive one, so we take
   // the absolute value.
-  Col<T> dg = diagvec(adj);
-  Row<T> colSums = sum(abs(adj(nodeIdx, nodeIdx))) - abs(dg(nodeIdx)).t();
-  Row<T> meanKIM = mean(colSums, 1); // This will be length 1
+  Mat<T> dg = diagvec(adj);
+  Mat<T> colSums = sum(abs(adj(nodeIdx, nodeIdx))) - abs(dg(nodeIdx)).t();
+  Mat<T> meanKIM = mean(colSums, 1); // This will be length 1
 
-  Row<T> sqSums = sum(square(adj(nodeIdx, nodeIdx))) - square(dg(nodeIdx)).t();
-  Row<T> MAR = sqSums / colSums;
-  Row<T> meanMAR = mean(MAR, 1); // This will be length 1
+  Mat<T> sqSums = sum(square(adj(nodeIdx, nodeIdx))) - square(dg(nodeIdx)).t();
+  Mat<T> MAR = sqSums / colSums;
+  Mat<T> meanMAR = mean(MAR, 1); // This will be length 1
   
   int n = subsetIndices.size();
-  double meanAdj = (double)sum(colSums) / (n*n - n);
 
   return List::create(
-    Named("kIM") = NumericVector(colSums.begin(), colSums.end()),
-    Named("MAR") = NumericVector(MAR.begin(), MAR.end()),
-    Named("meanAdj") = NumericVector(1, meanAdj),
-    Named("meanKIM") = NumericVector(meanKIM.begin(), meanKIM.end()),
-    Named("meanMAR") = NumericVector(meanMAR.begin(), meanMAR.end())
-  );  
+    Named("kIM") = colSums,
+    Named("MAR") = MAR,
+    Named("meanAdj") = sum(colSums, 1) / (n*n - n), 
+    Named("meanKIM") = meanKIM,                                                                                                                                                                                                            
+    Named("meanMAR") = meanMAR
+  );
 }                                                                                                                                                                                                                                          
 
 //' Calculate Network Properties
@@ -60,7 +59,7 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 //'   \enumerate{
 //'     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
 //'     \item{\emph{MAR}:}{The maximum adjacency ratio for each node.}
-//'     \item{\emph{meanAd}:}{The mean absolute edge weight of the network subset.}
+//'     \item{\emph{meanAdj}:}{The mean absolute edge weight of the network subset.}
 //'     \item{\emph{meanKIM}:}{The mean within-subset degree.}
 //'     \item{\emph{meanMAR}:}{The mean maximum adjacency ratio.}
 //'   }

@@ -31,9 +31,22 @@ only have to calculate the properties in the discovery network/data once.
 However, for some statistics it does not make sense to do this due to memory
 overhead (e.g. \emph{corAdj} would require storing a second copy of most of
 the discovery network in vector form). For these statistics, see
-\code{\link{sharedStats}}.
+\code{\link{calcSharedTestStats}}.
+}
+\section{Background}{
+
+The returned test statistics indicate the replication/preservation of each
+network property for a network subset in the two datasets provided in the
+\code{discProps} and \code{testProps} arguments.
+
+Evaluating the significance of these test statistics requires generation of a
+null distribution for each, by randomly sampling network subsets of the same
+size in the \emph{test} dataset, calculating their replication, and
+evaluating how extreme the observed test statistic is, in comparison to test
+statistics drawn from random permutation. This procedure is performed by the
+main function of this package, \code{\link{netRep}}.
 }
 \seealso{
-\code{\link[=subsetTestStats]{Between-network statistics}}
+\code{\link[=calcSplitTestStats]{Between-network statistics}}
 }
 

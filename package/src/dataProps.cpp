@@ -17,8 +17,6 @@ using namespace arma;
 //'   data matrix used to construct the network.
 //' @param subsetIndices indices of the network subset of interest in 
 //'   \code{pDat}.
-//' @param disckME (optional) a vector containing the network subset 
-//'   kME for each node in the discovery network.
 //' 
 //' @return
 //'  A list containing:
@@ -100,11 +98,11 @@ List DataProps(
       warning("SVD failed to converge, does your data contain missing or"
               " infinite values?");
       return List::create(
-          Named("kME") = NumericVector(1, NA_REAL),
-          Named("propVarExpl") = NumericVector(1, NA_REAL)
+          Named("kME") = NA_REAL,
+          Named("propVarExpl") = NA_REAL
         );
     }
-    vec summary(V.col(1));
+    mat summary(V.col(1));
 
     // Flip the sign of the summary profile so that the eigenvector is 
     // positively correlated with the average scaled value of the underlying
@@ -118,16 +116,16 @@ List DataProps(
     // We want the correlation between each variable (node) in the underlying
     // data and the summary profile for that network subset.
     mat p = cor(summary, aDat.rows(subsetRows).t());
-    vec kME(p.t());
+    mat kME(p.t());
     
     // The proportion of variance explained is the sum of the squared 
     // correlation between the network subset summary profile, and each of the 
     // variables in the data that correspond to nodes in the network subset.
-    vec pve(mean(square(p), 1));
+    mat pve(mean(square(p), 1));
     
     return List::create(
-        Named("kME") = NumericVector(kME.begin(), kME.end()),
-        Named("propVarExpl") = NumericVector(pve.begin(), pve.end())
+        Named("kME") = kME,
+        Named("propVarExpl") = pve
       );
   } else {
     throw Rcpp::exception(

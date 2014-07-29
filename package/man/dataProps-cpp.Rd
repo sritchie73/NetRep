@@ -13,10 +13,7 @@ network construction.}
 data matrix used to construct the network.}
 
 \item{subsetIndices}{indices of the network subset of interest in
-\code{pDat}.}
-
-\item{disckME}{(optional) a vector containing the network subset
-  kME for each node in the discovery network.}
+  \code{pDat}.}
 }
 \value{
 A list containing:

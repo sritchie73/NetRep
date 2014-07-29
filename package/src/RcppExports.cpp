@@ -6,6 +6,24 @@
 
 using namespace Rcpp;
 
+// NetStats
+List NetStats(SEXP pAdjD, IntegerVector discIndices, SEXP pAdjT, IntegerVector testIndices);
+RcppExport SEXP netrep_NetStats(SEXP pAdjDSEXP, SEXP discIndicesSEXP, SEXP pAdjTSEXP, SEXP testIndicesSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type pAdjD(pAdjDSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
+        Rcpp::traits::input_parameter< SEXP >::type pAdjT(pAdjTSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
+        List __result = NetStats(pAdjD, discIndices, pAdjT, testIndices);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // AllFinite
 LogicalVector AllFinite(SEXP pDat);
 RcppExport SEXP netrep_AllFinite(SEXP pDatSEXP) {

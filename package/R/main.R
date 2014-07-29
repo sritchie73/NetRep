@@ -340,19 +340,25 @@ netRep.core <- function(
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
         # get the indices in the underlying data and adjacency matrices for 
         # the subset nodes. Sorted, because sequential memory access is faster.
-        datInd <- match(subsetNodes, rownames(discDat))
-        adjInd <- match(subsetNodes, rownames(discAdj))
-        subsetProps(discAdj, adjInd, discDat, scaledDisc, datInd)
+        discDatInd <- match(subsetNodes, rownames(discDat))
+        discAdjInd <- match(subsetNodes, rownames(discAdj))
+        subsetProps(discAdj, discAdjInd, discDat, scaledDisc, discDatInd)
       }
       names(discProps) <- oSubsets
       
       # Now calculate the observed value for each network statistic
       observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
         subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-        datInd <- match(subsetNodes, rownames(testDat))
-        adjInd <- match(subsetNodes, rownames(testAdj))
-        testProps <- subsetProps(testAdj, adjInd, testDat, scaledTest, datInd)
-        subsetTestStats(discProps[[as.character(ss)]], testProps)
+        discDatInd <- match(subsetNodes, rownames(testDat))
+        testAdjInd <- match(subsetNodes, rownames(testAdj))
+        discAdjInd <- match(subsetNodes, rownames(discAdj))
+        testProps <- subsetProps(
+          testAdj, testAdjInd, testDat, scaledTest, discDatInd
+        )
+        return(c(
+          calcSplitTestStats(discProps[[as.character(ss)]], testProps),
+          calcSharedTestStats(discAdj, discAdjInd, testAdj, testAdjInd)
+        ))
       }
       rownames(observed) <- oSubsets
       
@@ -399,11 +405,15 @@ netRep.core <- function(
               }
               permDatInd <- match(permNames, rownames(testDat))
               permAdjInd <- match(permNames, rownames(testAdj))
+              discAdjInd <- match(subsetNodes, rownames(discAdj))
               
               testProps <- subsetProps(
                 testAdj, permAdjInd, testDat, scaledTest, permDatInd
               )
-              subsetTestStats(discProps[[as.character(ss)]], testProps)
+              return(c(
+                calcSplitTestStats(discProps[[as.character(ss)]], testProps),
+                calcSharedTestStats(discAdj, discAdjInd, testAdj, permAdjInd)
+              ))
             }
           }
         }
@@ -424,7 +434,7 @@ netRep.core <- function(
       
       # Collate results
       return(list(observed=observed, null=nulls, p.value=p.values,
-                  overlap=overlap, overlapSize=oSizes))
+                overlap=overlap, overlapSize=oSizes))
     } else {
       # We are not currently comparing these two datasets.
       return(NULL)
