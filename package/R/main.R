@@ -219,225 +219,241 @@ netRep.core <- function(
     scaledSets <- rep(list(NULL), length(datSets))
   }
   
+  # Set up return list 
+  res <- rep(list(NULL), nNets)
+  res <- lapply(res, function(x) { rep(list(NULL), nNets) })
+  
   # Iterate pairwise over datasets, comparing those marked "discovery"
   # with each marked as "test".
-  foreach(di=1:nNets) %:% foreach(ti=1:nNets) %do% {
-    if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
-      vCat(verbose, indent, sep="", 
-           "Calculating preservation of network subsets from dataset ",
-           setNames[di], ", in dataset ", setNames[ti], ".")
-      on.exit(vCat(verbose, indent, "Done!"))
-      
-      vCat(verbose, indent+1, "Attaching matrices...")
-      # Attach relevant matrices
-      # TODO: 
-      # Set up empty big.matices where we are building the networks on the fly
-      if (is.null(adjSets[[di]])) {
-        stop("not implemented yet")
-      } else {
-        discAdj <- attach.big.matrix(adjSets[[di]])
-      }
-      if (is.null(adjSets[[ti]])) {
-        stop("not implemented yet")
-      } else {
-        testAdj <- attach.big.matrix(adjSets[[ti]])
-      }
-      if (!is.null(datSets[[di]])) {
-        discDat <- attach.big.matrix(datSets[[di]])
-      } else {
-        discDat <- NULL
-      }
-      if (!is.null(datSets[[ti]])) {
-        testDat <- attach.big.matrix(datSets[[ti]])
-      } else {
-        testDat <- NULL
-      }
+  for (di in seq_len(nNets)) {
+    for (ti in seq_len(nNets)) {
+      if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
+        # Set up return list
+        res[[di]][[ti]] <- rep(list(NULL), 5)
         
-      # Create scaled data 
-      if (!is.null(discDat)) {
-        vCat(verbose, indent+1, "Checking discovery dataset for missing values...")
-        stopifnot(allFinite(discDat))
-        vCat(verbose, indent+1, "Creating temporary scaled dataset...")
-        if (is.null(scaledSets[[di]])) {
-          descriptor <- paste0("scaled", di, ".desc")
-          backing <- paste0("scaled", di, ".bin")
-          scaledDisc <- scaleBigMatrix(discDat, backing, ".temp-objects", descriptor)
-          scaledSets[[di]] <- file.path(".temp-objects", descriptor)
+        # Output messages
+        vCat(verbose, indent, sep="", 
+             "Calculating preservation of network subsets from dataset ",
+             setNames[di], ", in dataset ", setNames[ti], ".")
+        on.exit(vCat(verbose, indent, "Done!"))
+
+        # Attach relevant matrices
+        vCat(verbose, indent+1, "Attaching matrices...")
+        if (is.null(adjSets[[di]])) {
+          stop("not implemented yet")
         } else {
-          scaledDisc <- attach.big.matrix(scaledSets[[di]])
+          discAdj <- attach.big.matrix(adjSets[[di]])
         }
-        on.exit({ rm(scaledDisc) }, add=TRUE)
-      }
-      if (!is.null(testDat)) {
-        vCat(verbose, indent+1, "Checking test dataset for missing values...")
-        stopifnot(allFinite(testDat))
-        vCat(verbose, indent+1, "Creating temporary scaled dataset...")
-        if (is.null(scaledSets[[ti]])) {
-          descriptor <- paste0("scaled", ti, ".desc")
-          backing <- paste0("scaled", ti, ".bin")
-          scaledTest <- scaleBigMatrix(testDat, backing, ".temp-objects", descriptor)
-          scaledSets[[ti]] <- file.path(".temp-objects", descriptor)
+        if (is.null(adjSets[[ti]])) {
+          stop("not implemented yet")
         } else {
-          scaledTest <- attach.big.matrix(scaledSets[[ti]])
+          testAdj <- attach.big.matrix(adjSets[[ti]])
         }
-        on.exit({ rm(scaledTest) }, add=TRUE)
-      }
-      on.exit({ gc() }, add=TRUE) # clean up memory after run
-      
-      # Get a vector of nodes which are present in both datasets. Depends on 
-      # the combination of data input provided.
-      vCat(verbose, indent+1, "Extracting information about node overlap...")
-      if (is.null(testAdj)) {
-        if(is.null(discAdj)) {
-          oNodes <- rownames(discDat) %sub_in% rownames(testDat)
+        if (!is.null(datSets[[di]])) {
+          discDat <- attach.big.matrix(datSets[[di]])
         } else {
-          oNodes <- rownames(discAdj) %sub_in% rownames(testDat)
+          discDat <- NULL
         }
-        tNodes <- rownames(testDat)
-      } else {
-        if(is.null(discAdj)) {
-          oNodes <- rownames(discDat) %sub_in% rownames(testAdj)
+        if (!is.null(datSets[[ti]])) {
+          testDat <- attach.big.matrix(datSets[[ti]])
         } else {
-          oNodes <- rownames(discAdj) %sub_in% rownames(testAdj)
+          testDat <- NULL
         }
-        tNodes <- rownames(testAdj)
-      }
-      if (length(oNodes) == 0) {
-        warning("No nodes in dataset ", setNames[di],  
-                " are present in dataset ", setNames[ti], ", skipping.")
-        return(NULL)
-      }
-      
-      # Compute information about the network subsets, their size, and what 
-      # proportion of each is overlapping the test network.
-      dSubsets <- unique(nodeLabelSets[[di]])
-      oSubsets <- unique(nodeLabelSets[[di]][oNodes])
-      # Only look at subsets of interest, if specified:
-      if (!is.null(ignoreSets[[di]])) {
-        dSubsets <- dSubsets %sub_nin% ignoreSets[[di]]
-        oSubsets <- oSubsets %sub_nin% ignoreSets[[di]]
-      }
-      if (!is.null(includeSets[[di]])) {
-        dSubsets <- dSubsets %sub_in% includeSets[[di]]
-        oSubsets <- oSubsets %sub_in% includeSets[[di]]
-      }
-      # Get the size of each of the subsets of interest in the discovery dataset
-      dSizes <- table(nodeLabelSets[[di]])
-      dSizes <- dSizes[names(dSizes) %in% dSubsets] 
-      # Get the size of the overlap of each of the subsets of interest between
-      # the discovery and test datasets.
-      oSizes <- table(nodeLabelSets[[di]][oNodes])
-      oSizes <- oSizes[names(oSizes) %in% oSubsets]
-      # Need to handle the case where a subset of interest has no overlap.
-      oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
-      names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
-      overlap <- oSizes[names(dSizes)]/dSizes
-      
-      vCat(verbose, indent+1, "Calculating observed test statistics...")
-      # Obtain the topological properties for each network subset in the
-      # discovery dataset, we only want to calculate these once!
-      discProps <- foreach(ss=oSubsets) %do% {
-        subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-        # get the indices in the underlying data and adjacency matrices for 
-        # the subset nodes. Sorted, because sequential memory access is faster.
-        discDatInd <- match(subsetNodes, rownames(discDat))
-        discAdjInd <- match(subsetNodes, rownames(discAdj))
-        subsetProps(discAdj, discAdjInd, discDat, scaledDisc, discDatInd)
-      }
-      names(discProps) <- oSubsets
-      
-      # Now calculate the observed value for each network statistic
-      observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
-        subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-        discDatInd <- match(subsetNodes, rownames(testDat))
-        testAdjInd <- match(subsetNodes, rownames(testAdj))
-        discAdjInd <- match(subsetNodes, rownames(discAdj))
-        testProps <- subsetProps(
-          testAdj, testAdjInd, testDat, scaledTest, discDatInd
-        )
-        return(c(
-          calcSplitTestStats(discProps[[as.character(ss)]], testProps),
-          calcSharedTestStats(discAdj, discAdjInd, testAdj, testAdjInd)
-        ))
-      }
-      rownames(observed) <- oSubsets
-      
-      # Calculate the null distribution for each of the statistics.
-      vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
-           "permutations...")
-      if(verbose) {
-        # To log progress, we will write our progress to a file for each chunk
-        dir.create("run-progress", showWarnings=FALSE)
-        on.exit({
-          unlink("run-progress", recursive=TRUE)
-        }, add=TRUE)
-      }
-      nulls <- foreach(
-        chunk=ichunkTasks(verbose, nPerm, nCores),
-        .combine=abind3
-      ) %maybe_do_par% {
-        if (verbose & length(chunk) == 1) {
-          if (chunk == -1) {
-            monitorProgress(nWorkers, indent+2)
-            NULL
+        
+        # Create scaled data 
+        if (!is.null(discDat)) {
+          vCat(verbose, indent+1, 
+               "Checking discovery dataset for missing values...")
+          stopifnot(allFinite(discDat))
+          vCat(verbose, indent+1, "Creating temporary scaled dataset...")
+          if (is.null(scaledSets[[di]])) {
+            descriptor <- paste0("scaled", di, ".desc")
+            backing <- paste0("scaled", di, ".bin")
+            scaledDisc <- scaleBigMatrix(
+              discDat, backing, ".temp-objects", descriptor
+            )
+            scaledSets[[di]] <- file.path(".temp-objects", descriptor)
+          } else {
+            scaledDisc <- attach.big.matrix(scaledSets[[di]])
           }
+          on.exit({ rm(scaledDisc) }, add=TRUE)
+        }
+        if (!is.null(testDat)) {
+          vCat(verbose, indent+1, "Checking test dataset for missing values...")
+          stopifnot(allFinite(testDat))
+          vCat(verbose, indent+1, "Creating temporary scaled dataset...")
+          if (is.null(scaledSets[[ti]])) {
+            descriptor <- paste0("scaled", ti, ".desc")
+            backing <- paste0("scaled", ti, ".bin")
+            scaledTest <- scaleBigMatrix(
+              testDat, backing, ".temp-objects", descriptor
+            )
+            scaledSets[[ti]] <- file.path(".temp-objects", descriptor)
+          } else {
+            scaledTest <- attach.big.matrix(scaledSets[[ti]])
+          }
+          on.exit({ rm(scaledTest) }, add=TRUE)
+        }
+        on.exit({ gc() }, add=TRUE)
+        
+        # Get a vector of nodes which are present in both datasets. Depends on 
+        # the combination of data input provided.
+        vCat(verbose, indent+1, "Extracting information about node overlap...")
+        if (is.null(testAdj)) {
+          if(is.null(discAdj)) {
+            oNodes <- rownames(discDat) %sub_in% rownames(testDat)
+          } else {
+            oNodes <- rownames(discAdj) %sub_in% rownames(testDat)
+          }
+          tNodes <- rownames(testDat)
         } else {
-          if (verbose) {
-            conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
-            progressBar <- conns[[1]]
-            on.exit(lapply(conns, close))
-          } 
-          foreach(i=chunk, .combine=abind3) %do% { 
-            # Update the progress at the end of the loop.
+          if(is.null(discAdj)) {
+            oNodes <- rownames(discDat) %sub_in% rownames(testAdj)
+          } else {
+            oNodes <- rownames(discAdj) %sub_in% rownames(testAdj)
+          }
+          tNodes <- rownames(testAdj)
+        }
+        if (length(oNodes) == 0) {
+          warning("No nodes in dataset ", setNames[di],  
+                  " are present in dataset ", setNames[ti], ", skipping.")
+          return(NULL)
+        }
+        
+        # Compute information about the network subsets, their size, and what 
+        # proportion of each is overlapping the test network.
+        dSubsets <- unique(nodeLabelSets[[di]])
+        oSubsets <- unique(nodeLabelSets[[di]][oNodes])
+        # Only look at subsets of interest, if specified:
+        if (!is.null(ignoreSets[[di]])) {
+          dSubsets <- dSubsets %sub_nin% ignoreSets[[di]]
+          oSubsets <- oSubsets %sub_nin% ignoreSets[[di]]
+        }
+        if (!is.null(includeSets[[di]])) {
+          dSubsets <- dSubsets %sub_in% includeSets[[di]]
+          oSubsets <- oSubsets %sub_in% includeSets[[di]]
+        }
+        # Get the size of each of the subsets of interest in the discovery dataset
+        dSizes <- table(nodeLabelSets[[di]])
+        dSizes <- dSizes[names(dSizes) %in% dSubsets] 
+        # Get the size of the overlap of each of the subsets of interest between
+        # the discovery and test datasets.
+        oSizes <- table(nodeLabelSets[[di]][oNodes])
+        oSizes <- oSizes[names(oSizes) %in% oSubsets]
+        # Need to handle the case where a subset of interest has no overlap.
+        oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
+        names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
+        overlap <- oSizes[names(dSizes)]/dSizes
+        
+        vCat(verbose, indent+1, "Calculating observed test statistics...")
+        # Obtain the topological properties for each network subset in the
+        # discovery dataset, we only want to calculate these once!
+        discProps <- foreach(ss=oSubsets) %do% {
+          subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+          # get the indices in the underlying data and adjacency matrices for 
+          # the subset nodes. Sorted, because sequential memory access is faster.
+          discDatInd <- match(subsetNodes, rownames(discDat))
+          discAdjInd <- match(subsetNodes, rownames(discAdj))
+          subsetProps(discAdj, discAdjInd, discDat, scaledDisc, discDatInd)
+        }
+        names(discProps) <- oSubsets
+        
+        # Now calculate the observed value for each network statistic
+        observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
+          subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+          discDatInd <- match(subsetNodes, rownames(testDat))
+          testAdjInd <- match(subsetNodes, rownames(testAdj))
+          discAdjInd <- match(subsetNodes, rownames(discAdj))
+          testProps <- subsetProps(
+            testAdj, testAdjInd, testDat, scaledTest, discDatInd
+          )
+          return(c(
+            calcSplitTestStats(discProps[[as.character(ss)]], testProps),
+            calcSharedTestStats(discAdj, discAdjInd, testAdj, testAdjInd)
+          ))
+        }
+        rownames(observed) <- oSubsets
+        
+        # Calculate the null distribution for each of the statistics.
+        vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
+             "permutations...")
+        if(verbose) {
+          # To log progress, we will write our progress to a file for each chunk
+          dir.create("run-progress", showWarnings=FALSE)
+          on.exit({
+            unlink("run-progress", recursive=TRUE)
+          }, add=TRUE)
+        }
+        nulls <- foreach(
+          chunk=ichunkTasks(verbose, nPerm, nCores),
+          .combine=abind3
+        ) %maybe_do_par% {
+          if (verbose & length(chunk) == 1) {
+            if (chunk == -1) {
+              monitorProgress(nWorkers, indent+2)
+              NULL
+            }
+          } else {
             if (verbose) {
-              on.exit({
-                updateParProgress(progressBar, i)
-                if (nCores == 1) reportProgress(indent+2)
-              })                
-            }
-            foreach(ss=oSubsets, .combine=rbind) %do% {
-              # Select a random subset of nodes of the same size as the subset 
-              # ss, depending on our null model.
-              if (model == "overlap") {
-                permNames <- sample(oNodes, size=oSizes[ss])
-              } else {
-                permNames <- sample(tNodes, size=oSizes[ss])
+              conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
+              progressBar <- conns[[1]]
+              on.exit(lapply(conns, close))
+            } 
+            foreach(i=chunk, .combine=abind3) %do% { 
+              # Update the progress at the end of the loop.
+              if (verbose) {
+                on.exit({
+                  updateParProgress(progressBar, i)
+                  if (nCores == 1) reportProgress(indent+2)
+                })                
               }
-              permDatInd <- match(permNames, rownames(testDat))
-              permAdjInd <- match(permNames, rownames(testAdj))
-              discAdjInd <- match(subsetNodes, rownames(discAdj))
-              
-              testProps <- subsetProps(
-                testAdj, permAdjInd, testDat, scaledTest, permDatInd
-              )
-              return(c(
-                calcSplitTestStats(discProps[[as.character(ss)]], testProps),
-                calcSharedTestStats(discAdj, discAdjInd, testAdj, permAdjInd)
-              ))
+              foreach(ss=oSubsets, .combine=rbind) %do% {
+                # Select a random subset of nodes of the same size as the subset 
+                # ss, depending on our null model.
+                if (model == "overlap") {
+                  permNames <- sample(oNodes, size=oSizes[ss])
+                } else {
+                  permNames <- sample(tNodes, size=oSizes[ss])
+                }
+                permDatInd <- match(permNames, rownames(testDat))
+                permAdjInd <- match(permNames, rownames(testAdj))
+                discAdjInd <- match(subsetNodes, rownames(discAdj))
+                
+                testProps <- subsetProps(
+                  testAdj, permAdjInd, testDat, scaledTest, permDatInd
+                )
+                return(c(
+                  calcSplitTestStats(discProps[[as.character(ss)]], testProps),
+                  calcSharedTestStats(discAdj, discAdjInd, testAdj, permAdjInd)
+                ))
+              }
             }
           }
         }
+        dimnames(nulls)[[1]] <- oSubsets
+        dimnames(nulls)[[2]] <- colnames(observed)
+        dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
+        
+        # Calculate the p-value for the observed statistic based on the null 
+        # distribution
+        vCat(verbose, indent+1, "Calculating P-values...")
+        p.values <- foreach(stat=seq_len(ncol(observed)), .combine=cbind) %:% 
+          foreach(ss=seq_len(nrow(observed)), .combine=c) %do% {
+            pperm(nulls[ss,stat,], observed[ss,stat], tailApprox, 
+                  lower.tail=FALSE)
+          }
+        dimnames(p.values) <- dimnames(observed)
+        
+        # Collate results
+        res[[di]][[ti]][[1]] <- nulls
+        res[[di]][[ti]][[2]] <- observed
+        res[[di]][[ti]][[3]] <- p.values
+        res[[di]][[ti]][[4]] <- overlap
+        res[[di]][[ti]][[5]] <- oSizes
+        names(res[[di]][[ti]]) <- c("null", "observed", "p.value", 
+                                                  "overlapProp", "overlapSize")
       }
-      dimnames(nulls)[[1]] <- oSubsets
-      dimnames(nulls)[[2]] <- colnames(observed)
-      dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
-      
-      # Calculate the p-value for the observed statistic based on the null 
-      # distribution
-      vCat(verbose, indent+1, "Calculating P-values...")
-      p.values <- foreach(stat=seq_len(ncol(observed)), .combine=cbind) %:% 
-        foreach(ss=seq_len(nrow(observed)), .combine=c) %do% {
-          pperm(nulls[ss,stat,], observed[ss,stat], tailApprox, 
-                lower.tail=FALSE)
-      }
-      dimnames(p.values) <- dimnames(observed)
-      
-      # Collate results
-      return(list(observed=observed, null=nulls, p.value=p.values,
-                overlap=overlap, overlapSize=oSizes))
-    } else {
-      # We are not currently comparing these two datasets.
-      return(NULL)
     }
   }
+  res
 }
