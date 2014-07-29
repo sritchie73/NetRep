@@ -50,9 +50,19 @@ subsetTestStats <- function(discProps, testProps) {
   stats
 }
 
-#' Network subset topology
+#' Network subset properties
 #' 
-#' Calculate the topological characteristics of a network subset.
+#' @details
+#' All network statistics can be fundamentally broken into the calculation of
+#' some properties in the discovery network, and some calculation of properties
+#' in the test network. It makes sense to split these calculations, so that we
+#' only have to calculate the properties in the discovery network/data once.
+#' 
+#' However, for some statistics it does not make sense to do this due to memory
+#' overhead (e.g. \emph{corAdj} would require storing a second copy of most of
+#' the discovery network in vector form). For these statistics, see 
+#' \code{\link{sharedStats}}.
+#' 
 #'  
 #' @param adj Adjacency matrix for the network.
 #' @param adjInd Indices of the network subset in \code{adj}.
