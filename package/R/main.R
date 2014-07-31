@@ -237,33 +237,36 @@ netRep.core <- function(
              setNames[di], ", in dataset ", setNames[ti], ".")
 
         # Attach relevant matrices
-        vCat(verbose, indent+1, "Attaching matrices...")
+        vCat(verbose, indent+1, "Attaching and checking matrices...")
         if (is.null(adjSets[[di]])) {
           stop("not implemented yet")
         } else {
           discAdj <- attach.big.matrix(adjSets[[di]])
+          checkFinite(discAdj)
         }
         if (is.null(adjSets[[ti]])) {
           stop("not implemented yet")
         } else {
           testAdj <- attach.big.matrix(adjSets[[ti]])
+          checkFinite(testAdj)
         }
         if (!is.null(datSets[[di]])) {
           discDat <- attach.big.matrix(datSets[[di]])
+          checkFinite(discDat)
         } else {
           discDat <- NULL
         }
         if (!is.null(datSets[[ti]])) {
           testDat <- attach.big.matrix(datSets[[ti]])
+          checkFinite(testDat)
         } else {
           testDat <- NULL
         }
+        i
+        vCat("Checked discovery ")
         
         # Create scaled data 
         if (!is.null(discDat)) {
-          vCat(verbose, indent+1, 
-               "Checking discovery dataset for missing values...")
-          stopifnot(allFinite(discDat))
           vCat(verbose, indent+1, "Creating temporary scaled dataset...")
           if (is.null(scaledSets[[di]])) {
             descriptor <- paste0("scaled", di, ".desc")
@@ -277,8 +280,6 @@ netRep.core <- function(
           }
         }
         if (!is.null(testDat)) {
-          vCat(verbose, indent+1, "Checking test dataset for missing values...")
-          stopifnot(allFinite(testDat))
           vCat(verbose, indent+1, "Creating temporary scaled dataset...")
           if (is.null(scaledSets[[ti]])) {
             descriptor <- paste0("scaled", ti, ".desc")
