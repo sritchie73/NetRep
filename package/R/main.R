@@ -164,7 +164,7 @@ netRep <- function() {
 #'
 #' @import foreach
 #' @importFrom itertools isplitIndices
-netRep.core <- function(
+netRepMain <- function(
   datSets=NULL, adjSets=NULL, nodeLabelSets, discovery, test, nPerm=10000,
   buildNetFun, ignoreSets=NULL, includeSets=NULL,
   null="overlap", tailApprox=FALSE, verbose=TRUE, indent=0
