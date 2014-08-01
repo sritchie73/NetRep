@@ -53,7 +53,7 @@ all nodes in the test network will be used to draw the null distribution.}
 which are more extreme than the null distribution obtained through the
 permutation procedure.}
 
-\item{simpluf}{logical; if \code{TRUE}, simplify the structure of the output
+\item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
  list if possible.}
 }
 \description{
@@ -94,5 +94,19 @@ Any function argument ending in \code{"Sets"} expects a list, where each
  You may register more "cores" than are physically have on the machine, since
  this master core has relatively low overhead. Note that if only 2 cores have
  been registered, this is the same as running sequentially, since
+}
+\references{
+\enumerate{
+    \item{
+      Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
+      network module preserved and reproducible?} PLoS Comput. Biol.
+      \strong{7}, e1001057 (2011).
+    }
+    \item{
+      Knijnenburg, T. A., Wessels, L. F. A., Reinders, M. J. T. & Shmulevich,
+      I. \emph{Fewer permutations, more accurate P-values}. Bioinformatics
+      \strong{25}, i161-8 (2009).
+    }
+  }
 }
 
