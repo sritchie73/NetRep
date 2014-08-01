@@ -3,7 +3,6 @@
 export("%nin%")
 export("%sub_in%")
 export("%sub_nin%")
-export(netRep)
 export(pperm)
 export(qperm)
 export(qqperm)
