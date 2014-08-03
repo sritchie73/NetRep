@@ -23,6 +23,7 @@ Imports:
     gPdtest,
     fExtremes,
     graphics,
+    scales,
     RcppArmadillo (>= 0.4)
 Suggests:
     testthat

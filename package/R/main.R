@@ -97,6 +97,7 @@
 #'
 #' @import foreach
 #' @importFrom itertools isplitIndices
+#' @export
 netRepMain <- function(
   datSets=NULL, adjSets=NULL, nodeLabelSets, discovery, test, nPerm=10000,
   buildNetFun, ignoreSets=NULL, includeSets=NULL,
