@@ -197,8 +197,6 @@ netRepMain <- function(
         } else {
           testDat <- NULL
         }
-        i
-        vCat("Checked discovery ")
         
         # Create scaled data 
         if (!is.null(discDat)) {
