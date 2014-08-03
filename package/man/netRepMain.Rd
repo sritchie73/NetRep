@@ -53,6 +53,13 @@ all nodes in the test network will be used to draw the null distribution.}
 which are more extreme than the null distribution obtained through the
 permutation procedure.}
 
+\item{verbose}{logical; print output while the function is running
+(\code{TRUE} by default).}
+
+\item{indent}{numeric; a positive value indicating the indent level to start
+the output at. Defaults to 0. Each indent level adds two spaces to the
+start of each line of output.}
+
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
  list if possible.}
 }
