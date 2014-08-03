@@ -43,7 +43,7 @@ test_that("scaleBigMatrix is correct", {
   expect_equivalent(scaleBigMatrix(bigm)[,], t(scale(t(m))))
 })
 
-test_that("allFinite is correct", {
+test_that("checkFinite is correct", {
   set.seed(1)
   options(bigmemory.typecast.warning=FALSE)
   m1 <- matrix(sample(c(1:4, NA), 9, TRUE), 3)
@@ -54,11 +54,11 @@ test_that("allFinite is correct", {
   for (i in 1:4) {
     bigm1 <- as.big.matrix(m1, type=types[i])
     bigm4 <- as.big.matrix(m4, type=types[i])
-    expect_false(allFinite(bigm1))
-    expect_true(allFinite(bigm4))
+    expect_error(checkFinite(bigm1))
+    expect_null(checkFinite(bigm4))
   }
   bigm2 <- as.big.matrix(m2, type="double")
   bigm3 <- as.big.matrix(m3, type="double")
-  expect_false(allFinite(bigm2))
-  expect_false(allFinite(bigm3))
+  expect_error(checkFinite(bigm2))
+  expect_error(checkFinite(bigm3))
 })
