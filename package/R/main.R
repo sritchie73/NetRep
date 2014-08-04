@@ -250,6 +250,11 @@ netRepMain <- function(
           }
           tNodes <- nodeNameSets[[ti]]
         }
+        # Force the node indices to be strings, even if the provided identifiers
+        # are integers.
+        oNodes <- as.character(oNodes)
+        tNodes <- as.character(tNodes)
+        
         if (length(oNodes) == 0) {
           warning("No nodes in dataset ", setNames[di],  
                   " are present in dataset ", setNames[ti], ", skipping.")
