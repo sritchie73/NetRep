@@ -161,7 +161,11 @@ netRepMain <- function(
   
   # Set up return list 
   res <- rep(list(NULL), nNets)
-  res <- lapply(res, function(x) { rep(list(NULL), nNets) })
+  res <- lapply(res, function(x) { 
+    l <- rep(list(NULL), nNets); 
+    names(l) <- names(nodeLabelSets) 
+  })
+  names(res) <- names(nodeLabelSets)
   
   # Iterate pairwise over datasets, comparing those marked "discovery"
   # with each marked as "test".
@@ -383,13 +387,25 @@ netRepMain <- function(
         dimnames(p.values) <- dimnames(observed)
         
         # Collate results
-        res[[di]][[ti]][[1]] <- nulls
-        res[[di]][[ti]][[2]] <- observed
-        res[[di]][[ti]][[3]] <- p.values
-        res[[di]][[ti]][[4]] <- overlap
-        res[[di]][[ti]][[5]] <- oSizes
-        names(res[[di]][[ti]]) <- c("null", "observed", "p.value", 
-                                                  "overlapProp", "overlapSize")
+        # First order output nicely
+        tryCatch({
+          # For modules that are integer coded, make sure they're numerically
+          # ordered, not alphabetically.
+          arrOrder <- order(as.integer(rownames(null)))
+          vOrder <- order(as.integer(names(overlap)))
+        }, warning = function(w) {
+          # If we can't cast to an integer, sort normally.
+          arrOrder <- order(rownames(null))
+          vOrder <- order(overlap)
+        })
+        res[[di]][[ti]][[1]] <- nulls[arrOrder,,]
+        res[[di]][[ti]][[2]] <- observed[arrOrder,]
+        res[[di]][[ti]][[3]] <- p.values[arrOrder,]
+        res[[di]][[ti]][[4]] <- overlap[vOrder]
+        res[[di]][[ti]][[5]] <- oSizes[vOrder]
+        names(res[[di]][[ti]]) <- c(
+          "null", "observed", "p.value", "overlapProp", "overlapSize"
+        )
         
         vCat(verbose, indent+1, "Cleaning up temporary objects...")
         unlink("run-progress", recursive=TRUE)
