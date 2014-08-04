@@ -69,6 +69,14 @@ List NetStats(
       vectorise(discAdj(discIdx, discIdx)),
       vectorise(testAdj(testIdx, testIdx))
     );
+    if (p(0,0) < -1 || p(0,0) > 1) {
+      Function warning("warning");
+      warning("'cor.adj' returned a correlation outside of [-1,1]" 
+              "returning NA instead.");
+      return List::create(
+        Named("cor.adj") = NA_REAL
+      );
+    }
     return List::create(
       Named("cor.adj") = p
     );
