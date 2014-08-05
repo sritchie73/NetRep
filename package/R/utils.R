@@ -225,13 +225,9 @@ ichunkTasks <- function(verbose, n, cores) {
 #' 
 #' @param ... a number of big.matrix objects
 poke <- function(...) {
-  # dump output in some file we don't care about.
-  sink(".temp-objects/init-speed-hack-output.txt")
-  objs <- list(...)
-  for (o in seq_along(objs)) {
+  for (o in list(...)) {
     if (!is.null(o)) {
       o[1:5, 1:5]
     }
   }
-  sink() # return output to its normal state
 }
