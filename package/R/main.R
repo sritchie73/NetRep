@@ -306,11 +306,11 @@ netRepMain <- function(
         # Now calculate the observed value for each network statistic
         observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
           subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-          discDatInd <- match(subsetNodes, varNameSets[[ti]])
+          testDatInd <- match(subsetNodes, varNameSets[[ti]])
           testAdjInd <- match(subsetNodes, nodeNameSets[[ti]])
           discAdjInd <- match(subsetNodes, nodeNameSets[[di]])
           testProps <- subsetProps(
-            testAdj, testAdjInd, testDat, scaledTest, discDatInd
+            testAdj, testAdjInd, testDat, scaledTest, testDatInd
           )
           return(c(
             calcSplitTestStats(discProps[[as.character(ss)]], testProps),
