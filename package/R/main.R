@@ -210,7 +210,7 @@ netRepMain <- function(
         
         # Create scaled data 
         if (!is.null(discDat)) {
-          vCat(verbose, indent+1, "Creating temporary scaled dataset...")
+          vCat(verbose, indent+1, "Creating temporary scaled datasets...")
           if (is.null(scaledSets[[di]])) {
             descriptor <- paste0("scaled", di, ".desc")
             backing <- paste0("scaled", di, ".bin")
