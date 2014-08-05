@@ -223,7 +223,6 @@ netRepMain <- function(
           }
         }
         if (!is.null(testDat)) {
-          vCat(verbose, indent+1, "Creating temporary scaled dataset...")
           if (is.null(scaledSets[[ti]])) {
             descriptor <- paste0("scaled", ti, ".desc")
             backing <- paste0("scaled", ti, ".bin")
