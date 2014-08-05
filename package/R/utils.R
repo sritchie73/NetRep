@@ -211,3 +211,27 @@ ichunkTasks <- function(verbose, n, cores) {
   }
   e$fun(obj, substitute(ex), parent.frame(), e$data)
 }
+
+#' Poke attached big matrix objects to initialise them
+#' 
+#' This is a magical speed hack. See details
+#' 
+#' @details
+#' For some reason, one of the datasets i tried running on took an incredibly
+#' long time for some very small network subsets. After playing around it turns
+#' out that the first time any of the Rcpp functions are called, regardless of 
+#' subset size, it was taking forever. This can be solved simply by accessing
+#' the big.matrix objects beforehand.
+#' 
+#' @param ... a number of big.matrix objects
+poke <- function(...) {
+  # dump output in some file we don't care about.
+  sink(".temp-objects/init-speed-hack-output.txt")
+  objs <- list(...)
+  for (o in seq_along(objs)) {
+    if (!is.null(o)) {
+      o[1:5, 1:5]
+    }
+  }
+  sink() # return output to its normal state
+}

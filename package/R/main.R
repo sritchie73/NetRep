@@ -291,6 +291,7 @@ netRepMain <- function(
         overlap <- oSizes[names(dSizes)]/dSizes
         
         vCat(verbose, indent+1, "Calculating observed test statistics...")
+        poke(discAdj, discDat, scaledDisc, testAdj, testDat, scaledTest)
         # Obtain the topological properties for each network subset in the
         # discovery dataset, we only want to calculate these once!
         discProps <- foreach(ss=oSubsets) %do% {
@@ -336,6 +337,7 @@ netRepMain <- function(
               NULL
             }
           } else {
+            poke(discAdj, discDat, scaledDisc, testAdj, testDat, scaledTest)
             if (verbose) {
               conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
               progressBar <- conns[[1]]
