@@ -396,13 +396,14 @@ netRepMain <- function(
         tryCatch({
           # For modules that are integer coded, make sure they're numerically
           # ordered, not alphabetically.
-          arrOrder <- order(as.integer(rownames(null)))
+          arrOrder <- order(as.integer(rownames(nulls)))
           vOrder <- order(as.integer(names(overlap)))
         }, warning = function(w) {
           # If we can't cast to an integer, sort normally.
-          arrOrder <- order(rownames(null))
+          arrOrder <- order(rownames(nulls))
           vOrder <- order(overlap)
         })
+
         res[[di]][[ti]][[1]] <- nulls[arrOrder,,]
         res[[di]][[ti]][[2]] <- observed[arrOrder,]
         res[[di]][[ti]][[3]] <- p.values[arrOrder,]
