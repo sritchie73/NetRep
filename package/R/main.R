@@ -221,6 +221,8 @@ netRepMain <- function(
           } else {
             scaledDisc <- attach.big.matrix(scaledSets[[di]])
           }
+        } else {
+          scaledDisc <- NULL
         }
         if (!is.null(testDat)) {
           if (is.null(scaledSets[[ti]])) {
@@ -233,6 +235,8 @@ netRepMain <- function(
           } else {
             scaledTest <- attach.big.matrix(scaledSets[[ti]])
           }
+        } else {
+          scaledTest <- NULL
         }
         
         # Get a vector of nodes which are present in both datasets. Depends on 
