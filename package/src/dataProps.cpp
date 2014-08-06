@@ -65,7 +65,7 @@ List DataProps(
   
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) || 
-      is_true(any(subsetIndices > xpDat->nrow()))) {
+      is_true(any(subsetIndices > xpDat->ncol()))) {
     throw std::out_of_range("Some of requested indices are outside of range!");
   }
   // Make sure pScaledDat corresponds to pDat
