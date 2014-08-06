@@ -40,7 +40,7 @@ test_that("diag<- is correct", {
 test_that("scaleBigMatrix is correct", {
   m <- matrix(1:9, 3)
   bigm <- as.big.matrix(m, type="double")
-  expect_equivalent(scaleBigMatrix(bigm)[,], t(scale(t(m))))
+  expect_equivalent(scaleBigMatrix(bigm)[,], scale(m))
 })
 
 test_that("checkFinite is correct", {
