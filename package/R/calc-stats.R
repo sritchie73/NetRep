@@ -93,7 +93,7 @@ calcSplitTestStats <- function(discProps, testProps) {
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=calcSplitTestStats]{Between-network statistics}}
 subsetProps <- function(adj, adjInd, dat=NULL, scaled=NULL, datInd=NULL) {
-  props <- netProps(adj, sort(adjInd))
+  props <- netProps(adj, adjInd)
   if (!is.null(dat)) {
     props <- c(props, dataProps(dat, scaled, datInd))
   }

@@ -88,7 +88,7 @@ List DataProps(
     mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
     mat U, V;
     vec S;
-    uvec subsetRows = as<uvec>(subsetIndices) - 1;
+    uvec subsetRows = sort(as<uvec>(subsetIndices) - 1);
     
     // Get the summary profile for the network subset from the SVD.
     bool success = svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
@@ -117,13 +117,19 @@ List DataProps(
     mat p = cor(summary, aDat.rows(subsetRows).t());
     mat kME(p.t());
     
+    // To make sure the resulting MAR and KIM vectors are in the correct order,
+    // order the results to match the original ordering of subsetIndices.
+    Function rank("rank"); // Rank only works on R objects like IntegerVector.
+    uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;                                                                                                                                                                                      
+    vec oKME = kME(idxRank);
+
     // The proportion of variance explained is the sum of the squared 
     // correlation between the network subset summary profile, and each of the 
     // variables in the data that correspond to nodes in the network subset.
     mat pve(mean(square(p), 1));
     
     return List::create(
-        Named("kME") = kME,
+        Named("kME") = oKME,
         Named("propVarExpl") = pve
       );
   } else {

@@ -23,8 +23,10 @@ using namespace arma;
  */
 template <typename T>
 List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
-  // Convert indices to C++ indexing and a class Armadillo can work with
-  uvec nodeIdx = as<uvec>(subsetIndices) - 1;
+  // Convert indices to C++ indexing and a class Armadillo can work with.
+  // Indices are sorted, because sequential memory access is faster!.
+  uvec nodeIdx = sort(as<uvec>(subsetIndices) - 1);
+
 
   // We do not want a negative weight to cancel out a positive one, so we take
   // the absolute value.
@@ -37,10 +39,18 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   Mat<T> meanMAR = mean(MAR, 1); // This will be length 1
   
   int n = subsetIndices.size();
+  
+  // To make sure the resulting MAR and KIM vectors are in the correct order,
+  // order the results to match the original ordering of subsetIndices.
+  Function rank("rank"); // Rank only works on R objects like IntegerVector.
+  uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
+
+  Col<T> oKIM = colSums(idxRank);
+  Col<T> oMAR = MAR(idxRank);
 
   return List::create(
-    Named("kIM") = colSums,
-    Named("MAR") = MAR,
+    Named("kIM") = oKIM,
+    Named("MAR") = oMAR,
     Named("meanAdj") = sum(colSums, 1) / (n*n - n), 
     Named("meanKIM") = meanKIM,                                                                                                                                                                                                            
     Named("meanMAR") = meanMAR

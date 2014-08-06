@@ -300,7 +300,7 @@ netRepMain <- function(
         discProps <- foreach(ss=oSubsets) %do% {
           subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
           # get the indices in the underlying data and adjacency matrices for 
-          # the subset nodes. Sorted, because sequential memory access is faster.
+          # the subset nodes.
           discDatInd <- match(subsetNodes, varNameSets[[di]])
           discAdjInd <- match(subsetNodes, nodeNameSets[[di]])
           subsetProps(discAdj, discAdjInd, discDat, scaledDisc, discDatInd)
