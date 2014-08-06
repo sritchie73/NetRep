@@ -410,7 +410,7 @@ netRepMain <- function(
         res[[di]][[ti]][[4]] <- overlap[vOrder]
         res[[di]][[ti]][[5]] <- oSizes[vOrder]
         names(res[[di]][[ti]]) <- c(
-          "null", "observed", "p.value", "overlapProp", "overlapSize"
+          "nulls", "observed", "p.values", "overlapProp", "overlapSize"
         )
         
         vCat(verbose, indent+1, "Cleaning up temporary objects...")
