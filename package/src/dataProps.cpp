@@ -88,10 +88,10 @@ List DataProps(
     mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
     mat U, V;
     vec S;
-    uvec subsetRows = sort(as<uvec>(subsetIndices) - 1);
+    uvec subsetCols = as<uvec>(subsetIndices) - 1;
     
     // Get the summary profile for the network subset from the SVD.
-    bool success = svd_econ(U, S, V, aDat.rows(subsetRows), "right", "dc");
+    bool success = svd_econ(U, S, V, aDat.cols(subsetCols), "left", "dc");
     if (!success) {
       Function warning("warning");
       warning("SVD failed to converge, does your data contain missing or"
@@ -101,27 +101,21 @@ List DataProps(
           Named("propVarExpl") = NA_REAL
         );
     }
-    mat summary(V.col(1));
+    mat summary(U.col(1));
 
     // Flip the sign of the summary profile so that the eigenvector is 
     // positively correlated with the average scaled value of the underlying
     // data for the network subset.
     mat asDat((double *)xspDat->matrix(), xspDat->nrow(), xspDat->ncol(), false);
-    mat ap = cor(mean(asDat.rows(subsetRows)), summary);
+    mat ap = cor(mean(asDat.cols(subsetCols)), summary);
     if (ap(0,0) < 0) {
       summary *= -1; 
     }
     
     // We want the correlation between each variable (node) in the underlying
     // data and the summary profile for that network subset.
-    mat p = cor(summary, aDat.rows(subsetRows).t());
-    mat kME(p.t());
-    
-    // To make sure the resulting MAR and KIM vectors are in the correct order,
-    // order the results to match the original ordering of subsetIndices.
-    Function rank("rank"); // Rank only works on R objects like IntegerVector.
-    uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;                                                                                                                                                                                      
-    vec oKME = kME(idxRank);
+    mat p = cor(summary, aDat.cols(subsetCols));
+    mat kME(p);
 
     // The proportion of variance explained is the sum of the squared 
     // correlation between the network subset summary profile, and each of the 
@@ -129,7 +123,7 @@ List DataProps(
     mat pve(mean(square(p), 1));
     
     return List::create(
-        Named("kME") = oKME,
+        Named("kME") = kME,
         Named("propVarExpl") = pve
       );
   } else {

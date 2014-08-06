@@ -38,15 +38,13 @@ void Scale(SEXP pDat, SEXP spDat) {
     mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
     mat asDat((double *)xspDat->matrix(), xspDat->nrow(), xspDat->ncol(), false);
     
-    // Get the mean and std for each row (network node)
-    vec meanExpr(mean(aDat, 1));
-    vec sdExpr(stddev(aDat, 0, 1));
+    // Get the mean and std for each column (network node)
+    rowvec meanExpr(mean(aDat));
+    rowvec sdExpr(stddev(aDat));
   
     // Store scaled data
     for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
-      for (unsigned int ii = 0; ii < xpDat->nrow(); ii++) {
-        asDat(ii, jj) = (aDat(ii, jj) - meanExpr(ii))/sdExpr(ii);
-      }   
+      asDat.col(jj) = (aDat.col(jj) - meanExpr(jj))/sdExpr(jj);
     }
   } else {
     throw Rcpp::exception(

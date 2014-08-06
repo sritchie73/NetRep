@@ -10,7 +10,7 @@
 #'  adjacency matrices, one for each dataset. \code{datSets} should contain a 
 #'  list of \code{big.matrix} objects, which hold the underlying data the 
 #'  corresponding lement of the \code{adjSets} list (for example, a matrix of 
-#'  gene expression data). Here, we expect the rows of each element of 
+#'  gene expression data). Here, we expect the columns of each element of 
 #'  \code{datSets} to correspond to a node in the network.
 #'
 #'  Providing \code{datSets} is optional, if not provided, only statistics 
