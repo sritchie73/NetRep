@@ -348,6 +348,7 @@ netRepMain <- function(
               on.exit(lapply(conns, close))
             } 
             foreach(i=chunk, .combine=abind3) %do% { 
+              gc() # avoid memory leaks by garbage collecting at each iteration.
               # Update the progress at the end of the loop.
               if (verbose) {
                 on.exit({
