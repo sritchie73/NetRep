@@ -203,7 +203,7 @@ netRepMain <- function(
         }
         
         # Create scaled data 
-        if (!is.null(discDat)) {
+        if (!is.null(discDat) && !is.null(testDat)) {
           vCat(verbose, indent+1, "Creating temporary scaled datasets for kME",
                "calculations...")
           if (is.null(scaledSets[[di]])) {
@@ -216,10 +216,6 @@ netRepMain <- function(
           } else {
             scaledDisc <- attach.big.matrix(scaledSets[[di]])
           }
-        } else {
-          scaledDisc <- NULL
-        }
-        if (!is.null(testDat)) {
           if (is.null(scaledSets[[ti]])) {
             descriptor <- paste0("scaled", ti, ".desc")
             backing <- paste0("scaled", ti, ".bin")
@@ -231,6 +227,7 @@ netRepMain <- function(
             scaledTest <- attach.big.matrix(scaledSets[[ti]])
           }
         } else {
+          scaledDisc <- NULL
           scaledTest <- NULL
         }
         
