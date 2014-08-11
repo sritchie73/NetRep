@@ -37,12 +37,13 @@ setupParProgressLogs <- function(chunk, nChunks, ind) {
   
   # Set width of the bar based on the predicted level of indentation etc.
   width <- options("width")[[1]]
+  barWidth <- 9 # for some reason txtProgressBar is 9 characters too wide.
   if (nChunks > 1) {
     # Multiple worker cores, prepend with "Worker N:"
-    progWidth = width - ind*2 - nchar("Worker ") - nchar(nChunks) - 1
+    progWidth = width - ind*2 - nchar("Worker ") - nchar(nChunks) - 1 - barWidth
   } else {
     # If only one worker core, no need to prepend with "Worker N:"
-    progWidth = width - ind*2 
+    progWidth = width - ind*2 - barWidth
   }
   pb <- txtProgressBar(min, max, min, width=progWidth, style=3, file=logfile)
   list(pb, logfile)
