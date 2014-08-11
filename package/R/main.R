@@ -183,28 +183,21 @@ netRepMain <- function(
 
         # Attach relevant matrices
         vCat(verbose, indent+1, "Attaching and checking matrices...")
-        if (is.null(adjSets[[di]])) {
-          stop("not implemented yet")
-        } else {
+        if (!is.null(adjSets[[di]]) && !is.null(adjSets[[ti]])) {
           discAdj <- attach.big.matrix(adjSets[[di]])
           checkFinite(discAdj)
-        }
-        if (is.null(adjSets[[ti]])) {
-          stop("not implemented yet")
-        } else {
           testAdj <- attach.big.matrix(adjSets[[ti]])
           checkFinite(testAdj)
+        } else {
+          stop("not implemented yet")
         }
-        if (!is.null(datSets[[di]])) {
+        if (!is.null(datSets[[di]]) && !is.null(datSets[[ti]])) {
           discDat <- attach.big.matrix(datSets[[di]])
           checkFinite(discDat)
-        } else {
-          discDat <- NULL
-        }
-        if (!is.null(datSets[[ti]])) {
           testDat <- attach.big.matrix(datSets[[ti]])
           checkFinite(testDat)
         } else {
+          discDat <- NULL
           testDat <- NULL
         }
         
