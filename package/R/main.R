@@ -163,7 +163,8 @@ netRepMain <- function(
   res <- rep(list(NULL), nNets)
   res <- lapply(res, function(x) { 
     l <- rep(list(NULL), nNets); 
-    names(l) <- names(nodeLabelSets) 
+    names(l) <- names(nodeLabelSets)
+    l
   })
   names(res) <- names(nodeLabelSets)
   
