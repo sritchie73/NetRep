@@ -1,7 +1,7 @@
 Package: netrep
 Type: Package
 Title: Network Replication
-Version: 0.8.16
+Version: 0.8.17
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for efficiently and accurately assessing whether the
