@@ -147,14 +147,15 @@ netRepMain <- function(
     setNames <- names(nodeLabelSets)
   }
   
-  # Set up temporary directory for working big.matrix objects
+  # Set up temporary directory for working big.matrix objects, and permutation
+  # results.
+  dir.create(".temp-objects", showWarnings=FALSE)
+  on.exit({
+    unlink(".temp-objects", recursive=TRUE)
+  }, add=TRUE)
+  
   scaledSets <- NULL
   if (!is.null(datSets)) {
-    dir.create(".temp-objects", showWarnings=FALSE)
-    on.exit({
-      unlink(".temp-objects", recursive=TRUE)
-    }, add=TRUE)
-    
     scaledSets <- rep(list(NULL), length(datSets))
   }
   
@@ -335,10 +336,7 @@ netRepMain <- function(
           # To log progress, we will write our progress to a file for each chunk
           dir.create("run-progress", showWarnings=FALSE)
         }
-        nulls <- foreach(
-          chunk=ichunkTasks(verbose, nPerm, nCores),
-          .combine=abind3
-        ) %maybe_do_par% {
+        foreach(chunk=ichunkTasks(verbose, nPerm, nCores)) %maybe_do_par% {
           if (verbose & length(chunk) == 1) {
             if (chunk == -1) {
               monitorProgress(nWorkers, indent+2)
@@ -392,12 +390,29 @@ netRepMain <- function(
                 updateParProgress(progressBar, chunk[kk])
                 if (nCores == 1) {
                   reportProgress(indent+2)
+                  if (chunk[kk] == nPerm) {
+                    cat("\n")
+                  }
                 }
               }
             }
-            chunkStats
+            chunkNum <- ceiling(chunk[1]/length(chunk))
+            permFile <- paste0("chunk", chunkNum, "permutations.rds")
+            saveRDS(chunkStats, file.path(".temp-objects", permFile))
           }
         }
+        # Load in results
+        nulls <- array(NA, dim=c(nSubsets, nStats, nPerm))
+        chunkFiles <- list.files(".temp-objects", "chunk[0-9]*permutations.rds")
+        offset <- 1
+        for (cf in chunkFiles) {
+          chunk <- readRDS(file.path(".temp-objects", cf))
+          nCPerm <- dim(chunk)[3]
+          nulls[,,offset:(offset+nCPerm-1)] <- chunk
+          dimnames(nulls)[1:2] <- dimnames(chunk)[1:2]
+          dimnames(nulls)[[3]][offset:(offset+nCPerm-1)] <- dimnames(chunk)[[3]]
+          offset <- offset + nCPerm
+        }        
         
         # Calculate the p-value for the observed statistic based on the null 
         # distribution
