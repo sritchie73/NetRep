@@ -4,9 +4,9 @@ as.big.matrix(matrix(rnorm(100*100), 100, 100),
                    backingfile="test1.bin", descriptorfile="test1.desc")
 as.big.matrix(matrix(rnorm(100*100), 100, 100),
                     backingfile="test2.bin", descriptorfile="test2.desc")
-as.big.matrix(matrix(rnorm(100*50), 100, 50),
+as.big.matrix(matrix(rnorm(50*100), 50, 100),
               backingfile="dat1.bin", descriptorfile="dat1.desc")
-as.big.matrix(matrix(rnorm(100*75), 100, 75),
+as.big.matrix(matrix(rnorm(75*100), 75, 100),
               backingfile="dat2.bin", descriptorfile="dat2.desc")
 varNameSets <- rep(list(1:100), 2)
 nodeNameSets <- rep(list(1:100), 2)
