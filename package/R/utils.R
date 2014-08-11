@@ -131,15 +131,6 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
   }
 }
 
-#' Combine two-dimensional arrays
-#' 
-#' Binds two dimensional arrays along the third dimension.
-#' 
-#' @param ... any number of two dimensional objects, to be bound together along
-#'   the third dimension.
-#' @importFrom abind abind
-abind3 <- function(...) abind(..., along=3)
-
 #' Iterator with master worker
 #' 
 #' Create an iterator of chunks of indices from 1 to \code{n}, along with an 
