@@ -285,35 +285,50 @@ netRepMain <- function(
         names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
         overlap <- oSizes[names(dSizes)]/dSizes
         
-        vCat(verbose, indent+1, "Calculating observed test statistics...")
-        poke(discAdj, discDat, scaledDisc, testAdj, testDat, scaledTest)
+        
+        # How many network properites and statistics will we return? 
+        # Numbers required for data structure allocation
+        nProps <- ifelse(is.null(discDat), 5, 7)
+        nStats <- ifelse(is.null(discDat), 6, 9)
+        nSubsets <- length(oSubsets)
+        
         # Obtain the topological properties for each network subset in the
         # discovery dataset, we only want to calculate these once!
-        discProps <- foreach(ss=oSubsets) %do% {
-          subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+        vCat(verbose, indent+1, "Calculating observed test statistics...")
+        poke(discAdj, discDat, scaledDisc, testAdj, testDat, scaledTest)
+        discProps <- rep(list(NULL), nSubsets)
+        for (ii in seq_along(oSubsets)) {
+          sNodes <- names(which(nodeLabelSets[[di]][oNodes] == oSubsets[ii]))
           # get the indices in the underlying data and adjacency matrices for 
           # the subset nodes.
-          discDatInd <- match(subsetNodes, varNameSets[[di]])
-          discAdjInd <- match(subsetNodes, nodeNameSets[[di]])
-          subsetProps(discAdj, discAdjInd, discDat, scaledDisc, discDatInd)
+          discDatInd <- match(sNodes, varNameSets[[di]])
+          discAdjInd <- match(sNodes, nodeNameSets[[di]])
+          props <- subsetProps(
+            discAdj, discAdjInd, discDat, scaledDisc, discDatInd
+          )
+          discProps[[ii]] <- props
         }
         names(discProps) <- oSubsets
         
         # Now calculate the observed value for each network statistic
-        observed <- foreach(ss=oSubsets, .combine=rbind) %do% {
-          subsetNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-          testDatInd <- match(subsetNodes, varNameSets[[ti]])
-          testAdjInd <- match(subsetNodes, nodeNameSets[[ti]])
-          discAdjInd <- match(subsetNodes, nodeNameSets[[di]])
+        observed <- matrix(NA, nrow=nSubsets, ncol=nStats)
+        rownames(observed) <- oSubsets
+        for (ii in seq_along(oSubsets)) {
+          ss <- as.character(oSubsets[ii])
+          sNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+          testDatInd <- match(sNodes, varNameSets[[ti]])
+          testAdjInd <- match(sNodes, nodeNameSets[[ti]])
+          discAdjInd <- match(sNodes, nodeNameSets[[di]])
           testProps <- subsetProps(
             testAdj, testAdjInd, testDat, scaledTest, testDatInd
           )
-          return(c(
-            calcSplitTestStats(discProps[[as.character(ss)]], testProps),
+          stats <- c(
+            calcSplitTestStats(discProps[[ss]], testProps),
             calcSharedTestStats(discAdj, discAdjInd, testAdj, testAdjInd)
-          ))
+          )
+          observed[ii,] <- stats
+          colnames(observed) <- names(stats)
         }
-        rownames(observed) <- oSubsets
         
         # Calculate the null distribution for each of the statistics.
         vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
@@ -338,16 +353,13 @@ netRepMain <- function(
               progressBar <- conns[[1]]
               on.exit(lapply(conns, close))
             } 
-            foreach(i=chunk, .combine=abind3) %do% { 
+            chunkStats <- array(NA, dim=c(nSubsets, nStats, length(chunk)))
+            dimnames(chunkStats)[1:2] <- dimnames(observed)
+            dimnames(chunkStats)[[3]] <- paste0("permutation.", chunk)
+            for (kk in seq_along(chunk)) {
               gc() # avoid memory leaks by garbage collecting at each iteration.
-              # Update the progress at the end of the loop.
-              if (verbose) {
-                on.exit({
-                  updateParProgress(progressBar, i)
-                  if (nCores == 1) reportProgress(indent+2)
-                })                
-              }
-              foreach(ss=oSubsets, .combine=rbind) %do% {
+              for (ii in seq_along(oSubsets)) {
+                ss <- as.character(oSubsets[ii])
                 # Select a random subset of nodes of the same size as the subset 
                 # ss, depending on our null model.
                 if (model == "overlap") {
@@ -357,33 +369,52 @@ netRepMain <- function(
                 }
                 permDatInd <- match(permNames, varNameSets[[ti]])
                 permAdjInd <- match(permNames, nodeNameSets[[ti]])
-                discAdjInd <- match(subsetNodes, nodeNameSets[[di]])
+                sNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
+                discAdjInd <- match(sNodes, nodeNameSets[[di]])
                 
-                testProps <- subsetProps(
+                tryCatch({ 
+                  testProps <- subsetProps(
                   testAdj, permAdjInd, testDat, scaledTest, permDatInd
-                )
-                return(c(
-                  calcSplitTestStats(discProps[[as.character(ss)]], testProps),
-                  calcSharedTestStats(discAdj, discAdjInd, testAdj, permAdjInd)
-                ))
+                  )
+                  stats <- c(
+                    calcSplitTestStats(discProps[[ss]], testProps),
+                    calcSharedTestStats(discAdj, discAdjInd, testAdj, permAdjInd)
+                  )
+                  chunkStats[ii,,kk] <- stats
+                }, error = function(e) {
+                  warning(
+                    "Calculation for subset ", oSubsets[ii], " failed on ",
+                    "permutation ", chunk[kk], " with error message:\n",
+                    e$message
+                  )
+                })
+              }
+              # Update the progress at the end of the loop.
+              if (verbose) {
+                updateParProgress(progressBar, chunk[kk])
+                if (nCores == 1) {
+                  reportProgress(indent+2)
+                }
               }
             }
+            chunkStats
           }
         }
-        dimnames(nulls)[[1]] <- oSubsets
-        dimnames(nulls)[[2]] <- colnames(observed)
-        dimnames(nulls)[[3]] <- paste("permutation", seq_len(nPerm), sep=".")
         
         # Calculate the p-value for the observed statistic based on the null 
         # distribution
         vCat(verbose, indent+1, "Calculating P-values...")
-        p.values <- foreach(stat=seq_len(ncol(observed)), .combine=cbind) %:% 
-          foreach(ss=seq_len(nrow(observed)), .combine=c) %do% {
-            pperm(nulls[ss,stat,], observed[ss,stat], tailApprox, 
-                  lower.tail=FALSE)
-          }
+        p.values <- matrix(NA, nrow=nSubsets, ncol=nStats)
         dimnames(p.values) <- dimnames(observed)
-        
+        for (ii in seq_along(oSubsets)) {
+          for (jj in seq_len(nStats)) {
+            p.values[ii, jj] <- pperm(
+              nulls[ii, jj, ], observed[ii, jj], tailApprox, 
+              lower.tail=FALSE
+            )
+          }
+        }
+
         # Collate results
         # First order output nicely
         tryCatch({
