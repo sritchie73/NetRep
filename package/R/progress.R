@@ -119,10 +119,6 @@ reportProgress <- function(ind) {
   progress <- tail(readLines(conn, warn=FALSE), 1)
   on.exit({ 
     close(conn)
-    if (grepl("100%", progress)) {
-      file.remove(file.path("run-progress", "chunk1.log"))
-      cat("\n")
-    }
   })
   
   # Output sensibly
