@@ -172,8 +172,7 @@ netRepMain <- function(
   # with each marked as "test".
   for (di in seq_len(nNets)) {
     for (ti in seq_len(nNets)) {
-      tryCatch({
-        if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
+      if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
         # Set up return list
         res[[di]][[ti]] <- rep(list(NULL), 5)
         
@@ -443,11 +442,6 @@ netRepMain <- function(
         gc()
         vCat(verbose, indent, "Done!")
       }
-      }, error = function(e) {
-        warning(e$message)
-        vCat(TRUE, indent+1, "Pair Failed with error: ", e$message, 
-              "\nSkipping")
-      })
     }
   }
   if (simplify) {
