@@ -114,10 +114,9 @@ netRepMain <- function(
   # and also serve as useful documentation for the reader of the source code.
   di <- NULL # discovery dataset index in the "Sets" lists.
   ti <- NULL # test dataset index in the "Sets" lists.
-  ss <- NULL # an individual network subset label or index.
-  chunk <- NULL # chunk of permutations to run on a core.
-  i <- NULL # current permutation number.
-  stat <- NULL # column index for each statistic computed in the null 3D array.
+  ii <- NULL # iterator over the subsets
+  jj <- NULL # iterator over the statistics
+  kk <- NULL # iterator over the permutations
   
   # Identify the null model to use 
   nullModels <- c("overlap", "all")
