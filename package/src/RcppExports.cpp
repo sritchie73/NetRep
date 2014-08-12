@@ -6,6 +6,24 @@
 
 using namespace Rcpp;
 
+// NetStats
+List NetStats(SEXP pAdjD, IntegerVector discIndices, SEXP pAdjT, IntegerVector testIndices);
+RcppExport SEXP netrep_NetStats(SEXP pAdjDSEXP, SEXP discIndicesSEXP, SEXP pAdjTSEXP, SEXP testIndicesSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type pAdjD(pAdjDSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
+        Rcpp::traits::input_parameter< SEXP >::type pAdjT(pAdjTSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
+        List __result = NetStats(pAdjD, discIndices, pAdjT, testIndices);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // CheckFinite
 void CheckFinite(SEXP pDat);
 RcppExport SEXP netrep_CheckFinite(SEXP pDatSEXP) {
@@ -35,34 +53,6 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// GetDiag
-NumericVector GetDiag(SEXP pBigMat);
-RcppExport SEXP netrep_GetDiag(SEXP pBigMatSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP );
-        NumericVector __result = GetDiag(pBigMat);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
-// SetDiag
-void SetDiag(SEXP pBigMat, NumericVector value);
-RcppExport SEXP netrep_SetDiag(SEXP pBigMatSEXP, SEXP valueSEXP) {
-BEGIN_RCPP
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type value(valueSEXP );
-        SetDiag(pBigMat, value);
-    }
-    return R_NilValue;
-END_RCPP
-}
 // NetProps
 List NetProps(SEXP pAdjacency, IntegerVector subsetIndices);
 RcppExport SEXP netrep_NetProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
@@ -73,24 +63,6 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
         List __result = NetProps(pAdjacency, subsetIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
-// NetStats
-List NetStats(SEXP pAdjD, IntegerVector discIndices, SEXP pAdjT, IntegerVector testIndices);
-RcppExport SEXP netrep_NetStats(SEXP pAdjDSEXP, SEXP discIndicesSEXP, SEXP pAdjTSEXP, SEXP testIndicesSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pAdjD(pAdjDSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
-        Rcpp::traits::input_parameter< SEXP >::type pAdjT(pAdjTSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
-        List __result = NetStats(pAdjD, discIndices, pAdjT, testIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
