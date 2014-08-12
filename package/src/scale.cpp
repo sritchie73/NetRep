@@ -1,5 +1,5 @@
 #define ARMA_USE_LAPACK
-#define ARMA_DONT_USE_CXX11
+#define ARMA_NO_DEBUG
 
 #include <RcppArmadillo.h>
 using namespace Rcpp;
