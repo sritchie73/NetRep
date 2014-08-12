@@ -403,6 +403,7 @@ netRepMain <- function(
         }
         # Load in results
         nulls <- array(NA, dim=c(nSubsets, nStats, nPerm))
+        dimnames(nulls)[[3]] <- rep("", dim(nulls)[3])
         chunkFiles <- list.files(".temp-objects", "chunk[0-9]*permutations.rds")
         offset <- 1
         for (cf in chunkFiles) {
