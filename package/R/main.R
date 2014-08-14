@@ -93,7 +93,7 @@
 #'  list if possible.
 #'
 #' @import foreach
-#' @importFrom itertools isplitIndices
+#' @import RhpcBLASctl
 #' @export
 netRepMain <- function(
   datSets=NULL, varNameSets=NULL, adjSets=NULL, nodeNameSets=NULL, 
@@ -127,6 +127,16 @@ netRepMain <- function(
     nWorkers <- nCores
   }
   vCat(verbose, indent, "Running with", nWorkers, "worker cores.")
+  
+  # Since we expect the user to explicitly handle the number of parallel threads,
+  # we will disable the potential implicit parallelism on systems where R has
+  # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
+  omp_set_num_threads(1)
+  blas_set_num_threads(1)
+  
+  # Note to self: if we do any linear algebra on the full networks in 
+  # preparation at a later date, we'll first need to set the number of threads
+  # to `nCores`.
   
   nNets <- length(nodeLabelSets)
   

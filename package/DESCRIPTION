@@ -20,7 +20,8 @@ Imports:
     methods,
     utils,
     BH,
-    RcppArmadillo (>= 0.4)
+    RcppArmadillo (>= 0.4),
+    RhpcBLASctl
 Suggests:
     testthat
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
