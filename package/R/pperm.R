@@ -52,8 +52,6 @@
 #' @param n number of observations. If \code{length(n) > 1}, the length is 
 #'  taken to be the number required. 
 #' @param log.p logicial; if TRUE, probabilities p are given as log(p)
-#' @param tail.approx logical; if \code{TRUE}, use the tail approximation 
-#'  algorithm to estimate extreme p-values (see details).
 #' @param lower.tail logical; if TRUE (default), probabilities are 
 #'    \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.   
 #'  
@@ -69,60 +67,25 @@
 #' @aliases permutation permuted
 #' @name permutation
 NULL
-  
+
+# @param tail.approx logical; if \code{TRUE}, use the tail approximation 
+#  algorithm to estimate extreme p-values (see details).
 #' @rdname permutation
 #' @export
 #' @import gPdtest
 #' @importFrom fExtremes pgpd
-pperm <- function(permuted, q, tail.approx=FALSE, lower.tail=TRUE, log.p=FALSE) {
+pperm <- function(permuted, q, lower.tail=TRUE, log.p=FALSE) {
   permuted <- sort(permuted)
   if (lower.tail) {
     more.extreme <- length(permuted[permuted < q])
   } else {
     more.extreme <- length(permuted[permuted > q])
   }
-  if (tail.approx & more.extreme < 10) {
-    # Starting with the 250 most extreme observations (exceedances) , decrease 
-    # by 10, until we have a good fit to a GPD (p > 0.05), see (2).
-    topn <- 250
-    while (topn > 0) {
-      if (lower.tail) {
-        exc <- head(permuted, topn)
-      } else {
-        exc <- tail(permuted, topn)
-      }
-      if (all(exc < 0)) {
-        warning("unable to fit a generalized pareto distribution for this test",
-                " because the extremities are negative")
-        return(pperm(permuted, q, FALSE, lower.tail, log.p))
-      } else if (any(exc < 0)) {
-        topn <- topn - 10
-      } else {
-        test <- gpd.test(exc)
-        ifelse(test$boot.test$p.value > 0.05, break, topn <- topn - 10)
-      }
-    }
-    if (topn == 0) {
-      warning("unable to fit a generalized pareto distribution to the permuted",
-              " data!")
-      return(pperm(permuted, q, FALSE, lower.tail, log.p))
-    } else {
-      fit <- gpd.fit(exc, method="amle")
-      p.value <- pgpd(q, xi=fit[[1]], beta=fit[[2]], lower.tail=lower.tail)
-      p.value <- as.numeric(p.value) # get rid of extra attributes
-      if (log.p) {
-        p.value <- log(p.value)
-      }
-    }
+  nPerm <- length(permuted)
+  if (log.p) {
+    p.value <- log(more.extreme + 1) - log(nPerm + 1)
   } else {
-    # If we're using tail approximation, no need for the pseudocount (2)
-    pCount <- ifelse(tail.approx, 0, 1)
-    nPerm <- length(permuted)
-    if (log.p) {
-      p.value <- log(more.extreme + pCount) - log(nPerm + pCount)
-    } else {
-      p.value <- (more.extreme + pCount) / (nPerm + pCount)
-    }
+    p.value <- (more.extreme + 1) / (nPerm + 1)
   }
   return(p.value)
 }

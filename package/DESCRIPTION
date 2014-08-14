@@ -20,8 +20,6 @@ Imports:
     methods,
     utils,
     BH,
-    gPdtest,
-    fExtremes,
     RcppArmadillo (>= 0.4)
 Suggests:
     testthat

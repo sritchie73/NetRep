@@ -87,10 +87,6 @@
 #'   (default) only the nodes present in both the discovery and test networks
 #'   will be used to draw the null distribution for each statistic. If "all", 
 #'   all nodes in the test network will be used to draw the null distribution.
-#' @param tailApprox logical; if \code{TRUE}, the tail approximation method from
-#'   (\emph{2}) is used to obtain an estimated p-value for network statistics
-#'   which are more extreme than the null distribution obtained through the 
-#'   permutation procedure.
 #' @param verbose logical; print output while the function is running 
 #'   (\code{TRUE} by default).
 #' @param indent numeric; a positive value indicating the indent level to start
@@ -106,7 +102,7 @@ netRepMain <- function(
   datSets=NULL, varNameSets=NULL, adjSets=NULL, nodeNameSets=NULL, 
   nodeLabelSets, discovery, test, nPerm=10000,
   buildNetFun, ignoreSets=NULL, includeSets=NULL, 
-  null="overlap", tailApprox=FALSE, verbose=TRUE, indent=0, 
+  null="overlap", verbose=TRUE, indent=0, 
   simplify=TRUE
 ) {
   # The following declarations are for iterators declared inside each foreach 
@@ -423,8 +419,7 @@ netRepMain <- function(
         for (ii in seq_along(oSubsets)) {
           for (jj in seq_len(nStats)) {
             p.values[ii, jj] <- pperm(
-              nulls[ii, jj, ], observed[ii, jj], tailApprox, 
-              lower.tail=FALSE
+              nulls[ii, jj, ], observed[ii, jj], lower.tail=FALSE
             )
           }
         }
