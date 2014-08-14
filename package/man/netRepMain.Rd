@@ -5,8 +5,8 @@
 \usage{
 netRepMain(datSets = NULL, varNameSets = NULL, adjSets = NULL,
   nodeNameSets = NULL, nodeLabelSets, discovery, test, nPerm = 10000,
-  buildNetFun, ignoreSets = NULL, includeSets = NULL, null = "overlap",
-  tailApprox = FALSE, verbose = TRUE, indent = 0, simplify = TRUE)
+  ignoreSets = NULL, includeSets = NULL, null = "overlap",
+  verbose = TRUE, indent = 0, simplify = TRUE)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
@@ -37,10 +37,6 @@ and/or \code{adjSets} are to be treated as the \emph{test} datasets.}
 
 \item{nPerm}{number of permutations to use.}
 
-\item{buildNetFun}{A function for constructing a network from the
-\code{datSets}. This is used only where a pre-constructed network is not
-provided in \code{adjSets}.}
-
 \item{ignoreSets}{An optional list, where the elments for each
 \emph{discovery} data set are vectors specifying which sub-networks to
 skip.}
@@ -53,11 +49,6 @@ include.}
 (default) only the nodes present in both the discovery and test networks
 will be used to draw the null distribution for each statistic. If "all",
 all nodes in the test network will be used to draw the null distribution.}
-
-\item{tailApprox}{logical; if \code{TRUE}, the tail approximation method from
-(\emph{2}) is used to obtain an estimated p-value for network statistics
-which are more extreme than the null distribution obtained through the
-permutation procedure.}
 
 \item{verbose}{logical; print output while the function is running
 (\code{TRUE} by default).}
