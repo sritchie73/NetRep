@@ -8,7 +8,7 @@ using namespace arma;
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/BigMatrix.h>
 
-/* Implementation of NetProps
+/* Implementation of AdjProps
  *
  * @param adj the armadillo compatible adjacency matrix
  * @param subsetIndices indices of the network subset to compute the mean
@@ -22,7 +22,7 @@ using namespace arma;
  *     - The mean maximum adjacency ratio (meanMAR).
  */
 template <typename T>
-List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
+List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   // Convert indices to C++ indexing and a class Armadillo can work with.
   // Indices are sorted, because sequential memory access is faster!.
   uvec nodeIdx = sort(as<uvec>(subsetIndices) - 1);
@@ -32,28 +32,19 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   // the absolute value.
   Mat<T> dg = diagvec(adj);
   Mat<T> colSums = sum(abs(adj(nodeIdx, nodeIdx))) - abs(dg(nodeIdx)).t();
-  Mat<T> meanKIM = mean(colSums, 1); // This will be length 1
-
-  Mat<T> sqSums = sum(square(adj(nodeIdx, nodeIdx))) - square(dg(nodeIdx)).t();
-  Mat<T> MAR = sqSums / colSums;
-  Mat<T> meanMAR = mean(MAR, 1); // This will be length 1
   
   int n = subsetIndices.size();
   
-  // To make sure the resulting MAR and KIM vectors are in the correct order,
+  // To make sure the resulting KIM vector is in the correct order,
   // order the results to match the original ordering of subsetIndices.
   Function rank("rank"); // Rank only works on R objects like IntegerVector.
   uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
 
   Col<T> oKIM = colSums(idxRank);
-  Col<T> oMAR = MAR(idxRank);
 
   return List::create(
     Named("kIM") = oKIM,
-    Named("MAR") = oMAR,
-    Named("meanAdj") = sum(colSums, 1) / (n*n - n), 
-    Named("meanKIM") = meanKIM,                                                                                                                                                                                                            
-    Named("meanMAR") = meanMAR
+    Named("meanAdj") = sum(colSums, 1) / (n*n - n)
   );
 }                                                                                                                                                                                                                                          
 
@@ -72,9 +63,9 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 //'     \item{\emph{meanKIM}:}{The mean within-subset degree.}
 //'     \item{\emph{meanMAR}:}{The mean maximum adjacency ratio.}
 //'   }
-//' @rdname netProps-cpp
+//' @rdname AdjProps-cpp
 // [[Rcpp::export]]
-List NetProps(SEXP pAdjacency, IntegerVector subsetIndices) {
+List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices) {
   XPtr<BigMatrix> xpAdj(pAdjacency);
 
   // Make sure we're not indexing out of range.
@@ -87,22 +78,22 @@ List NetProps(SEXP pAdjacency, IntegerVector subsetIndices) {
   //  Dispatch function for all types of big.matrix.
   unsigned short type = xpAdj->matrix_type();
   if (type == 1) {
-    return NetProps(
+    return AdjProps(
       arma::Mat<char>((char *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 2) {
-    return NetProps(
+    return AdjProps(
       arma::Mat<short>((short *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 4) {
-    return NetProps(
+    return AdjProps(
       arma::Mat<int>((int *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 8) {
-    return NetProps(
+    return AdjProps(
       arma::Mat<double>((double *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
