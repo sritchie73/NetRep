@@ -43,10 +43,7 @@ calcSplitTestStats <- function(discProps, testProps) {
   
   stats <- c(
     meanAdj = testProps[["meanAdj"]],
-    meanKIM = testProps[["meanKIM"]],
-    meanMAR = testProps[["meanMAR"]],
     cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]]),
-    cor.MAR = cor(discProps[["MAR"]], testProps[["MAR"]])
   )
   if ("propVarExpl" %in% names(testProps)) { # Detect if data has been provided
     stats <- c(stats,

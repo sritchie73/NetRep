@@ -11,15 +11,11 @@ using namespace arma;
 /* Implementation of AdjProps
  *
  * @param adj the armadillo compatible adjacency matrix
- * @param subsetIndices indices of the network subset to compute the mean
- *   adjacency on
+ * @param subsetIndices indices of the network subset of interest.
  * @return
  *    A List containing:
  *     - The weighted within-subset degree for each node (kIM).
- *     - The maximum adjacency ratio for each node (MAR).
  *     - The mean absolute edge weight of the network subset (meanAdj).
- *     - The mean within-subset degree (meanKIM).
- *     - The mean maximum adjacency ratio (meanMAR).
  */
 template <typename T>
 List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
@@ -48,20 +44,16 @@ List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   );
 }                                                                                                                                                                                                                                          
 
-//' Calculate Network Properties
+//' Calculate Mean Adjacency and Intramodular Connectivity
 //'
-//' @param pAdjacency SEXP container for the pointer to the adjacency matrix
-//' @param subsetIndices indices of the subset of the network to calculate
-//'   the mean adjacency for.
+//' @param pAdjacency SEXP container for the pointer to the adjacency matrix.
+//' @param subsetIndices indices of the network subset of interest.
 //'   
 //' @return
 //'   A List containing:
 //'   \enumerate{
 //'     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
-//'     \item{\emph{MAR}:}{The maximum adjacency ratio for each node.}
 //'     \item{\emph{meanAdj}:}{The mean absolute edge weight of the network subset.}
-//'     \item{\emph{meanKIM}:}{The mean within-subset degree.}
-//'     \item{\emph{meanMAR}:}{The mean maximum adjacency ratio.}
 //'   }
 //' @rdname AdjProps-cpp
 // [[Rcpp::export]]
