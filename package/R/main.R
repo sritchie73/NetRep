@@ -257,7 +257,7 @@ netRepMain <- function(
         if (length(oNodes) == 0) {
           warning("No nodes in dataset ", setNames[di],  
                   " are present in dataset ", setNames[ti], ", skipping.")
-          return(NULL)
+          next
         }
         
         # Compute information about the network subsets, their size, and what 
