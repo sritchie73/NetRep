@@ -60,11 +60,14 @@ List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices) {
   XPtr<BigMatrix> xpAdj(pAdjacency);
 
+  if (xpAdj->ncol() != xpAdj->nrow()) {
+    throw Rcpp::exception("provided matrix is not square!");
+  }
+  
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) ||
-      is_true(any(subsetIndices > xpAdj->ncol())) ||
-      is_true(any(subsetIndices > xpAdj->nrow()))) {
-    throw std::out_of_range("Requested index outside of range!");
+      is_true(any(subsetIndices > xpAdj->ncol()))) {
+    throw std::out_of_range("requested index outside of range!");
   }
 
   //  Dispatch function for all types of big.matrix.
