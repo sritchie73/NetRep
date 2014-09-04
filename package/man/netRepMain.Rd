@@ -20,7 +20,8 @@ each dataset, corresponding to the adjacency matrix of edge weights between
 each pair of nodes in the network.}
 
 \item{nodeNameSets}{\code{NULL}, or a list of character vectors giving the
-\code{rownames} of \code{adjSets}.}
+node names for the corresponding element of \code{datSets}, \code{corSets},
+and \code{adjSets}.}
 
 \item{nodeLabelSets}{a list, whose elements are \code{NULL} for each
 \emph{test} dataset, and a vector for each \emph{discovery} dataset
