@@ -3,21 +3,23 @@
 \alias{NetStats}
 \title{Calculate Network Statistics}
 \usage{
-NetStats(pAdjD, discIndices, pAdjT, testIndices)
+NetStats(pCoexpD, discIndices, pCoexpT, testIndices)
 }
 \arguments{
-\item{pAdjD,pAdjT}{SEXP containers for the pointers to the
-\code{\link[bigmemory]{big.matrix}} objects holding the \emph{discovery}
-and \emph{test} networks respectively.}
+\item{pCoexpD,pCoexpT}{SEXP containers for the pointers to the coexpression
+matrices for the \emph{discovery} and \emph{test} networks respectively.}
 
-\item{discIndices,testIndices}{indices of the network subset of interest in
+\item{discIndices,testIndices}{indices of the network subset in
   the \emph{discovery} and \emph{test} networks respectively.}
 }
 \value{
 A vector containing:
   \enumerate{
-    \item{\emph{cor.adj}:}{
-      The correlation between the edge weights for both networks.
+    \item{\emph{cor.cor}:}{
+      The correlation between the subset coexpression for both networks.
+    }
+    \item{\emph{mean.Cor}:}{
+      The mean correlation density of the network subset.
     }
   }
 }
@@ -25,5 +27,14 @@ A vector containing:
 For some statistics it does not make sense to calculate the necessary
 components in advance due to large memory overhead, or logic that doesn't
 separate nicely. This function deals with those statistics.
+}
+\references{
+\enumerate{
+    \item{
+      Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
+      network module preserved and reproducible?} PLoS Comput. Biol.
+      \strong{7}, e1001057 (2011).
+    }
+ }
 }
 

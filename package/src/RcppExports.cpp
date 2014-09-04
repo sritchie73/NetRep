@@ -23,17 +23,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // NetStats
-List NetStats(SEXP pAdjD, IntegerVector discIndices, SEXP pAdjT, IntegerVector testIndices);
-RcppExport SEXP netrep_NetStats(SEXP pAdjDSEXP, SEXP discIndicesSEXP, SEXP pAdjTSEXP, SEXP testIndicesSEXP) {
+List NetStats(SEXP pCoexpD, IntegerVector discIndices, SEXP pCoexpT, IntegerVector testIndices);
+RcppExport SEXP netrep_NetStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pAdjD(pAdjDSEXP );
+        Rcpp::traits::input_parameter< SEXP >::type pCoexpD(pCoexpDSEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
-        Rcpp::traits::input_parameter< SEXP >::type pAdjT(pAdjTSEXP );
+        Rcpp::traits::input_parameter< SEXP >::type pCoexpT(pCoexpTSEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
-        List __result = NetStats(pAdjD, discIndices, pAdjT, testIndices);
+        List __result = NetStats(pCoexpD, discIndices, pCoexpT, testIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
