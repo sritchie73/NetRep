@@ -3,23 +3,21 @@
 \alias{netRepMain}
 \title{Assessing Network Replication}
 \usage{
-netRepMain(datSets = NULL, varNameSets = NULL, adjSets = NULL,
-  nodeNameSets = NULL, nodeLabelSets, discovery, test, nPerm = 10000,
-  ignoreSets = NULL, includeSets = NULL, null = "overlap",
-  verbose = TRUE, indent = 0, simplify = TRUE)
+netRepMain(datSets = NULL, corSets, adjSets, nodeNameSets = NULL,
+  nodeLabelSets, discovery, test, nPerm = 10000, ignoreSets = NULL,
+  includeSets = NULL, null = "overlap", verbose = TRUE, indent = 0,
+  simplify = TRUE)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
 each dataset.}
 
-\item{varNameSets}{\code{NULL}, or a list of character vectors giving the
-\code{rownames} of \code{datSets}.}
+\item{corSets}{a list of \code{\link{big.matrix}} objects: one for each
+dataset, corresponding to the pairwise-gene correlation.}
 
-\item{adjSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
+\item{adjSets}{a list of \code{\link{big.matrix}} objects: one for
 each dataset, corresponding to the adjacency matrix of edge weights between
-each pair of nodes in the network. Alternatively, if the list elements
-are \code{NULL}, then the networks will be dynamically calculated using the
-provided \code{buildNetFun} on the corresponding \code{datSet}.}
+each pair of nodes in the network.}
 
 \item{nodeNameSets}{\code{NULL}, or a list of character vectors giving the
 \code{rownames} of \code{adjSets}.}

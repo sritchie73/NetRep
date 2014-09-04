@@ -15,7 +15,7 @@ using namespace arma;
  * @return
  *    A List containing:
  *     - The weighted within-subset degree for each node (kIM).
- *     - The mean absolute edge weight of the network subset (meanAdj).
+ *     - The mean absolute edge weight of the network subset (mean.adj).
  */
 template <typename T>
 List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
@@ -40,7 +40,7 @@ List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 
   return List::create(
     Named("kIM") = oKIM,
-    Named("meanAdj") = sum(colSums, 1) / (n*n - n)
+    Named("mean.adj") = sum(colSums, 1) / (n*n - n)
   );
 }                                                                                                                                                                                                                                          
 

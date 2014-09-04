@@ -47,8 +47,8 @@ netStats <- function(discAdj, discIndices, testAdj, testIndices) {
 #'  adjacency matrix. These properties can either be scalers (summarising the
 #'  whole network subset), or vectors (characterising some property for each
 #'  node in the network subset).
-netProps <- function(adj, subsetIndices) {
-  res <- NetProps(adj@address, subsetIndices)
+adjProps <- function(adj, subsetIndices) {
+  res <- AdjProps(adj@address, subsetIndices)
   lapply(res, as.vector)
 }
 

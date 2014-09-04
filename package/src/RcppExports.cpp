@@ -22,24 +22,6 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// NetStats
-List NetStats(SEXP pCoexpD, IntegerVector discIndices, SEXP pCoexpT, IntegerVector testIndices);
-RcppExport SEXP netrep_NetStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pCoexpD(pCoexpDSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
-        Rcpp::traits::input_parameter< SEXP >::type pCoexpT(pCoexpTSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
-        List __result = NetStats(pCoexpD, discIndices, pCoexpT, testIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
 // CheckFinite
 void CheckFinite(SEXP pDat);
 RcppExport SEXP netrep_CheckFinite(SEXP pDatSEXP) {
@@ -63,6 +45,24 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< SEXP >::type pScaledDat(pScaledDatSEXP );
         Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
         List __result = DataProps(pDat, pScaledDat, subsetIndices);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// NetStats
+List NetStats(SEXP pCoexpD, IntegerVector discIndices, SEXP pCoexpT, IntegerVector testIndices);
+RcppExport SEXP netrep_NetStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type pCoexpD(pCoexpDSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
+        Rcpp::traits::input_parameter< SEXP >::type pCoexpT(pCoexpTSEXP );
+        Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
+        List __result = NetStats(pCoexpD, discIndices, pCoexpT, testIndices);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

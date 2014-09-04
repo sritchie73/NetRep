@@ -72,8 +72,6 @@ NULL
 #  algorithm to estimate extreme p-values (see details).
 #' @rdname permutation
 #' @export
-#' @import gPdtest
-#' @importFrom fExtremes pgpd
 pperm <- function(permuted, q, lower.tail=TRUE, log.p=FALSE) {
   permuted <- sort(permuted)
   if (lower.tail) {

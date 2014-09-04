@@ -56,13 +56,11 @@
 #' 
 #' @param datSets \code{NULL}, or a list of \code{\link{big.matrix}}: one for 
 #'   each dataset. 
-#' @param varNameSets \code{NULL}, or a list of character vectors giving the 
-#'   \code{rownames} of \code{datSets}.
-#' @param adjSets \code{NULL}, or a list of \code{\link{big.matrix}}: one for 
+#' @param corSets a list of \code{\link{big.matrix}} objects: one for each 
+#'   dataset, corresponding to the pairwise-gene correlation. 
+#' @param adjSets a list of \code{\link{big.matrix}} objects: one for 
 #'   each dataset, corresponding to the adjacency matrix of edge weights between
-#'   each pair of nodes in the network. Alternatively, if the list elements 
-#'   are \code{NULL}, then the networks will be dynamically calculated using the 
-#'   provided \code{buildNetFun} on the corresponding \code{datSet}.
+#'   each pair of nodes in the network.
 #' @param nodeNameSets \code{NULL}, or a list of character vectors giving the 
 #'   \code{rownames} of \code{adjSets}.
 #' @param nodeLabelSets a list, whose elements are \code{NULL} for each 
@@ -96,7 +94,7 @@
 #' @import RhpcBLASctl
 #' @export
 netRepMain <- function(
-  datSets=NULL, varNameSets=NULL, adjSets=NULL, nodeNameSets=NULL, 
+  datSets=NULL, corSets, adjSets, nodeNameSets=NULL, 
   nodeLabelSets, discovery, test, nPerm=10000, ignoreSets=NULL, 
   includeSets=NULL, null="overlap", verbose=TRUE, indent=0, simplify=TRUE
 ) {
@@ -183,23 +181,27 @@ netRepMain <- function(
              setNames[di], ", in dataset ", setNames[ti], ".")
 
         # Attach relevant matrices
-        vCat(verbose, indent+1, "Attaching and checking matrices...")
-        if (!is.null(adjSets[[di]]) && !is.null(adjSets[[ti]])) {
-          discAdj <- attach.big.matrix(adjSets[[di]])
-          checkFinite(discAdj)
-          testAdj <- attach.big.matrix(adjSets[[ti]])
-          checkFinite(testAdj)
-        } else {
-          stop("not implemented yet")
-        }
+        vCat(verbose, indent+1, "Attaching matrices...")
+        discCor <- attach.big.matrix(corSets[[di]])
+        discAdj <- attach.big.matrix(adjSets[[di]])
+        testCor <- attach.big.matrix(corSets[[ti]])
+        testAdj <- attach.big.matrix(adjSets[[ti]])
         if (!is.null(datSets[[di]]) && !is.null(datSets[[ti]])) {
           discDat <- attach.big.matrix(datSets[[di]])
-          checkFinite(discDat)
           testDat <- attach.big.matrix(datSets[[ti]])
-          checkFinite(testDat)
         } else {
           discDat <- NULL
           testDat <- NULL
+        }        
+        
+        vCat(verbose, indent+1, "Checking matrices...")
+        checkFinite(discCor)
+        checkFinite(discAdj)
+        checkFinite(testCor)
+        checkFinite(testAdj)
+        if (!is.null(datSets[[di]]) && !is.null(datSets[[ti]])) {
+          checkFinite(discDat)
+          checkFinite(testDat)
         }
         
         # Create scaled data 
@@ -234,21 +236,9 @@ netRepMain <- function(
         # Get a vector of nodes which are present in both datasets. Depends on 
         # the combination of data input provided.
         vCat(verbose, indent+1, "Extracting information about node overlap...")
-        if (is.null(testAdj)) {
-          if(is.null(discAdj)) {
-            oNodes <- varNameSets[[di]] %sub_in% varNameSets[[ti]]
-          } else {
-            oNodes <- nodeNameSets[[di]] %sub_in% varNameSets[[ti]]
-          }
-          tNodes <- varNameSets[[ti]]
-        } else {
-          if(is.null(discAdj)) {
-            oNodes <- varNameSets[[di]] %sub_in% nodeNameSets[[ti]]
-          } else {
-            oNodes <- nodeNameSets[[di]] %sub_in% nodeNameSets[[ti]]
-          }
-          tNodes <- nodeNameSets[[ti]]
-        }
+        oNodes <- nodeNameSets[[di]] %sub_in% nodeNameSets[[ti]]
+        tNodes <- nodeNameSets[[ti]]
+        
         # Force the node indices to be strings, even if the provided identifiers
         # are integers.
         oNodes <- as.character(oNodes)
@@ -285,26 +275,23 @@ netRepMain <- function(
         names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
         overlap <- oSizes[names(dSizes)]/dSizes
         
-        
         # How many network properites and statistics will we return? 
         # Numbers required for data structure allocation
-        nProps <- ifelse(is.null(discDat), 5, 7)
-        nStats <- ifelse(is.null(discDat), 6, 9)
+        nStats <- ifelse(is.null(discDat), 4, 7)
         nSubsets <- length(oSubsets)
         
         # Obtain the topological properties for each network subset in the
         # discovery dataset, we only want to calculate these once!
         vCat(verbose, indent+1, "Calculating observed test statistics...")
-        poke(discAdj, discDat, scaledDisc, testAdj, testDat, scaledTest)
+        poke(discCor, discAdj, discDat, scaledDisc, testCor, testAdj, testDat, scaledTest)
         discProps <- rep(list(NULL), nSubsets)
         for (ii in seq_along(oSubsets)) {
           sNodes <- names(which(nodeLabelSets[[di]][oNodes] == oSubsets[ii]))
           # get the indices in the underlying data and adjacency matrices for 
           # the subset nodes.
-          discDatInd <- match(sNodes, varNameSets[[di]])
-          discAdjInd <- match(sNodes, nodeNameSets[[di]])
+          subsetInd <- match(sNodes, nodeNameSets[[di]])
           props <- subsetProps(
-            discAdj, discAdjInd, discDat, scaledDisc, discDatInd
+            discAdj, subsetInd, discDat, scaledDisc
           )
           discProps[[ii]] <- props
         }
@@ -316,15 +303,14 @@ netRepMain <- function(
         for (ii in seq_along(oSubsets)) {
           ss <- as.character(oSubsets[ii])
           sNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-          testDatInd <- match(sNodes, varNameSets[[ti]])
-          testAdjInd <- match(sNodes, nodeNameSets[[ti]])
-          discAdjInd <- match(sNodes, nodeNameSets[[di]])
+          testInd <- match(sNodes, nodeNameSets[[ti]])
+          discInd <- match(sNodes, nodeNameSets[[di]])
           testProps <- subsetProps(
-            testAdj, testAdjInd, testDat, scaledTest, testDatInd
+            testAdj, testInd, testDat, scaledTest
           )
           stats <- c(
             calcSplitTestStats(discProps[[ss]], testProps),
-            calcSharedTestStats(discAdj, discAdjInd, testAdj, testAdjInd)
+            calcSharedTestStats(discAdj, discInd, testAdj, testInd)
           )
           observed[ii,] <- stats
           colnames(observed) <- names(stats)
@@ -344,7 +330,7 @@ netRepMain <- function(
               NULL
             }
           } else {
-            poke(discAdj, discDat, scaledDisc, testAdj, testDat, scaledTest)
+            poke(discCor, discAdj, discDat, scaledDisc, testCor, testAdj, testDat, scaledTest)
             if (verbose) {
               conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
               progressBar <- conns[[1]]
@@ -364,18 +350,18 @@ netRepMain <- function(
                 } else {
                   permNames <- sample(tNodes, size=oSizes[ss])
                 }
-                permDatInd <- match(permNames, varNameSets[[ti]])
-                permAdjInd <- match(permNames, nodeNameSets[[ti]])
+                
+                permInd <- match(permNames, nodeNameSets[[ti]])
                 sNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
-                discAdjInd <- match(sNodes, nodeNameSets[[di]])
+                discInd <- match(sNodes, nodeNameSets[[di]])
                 
                 tryCatch({ 
                   testProps <- subsetProps(
-                  testAdj, permAdjInd, testDat, scaledTest, permDatInd
+                    testAdj, permInd, testDat, scaledTest
                   )
                   stats <- c(
                     calcSplitTestStats(discProps[[ss]], testProps),
-                    calcSharedTestStats(discAdj, discAdjInd, testAdj, permAdjInd)
+                    calcSharedTestStats(discAdj, discInd, testAdj, permInd)
                   )
                   chunkStats[ii,,kk] <- stats
                 }, error = function(e) {
@@ -441,10 +427,20 @@ netRepMain <- function(
           arrOrder <- order(rownames(nulls))
           vOrder <- order(overlap)
         })
-
-        res[[di]][[ti]][[1]] <- nulls[arrOrder,,]
-        res[[di]][[ti]][[2]] <- observed[arrOrder,]
-        res[[di]][[ti]][[3]] <- p.values[arrOrder,]
+        
+        # Order statistics: First density stats, then connectivity
+        if (is.null(discDat)) {
+          statOrder <- c("mean.cor", "mean.adj", "cor.kIM", "cor.cor")
+        } else {
+          statOrder <- c(
+            "propVarExpl", "mean.kME", "mean.cor", "mean.adj", 
+            "cor.kIM", "cor.kME", "cor.cor"
+          ) 
+        }
+        
+        res[[di]][[ti]][[1]] <- nulls[arrOrder, statOrder,]
+        res[[di]][[ti]][[2]] <- observed[arrOrder, statOrder]
+        res[[di]][[ti]][[3]] <- p.values[arrOrder, statOrder]
         res[[di]][[ti]][[4]] <- overlap[vOrder]
         res[[di]][[ti]][[5]] <- oSizes[vOrder]
         names(res[[di]][[ti]]) <- c(

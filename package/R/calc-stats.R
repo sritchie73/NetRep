@@ -42,13 +42,13 @@ calcSplitTestStats <- function(discProps, testProps) {
   stopifnot(length(discProps) == length(testProps))
   
   stats <- c(
-    meanAdj = testProps[["meanAdj"]],
-    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]]),
+    mean.adj = testProps[["mean.adj"]],
+    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]])
   )
   if ("propVarExpl" %in% names(testProps)) { # Detect if data has been provided
     stats <- c(stats,
       propVarExpl = testProps[["propVarExpl"]],
-      mean.KME = mean(sign(discProps[["kME"]]) * testProps[["kME"]]),
+      mean.kME = mean(sign(discProps[["kME"]]) * testProps[["kME"]]),
       cor.kME = cor(discProps[["kME"]], testProps[["kME"]])
     )
   }
@@ -81,23 +81,22 @@ calcSplitTestStats <- function(discProps, testProps) {
 #' main function of this package, \code{\link{netRep}}.
 #'  
 #' @param adj Adjacency matrix for the network.
-#' @param adjInd Indices of the network subset in \code{adj}.
+#' @param subsetInd Indices of the network subset.
 #' @param dat (Optional) Underlying data for the network.
 #' @param scaled (Optional) a row scaled \code{big.matrix} of \code{dat}.
-#' @param datInd (Optional) Indices of the network subset in \code{dat}.
-#'
+#' 
 #' @return
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=calcSplitTestStats]{Between-network statistics}}
-subsetProps <- function(adj, adjInd, dat=NULL, scaled=NULL, datInd=NULL) {
-  props <- netProps(adj, adjInd)
+subsetProps <- function(adj, subsetInd, dat=NULL, scaled=NULL) {
+  props <- adjProps(adj, subsetInd)
   if (!is.null(dat)) {
-    props <- c(props, dataProps(dat, scaled, datInd))
+    props <- c(props, dataProps(dat, scaled, subsetInd))
   }
   props
 }
 
-#' Network statistics from combined data
+#' Calculate the cor.cor and mean.cor
 #' 
 #' For some statistics it does not make sense to calculate the necessary 
 #' components in advance due to large memory overhead, or logic that doesn't
@@ -111,11 +110,12 @@ subsetProps <- function(adj, adjInd, dat=NULL, scaled=NULL, datInd=NULL) {
 #' @seealso \code{\link[=subsetProps]{Network subset topology}} 
 #'   \code{\link{netRep}}
 #'   
-#' @param discAdj,testAdj \code{\link[bigmemory]{big.matrix}} objects for the 
-#'  \emph{discovery} and \emph{test} networks.
+#' @param discCor,testCor \code{\link[bigmemory]{big.matrix}} objects for the 
+#'  correlation matrices in the \emph{discovery} and \emph{test} networks 
+#'  respectively.
 #' @param discIndices,testIndices indices of the network subset in the 
-#'  \emph{discovery} and \emph{test} networks.
+#'  \emph{discovery} and \emph{test} networks respectively.
 #' @return A vector of test statistics.
-calcSharedTestStats <- function(discAdj, discIndices, testAdj, testIndices) {
-  unlist(netStats(discAdj, discIndices, testAdj, testIndices))
+calcSharedTestStats <- function(discCor, discIndices, testCor, testIndices) {
+  unlist(netStats(discCor, discIndices, testCor, testIndices))
 }

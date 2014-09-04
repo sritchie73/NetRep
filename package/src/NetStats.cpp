@@ -19,7 +19,7 @@ using namespace arma;
 //
 // @return A list containing the
 //    - correlation of the correlation (cor.cor)
-//    - sign aware mean of the correlation (mean.Cor)
+//    - sign aware mean of the correlation (mean.cor)
 template <typename S, typename T>
 List NetStats(
   XPtr<BigMatrix> xpCoexpD, MatrixAccessor<S> matCoexpD, IntegerVector dIdx,
@@ -61,7 +61,7 @@ List NetStats(
   );  
 }
 
-//' Calculate Network Statistics
+//' Calculate the cor.cor and mean.cor
 //'
 //' For some statistics it does not make sense to calculate the necessary
 //' components in advance due to large memory overhead, or logic that doesn't
@@ -78,7 +78,7 @@ List NetStats(
 //'     \item{\emph{cor.cor}:}{
 //'       The correlation between the subset coexpression for both networks.
 //'     }
-//'     \item{\emph{mean.Cor}:}{
+//'     \item{\emph{mean.cor}:}{
 //'       The mean correlation density of the network subset.
 //'     }
 //'   }
