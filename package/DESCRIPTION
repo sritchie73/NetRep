@@ -20,7 +20,6 @@ Imports:
     methods,
     utils,
     BH,
-    RcppArmadillo (>= 0.4),
     RhpcBLASctl
 Suggests:
     testthat
