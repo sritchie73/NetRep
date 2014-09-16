@@ -20,6 +20,7 @@ Imports:
     methods,
     utils,
     statmod,
+    RcppArmadillo,
     BH,
     RhpcBLASctl
 Suggests:
