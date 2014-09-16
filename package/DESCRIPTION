@@ -19,6 +19,7 @@ Imports:
     Rcpp (>= 0.11),
     methods,
     utils,
+    statmod,
     BH,
     RhpcBLASctl
 Suggests:

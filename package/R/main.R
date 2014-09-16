@@ -411,7 +411,7 @@ netRepMain <- function(
         for (ii in seq_along(oSubsets)) {
           for (jj in seq_len(nStats)) {
             p.values[ii, jj] <- pperm(
-              nulls[ii, jj, ], observed[ii, jj], lower.tail=FALSE
+              nulls[ii, jj, ], observed[ii, jj], oSizes[rownames(p.values)[ii]]
             )
           }
         }

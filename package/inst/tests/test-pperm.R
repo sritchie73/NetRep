@@ -8,11 +8,8 @@ normApprox <- function(...) { equals(..., tolerance = 0.1) }
 pApprox <- function(...) { equals(..., tolerance = 0.05) }
 
 test_that("pperm approximates normal for n=10000", {
-  expect_that(pperm(normData, -1.644854), pApprox(pnorm(-1.644854)))
-  expect_that(pperm(normData, 1.644854), pApprox(pnorm(1.644854)))
-  expect_that(pperm(normData, -1.644854, lower.tail=FALSE), pApprox(pnorm(1.644854)))  
-  expect_that(pperm(normData, 1.644854, lower.tail=FALSE), pApprox(pnorm(-1.644854)))  
-  expect_that(pperm(normData, -1.644854, log.p=TRUE), pApprox(pnorm(-1.644854, log.p=TRUE)))
+  expect_that(pperm(normData, -1.644854, 1), pApprox(pnorm(-1.644854, lower.tail=FALSE)))
+  expect_that(pperm(normData, 1.644854, 1), pApprox(pnorm(1.644854, lower.tail=FALSE)))  
 })
 
 test_that("qperm returns similar pvalues to pnorm for n=10000", {

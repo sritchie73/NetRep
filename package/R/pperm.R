@@ -47,6 +47,8 @@
 #'   }
 #'  
 #' @param permuted vector of values making up the empirical distribution.
+#' @param subsetSize the size of the network subset the null distribution is 
+#'  drawn for.
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations. If \code{length(n) > 1}, the length is 
@@ -59,10 +61,10 @@
 #'  # A contrived example. For large n these results will be the same as qnorm, 
 #'  # rnorm, pnorm.
 #'  normData <- rnorm(n=10000)
-#'  pperm(normData, -1.644854) # should be approximately 0.05
 #'  qperm(normData, 0.95) # should be approximately 1.644854
 #'  rperm(normData, 100) # should be similar to rnorm(100)
 #'    
+#'  pperm(normData, 1.644854, 1) # should be approximately 0.05
 #'  
 #' @aliases permutation permuted
 #' @name permutation
@@ -71,20 +73,17 @@ NULL
 # @param tail.approx logical; if \code{TRUE}, use the tail approximation 
 #  algorithm to estimate extreme p-values (see details).
 #' @rdname permutation
+#' @importFrom statmod permp
 #' @export
-pperm <- function(permuted, q, lower.tail=TRUE, log.p=FALSE) {
+pperm <- function(permuted, q, moduleSize, lowerTail=FALSE) {
   permuted <- sort(permuted)
-  if (lower.tail) {
+  if (lowerTail) {
     more.extreme <- length(permuted[permuted < q])
   } else {
     more.extreme <- length(permuted[permuted > q])
   }
   nPerm <- length(permuted)
-  if (log.p) {
-    p.value <- log(more.extreme + 1) - log(nPerm + 1)
-  } else {
-    p.value <- (more.extreme + 1) / (nPerm + 1)
-  }
+  p.value <- permp(more.extreme, nPerm, total.nperm=choose(nPerm, moduleSize))
   return(p.value)
 }
 
