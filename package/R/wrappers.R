@@ -2,7 +2,7 @@
 #' Wrapper functions for Rcpp functions
 #' 
 #' These functions abstract away the calls to the Rcpp implementations of 
-#' \code{\link{NetStats}}, \code{\link{NetProps}}, and \code{\link{dataProps}}.
+#' \code{\link{NetStats}}, \code{\link{AdjProps}}, and \code{\link{dataProps}}.
 #' There are two reasons why this is convenient:
 #' \enumerate{
 #'  \item{
