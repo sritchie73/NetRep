@@ -83,7 +83,7 @@ pperm <- function(permuted, q, moduleSize, lowerTail=FALSE) {
 #' @rdname permutation
 #' @export
 requiredPower <- function(alpha) {
-  n <- 1/alpha
+  1/alpha
 }
 
 
