@@ -311,7 +311,7 @@ netRepMain <- function(
           )
           stats <- c(
             calcSplitTestStats(discProps[[ss]], testProps),
-            calcSharedTestStats(discAdj, discInd, testAdj, testInd)
+            calcSharedTestStats(discCor, discInd, testCor, testInd)
           )
           observed[ii,] <- stats
           colnames(observed) <- names(stats)
@@ -362,7 +362,7 @@ netRepMain <- function(
                   )
                   stats <- c(
                     calcSplitTestStats(discProps[[ss]], testProps),
-                    calcSharedTestStats(discAdj, discInd, testAdj, permInd)
+                    calcSharedTestStats(discCor, discInd, testCor, permInd)
                   )
                   chunkStats[ii,,kk] <- stats
                 }, error = function(e) {
