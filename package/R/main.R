@@ -287,8 +287,8 @@ netRepMain <- function(
         if (!is.null(nodeLabelSets[[ti]])) {
           # Get total number of nodes from each discovery subset in each test subset 
           subsetOverlap <- table(
-            nodeLabelSets[[di]][nodesPres], 
-            nodeLabelSets[[ti]][nodesPres]
+            nodeLabelSets[[di]][oNodes], 
+            nodeLabelSets[[ti]][oNodes]
           )
           # filter on subsets the user cares about
           subsetOverlap <- subsetOverlap[dSubsets,]
@@ -307,9 +307,11 @@ netRepMain <- function(
           })
           subsetOverlap <- subsetOverlap[rOrder, cOrder]
           # add information about sizes of both the discovery and test subsets
-          tSizes <- table(nodeLabelSets[[ti]][nodesPres])[cOrder]
+          tSizes <- table(nodeLabelSets[[ti]][oNodes])[cOrder]
           subsetOverlap <- cbind(dSizes[dOrder], subsetOverlap)
           subsetOverlap <- rbind(c(NA, tSizes), subsetOverlap)
+          rownames(subsetOverlap)[1] <- "size"
+          colnames(subsetOverlap)[1] <- "size"
         } else {
           subsetOverlap <- NULL
         }
