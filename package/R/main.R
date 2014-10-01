@@ -491,7 +491,7 @@ netRepMain <- function(
           res[[di]][[ti]][[6]] <- subsetOverlap
           names(res[[di]][[ti]]) <- c(
             "nulls", "observed", "p.values", "nodesPresent", "propNodesPresent",
-            "subsetOverlap"
+            "contigency"
           )
         } else {
           names(res[[di]][[ti]]) <- c(
