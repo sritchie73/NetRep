@@ -162,7 +162,7 @@ netRepMain <- function(
   # Set up return list 
   res <- rep(list(NULL), nNets)
   res <- lapply(res, function(x) { 
-    l <- rep(list(NULL), nNets); 
+    l <- rep(list(NULL), nNets)
     names(l) <- names(nodeLabelSets)
     l
   })
@@ -269,17 +269,48 @@ netRepMain <- function(
         dSizes <- dSizes[names(dSizes) %in% dSubsets] 
         # Get the size of the overlap of each of the subsets of interest between
         # the discovery and test datasets.
-        oSizes <- table(nodeLabelSets[[di]][oNodes])
-        oSizes <- oSizes[names(oSizes) %in% oSubsets]
+        nodesPres <- table(nodeLabelSets[[di]][oNodes])
+        nodesPres <- nodesPres[names(nodesPres) %in% oSubsets]
         # Need to handle the case where a subset of interest has no overlap.
-        oSizes <- c(oSizes, rep(0, length(dSubsets %sub_nin% oSubsets)))
-        names(oSizes) <- c(names(oSizes) %sub_nin% "", dSubsets %sub_nin% oSubsets)
-        overlap <- oSizes[names(dSizes)]/dSizes
+        nodesPres <- c(nodesPres, rep(0, length(dSubsets %sub_nin% oSubsets)))
+        names(nodesPres) <- c(names(nodesPres) %sub_nin% "", dSubsets %sub_nin% oSubsets)
+        propNodesPres <- nodesPres[names(dSizes)]/dSizes
         
         # How many network properites and statistics will we return? 
         # Numbers required for data structure allocation
         nStats <- ifelse(is.null(discDat), 4, 7)
         nSubsets <- length(oSubsets)
+        
+        # Calculate some basic cross-tabulation statistics so we can assess
+        # which modules in both datasets map to each other, if module detection
+        # has also been performed for the test network
+        if (!is.null(nodeLabelSets[[ti]])) {
+          # Get total number of nodes from each discovery subset in each test subset 
+          subsetOverlap <- table(
+            nodeLabelSets[[di]][nodesPres], 
+            nodeLabelSets[[ti]][nodesPres]
+          ) 
+          # convert to a proportion
+          subsetPropOverlap <- apply(subsetOverlap, 2, function(column) { 
+            column / table(nodeLabelSets[[di]][nodesPres])
+          })
+          # order the tables
+          tryCatch({
+            # For modules that are integer coded, make sure they're numerically
+            # ordered, not alphabetically.
+            rOrder <- order(as.integer(rownames(subsetOverlap)))
+            cOrder <- order(as.integer(colnames(subsetOverlap)))
+          }, warning = function(w) {
+            # If we can't cast to an integer, sort normally.
+            rOrder <- order(rownames(subsetOverlap))
+            cOrder <- order(colnames(subsetOverlap))
+          })
+          subsetOverlap <- subsetOverlap[rOrder, cOrder]
+          subsetPropOverlap <- subsetPropOverlap[rOrder, cOrder]
+        } else {
+          subsetOverlap <- NULL
+          subsetPropOverlap <- NULL
+        }
         
         # Obtain the topological properties for each network subset in the
         # discovery dataset, we only want to calculate these once!
@@ -347,9 +378,9 @@ netRepMain <- function(
                 # Select a random subset of nodes of the same size as the subset 
                 # ss, depending on our null model.
                 if (model == "overlap") {
-                  permNames <- sample(oNodes, size=oSizes[ss])
+                  permNames <- sample(oNodes, size=nodesPres[ss])
                 } else {
-                  permNames <- sample(tNodes, size=oSizes[ss])
+                  permNames <- sample(tNodes, size=nodesPres[ss])
                 }
                 
                 permInd <- match(permNames, nodeNameSets[[ti]])
@@ -411,7 +442,7 @@ netRepMain <- function(
         for (ii in seq_along(oSubsets)) {
           for (jj in seq_len(nStats)) {
             p.values[ii, jj] <- pperm(
-              nulls[ii, jj, ], observed[ii, jj], oSizes[rownames(p.values)[ii]]
+              nulls[ii, jj, ], observed[ii, jj], nodesPres[rownames(p.values)[ii]]
             )
           }
         }
@@ -422,11 +453,11 @@ netRepMain <- function(
           # For modules that are integer coded, make sure they're numerically
           # ordered, not alphabetically.
           arrOrder <- order(as.integer(rownames(nulls)))
-          vOrder <- order(as.integer(names(overlap)))
+          vOrder <- order(as.integer(names(propNodesPres)))
         }, warning = function(w) {
           # If we can't cast to an integer, sort normally.
           arrOrder <- order(rownames(nulls))
-          vOrder <- order(overlap)
+          vOrder <- order(propNodesPres)
         })
         
         # Order statistics: First density stats, then connectivity
@@ -439,14 +470,25 @@ netRepMain <- function(
           ) 
         }
         
+        # Collate results
         res[[di]][[ti]][[1]] <- nulls[arrOrder, statOrder,]
         res[[di]][[ti]][[2]] <- observed[arrOrder, statOrder]
         res[[di]][[ti]][[3]] <- p.values[arrOrder, statOrder]
-        res[[di]][[ti]][[4]] <- overlap[vOrder]
-        res[[di]][[ti]][[5]] <- oSizes[vOrder]
-        names(res[[di]][[ti]]) <- c(
-          "nulls", "observed", "p.values", "overlapProp", "overlapSize"
-        )
+        res[[di]][[ti]][[4]] <- nodesPres[vOrder]
+        res[[di]][[ti]][[5]] <- propNodesPres[vOrder]
+        
+        if(!is.null(subsetOverlap)) {
+          res[[di]][[ti]][[6]] <- subsetOverlap
+          res[[di]][[ti]][[7]] <- subsetPropOverlap   
+          names(res[[di]][[ti]]) <- c(
+            "nulls", "observed", "p.values", "nodesPresent", "propNodesPresent",
+            "subsetOverlap", "subsetPropOverlap"
+          )
+        } else {
+          names(res[[di]][[ti]]) <- c(
+            "nulls", "observed", "p.values", "nodesPresent", "propNodesPresent"
+          )
+        }
         
         vCat(verbose, indent+1, "Cleaning up temporary objects...")
         unlink("run-progress", recursive=TRUE)
