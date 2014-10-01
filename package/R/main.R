@@ -298,18 +298,17 @@ netRepMain <- function(
             # ordered, not alphabetically.
             rOrder <- order(as.integer(rownames(subsetOverlap)))
             cOrder <- order(as.integer(colnames(subsetOverlap)))
-            dOrder <- order(as.integer(names(dSizes)))
           }, warning = function(w) {
             # If we can't cast to an integer, sort normally.
             rOrder <- order(rownames(subsetOverlap))
             cOrder <- order(colnames(subsetOverlap))
-            dOrder <- order(names(dSizes))
           })
           subsetOverlap <- subsetOverlap[rOrder, cOrder]
           # add information about sizes of both the discovery and test subsets
-          tSizes <- table(nodeLabelSets[[ti]][oNodes])[cOrder]
-          subsetOverlap <- cbind(dSizes[dOrder], subsetOverlap)
-          subsetOverlap <- rbind(c(NA, tSizes), subsetOverlap)
+          dSubSizes <- table(nodeLabelSets[[di]][oNodes])[rOrder]
+          tSubSizes <- table(nodeLabelSets[[ti]][oNodes])[cOrder]
+          subsetOverlap <- cbind(dSubSizes, subsetOverlap)
+          subsetOverlap <- rbind(c(NA, tSubSizes), subsetOverlap)
           rownames(subsetOverlap)[1] <- "size"
           colnames(subsetOverlap)[1] <- "size"
         } else {
