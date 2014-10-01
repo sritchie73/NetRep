@@ -289,27 +289,29 @@ netRepMain <- function(
           subsetOverlap <- table(
             nodeLabelSets[[di]][nodesPres], 
             nodeLabelSets[[ti]][nodesPres]
-          ) 
-          # convert to a proportion
-          subsetPropOverlap <- apply(subsetOverlap, 2, function(column) { 
-            column / table(nodeLabelSets[[di]][nodesPres])
-          })
+          )
+          # filter on subsets the user cares about
+          subsetOverlap <- subsetOverlap[dSubsets,]
           # order the tables
           tryCatch({
             # For modules that are integer coded, make sure they're numerically
             # ordered, not alphabetically.
             rOrder <- order(as.integer(rownames(subsetOverlap)))
             cOrder <- order(as.integer(colnames(subsetOverlap)))
+            dOrder <- order(as.integer(names(dSizes)))
           }, warning = function(w) {
             # If we can't cast to an integer, sort normally.
             rOrder <- order(rownames(subsetOverlap))
             cOrder <- order(colnames(subsetOverlap))
+            dOrder <- order(names(dSizes))
           })
           subsetOverlap <- subsetOverlap[rOrder, cOrder]
-          subsetPropOverlap <- subsetPropOverlap[rOrder, cOrder]
+          # add information about sizes of both the discovery and test subsets
+          tSizes <- table(nodeLabelSets[[ti]][nodesPres])[cOrder]
+          subsetOverlap <- cbind(dSizes[dOrder], subsetOverlap)
+          subsetOverlap <- rbind(c(NA, tSizes), subsetOverlap)
         } else {
           subsetOverlap <- NULL
-          subsetPropOverlap <- NULL
         }
         
         # Obtain the topological properties for each network subset in the
@@ -441,8 +443,14 @@ netRepMain <- function(
         dimnames(p.values) <- dimnames(observed)
         for (ii in seq_along(oSubsets)) {
           for (jj in seq_len(nStats)) {
-            p.values[ii, jj] <- pperm(
-              nulls[ii, jj, ], observed[ii, jj], nodesPres[rownames(p.values)[ii]]
+            if (jj %in% c("mean.Adj", "propVarExpl")) {
+              alternative <- "greater"
+            } else {
+              alternative <- "two.sided"
+            }
+            p.values[ii, jj] <- perm.test(
+              nulls[ii, jj, ], observed[ii, jj], nodesPres[rownames(p.values)[ii]],
+              alternative
             )
           }
         }
@@ -479,10 +487,9 @@ netRepMain <- function(
         
         if(!is.null(subsetOverlap)) {
           res[[di]][[ti]][[6]] <- subsetOverlap
-          res[[di]][[ti]][[7]] <- subsetPropOverlap   
           names(res[[di]][[ti]]) <- c(
             "nulls", "observed", "p.values", "nodesPresent", "propNodesPresent",
-            "subsetOverlap", "subsetPropOverlap"
+            "subsetOverlap"
           )
         } else {
           names(res[[di]][[ti]]) <- c(

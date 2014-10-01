@@ -52,24 +52,65 @@
 #'  # A contrived example. For large n these results will be the same as qnorm, 
 #'  # rnorm, pnorm.
 #'  normData <- rnorm(n=10000)
-#'  pperm(normData, 1.644854, 1) # should be approximately 0.05
+#'  perm.test(normData, 1.644854, 1) # should be approximately 0.05
 #'  
 #' @aliases permutation permuted
 # @param tail.approx logical; if \code{TRUE}, use the tail approximation 
 #  algorithm to estimate extreme p-values (see details).
 #' @name permutation
-#' @importFrom statmod permp
 #' @export
-pperm <- function(permuted, q, moduleSize, lowerTail=FALSE) {
+perm.test <- function(permuted, q, moduleSize, alternative="greater") {
+  validAlts <- c("two.sided", "less", "greater")
+  altMatch <- pmatch(alternative, validAlts)
+  if (is.na(altMatch))
+    stop("Alternative must be one of ", validAlts)
+  
   permuted <- sort(permuted)
-  if (lowerTail) {
-    more.extreme <- length(permuted[permuted < q])
-  } else {
-    more.extreme <- length(permuted[permuted > q])
-  }
   nPerm <- length(permuted)
-  p.value <- permp(more.extreme, nPerm, total.nperm=choose(nPerm, moduleSize))
-  return(p.value)
+  
+  less.extreme <- length(permuted[permuted < q])
+  more.extreme <- length(permuted[permuted > q])
+  lower.pval <- permp(less.extreme, nPerm, total.nperm=choose(nPerm, moduleSize))
+  upper.pval <- permp(more.extreme, nPerm, total.nperm=choose(nPerm, moduleSize))
+  
+  if (altMatch == 1L) {
+    return(min(lower.pval, upper.pval)*2)
+  } else if (altMatch == 2L) {
+    return(lower.pval) 
+  } else if (altMatch == 3L) {
+    return(upper.pval)
+  } 
+}
+
+#' Exact permutation p-values wrapper
+#' 
+#' Wrapper for \code{\link[statmod]{permp}} from the 
+#' \code{\link[statmod]{statmod}} library, which can crash if FORTRAN 
+#' libraries are not properly linked.
+#' 
+#' @details
+#' In the case \code{\link[statmod]{permp}} fails, the wrapper will fall back 
+#' to a slightly more conservative biased estimator: (1+x)/(1+nPerm).
+#' 
+#' @param x number of permutations that yielded test statistics at least as 
+#'  extreme as the observed data. May be a vector or an array of values. 
+#' @param nperm total number of permutations performed.
+#' @param ... other arguments to pass to\code{\link[statmod]{permp}}.
+#' @return 
+#'  vector or array of p-values, of same dimensions as \code{x}.
+#' @importFrom statmod permp
+permp <- function(x, nperm, ...) {
+  tryCatch({
+    return(statmod::permp(x, nperm, ...))
+  }, error=function(e) {
+    warning(
+      "Error from statmod::permp:", e$message, 
+      "\nUsing conservative biased estimator (1+x)/(1+nPerm) instead."
+    )
+    return(
+      (x + 1)/(nperm + 1)  
+    )
+  })
 }
 
 #' @description
