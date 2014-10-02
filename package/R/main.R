@@ -444,7 +444,7 @@ netRepMain <- function(
         dimnames(p.values) <- dimnames(observed)
         for (ii in seq_along(oSubsets)) {
           for (jj in seq_len(nStats)) {
-            if (jj %in% c("mean.Adj", "propVarExpl")) {
+            if (colnames(observed)[jj] %in% c("mean.adj", "propVarExpl")) {
               alternative <- "greater"
             } else {
               alternative <- "two.sided"
