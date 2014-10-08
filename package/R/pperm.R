@@ -42,36 +42,39 @@
 #'   }
 #'  
 #' @param permuted vector of values making up the empirical distribution.
+#' @param observed the observed value of the test statistic.
 #' @param subsetSize the size of the network subset the null distribution is 
 #'  drawn for.
-#' @param q vector of quantiles.
-#' @param lowerTail logical; if TRUE (default), probabilities are 
-#'    \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.   
-#'  
-#' @examples
-#'  # A contrived example. For large n these results will be the same as qnorm, 
-#'  # rnorm, pnorm.
-#'  normData <- rnorm(n=10000)
-#'  perm.test(normData, 1.644854, 1) # should be approximately 0.05
+#' @param totalSize the size of the whole network
+#' @param order logical; does the order of nodes in the permutation affect the 
+#'  value of the test statistic?
+#' @param alternative a character string specifying the alternative hypothesis, 
+#'  must be one of "greater" (default), "less", or "two.sider". 
+#'  You can specify just the initial letter.
 #'  
 #' @aliases permutation permuted
-# @param tail.approx logical; if \code{TRUE}, use the tail approximation 
-#  algorithm to estimate extreme p-values (see details).
 #' @name permutation
 #' @export
-perm.test <- function(permuted, q, moduleSize, alternative="greater") {
+perm.test <- function(
+  permuted, observed, subsetSize, totalSize, order=TRUE, alternative="greater"
+) {
   validAlts <- c("two.sided", "less", "greater")
   altMatch <- pmatch(alternative, validAlts)
   if (is.na(altMatch))
     stop("Alternative must be one of ", validAlts)
   
+  if (order) {
+    total.nperm = prod(totalSize:(totalSize - subsetSize + 1))
+  } else {
+    total.nperm = choose(totalSize, subsetSize)
+  }
   permuted <- sort(permuted)
   nPerm <- length(permuted)
   
-  less.extreme <- length(permuted[permuted < q])
-  more.extreme <- length(permuted[permuted > q])
-  lower.pval <- permp(less.extreme, nPerm, total.nperm=choose(nPerm, moduleSize))
-  upper.pval <- permp(more.extreme, nPerm, total.nperm=choose(nPerm, moduleSize))
+  less.extreme <- length(permuted[permuted < observed])
+  more.extreme <- length(permuted[permuted > observed])
+  lower.pval <- permp(less.extreme, nPerm, total.nperm=total.nperm)
+  upper.pval <- permp(more.extreme, nPerm, total.nperm=total.nperm)
   
   if (altMatch == 1L) {
     return(min(lower.pval, upper.pval)*2)

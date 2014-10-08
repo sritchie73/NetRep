@@ -6,22 +6,29 @@
 \alias{requiredPower}
 \title{Distribution from Permutations}
 \usage{
-perm.test(permuted, q, moduleSize, alternative = "greater")
+perm.test(permuted, observed, subsetSize, totalSize, order = TRUE,
+  alternative = "greater")
 
 requiredPower(alpha)
 }
 \arguments{
 \item{permuted}{vector of values making up the empirical distribution.}
 
-\item{q}{vector of quantiles.}
-
-\item{alpha}{desired significance threshold.}
+\item{observed}{the observed value of the test statistic.}
 
 \item{subsetSize}{the size of the network subset the null distribution is
 drawn for.}
 
-\item{lowerTail}{logical; if TRUE (default), probabilities are
-   \eqn{P[x \le x]} otherwise \eqn{P[X > x]}.}
+\item{totalSize}{the size of the whole network}
+
+\item{order}{logical; does the order of nodes in the permutation affect the
+value of the test statistic?}
+
+\item{alternative}{a character string specifying the alternative hypothesis,
+ must be one of "greater" (default), "less", or "two.sider".
+ You can specify just the initial letter.}
+
+\item{alpha}{desired significance threshold.}
 }
 \value{
 The minimum number of permutations required to detect any significant
@@ -63,12 +70,6 @@ It is possible for the quantile \code{p} to fall exactly halfway
  user to choose which observation to take: the conservative approach is to
  choose the first observation if \code{p} < 0.5, or the second observation if
  \code{p} > 0.5.
-}
-\examples{
-# A contrived example. For large n these results will be the same as qnorm,
- # rnorm, pnorm.
- normData <- rnorm(n=10000)
- perm.test(normData, 1.644854, 1) # should be approximately 0.05
 }
 \references{
 \enumerate{

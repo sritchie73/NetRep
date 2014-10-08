@@ -446,12 +446,15 @@ netRepMain <- function(
           for (jj in seq_len(nStats)) {
             if (colnames(observed)[jj] %in% c("mean.adj", "propVarExpl")) {
               alternative <- "greater"
+              order <- FALSE
             } else {
               alternative <- "two.sided"
+              order <- TRUE
             }
             p.values[ii, jj] <- perm.test(
-              nulls[ii, jj, ], observed[ii, jj], nodesPres[rownames(p.values)[ii]],
-              alternative
+              nulls[ii, jj, ], observed[ii, jj], 
+              nodesPres[rownames(p.values)[ii]], length(oNodes),
+              order=order, alternative=alternative
             )
           }
         }
