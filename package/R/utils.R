@@ -238,3 +238,23 @@ is.equal <- function(vector, value) {
   })
 }
 
+# Dynamically detect and load a big matrix object depending on input type
+dynamicMatLoad <- function(object, ...) {
+  if (class(object) == "character") {
+    if (!file.exists(object))
+      stop("file", object, "does not exist")
+    
+    # Is this file a big.matrix descriptor?
+    if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
+      return(attach.big.matrix(object))
+    } else {
+      mat <- as.matrix(read.table(file=object, ...))
+      return()
+    }
+    
+  } else if (class(object) == "matrix") {
+    return(as.big.matrix(object))
+  }
+}
+
+
