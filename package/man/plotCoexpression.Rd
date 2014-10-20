@@ -9,7 +9,7 @@ plotCoexpression(coexpression, module.labels = NULL, heatmap.gradient)
 \item{module.labels}{an optional named vector assigning each node to a module.}
 
 \item{heatmap.gradient}{A vector of colors to use for (or interpolate over)
-the heatmap.bins.}
+to render the coexpression.}
 
 \item{coexpresion}{a square matrix containing the pairwise gene coexpression.}
 }
