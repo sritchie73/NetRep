@@ -30,6 +30,23 @@ scaleBigMatrix <- function(
   res
 }
 
+#' Get the range of a big.matrix or its subset
+#' 
+#' Note subsetting only applies to columns: this is only meant for use with the 
+#' gene expression matrix.
+#' 
+#' @param x a big matrix
+#' @param subsetIndices an optional vector to subset the matrix by
+#' 
+rangeBigMatrix <- function(x, subsetIndices) {
+  if (missing(subsetIndices)) {
+    res <- BigRange(x@address)
+  } else {
+    res <- RangeSubset(x@address, subsetIndices)
+  }
+  unlist(lapply(res, as.vector))
+}
+
 #' Check if all entries of a `big.matrix` are Finite
 #' 
 #' If there are non-finite entires (\code{NA}, \code{NaN}, \code{-Inf}, 

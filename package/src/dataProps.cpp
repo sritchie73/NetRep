@@ -98,6 +98,7 @@ List DataProps(
               " infinite values?");
       return List::create(
           Named("kME") = NA_REAL,
+          Named("SEP") = NA_REAL,
           Named("propVarExpl") = NA_REAL
         );
     }
@@ -131,6 +132,7 @@ List DataProps(
     
     return List::create(
         Named("kME") = oKME,
+        Named("SEP") = summary,
         Named("propVarExpl") = pve
       );
   } else {

@@ -1,4 +1,3 @@
-
 #' Wrapper functions for Rcpp functions
 #' 
 #' These functions abstract away the calls to the Rcpp implementations of 

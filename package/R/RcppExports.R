@@ -116,6 +116,28 @@ NetStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
     .Call('netrep_NetStats', PACKAGE = 'netrep', pCoexpD, discIndices, pCoexpT, testIndices)
 }
 
+#' Get the range of values in a big.matrix column subset
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#'   
+#' @rdname range-cpp
+RangeSubset <- function(pDat, subsetIndices) {
+    .Call('netrep_RangeSubset', PACKAGE = 'netrep', pDat, subsetIndices)
+}
+
+#' Get the range of values in a big.matrix
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#'   
+#' @rdname range-cpp
+BigRange <- function(pDat) {
+    .Call('netrep_BigRange', PACKAGE = 'netrep', pDat)
+}
+
 #' Scale a matrix by its rows
 #' 
 #' @param pDat SEXP container for the pointer to the data matrix to be scaled.

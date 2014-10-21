@@ -3,13 +3,26 @@
 \alias{plotCoexpression}
 \title{Coexpression plot}
 \usage{
-plotCoexpression(coexpression, module.labels = NULL, heatmap.gradient)
+plotCoexpression(coexpression, module.labels = NULL, heatmap.gradient,
+  adjacency = FALSE, cex.title = 1.4, cex.lab = 1,
+  main = ifelse(adjacency, "Adjacencies", "Coexpression"), xlab = "genes")
 }
 \arguments{
 \item{module.labels}{an optional named vector assigning each node to a module.}
 
 \item{heatmap.gradient}{A vector of colors to use for (or interpolate over)
 to render the coexpression.}
+
+\item{adjacency}{logical; are we plotting the adjacency instead? Affects
+automatic color palette and title selection}
+
+\item{cex.title}{cex for the title text}
+
+\item{cex.lab}{cex for the axis label}
+
+\item{main}{title for the plot}
+
+\item{xlab}{label for the x axis}
 
 \item{coexpresion}{a square matrix containing the pairwise gene coexpression.}
 }

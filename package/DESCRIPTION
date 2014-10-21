@@ -20,7 +20,8 @@ Imports:
     statmod,
     RcppArmadillo,
     BH,
-    RhpcBLASctl
+    RhpcBLASctl,
+    RColorBrewer
 Suggests:
     testthat
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo

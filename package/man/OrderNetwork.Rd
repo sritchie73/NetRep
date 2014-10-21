@@ -6,7 +6,7 @@
 orderNetwork(adjacency, module.labels = NULL, summary.exp = NULL)
 }
 \arguments{
-\item{adjacency}{Matrix of node adjacencies}
+\item{adjacency}{Matrix of gene adjacencies}
 
 \item{module.labels}{Optional vector of module assignments for each gene.}
 
