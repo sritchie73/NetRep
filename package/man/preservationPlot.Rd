@@ -4,8 +4,8 @@
 \title{Generate preservation plot components}
 \usage{
 preservationPlot(gene.expr, coexpression, adjacency, moduleLabels, module,
-  is.relative = TRUE, cex.axis = 0.8, cex.title = 0.9, dpi = 100,
-  cex.lab = 0.6)
+  geneIndices, is.relative = TRUE, cex.axis = 0.8, cex.title = 0.9,
+  dpi = 100, cex.lab = 0.6)
 }
 \arguments{
 \item{gene.expr}{gene expression matrix. Expects rows to be samples, and
@@ -18,6 +18,9 @@ columns to be genes.}
 \item{moduleLabels}{vector of labels assigning each gene to a module.}
 
 \item{module}{module to plot preservation for.}
+
+\item{geneIndices}{alternative to \code{module}: specify indices of module
+instead}
 
 \item{is.relative}{logical; is the gene expression relative to some other
 measure? If \code{TRUE}, a divergent palette is selected when plotting the

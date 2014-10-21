@@ -21,6 +21,8 @@
 #' @param adjacency matrix of pairwise gene adjacencies.
 #' @param moduleLabels vector of labels assigning each gene to a module.
 #' @param module module to plot preservation for.
+#' @param geneIndices alternative to \code{module}: specify indices of module
+#'   instead
 #' @param is.relative logical; is the gene expression relative to some other 
 #'   measure? If \code{TRUE}, a divergent palette is selected when plotting the
 #'   expression, otherwise a sequential palette is chosen.
@@ -30,7 +32,7 @@
 #' @param dpi resolution for each of the panels.#' 
 #' @export
 preservationPlot <- function(
-  gene.expr, coexpression, adjacency, moduleLabels, module,
+  gene.expr, coexpression, adjacency, moduleLabels, module, geneIndices,
   is.relative=TRUE, cex.axis=0.8, cex.title=0.9, dpi=100, cex.lab=0.6
 ) {
   old.mar <- par('mar')
@@ -41,7 +43,23 @@ preservationPlot <- function(
   adj <- dynamicMatLoad(adjacency)
   
   # Get module subset
-  modNodes <- which(moduleLabels == module)
+  if (!missing(module)) {
+    modNodes <- which(moduleLabels == module)
+  } else {
+    if (missing(geneIndices)) 
+      stop("If module not specified, 'geneIndices' must be given instead!")
+    if (typeof(geneIndices) == "character") {
+      present <- geneIndices %sub_in% names(moduleLabels)
+      notPresent <- geneIndices %sub_nin% names(moduleLabels)
+      if (length(notPresent) > 0) {
+        warning("some of the module genes are not present in this dataset!\n",
+                "These will be omitted from the preservation plot.")
+      }
+      modNodes <- moduleLabels[match(present, names(moduleLabels))]
+    } else {
+      modNodes <- moduleLabels[geneIndices]
+    }
+  }
   ge <- ge[,modNodes]
   coexp <- coexp[modNodes, modNodes]
   adj <- adj[modNodes, modNodes]
