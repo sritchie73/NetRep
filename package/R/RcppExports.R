@@ -17,6 +17,63 @@ AdjProps <- function(pAdjacency, subsetIndices) {
     .Call('netrep_AdjProps', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
 
+#' Calculate the cor.cor and mean.cor
+#'
+#' For some statistics it does not make sense to calculate the necessary
+#' components in advance due to large memory overhead, or logic that doesn't
+#' separate nicely. This function deals with those statistics.
+#'
+#' @param pCoexpD,pCoexpT SEXP containers for the pointers to the coexpression 
+#'  matrices for the \emph{discovery} and \emph{test} networks respectively.
+#' @param discIndices,testIndices indices of the network subset in
+#'   the \emph{discovery} and \emph{test} networks respectively.
+#'
+#' @return
+#'   A vector containing:
+#'   \enumerate{
+#'     \item{\emph{cor.cor}:}{
+#'       The correlation between the subset coexpression for both networks.
+#'     }
+#'     \item{\emph{mean.cor}:}{
+#'       The mean correlation density of the network subset.
+#'     }
+#'   }
+#'   
+#' @references
+#'   \enumerate{
+#'     \item{
+#'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
+#'       network module preserved and reproducible?} PLoS Comput. Biol. 
+#'       \strong{7}, e1001057 (2011). 
+#'     }
+#'  }
+#' @rdname netStats-cpp
+NetStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
+    .Call('netrep_NetStats', PACKAGE = 'netrep', pCoexpD, discIndices, pCoexpT, testIndices)
+}
+
+#' Get the range of values in a big.matrix column subset
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#'   
+#' @rdname range-cpp
+RangeSubset <- function(pDat, subsetIndices) {
+    .Call('netrep_RangeSubset', PACKAGE = 'netrep', pDat, subsetIndices)
+}
+
+#' Get the range of values in a big.matrix
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#'   
+#' @rdname range-cpp
+BigRange <- function(pDat) {
+    .Call('netrep_BigRange', PACKAGE = 'netrep', pDat)
+}
+
 #' Check the elements of a `big.matrix`
 #' 
 #' Are all the values finite? 
@@ -79,63 +136,6 @@ CheckFinite <- function(pDat) {
 #'  
 DataProps <- function(pDat, pScaledDat, subsetIndices) {
     .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices)
-}
-
-#' Calculate the cor.cor and mean.cor
-#'
-#' For some statistics it does not make sense to calculate the necessary
-#' components in advance due to large memory overhead, or logic that doesn't
-#' separate nicely. This function deals with those statistics.
-#'
-#' @param pCoexpD,pCoexpT SEXP containers for the pointers to the coexpression 
-#'  matrices for the \emph{discovery} and \emph{test} networks respectively.
-#' @param discIndices,testIndices indices of the network subset in
-#'   the \emph{discovery} and \emph{test} networks respectively.
-#'
-#' @return
-#'   A vector containing:
-#'   \enumerate{
-#'     \item{\emph{cor.cor}:}{
-#'       The correlation between the subset coexpression for both networks.
-#'     }
-#'     \item{\emph{mean.cor}:}{
-#'       The mean correlation density of the network subset.
-#'     }
-#'   }
-#'   
-#' @references
-#'   \enumerate{
-#'     \item{
-#'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
-#'       network module preserved and reproducible?} PLoS Comput. Biol. 
-#'       \strong{7}, e1001057 (2011). 
-#'     }
-#'  }
-#' @rdname netStats-cpp
-NetStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
-    .Call('netrep_NetStats', PACKAGE = 'netrep', pCoexpD, discIndices, pCoexpT, testIndices)
-}
-
-#' Get the range of values in a big.matrix column subset
-#' 
-#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#'   
-#' @rdname range-cpp
-RangeSubset <- function(pDat, subsetIndices) {
-    .Call('netrep_RangeSubset', PACKAGE = 'netrep', pDat, subsetIndices)
-}
-
-#' Get the range of values in a big.matrix
-#' 
-#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#'   
-#' @rdname range-cpp
-BigRange <- function(pDat) {
-    .Call('netrep_BigRange', PACKAGE = 'netrep', pDat)
 }
 
 #' Scale a matrix by its rows
