@@ -5,7 +5,7 @@
 \usage{
 plotKME(gene.expr, module.labels, heatmap.gradient, cex.axis = 1,
   cex.title = 1.4, main = "Intramodular Module Membership",
-  xlab = "genes", cex.lab = cex.axis)
+  xlab = "genes", cex.lab = cex.axis, missing.inds = NULL)
 }
 \arguments{
 \item{gene.expr}{matrix of gene expression data. Expects columns to be the
@@ -25,6 +25,9 @@ to render the coexpression.}
 \item{xlab}{label for the x axis}
 
 \item{cex.lab}{cex for the axis label}
+
+\item{missing.inds}{indices for missing genes, needed to preserved order
+ when comparing plots across datasets.}
 }
 \description{
 Plot the Intramodular Module Membership

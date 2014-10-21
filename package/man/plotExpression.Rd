@@ -5,7 +5,8 @@
 \usage{
 plotExpression(gene.expr, heatmap.gradient, expression.range,
   is.relative = TRUE, cex.title = 1.4, main = "Gene Expression",
-  xlab = "genes", ylab = "samples", cex.lab = 1)
+  xlab = "genes", ylab = "samples", cex.lab = 1, missing.genes = NULL,
+  missing.samples = NULL, new.samples = 0)
 }
 \arguments{
 \item{gene.expr}{matrix of gene expression data. Expects columns to be the
@@ -28,6 +29,15 @@ This affects automated color gradient choice.}
 \item{ylab}{label for the y axis}
 
 \item{cex.lab}{cex for the axis label}
+
+\item{missing.genes}{indices for missing genes, needed to preserved order
+when comparing plots across datasets.}
+
+\item{missing.samples}{locations for the missing samples}
+
+\item{new.samples}{the number of new samples in the dataset. Assumes they are
+  placed at the end of the expression matrix, so draws a line to indicate
+  where these fall.}
 }
 \description{
 Plot a heatmap of the gene expression

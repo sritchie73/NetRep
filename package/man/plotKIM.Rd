@@ -5,7 +5,7 @@
 \usage{
 plotKIM(adjacency, module.labels, col = "orange", cex.axis = 1,
   cex.title = 1.4, main = "Intramodular Connectivity", xlab = "genes",
-  cex.lab = cex.axis)
+  cex.lab = cex.axis, missing.inds = NULL)
 }
 \arguments{
 \item{adjacency}{Matrix of gene adjacencies}
@@ -19,6 +19,9 @@ plotKIM(adjacency, module.labels, col = "orange", cex.axis = 1,
 \item{main}{title for the plot}
 
 \item{cex.lab}{cex for the axis label}
+
+\item{missing.inds}{indices for missing genes, needed to preserved order
+ when comparing plots across datasets.}
 }
 \description{
 Plot the Intramodular Connectivity

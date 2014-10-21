@@ -3,6 +3,18 @@
 #' @details
 #' All matrix arguments will take \code{matrix}, \code{big.matrix}, or 
 #' \code{big.matrix} descriptors.
+#'  
+#' If \code{module} is specified, genes will be ordered by connectivity. 
+#' Alternatively, if \code{moduleGenes} is given, nodes will remain in the same
+#' order as specified. \code{\link{orderNetwork}} will be useful to determine
+#' the correct order. If \code{sampleOrder} is provided, samples in the gene
+#' expression, and summary expression plots will be ordered as described. 
+#' Missing samples will be shown in grey. Samples not present in the 
+#' \code{sampleOrder} (e.g. not present in the discovery dataset) will be shown
+#' at the bottom, ordered by their summary expression.
+#' 
+#' Where genes are missing, these will be represented with grey squares in all
+#' plots.
 #' 
 #' @return
 #' Outputs files for the following:
@@ -21,19 +33,28 @@
 #' @param adjacency matrix of pairwise gene adjacencies.
 #' @param moduleLabels vector of labels assigning each gene to a module.
 #' @param module module to plot preservation for.
-#' @param geneIndices alternative to \code{module}: specify indices of module
-#'   instead
+#' @param moduleGenes alternative to \code{module}: specify module genes / 
+#'   indices instead to preserve order (see details). Can either be a character
+#'   vector of gene names, or a vector of indices for the corresponding
+#'   \code{moduleLabels}.
+#' @param sampleOrder (optional) order for the samples. If omitted, samples are
+#'   ordered based on their summary expression profile. This is useful for
+#'   preserving sample order across datasets (e.g. tissues) (see details).
+#' @param sampleNames (optional) set of sample names for the dataset. If 
+#'  omitted, and \code{sampleOrder} has been provided, and is a set of names,
+#'  this will default to the rownames of the \code{gene.expr}.
 #' @param is.relative logical; is the gene expression relative to some other 
 #'   measure? If \code{TRUE}, a divergent palette is selected when plotting the
 #'   expression, otherwise a sequential palette is chosen.
 #' @param cex.axis \code{cex} for the axis tick labels
 #' @param cex.title \code{cex} for the titles
 #' @param cex.lab \code{cex} for the axis labels
-#' @param dpi resolution for each of the panels.#' 
+#' 
 #' @export
 preservationPlot <- function(
-  gene.expr, coexpression, adjacency, moduleLabels, module, geneIndices,
-  is.relative=TRUE, cex.axis=0.8, cex.title=0.9, dpi=100, cex.lab=0.6
+  gene.expr, coexpression, adjacency, moduleLabels, module, moduleGenes,
+  sampleOrder, sampleNames, is.relative=TRUE, cex.axis=0.8, cex.title=0.9, 
+  cex.lab=0.6
 ) {
   old.mar <- par('mar')
   
@@ -42,44 +63,94 @@ preservationPlot <- function(
   coexp <- dynamicMatLoad(coexpression)
   adj <- dynamicMatLoad(adjacency)
   
-  # Get module subset
+  # Get indices of module subset in the current data
+  missingGenesPos <- NULL # indices within module
+  
   if (!missing(module)) {
     modNodes <- which(moduleLabels == module)
   } else {
-    if (missing(geneIndices)) 
-      stop("If module not specified, 'geneIndices' must be given instead!")
-    if (typeof(geneIndices) == "character") {
-      present <- geneIndices %sub_in% names(moduleLabels)
-      notPresent <- geneIndices %sub_nin% names(moduleLabels)
-      if (length(notPresent) > 0) {
-        warning("some of the module genes are not present in this dataset!\n",
-                "These will be omitted from the preservation plot.")
+    if (missing(moduleGenes)) 
+      stop("If module not specified, 'moduleGenes' must be given instead!")
+    if (typeof(moduleGenes) == "character") {
+      modNodes <- match(moduleGenes, names(moduleLabels))
+      
+      if (any(is.na(modNodes))) {
+        missingGenesPos <- which(is.na(modNodes))
+        modNodes <- modNodes[!is.na(modNodes)]
       }
-      modNodes <- moduleLabels[match(present, names(moduleLabels))]
     } else {
-      modNodes <- moduleLabels[geneIndices]
+      stop("expecting 'moduleGenes' to be a character vector!")
     }
   }
+  
   ge <- ge[,modNodes]
   coexp <- coexp[modNodes, modNodes]
   adj <- adj[modNodes, modNodes]
   
-  # Order genes in decreasing order of connectivity
-  go <- orderNetwork(adj)
-  ge <- ge[, go]
-  coexp <- coexp[go, go]
-  adj <- adj[go, go]
+  # Order genes in decreasing order of connectivity if we're examining a module
+  # in the discovery dataset
+  if (!missing(module)) {
+    go <- orderNetwork(adj)
+    ge <- ge[, go]
+    coexp <- coexp[go, go]
+    adj <- adj[go, go]
+  }
 
-  # Order samples in decreasing order by summary expression profile
+  # Order samples in decreasing order by summary expression profile if we're
+  # examining the module in its discovery dataset.
   so <- orderSamples(ge)
-  ge <- ge[so,]
+  
+  newSamples <- NULL
+  missingSamplePos <- NULL
+  
+  if (missing(sampleOrder)) {
+    ge <- ge[so,]
+  } else {
+    if (typeof(sampleOrder) == "character") {
+      if (missing(sampleNames)) {
+        sampleNames <- rownames(gene.expr)
+        if (is.null(sampleNames)) {
+          stop("unable to determine sample order due to lack of sample names!")
+        }
+        if (length(sampleNames) != nrow(gene.expr)) {
+          stop("Expecting sampleNames vector to be the same length as the",
+                "number of rows in gene.expr!")
+        }
+      }
+      
+      # Get the indices of the pre-ordered samples in this dataset
+      sampleInds <- match(sampleOrder, sampleNames)
+      
+      # Get the appropriate location of missing samples
+      if (any(is.na(sampleInds))) {
+        missingSamplePos <- which(is.na(sampleInds))
+        sampleInds <- sampleInds[!is.na(sampleInds)]
+      }
+      
+      # Order new samples and append to the end
+      if (any(sampleNames %nin% sampleOrder)) {
+        # What samples are in this dataset but not in the discovery?
+        newSamples <- sampleNames %sub_nin% sampleOrder
+        # How are they ordered within this dataset?
+        orderedNewSamples <- sampleNames[so] %sub_in% newSamples
+        # What is their index in the gene expression?
+        newSamples <- match(orderedNewSamples, sampleNames)
+        # Order gene expression appropriately
+        ge <- rbind(ge[sampleInds,], ge[newSamples,])
+      } else {
+        ge <- ge[sampleInds,]
+      }
+    } else {
+      stop("expecting 'sampleOrder' to be a character vector!")
+    }
+  }
   
   # cast back to big.matrix
   adj <- dynamicMatLoad(adj)
   coexp <- dynamicMatLoad(coexp)
   ge <- dynamicMatLoad(ge)
   
-  nGenes <- length(go)
+  nGenes <- ncol(coexp)
   
   titleh <- 0.04 # There are 4 of these
   trih <- 0.2 # There are 2 of these
@@ -107,7 +178,10 @@ preservationPlot <- function(
   
   par(mar=c(0,0,0,0))
   nullPlot() # empty space next to title above adjacency heatmap
-  nullPlot() # empty space next to adjacency heatmap
+  
+  # Show legend for NA values
+  nullPlot()
+  par(mar=c(0,0,0,0))
   nullPlot() # empty space next to title above coexpression heatmap
   nullPlot() # empty space next to coexpression heatmap
   nullPlot() # empty space next to title above intramodular connectivity plot
@@ -120,7 +194,7 @@ preservationPlot <- function(
   nullPlot() # empty space reserved for title
   plotSummaryExpression(
     ge, is.relative=is.relative, cex.axis=cex.axis, cex.title=cex.title*0.7,
-    ylab=""
+    ylab="", missing.inds = missingSamplePos, new.samples = length(newSamples)
   )
   
   par(mar=c(0,0,0,0))
@@ -134,25 +208,39 @@ preservationPlot <- function(
   # Plot adjacency heatmap
   par(mar=c(1,0,0,0))
   nullPlot() # empty space reserved for title
-  plotCoexpression(adj, cex.title=cex.title, cex.lab=cex.lab, adjacency=TRUE)
+  plotCoexpression(
+    adj, cex.title=cex.title, cex.lab=cex.lab, adjacency=TRUE,
+    missing.inds = missingGenesPos
+  )
   
   # Plot coexpression heatmap
   nullPlot() # empty space reserved title
-  plotCoexpression(coexp, cex.title=cex.title, cex.lab=cex.lab)
+  plotCoexpression(
+    coexp, cex.title=cex.title, cex.lab=cex.lab, 
+    missing.inds = missingGenesPos
+  )
   
   # Plot intramodular connectivity
   nullPlot() # empty space reserved for title
-  plotKIM(adj, cex.title=cex.title, cex.axis=cex.axis, cex.lab=cex.lab)
+  plotKIM(
+    adj, cex.title=cex.title, cex.axis=cex.axis, cex.lab=cex.lab,
+    missing.inds = missingGenesPos
+  )
   
   # Plot intramodular module membership
   par(mar=c(0,0,0,0))
   nullPlot() # empty space reserved for title
-  plotKME(ge, cex.title=cex.title, cex.axis=cex.axis, cex.lab=cex.lab)
+  plotKME(
+    ge, cex.title=cex.title, cex.axis=cex.axis, cex.lab=cex.lab,
+    missing.inds = missingGenesPos
+  )
   
   # Plot expression matrix
   nullPlot() # empty space reserved for title
   plotExpression(
-    ge, is.relative=is.relative, cex.title=cex.title, cex.lab=cex.lab 
+    ge, is.relative=is.relative, cex.title=cex.title, cex.lab=cex.lab,
+    missing.genes = missingGenesPos, missing.samples = missingSamplePos, 
+    new.samples = length(newSamples)
   )
   
   # Empty plot underneath the expression (for the SEP axis)
@@ -167,8 +255,8 @@ preservationPlot <- function(
   # Plot adjacency legend
   par(mar=c(2,3,2,0.4))
   plotLegend( 
-    gradient=custom.palette(FALSE), 
-    range=c(0, 1), cex.axis=cex.axis, cex.title=cex.title*0.7, main="", nTicks=4
+    gradient=custom.palette(FALSE), range=c(0, 1), cex.axis=cex.axis, 
+    cex.title=cex.title*0.7, main="", nTicks=4
   )
   
   par(mar=c(0,0,0,0))
@@ -177,9 +265,8 @@ preservationPlot <- function(
   # Plot coexpression legend
   par(mar=c(2,3,2,0.4))
   plotLegend( 
-    gradient=custom.palette(TRUE), 
-    range=c(-1, 1), cex.axis=cex.axis, cex.title=cex.title*0.7, main="", 
-    nTicks=5
+    gradient=custom.palette(TRUE), range=c(-1, 1), cex.axis=cex.axis, 
+    cex.title=cex.title*0.7, main="", nTicks=5
   )
   
   par(mar=c(0,0,0,0))
@@ -192,9 +279,8 @@ preservationPlot <- function(
   # Plot expression legend
   par(mar=c(2,3,2,0.4))
   plotLegend( 
-    gradient=expression.palette(is.relative), 
-    range=rangeBigMatrix(ge), cex.axis=cex.axis, cex.title=cex.title*0.7, 
-    main="", nTicks=5
+    gradient=expression.palette(is.relative), range=rangeBigMatrix(ge),
+    cex.axis=cex.axis, cex.title=cex.title*0.7, main="", nTicks=5
   )
   
   par(mar=c(0,0,0,0))
@@ -287,6 +373,7 @@ orderSamples <- function(gene.expr) {
 #' 
 #' @param gradient A vector of colors to create the gradient
 #' @param range range of values the colors fall over
+#' @param has.missing logical; are there missing values on the plot?
 #' @param cex.axis cex for the axis text
 #' @param cex.title cex for the title text
 #' @param main title for the legend
@@ -294,7 +381,8 @@ orderSamples <- function(gene.expr) {
 #' 
 #' @export
 plotLegend <- function(
-  gradient, range, cex.axis=0.8, cex.title=1, main="Legend", nTicks=9
+  gradient, range, cex.axis=0.8, cex.title=1, main="Legend", 
+  nTicks=9
 ) {
   if(missing(gradient)) {
     gradient <- custom.palette()
@@ -330,11 +418,14 @@ plotLegend <- function(
 #' @param cex.lab cex for the axis label
 #' @param cex.title cex for the title text
 #' @param main title for the plot
+#' @param missing.inds indices for missing genes, needed to preserved order 
+#'  when comparing plots across datasets.
 #' 
 #' @export
 plotKIM <- function(
   adjacency, module.labels, col="orange", cex.axis=1, cex.title=1.4, 
-  main="Intramodular Connectivity", xlab="genes", cex.lab=cex.axis
+  main="Intramodular Connectivity", xlab="genes", cex.lab=cex.axis,
+  missing.inds=NULL
 ) {
   adjacency <- dynamicMatLoad(adjacency)
   if (nrow(adjacency) != ncol(adjacency))
@@ -354,8 +445,15 @@ plotKIM <- function(
     kIM[modGenes] <- adjProps(adjacency, modGenes)$kIM
   }
   
+  if (!is.null(missing.inds)) {
+    # insert missing values in the appropriate location 
+    fullKIM <- rep(NA, length(kIM)+length(missing.inds))
+    fullKIM[-missing.inds] <- kIM
+    kIM <- fullKIM
+  }
+  
   myBarPlot(
-    kIM, cols=col, height.lim=c(0, max(kIM)), cex.axis=cex.axis, 
+    kIM, cols=col, height.lim=c(0, max(kIM, na.rm=TRUE)), cex.axis=cex.axis, 
     cex.title=cex.title, main=main, bar.lab=xlab, cex.lab=cex.lab
   )
 }
@@ -372,11 +470,14 @@ plotKIM <- function(
 #' @param cex.title cex for the title text
 #' @param main title for the plot
 #' @param xlab label for the x axis
+#' @param missing.inds indices for missing genes, needed to preserved order 
+#'  when comparing plots across datasets.
 #'
 #' @export
 plotKME <- function(
   gene.expr, module.labels, heatmap.gradient, cex.axis=1, cex.title=1.4,
-  main = "Intramodular Module Membership", xlab="genes", cex.lab=cex.axis
+  main = "Intramodular Module Membership", xlab="genes", cex.lab=cex.axis,
+  missing.inds = NULL
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaled <- scaleBigMatrix(gene.expr)
@@ -403,6 +504,13 @@ plotKME <- function(
     kME[modGenes] <- dataProps(gene.expr, scaled, modGenes)$kME
   }
   
+  if (!is.null(missing.inds)) {
+    # insert missing values in the appropriate location 
+    fullKME <- rep(NA, length(kME)+length(missing.inds))
+    fullKME[-missing.inds] <- kME
+    kME <- fullKME
+  }
+  
   cols <- sapply(kME, findColInGrad, edgeBins, colGrad)
   
   myBarPlot(
@@ -426,11 +534,16 @@ plotKME <- function(
 #' @param cex.lab cex for the axis label
 #' @param cex.title cex for the title text
 #' @param main title for the plot
+#' @param missing.inds locations for the missing samples
+#' @param new.samples the number of new samples in the dataset. Assumes they are
+#'   placed at the end of the expression matrix, so draws a line to indicate 
+#'   where these fall.
 #' 
 #' @export
 plotSummaryExpression <- function(
   gene.expr, heatmap.gradient, expression.range, is.relative=TRUE, cex.axis=1,
-  cex.title=1.4, main="Summary\nExpression", ylab="samples", cex.lab=cex.axis
+  cex.title=1.4, main="Summary\nExpression", ylab="samples", cex.lab=cex.axis,
+  missing.inds = NULL, new.samples = 0
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaled <- scaleBigMatrix(gene.expr)
@@ -451,6 +564,13 @@ plotSummaryExpression <- function(
     expression.range <- range(SEP)
   }
   
+  if (!is.null(missing.inds)) {
+    # insert missing values in the appropriate location 
+    fullSEP <- rep(NA, length(SEP)+length(missing.inds))
+    fullSEP[-missing.inds] <- SEP
+    SEP <- fullSEP
+  }
+  
   cols <- sapply(SEP, findColInGrad, exprBins, colGrad)
   
   myBarPlot(
@@ -458,6 +578,10 @@ plotSummaryExpression <- function(
     border=NA, bar.width=1, cex.title=cex.title, main=main, bar.lab=ylab, 
     cex.lab=cex.lab
   )
+  if (new.samples > 0) {
+    # demarcate new samples unique to this dataset
+    abline(h = new.samples, col="red") 
+  }
 }
 
 #' Plot a heatmap of the gene expression
@@ -474,24 +598,48 @@ plotSummaryExpression <- function(
 #' @param main title for the plot   
 #' @param xlab label for the x axis
 #' @param ylab label for the y axis
+#' @param missing.genes indices for missing genes, needed to preserved order 
+#'  when comparing plots across datasets.
+#' @param missing.samples locations for the missing samples
+#' @param new.samples the number of new samples in the dataset. Assumes they are
+#'   placed at the end of the expression matrix, so draws a line to indicate 
+#'   where these fall. 
 #'
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 plotExpression <- function(
   gene.expr, heatmap.gradient, expression.range, is.relative=TRUE, 
   cex.title=1.4, main="Gene Expression", xlab="genes", ylab="samples", 
-  cex.lab=1
+  cex.lab=1, missing.genes = NULL, missing.samples = NULL, new.samples = 0
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
-  
-  if (missing(heatmap.gradient)) {
-    heatmap.gradient <- expression.palette(is.relative)
-  }
   
   if (missing(expression.range)) {
     poke(gene.expr)
     expression.range <- rangeBigMatrix(gene.expr)
   }
+  
+  if (!is.null(missing.genes) && !is.null(missing.samples)) {
+    tmp <- matrix(
+      NA, nrow(gene.expr) + length(missing.samples), 
+      ncol(gene.expr) + length(missing.genes)  
+    )
+    tmp[-missing.samples, -missing.genes] <- gene.expr[,]
+    gene.expr <- tmp
+  } else if (!is.null(missing.genes)) {
+    tmp <- matrix(NA, nrow(gene.expr), ncol(gene.expr) + length(missing.genes))
+    tmp[, -missing.genes] <- gene.expr[,]
+    gene.expr <- tmp
+  } else if (!is.null(missing.samples)) {
+    tmp <- matrix(NA, nrow(gene.expr) + length(missing.samples), ncol(gene.expr))
+    tmp[-missing.samples, ] <- gene.expr[,]
+    gene.expr <- tmp
+  }
+  
+  if (missing(heatmap.gradient)) {
+    heatmap.gradient <- expression.palette(is.relative)
+  }
+  
   nColBins <- 255 
   colGrad <- colorRampPalette(heatmap.gradient)(nColBins)
   exprBins <- seq(-1, 1, length=nColBins+1)
@@ -512,6 +660,10 @@ plotExpression <- function(
   }
   box()
   addTitle(main, cex.title)
+  if (new.samples > 0) {
+    # demarcate new samples unique to this dataset
+    abline(h=new.samples, col="red") 
+  }
 }
 
 #' Coexpression plot
@@ -528,17 +680,30 @@ plotExpression <- function(
 #' @param adjacency logical; are we plotting the adjacency instead? Affects 
 #'  automatic color palette and title selection
 #' @param xlab label for the x axis
+#' @param missing.inds indices for missing genes, needed to preserved order 
+#'  when comparing plots across datasets.
 #'        
 #' @export
 plotCoexpression <- function(
   coexpression, module.labels=NULL, heatmap.gradient, adjacency=FALSE, 
-  cex.title=1.4, cex.lab=1,
+  cex.title=1.4, cex.lab=1, missing.inds = NULL,
   main=ifelse(adjacency, "Adjacencies", "Coexpression"), xlab="genes"
 ) {
   coexpression <- dynamicMatLoad(coexpression)
   if (nrow(coexpression) != ncol(coexpression))
     stop("expecting a square edge.matrix!")
   
+  # insert NA rows / columns if appropriate
+  if (!is.null(missing.inds)) {
+    newCoexp <- matrix(
+      NA, nrow=nrow(coexpression) + length(missing.inds), 
+      ncol=ncol(coexpression) + length(missing.inds)
+    )
+    newCoexp[-missing.inds, -missing.inds] <- coexpression[,]
+    coexpression <- newCoexp
+    diag(coexpression) <- 1
+  }
+   
   nGenes <- nrow(coexpression)
   
   if(missing(heatmap.gradient)) {
@@ -686,11 +851,12 @@ getModuleBreaks <- function(module.labels) {
 # Because barplot has weird margins
 myBarPlot <- function(
   heights, height.lim, cols=NA, bar.width=0.8, horiz=FALSE, border="black",
-  cex.axis=1, cex.title, main, bar.lab, cex.lab
+  cex.axis=1, cex.title=1, main="", bar.lab="", cex.lab=1
 ) {
+  
   bars.lim <- c(0, length(heights))
   if (missing(height.lim)) {
-    height.lim <- range(heights)
+    height.lim <- range(heights, na.rm=TRUE)
   }
   
   if (horiz) {
@@ -701,12 +867,7 @@ myBarPlot <- function(
     ylim <- height.lim
   }
   
-  xlim <- getLimsForManualUsr(xlim)
-  ylim <- getLimsForManualUsr(ylim)
-  plot(
-    0, type='n', xaxt='n', yaxt='n', xlim=xlim, ylim=ylim, xlab="", ylab="", 
-    frame.plot = FALSE
-  )
+  nullPlot(xlim, ylim)
   
   for (ii in seq_along(heights)) {
     bar.min <- max(0, height.lim[1])
@@ -794,7 +955,11 @@ expression.palette <- function(diverging) {
 # Expects `edgeBins` to be in ascending order, and `edgeBins` to be 1 longer 
 # than `colors`.
 #
-findColInGrad <- function(weight, edgeBins, colors) {  
+findColInGrad <- function(weight, edgeBins, colors, na.color="#AAAAAA") {
+  # Handle NA values
+  if (is.na(weight)) {
+    return(na.color)
+  }
   # Handle cases where edge weight is outside range
   if (weight <= edgeBins[1]){
     return(colors[1])

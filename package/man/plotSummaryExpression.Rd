@@ -5,7 +5,8 @@
 \usage{
 plotSummaryExpression(gene.expr, heatmap.gradient, expression.range,
   is.relative = TRUE, cex.axis = 1, cex.title = 1.4,
-  main = "Summary\\nExpression", ylab = "samples", cex.lab = cex.axis)
+  main = "Summary\\nExpression", ylab = "samples", cex.lab = cex.axis,
+  missing.inds = NULL, new.samples = 0)
 }
 \arguments{
 \item{heatmap.gradient}{A vector of colors to use for (or interpolate over)
@@ -21,6 +22,12 @@ This affects automated color gradient choice.}
 \item{main}{title for the plot}
 
 \item{cex.lab}{cex for the axis label}
+
+\item{missing.inds}{locations for the missing samples}
+
+\item{new.samples}{the number of new samples in the dataset. Assumes they are
+  placed at the end of the expression matrix, so draws a line to indicate
+  where these fall.}
 
 \item{coexpresion}{a square matrix containing the pairwise gene coexpression.}
 

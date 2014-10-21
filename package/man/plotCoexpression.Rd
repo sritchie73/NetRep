@@ -4,7 +4,7 @@
 \title{Coexpression plot}
 \usage{
 plotCoexpression(coexpression, module.labels = NULL, heatmap.gradient,
-  adjacency = FALSE, cex.title = 1.4, cex.lab = 1,
+  adjacency = FALSE, cex.title = 1.4, cex.lab = 1, missing.inds = NULL,
   main = ifelse(adjacency, "Adjacencies", "Coexpression"), xlab = "genes")
 }
 \arguments{
@@ -19,6 +19,9 @@ automatic color palette and title selection}
 \item{cex.title}{cex for the title text}
 
 \item{cex.lab}{cex for the axis label}
+
+\item{missing.inds}{indices for missing genes, needed to preserved order
+ when comparing plots across datasets.}
 
 \item{main}{title for the plot}
 

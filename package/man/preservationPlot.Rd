@@ -4,8 +4,8 @@
 \title{Generate preservation plot components}
 \usage{
 preservationPlot(gene.expr, coexpression, adjacency, moduleLabels, module,
-  geneIndices, is.relative = TRUE, cex.axis = 0.8, cex.title = 0.9,
-  dpi = 100, cex.lab = 0.6)
+  moduleGenes, sampleOrder, sampleNames, is.relative = TRUE, cex.axis = 0.8,
+  cex.title = 0.9, cex.lab = 0.6)
 }
 \arguments{
 \item{gene.expr}{gene expression matrix. Expects rows to be samples, and
@@ -19,8 +19,18 @@ columns to be genes.}
 
 \item{module}{module to plot preservation for.}
 
-\item{geneIndices}{alternative to \code{module}: specify indices of module
-instead}
+\item{moduleGenes}{alternative to \code{module}: specify module genes /
+indices instead to preserve order (see details). Can either be a character
+vector of gene names, or a vector of indices for the corresponding
+\code{moduleLabels}.}
+
+\item{sampleOrder}{(optional) order for the samples. If omitted, samples are
+ordered based on their summary expression profile. This is useful for
+preserving sample order across datasets (e.g. tissues) (see details).}
+
+\item{sampleNames}{(optional) set of sample names for the dataset. If
+omitted, and \code{sampleOrder} has been provided, and is a set of names,
+this will default to the rownames of the \code{gene.expr}.}
 
 \item{is.relative}{logical; is the gene expression relative to some other
 measure? If \code{TRUE}, a divergent palette is selected when plotting the
@@ -29,8 +39,6 @@ expression, otherwise a sequential palette is chosen.}
 \item{cex.axis}{\code{cex} for the axis tick labels}
 
 \item{cex.title}{\code{cex} for the titles}
-
-\item{dpi}{resolution for each of the panels.#'}
 
 \item{cex.lab}{\code{cex} for the axis labels}
 }
@@ -51,5 +59,17 @@ Generate preservation plot components
 \details{
 All matrix arguments will take \code{matrix}, \code{big.matrix}, or
 \code{big.matrix} descriptors.
+
+If \code{module} is specified, genes will be ordered by connectivity.
+Alternatively, if \code{moduleGenes} is given, nodes will remain in the same
+order as specified. \code{\link{orderNetwork}} will be useful to determine
+the correct order. If \code{sampleOrder} is provided, samples in the gene
+expression, and summary expression plots will be ordered as described.
+Missing samples will be shown in grey. Samples not present in the
+\code{sampleOrder} (e.g. not present in the discovery dataset) will be shown
+at the bottom, ordered by their summary expression.
+
+Where genes are missing, these will be represented with grey squares in all
+plots.
 }
 

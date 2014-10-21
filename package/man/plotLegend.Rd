@@ -18,6 +18,8 @@ plotLegend(gradient, range, cex.axis = 0.8, cex.title = 1,
 \item{main}{title for the legend}
 
 \item{nTicks}{number of tick marks for the axis}
+
+\item{has.missing}{logical; are there missing values on the plot?}
 }
 \description{
 Plot a vertical gradient legend

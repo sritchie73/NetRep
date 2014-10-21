@@ -259,5 +259,3 @@ dynamicMatLoad <- function(object, ...) {
   }
   stop("unable to load object of type", class(object), "as a big.matrix!")
 }
-
-
