@@ -994,9 +994,10 @@ colorRampSymmetric <- function(colors, val.range, nBins) {
   if (0 > val.range[1] & 0 < val.range[2]) {
     range.len <- val.range[2] - val.range[1]
     nTopBins <- nBins*(val.range[2]/range.len)
-    nBotBins <- nBins*(-1*val.range[1]/range.len)
-    botCols <- colorRampPalette(colors[1:4])(nBotBins)
-    topCols <- colorRampPalette(colors[4:7])(nTopBins)
+    nBotBins <- nBins*(-1*val.range[1]/range.len) 
+    midColIndex <- median(seq_along(colors))
+    botCols <- colorRampPalette(colors[1:midColIndex])(nBotBins)
+    topCols <- colorRampPalette(colors[midColIndex:length(colors)])(nTopBins)
     c(botCols, topCols)
   } else {
     colorRampPalette(colors)(nBins)
