@@ -4,8 +4,8 @@
 \title{Generate preservation plot components}
 \usage{
 preservationPlot(gene.expr, coexpression, adjacency, moduleLabels, module,
-  moduleGenes, sampleOrder, sampleNames, is.relative = TRUE, cex.axis = 0.8,
-  cex.title = 0.9, cex.lab = 0.6)
+  moduleGenes, sampleOrder, sampleNames, includeNew = TRUE,
+  is.relative = TRUE, cex.axis = 0.8, cex.title = 0.9, cex.lab = 0.6)
 }
 \arguments{
 \item{gene.expr}{gene expression matrix. Expects rows to be samples, and
@@ -31,6 +31,10 @@ preserving sample order across datasets (e.g. tissues) (see details).}
 \item{sampleNames}{(optional) set of sample names for the dataset. If
 omitted, and \code{sampleOrder} has been provided, and is a set of names,
 this will default to the rownames of the \code{gene.expr}.}
+
+\item{includeNew}{logical; In the case \code{sampleOrder} and
+\code{sampleNames} have been provided, should the samples present in the
+data provided, but not in \code{sampleOrder} be included in the plots?}
 
 \item{is.relative}{logical; is the gene expression relative to some other
 measure? If \code{TRUE}, a divergent palette is selected when plotting the

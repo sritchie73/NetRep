@@ -4,7 +4,7 @@
 \title{Plot a vertical gradient legend}
 \usage{
 plotLegend(gradient, range, cex.axis = 0.8, cex.title = 1,
-  main = "Legend", nTicks = 9)
+  main = "Legend")
 }
 \arguments{
 \item{gradient}{A vector of colors to create the gradient}
@@ -16,8 +16,6 @@ plotLegend(gradient, range, cex.axis = 0.8, cex.title = 1,
 \item{cex.title}{cex for the title text}
 
 \item{main}{title for the legend}
-
-\item{nTicks}{number of tick marks for the axis}
 
 \item{has.missing}{logical; are there missing values on the plot?}
 }

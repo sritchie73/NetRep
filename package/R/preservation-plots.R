@@ -43,6 +43,9 @@
 #' @param sampleNames (optional) set of sample names for the dataset. If 
 #'  omitted, and \code{sampleOrder} has been provided, and is a set of names,
 #'  this will default to the rownames of the \code{gene.expr}.
+#' @param includeNew logical; In the case \code{sampleOrder} and 
+#'  \code{sampleNames} have been provided, should the samples present in the 
+#'  data provided, but not in \code{sampleOrder} be included in the plots?
 #' @param is.relative logical; is the gene expression relative to some other 
 #'   measure? If \code{TRUE}, a divergent palette is selected when plotting the
 #'   expression, otherwise a sequential palette is chosen.
@@ -53,8 +56,8 @@
 #' @export
 preservationPlot <- function(
   gene.expr, coexpression, adjacency, moduleLabels, module, moduleGenes,
-  sampleOrder, sampleNames, is.relative=TRUE, cex.axis=0.8, cex.title=0.9, 
-  cex.lab=0.6
+  sampleOrder, sampleNames, includeNew=TRUE,
+  is.relative=TRUE, cex.axis=0.8, cex.title=0.9, cex.lab=0.6
 ) {
   old.mar <- par('mar')
   
@@ -128,7 +131,7 @@ preservationPlot <- function(
       }
       
       # Order new samples and append to the end
-      if (any(sampleNames %nin% sampleOrder)) {
+      if (any(sampleNames %nin% sampleOrder) && includeNew) {
         # What samples are in this dataset but not in the discovery?
         newSamples <- sampleNames %sub_nin% sampleOrder
         # How are they ordered within this dataset?
@@ -256,7 +259,7 @@ preservationPlot <- function(
   par(mar=c(2,3,2,0.4))
   plotLegend( 
     gradient=custom.palette(FALSE), range=c(0, 1), cex.axis=cex.axis, 
-    cex.title=cex.title*0.7, main="", nTicks=4
+    cex.title=cex.title*0.7, main=""
   )
   
   par(mar=c(0,0,0,0))
@@ -266,7 +269,7 @@ preservationPlot <- function(
   par(mar=c(2,3,2,0.4))
   plotLegend( 
     gradient=custom.palette(TRUE), range=c(-1, 1), cex.axis=cex.axis, 
-    cex.title=cex.title*0.7, main="", nTicks=5
+    cex.title=cex.title*0.7, main=""
   )
   
   par(mar=c(0,0,0,0))
@@ -280,7 +283,7 @@ preservationPlot <- function(
   par(mar=c(2,3,2,0.4))
   plotLegend( 
     gradient=expression.palette(is.relative), range=rangeBigMatrix(ge),
-    cex.axis=cex.axis, cex.title=cex.title*0.7, main="", nTicks=5
+    cex.axis=cex.axis, cex.title=cex.title*0.7, main=""
   )
   
   par(mar=c(0,0,0,0))
@@ -377,12 +380,10 @@ orderSamples <- function(gene.expr) {
 #' @param cex.axis cex for the axis text
 #' @param cex.title cex for the title text
 #' @param main title for the legend
-#' @param nTicks number of tick marks for the axis
 #' 
 #' @export
 plotLegend <- function(
-  gradient, range, cex.axis=0.8, cex.title=1, main="Legend", 
-  nTicks=9
+  gradient, range, cex.axis=0.8, cex.title=1, main="Legend"
 ) {
   if(missing(gradient)) {
     gradient <- custom.palette()
@@ -392,8 +393,13 @@ plotLegend <- function(
   
   nullPlot(c(0, 1), range)
   
-  axis.locs <- seq(range[1], range[2], length=nTicks)
-  axis.text <- format(axis.locs, digits=2)
+  # create 5 axis ticks
+  if (0 > range[1] && 0 < range [2]) {
+    axis.locs <- c(range[1], range[1]/2, 0, range[2]/2, range[2])
+  } else {
+    axis.locs <- seq(range[1], range[2], length=5) 
+  }
+  axis.text <- round(axis.locs, digits=2)
   
   binLocs <- seq(range[1], range[2], length=nColBins + 1)
   for (ii in 2:length(binLocs)) {
@@ -894,10 +900,14 @@ myBarPlot <- function(
   
   if (horiz) {
     abline(v=0)
-    # only print every third tick
+    # only print three ticks
     ticks <- axTicks(side=1)
-    ticks <- ticks[seq(1, length(ticks), 3)]
-    axis(side=1, at=ticks, labels=format(ticks, digits=2), cex.axis=cex.axis)
+    if (0 > min(ticks) && 0 < max(ticks)) {
+      ticks <- c(min(ticks), 0, max(ticks))
+    } else {
+      ticks <- seq(min(ticks), max(ticks), length=3)
+    }
+    axis(side=1, at=ticks, labels=round(ticks, digits=2), cex.axis=cex.axis)
     mtext(bar.lab, side=2, cex=cex.lab)
   } else {
     abline(h=0)
@@ -905,8 +915,7 @@ myBarPlot <- function(
     ticks <- axTicks(side=2)
     ticks = ticks[seq(1, length(ticks), 2)]
     axis(
-      side=2, at=ticks, labels=format(ticks, digits=2), cex.axis=cex.axis, 
-      las=2
+      side=2, at=ticks, labels=round(ticks, digits=2), cex.axis=cex.axis, las=2
     )
     mtext(bar.lab, side=1, cex=cex.lab)
   }
@@ -944,7 +953,8 @@ custom.palette <- function(diverging=TRUE) {
 # isRelative: should the expression be considered diverging around 0?
 expression.palette <- function(diverging) {
   if (diverging) {
-    brewer.pal(6, "PRGn")
+    pal <- brewer.pal(6, "PRGn")
+    pal <- c(pal[1:3], "#FFFFFF", pal[4:6]) # insert white into the middle.
   } else {
     rev(brewer.pal(9, "Greens"))
   }
