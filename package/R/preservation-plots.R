@@ -389,7 +389,7 @@ plotLegend <- function(
     gradient <- custom.palette()
   }
   nColBins <- 255
-  grad <- colorRampPalette(gradient)(nColBins)
+  grad <- colorRampSymmetric(gradient, range, nColBins)
   
   nullPlot(c(0, 1), range)
   
@@ -647,7 +647,7 @@ plotExpression <- function(
   }
   
   nColBins <- 255 
-  colGrad <- colorRampPalette(heatmap.gradient)(nColBins)
+  colGrad <- colorRampSymmetric(heatmap.gradient, expression.range, nColBins)
   exprBins <- seq(-1, 1, length=nColBins+1)
   
   nullPlot(c(0, ncol(gene.expr)), c(0, nrow(gene.expr)), xlab, ylab, cex.lab)
@@ -987,4 +987,18 @@ findColInGrad <- function(weight, edgeBins, colors, na.color="#AAAAAA") {
 
 addTitle <- function(title, cex) {
   mtext(title, side=3, cex=cex, line=0.4)
+}
+
+# Get a gradient such that the centre color lines up with 0.
+colorRampSymmetric <- function(colors, val.range, nBins) {
+  if (0 > val.range[1] & 0 < val.range[2]) {
+    range.len <- val.range[2] - val.range[1]
+    nTopBins <- nBins*(val.range[2]/range.len)
+    nBotBins <- nBins*(-1*val.range[1]/range.len)
+    botCols <- colorRampPalette(colors[1:4])(nBotBins)
+    topCols <- colorRampPalette(colors[4:7])(nTopBins)
+    c(botCols, topCols)
+  } else {
+    colorRampPalette(colors)(nBins)
+  }
 }
