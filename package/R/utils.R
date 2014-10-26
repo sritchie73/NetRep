@@ -218,7 +218,9 @@ ichunkTasks <- function(verbose, n, cores) {
 poke <- function(...) {
   for (o in list(...)) {
     if (!is.null(o)) {
-      o[1:5, 1:5]
+      pCols <- min(ncol(o), 5)
+      pRows <- min(nrow(o), 5)
+      o[1:pRows, 1:pCols]
     }
   }
 }
