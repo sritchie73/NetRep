@@ -474,11 +474,11 @@ netRepMain <- function(
         
         # Order statistics: First density stats, then connectivity
         if (is.null(discDat)) {
-          statOrder <- c("mean.cor", "mean.adj", "cor.kIM", "cor.cor")
+          statOrder <- c("mean.adj", "cor.kIM", "cor.cor", "mean.cor")
         } else {
           statOrder <- c(
-            "propVarExpl", "mean.kME", "mean.cor", "mean.adj", 
-            "cor.kIM", "cor.kME", "cor.cor"
+            "mean.adj", "propVarExpl", "cor.cor", "cor.kIM", "cor.kME",
+            "mean.cor", "mean.kME"
           ) 
         }
         
