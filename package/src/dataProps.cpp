@@ -102,7 +102,7 @@ List DataProps(
           Named("propVarExpl") = NA_REAL
         );
     }
-    mat summary(U.col(1));
+    mat summary(U.col(0));
 
     // Flip the sign of the summary profile so that the eigenvector is 
     // positively correlated with the average scaled value of the underlying
