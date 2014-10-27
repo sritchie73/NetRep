@@ -401,7 +401,7 @@ plotLegend <- function(
   }
   axis.text <- round(axis.locs, digits=2)
   
-  binLocs <- seq(range[1], range[2], length=nColBins + 1)
+  binLocs <- seq(range[1], range[2], length=length(grad) + 1)
   for (ii in 2:length(binLocs)) {
     rect(
       xleft=0, 
@@ -625,7 +625,7 @@ plotExpression <- function(
     expression.range <- rangeBigMatrix(gene.expr)
   }
   
-  if (!is.null(missing.genes) && !is.null(missing.samples)) {
+  if (!is.null(missing.genes) & !is.null(missing.samples)) {
     tmp <- matrix(
       NA, nrow(gene.expr) + length(missing.samples), 
       ncol(gene.expr) + length(missing.genes)  
@@ -648,7 +648,7 @@ plotExpression <- function(
   
   nColBins <- 255 
   colGrad <- colorRampSymmetric(heatmap.gradient, expression.range, nColBins)
-  exprBins <- seq(-1, 1, length=nColBins+1)
+  exprBins <- seq(expression.range[1], expression.range[2], length=nColBins+1)
   
   nullPlot(c(0, ncol(gene.expr)), c(0, nrow(gene.expr)), xlab, ylab, cex.lab)
   
@@ -992,13 +992,22 @@ addTitle <- function(title, cex) {
 # Get a gradient such that the centre color lines up with 0.
 colorRampSymmetric <- function(colors, val.range, nBins) {
   if (0 > val.range[1] & 0 < val.range[2]) {
-    range.len <- val.range[2] - val.range[1]
-    nTopBins <- nBins*(val.range[2]/range.len)
-    nBotBins <- nBins*(-1*val.range[1]/range.len) 
-    midColIndex <- median(seq_along(colors))
-    botCols <- colorRampPalette(colors[1:midColIndex])(nBotBins)
-    topCols <- colorRampPalette(colors[midColIndex:length(colors)])(nTopBins)
-    c(botCols, topCols)
+    ## Get the color gradient so that the colors are balanced across the axes
+    fullRange <- colorRampPalette(colors)(nBins)
+    maxVal <- max(abs(val.range))
+    r.vals <- seq(-1*maxVal, maxVal, length=nBins+1)
+    
+    min.col.index <- 0
+    max.col.index <- 0
+    for (i in 1:(length(r.vals) - 1)) {
+      if (val.range[1] >= r.vals[i] & val.range[1] <= r.vals[i + 1]) {
+        min.col.index <- i
+      }
+      if (val.range[2] >= r.vals[i] & val.range[2] <= r.vals[i + 1]) {
+        max.col.index <- i
+      }
+    }
+    fullRange[min.col.index:max.col.index]
   } else {
     colorRampPalette(colors)(nBins)
   }
