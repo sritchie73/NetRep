@@ -484,7 +484,6 @@ netRepMain <- function(
         
         vCat(verbose, indent+1, "Cleaning up temporary objects...")
         unlink(run.dir, recursive=TRUE)
-        rm(scaledDisc, discAdj, scaledTest, testAdj)
         gc()
         vCat(verbose, indent, "Done!")
       }
