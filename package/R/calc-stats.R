@@ -80,32 +80,22 @@ calcSplitTestStats <- function(discProps, testProps) {
 #' statistics drawn from random permutation. This procedure is performed by the 
 #' main function of this package, \code{\link{netRep}}.
 #'  
-#' @param adjDesc file path to the \code{\link[bigmemory]{big.matrix}} 
+#' @param adj \code{\link[bigmemory]{big.matrix}} or file path to its 
 #'  descriptor for the pairwise gene adjancencies.
 #' @param subsetInd Indices of the network subset.
-#' @param scaledDesc (Optional) file path to the 
-#'   \code{\link[bigmemory]{big.matrix}} descriptor for the scaled expression 
-#'   data.
+#' @param scaledDesc (Optional) \code{\link[bigmemory]{big.matrix}} object or 
+#'  file path to its descriptor for the scaled expression data.
+#' @param lowmem logical; If \code{TRUE}, \code{\link[bigmemory]{big.matrix}} 
+#'  objects are attached, and freed at the end of each wrapper function. If
+#'  \code{FALSE}, it is assumed the corresponding arguments are the already
+#'  attached \code{\link[bigmemory]{big.matrix}} objects.
 #' @return
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=calcSplitTestStats]{Between-network statistics}}
-subsetProps <- function(adjDesc, subsetInd, scaledDesc=NULL) {
-  adj <- attach.big.matrix(adjDesc)
-  on.exit({
-    rm(adj)
-    gc()
-  })
-  poke(adj)
-  props <- adjProps(adj, subsetInd)
-
-  if (!is.null(scaledDesc)) {
-    scaled <- attach.big.matrix(scaledDesc)
-    on.exit({
-      rm(scaled)
-      gc()
-    }, add=TRUE)
-    poke(scaled)
-    props <- c(props, dataProps(scaled, subsetInd))
+subsetProps <- function(adj, subsetInd, scaled=NULL, lowmem=FALSE) {
+  props <- adjProps(adj, subsetInd, lowmem)
+  if (!is.null(scaled)) {
+    props <- c(props, dataProps(scaled, subsetInd, lowmem))
   }
   props
 }
@@ -124,24 +114,14 @@ subsetProps <- function(adjDesc, subsetInd, scaledDesc=NULL) {
 #' @seealso \code{\link[=subsetProps]{Network subset topology}} 
 #'   \code{\link{netRep}}
 #'   
-#' @param discCorDesc,testCorDesc file path to the 
-#'  \code{\link[bigmemory]{big.matrix}} descriptor objects for the 
-#'  correlation matrices in the \emph{discovery} and \emph{test} networks 
-#'  respectively.
+#' @param discCor,testCor \code{\link[bigmemory]{big.matrix}} object or 
+#'  file path to its descriptor for the correlation matrices in the 
+#'  \emph{discovery} and \emph{test} networks respectively.
 #' @param discIndices,testIndices indices of the network subset in the 
 #'  \emph{discovery} and \emph{test} networks respectively.
 #' @return A vector of test statistics.
 calcSharedTestStats <- function(
-  discCorDesc, discIndices, testCorDesc, testIndices
+  discCor, discIndices, testCor, testIndices, lowmem
 ) {
-  discCor <- attach.big.matrix(discCorDesc)
-  testCor <- attach.big.matrix(testCorDesc)
-  on.exit({
-    rm(discCor)
-    rm(testCor)
-    gc()
-  })
-  poke(discCor)
-  poke(testCor)
-  unlist(netStats(discCor, discIndices, testCor, testIndices))
+  unlist(netStats(discCor, discIndices, testCor, testIndices, lowmem))
 }

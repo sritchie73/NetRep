@@ -490,6 +490,7 @@ plotKME <- function(
   gene.expr <- dynamicMatLoad(gene.expr)
   scaledDesc <- scaleBigMatrix(gene.expr, ".")
   on.exit({ unlink(scaledDesc) })
+  scaled <- attach.big.matrix(scaledDesc)
   
   nGenes <- ncol(gene.expr)
   
@@ -510,7 +511,7 @@ plotKME <- function(
   
   for (mm in unique(module.labels)) {
     modGenes <- which(module.labels == mm)
-    kME[modGenes] <- dataProps(gene.expr, scaled, modGenes)$kME
+    kME[modGenes] <- dataProps(scaled, modGenes)$kME
   }
   
   if (!is.null(missing.inds)) {
@@ -555,7 +556,7 @@ plotSummaryExpression <- function(
   missing.inds = NULL, new.samples = 0
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
-  scaledDesc <- scaleBigMatrix(gene.expr)
+  scaledDesc <- scaleBigMatrix(gene.expr, ".")
   on.exit({ unlink(scaledDesc) })
   scaled <- attach.big.matrix(scaledDesc)
   
@@ -569,7 +570,7 @@ plotSummaryExpression <- function(
   
   poke(gene.expr)
   poke(scaled)
-  SEP <- dataProps(gene.expr, scaled, 1:ncol(gene.expr))$SEP
+  SEP <- dataProps(scaled, 1:ncol(gene.expr))$SEP
   
   if (missing(expression.range)) {
     expression.range <- range(SEP)

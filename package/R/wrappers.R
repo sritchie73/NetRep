@@ -29,14 +29,26 @@
 #' @param dat underlying data the adjacency matrix was constructed from
 #' @param scaledDat a row scaled \code{big.matrix} version of \code{dat}.
 #'  See \code{\link{scaleBigMatrix}}.
-#'  
+#' @param lowmem logical; If \code{TRUE}, \code{\link[bigmemory]{big.matrix}} 
+#'  objects are attached, and freed at the end of each wrapper function. If
+#'  \code{FALSE}, it is assumed the corresponding arguments are the already
+#'  attached \code{\link[bigmemory]{big.matrix}} objects.
 #'
 NULL
 
 #' @rdname wrappers
 #' @return \code{netStats:} a list of statistics calculated between adjacency
 #'  matrices for a \emph{discovery} and \emph{test} network.
-netStats <- function(discAdj, discIndices, testAdj, testIndices) {
+netStats <- function(discAdj, discIndices, testAdj, testIndices, lowmem=FALSE) {
+  if (lowmem) {
+    discAdj <- attach.big.matrix(discAdj)
+    testAdj <- attach.big.matrix(testAdj)
+    on.exit({
+      rm(discAdj, testAdj)
+      gc()
+    })
+    poke(discAdj, testAdj)
+  }
   res <- NetStats(discAdj@address, discIndices, testAdj@address, testIndices)
   lapply(res, as.vector)
 }
@@ -46,7 +58,15 @@ netStats <- function(discAdj, discIndices, testAdj, testIndices) {
 #'  adjacency matrix. These properties can either be scalers (summarising the
 #'  whole network subset), or vectors (characterising some property for each
 #'  node in the network subset).
-adjProps <- function(adj, subsetIndices) {
+adjProps <- function(adj, subsetIndices, lowmem=FALSE) {
+  if (lowmem) {
+    adj <- attach.big.matrix(adj)
+    on.exit({
+      rm(adj)
+      gc()
+    })
+    poke(adj)
+  }
   res <- AdjProps(adj@address, subsetIndices)
   lapply(res, as.vector)
 }
@@ -57,7 +77,15 @@ adjProps <- function(adj, subsetIndices) {
 #'   These properties can either be scalers (summarising the whole network
 #'   subset), or vectors (characterising some property for each node in the
 #'   network subset).
-dataProps <- function(scaledDat, datIndices) {
+dataProps <- function(scaledDat, datIndices, lowmem=FALSE) {
+  if (lowmem) {
+    scaledDat <- attach.big.matrix(scaledDat)
+    on.exit({
+      rm(scaledDat)
+      gc()
+    })
+    poke(scaledDat)
+  }
   res <- DataProps(scaledDat@address, datIndices)
   lapply(res, as.vector)
 }

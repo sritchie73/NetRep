@@ -3,13 +3,12 @@
 \alias{calcSharedTestStats}
 \title{Calculate the cor.cor and mean.cor}
 \usage{
-calcSharedTestStats(discCorDesc, discIndices, testCorDesc, testIndices)
+calcSharedTestStats(discCor, discIndices, testCor, testIndices, lowmem)
 }
 \arguments{
-\item{discCorDesc,testCorDesc}{file path to the
-\code{\link[bigmemory]{big.matrix}} descriptor objects for the
-correlation matrices in the \emph{discovery} and \emph{test} networks
-respectively.}
+\item{discCor,testCor}{\code{\link[bigmemory]{big.matrix}} object or
+file path to its descriptor for the correlation matrices in the
+\emph{discovery} and \emph{test} networks respectively.}
 
 \item{discIndices,testIndices}{indices of the network subset in the
 \emph{discovery} and \emph{test} networks respectively.}

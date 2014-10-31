@@ -6,11 +6,11 @@
 \alias{wrappers}
 \title{Wrapper functions for Rcpp functions}
 \usage{
-netStats(discAdj, discIndices, testAdj, testIndices)
+netStats(discAdj, discIndices, testAdj, testIndices, lowmem = FALSE)
 
-adjProps(adj, subsetIndices)
+adjProps(adj, subsetIndices, lowmem = FALSE)
 
-dataProps(scaledDat, datIndices)
+dataProps(scaledDat, datIndices, lowmem = FALSE)
 }
 \arguments{
 \item{discAdj,testAdj,adj}{\code{\link[bigmemory]{big.matrix}} objects
@@ -21,8 +21,13 @@ networks respectively.}
 of interest in the adjacency matrices for the \emph{discovery} and
 \emph{test} and networks respectively.}
 
+\item{lowmem}{logical; If \code{TRUE}, \code{\link[bigmemory]{big.matrix}}
+objects are attached, and freed at the end of each wrapper function. If
+\code{FALSE}, it is assumed the corresponding arguments are the already
+attached \code{\link[bigmemory]{big.matrix}} objects.}
+
 \item{scaledDat}{a row scaled \code{big.matrix} version of \code{dat}.
- See \code{\link{scaleBigMatrix}}.}
+See \code{\link{scaleBigMatrix}}.}
 
 \item{datIndices}{indices for the network subset of interest in the
 underlying data provided for \code{\link{DataProps}}.}

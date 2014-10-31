@@ -6,7 +6,7 @@
 netRepMain(datSets = NULL, corSets, adjSets, nodeNameSets = NULL,
   nodeLabelSets, discovery, test, nPerm = 10000, ignoreSets = NULL,
   includeSets = NULL, null = "overlap", verbose = TRUE, indent = 0,
-  simplify = TRUE)
+  simplify = TRUE, lowmem = FALSE)
 }
 \arguments{
 \item{datSets}{\code{NULL}, or a list of \code{\link{big.matrix}}: one for
@@ -57,7 +57,10 @@ the output at. Defaults to 0. Each indent level adds two spaces to the
 start of each line of output.}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
- list if possible.}
+list if possible.}
+
+\item{lowmem}{logical; should memory usage be minimised? Useful on machines
+ without lots of RAM, but slows down permutation calculations threefold.}
 }
 \description{
 This function provides the main functionality, but requires well formed

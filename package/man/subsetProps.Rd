@@ -3,17 +3,21 @@
 \alias{subsetProps}
 \title{Network subset properties}
 \usage{
-subsetProps(adjDesc, subsetInd, scaledDesc = NULL)
+subsetProps(adj, subsetInd, scaled = NULL, lowmem = FALSE)
 }
 \arguments{
-\item{adjDesc}{file path to the \code{\link[bigmemory]{big.matrix}}
+\item{adj}{\code{\link[bigmemory]{big.matrix}} or file path to its
 descriptor for the pairwise gene adjancencies.}
 
 \item{subsetInd}{Indices of the network subset.}
 
-\item{scaledDesc}{(Optional) file path to the
-\code{\link[bigmemory]{big.matrix}} descriptor for the scaled expression
-data.}
+\item{lowmem}{logical; If \code{TRUE}, \code{\link[bigmemory]{big.matrix}}
+objects are attached, and freed at the end of each wrapper function. If
+\code{FALSE}, it is assumed the corresponding arguments are the already
+attached \code{\link[bigmemory]{big.matrix}} objects.}
+
+\item{scaledDesc}{(Optional) \code{\link[bigmemory]{big.matrix}} object or
+file path to its descriptor for the scaled expression data.}
 }
 \value{
 A list of topological properties for the given network subset
