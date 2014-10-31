@@ -325,6 +325,9 @@ netRepMain <- function(
         vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
              "permutations...")
         run.dir <- paste(".run-progress", stamp)
+        on.exit({
+          unlink(run.dir, recursive=TRUE)
+        }, add=TRUE)
         if(verbose) {
           # To log progress, we will write our progress to a file for each chunk
           dir.create(run.dir, showWarnings=FALSE)
