@@ -57,8 +57,8 @@ adjProps <- function(adj, subsetIndices) {
 #'   These properties can either be scalers (summarising the whole network
 #'   subset), or vectors (characterising some property for each node in the
 #'   network subset).
-dataProps <- function(dat, scaledDat, datIndices) {
-  res <- DataProps(dat@address, scaledDat@address, datIndices)
+dataProps <- function(scaledDat, datIndices) {
+  res <- DataProps(scaledDat@address, datIndices)
   lapply(res, as.vector)
 }
   

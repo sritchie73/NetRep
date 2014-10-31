@@ -10,7 +10,7 @@ netStats(discAdj, discIndices, testAdj, testIndices)
 
 adjProps(adj, subsetIndices)
 
-dataProps(dat, scaledDat, datIndices)
+dataProps(scaledDat, datIndices)
 }
 \arguments{
 \item{discAdj,testAdj,adj}{\code{\link[bigmemory]{big.matrix}} objects
@@ -21,13 +21,13 @@ networks respectively.}
 of interest in the adjacency matrices for the \emph{discovery} and
 \emph{test} and networks respectively.}
 
-\item{dat}{underlying data the adjacency matrix was constructed from}
-
 \item{scaledDat}{a row scaled \code{big.matrix} version of \code{dat}.
  See \code{\link{scaleBigMatrix}}.}
 
 \item{datIndices}{indices for the network subset of interest in the
 underlying data provided for \code{\link{DataProps}}.}
+
+\item{dat}{underlying data the adjacency matrix was constructed from}
 }
 \value{
 \code{netStats:} a list of statistics calculated between adjacency

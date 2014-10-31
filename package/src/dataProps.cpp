@@ -10,9 +10,7 @@ using namespace arma;
 
 //' Network subset eigenvector and proportion of variance explained in C++
 //' 
-//' @param pDat SEXP container for the pointer to the data matrix used in 
-//'   network construction.
-//' @param pScaledDat SEXP container for the pointer to a scaled version of the 
+//' @param pDat SEXP container for the pointer to a scaled version of the 
 //'   data matrix used to construct the network.
 //' @param subsetIndices indices of the network subset of interest in 
 //'   \code{pDat}.
@@ -58,27 +56,14 @@ using namespace arma;
 //'  
 // [[Rcpp::export]]
 List DataProps(
-  SEXP pDat, SEXP pScaledDat, IntegerVector subsetIndices
+  SEXP pDat, IntegerVector subsetIndices
 ) {
   XPtr<BigMatrix> xpDat(pDat);
-  XPtr<BigMatrix> xspDat(pScaledDat);
   
   // Make sure we're not indexing out of range.
   if (is_true(any(subsetIndices <= 0)) || 
       is_true(any(subsetIndices > xpDat->ncol()))) {
     throw std::out_of_range("Some of requested indices are outside of range!");
-  }
-  // Make sure pScaledDat corresponds to pDat
-    if (xpDat->ncol() != xspDat->ncol() ||
-      xpDat->nrow() != xspDat->nrow()) {
-    throw Rcpp::exception(
-        "The results matrix must have the same dimensions as the data matrix!"
-      );
-  }
-  if (xpDat->matrix_type() != xspDat->matrix_type()) {
-    throw Rcpp::exception(
-        "The results matrix must have the same 'type' as the data matrix."
-      );
   }
   
   // We can only work with BigMatrix objects of type double here due to SVD 
@@ -107,8 +92,7 @@ List DataProps(
     // Flip the sign of the summary profile so that the eigenvector is 
     // positively correlated with the average scaled value of the underlying
     // data for the network subset.
-    mat asDat((double *)xspDat->matrix(), xspDat->nrow(), xspDat->ncol(), false);
-    mat ap = cor(mean(asDat.cols(subsetCols), 1), summary);
+    mat ap = cor(mean(aDat.cols(subsetCols), 1), summary);
     if (ap(0,0) < 0) {
       summary *= -1; 
     }

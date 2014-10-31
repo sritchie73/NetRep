@@ -3,14 +3,12 @@
 \alias{subsetProps}
 \title{Network subset properties}
 \usage{
-subsetProps(adj, subsetInd, dat = NULL, scaled = NULL)
+subsetProps(adj, subsetInd, scaled = NULL)
 }
 \arguments{
 \item{adj}{Adjacency matrix for the network.}
 
 \item{subsetInd}{Indices of the network subset.}
-
-\item{dat}{(Optional) Underlying data for the network.}
 
 \item{scaled}{(Optional) a row scaled \code{big.matrix} of \code{dat}.}
 }

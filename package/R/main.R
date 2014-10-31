@@ -207,8 +207,7 @@ netRepMain <- function(
         
         # Create scaled data 
         if (!is.null(discDat) && !is.null(testDat)) {
-          vCat(verbose, indent+1, "Creating temporary scaled datasets for kME",
-               "calculations...")
+          vCat(verbose, indent+1, "Scaling gene expression...")
           if (is.null(scaledSets[[di]])) {
             descriptor <- paste0("scaled", di, ".desc")
             backing <- paste0("scaled", di, ".bin")
@@ -233,6 +232,8 @@ netRepMain <- function(
           scaledDisc <- NULL
           scaledTest <- NULL
         }
+        rm(discDat, testDat)
+        gc()
         
         # Get a vector of nodes which are present in both datasets. Depends on 
         # the combination of data input provided.
@@ -278,7 +279,7 @@ netRepMain <- function(
         
         # How many network properites and statistics will we return? 
         # Numbers required for data structure allocation
-        nStats <- ifelse(is.null(discDat), 4, 7)
+        nStats <- ifelse(is.null(scaledDisc), 4, 7)
         nSubsets <- length(oSubsets)
         
         # Calculate some basic cross-tabulation statistics so we can assess
@@ -318,7 +319,7 @@ netRepMain <- function(
         # Obtain the topological properties for each network subset in the
         # discovery dataset, we only want to calculate these once!
         vCat(verbose, indent+1, "Calculating observed test statistics...")
-        poke(discCor, discAdj, discDat, scaledDisc, testCor, testAdj, testDat, scaledTest)
+        poke(discCor, discAdj, scaledDisc, testCor, testAdj, scaledTest)
         discProps <- rep(list(NULL), nSubsets)
         for (ii in seq_along(oSubsets)) {
           sNodes <- names(which(nodeLabelSets[[di]][oNodes] == oSubsets[ii]))
@@ -326,7 +327,7 @@ netRepMain <- function(
           # the subset nodes.
           subsetInd <- match(sNodes, nodeNameSets[[di]])
           props <- subsetProps(
-            discAdj, subsetInd, discDat, scaledDisc
+            discAdj, subsetInd, scaledDisc
           )
           discProps[[ii]] <- props
         }
@@ -341,7 +342,7 @@ netRepMain <- function(
           testInd <- match(sNodes, nodeNameSets[[ti]])
           discInd <- match(sNodes, nodeNameSets[[di]])
           testProps <- subsetProps(
-            testAdj, testInd, testDat, scaledTest
+            testAdj, testInd, scaledTest
           )
           stats <- c(
             calcSplitTestStats(discProps[[ss]], testProps),
@@ -365,7 +366,7 @@ netRepMain <- function(
               NULL
             }
           } else {
-            poke(discCor, discAdj, discDat, scaledDisc, testCor, testAdj, testDat, scaledTest)
+            poke(discCor, discAdj, scaledDisc, testCor, testAdj, scaledTest)
             if (verbose) {
               conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
               progressBar <- conns[[1]]
@@ -392,7 +393,7 @@ netRepMain <- function(
                 
                 tryCatch({ 
                   testProps <- subsetProps(
-                    testAdj, permInd, testDat, scaledTest
+                    testAdj, permInd, scaledTest
                   )
                   stats <- c(
                     calcSplitTestStats(discProps[[ss]], testProps),
@@ -473,7 +474,7 @@ netRepMain <- function(
         })
         
         # Order statistics: First density stats, then connectivity
-        if (is.null(discDat)) {
+        if (is.null(scaledDisc)) {
           statOrder <- c("mean.adj", "cor.kIM", "cor.cor", "mean.cor")
         } else {
           statOrder <- c(
@@ -503,7 +504,7 @@ netRepMain <- function(
         
         vCat(verbose, indent+1, "Cleaning up temporary objects...")
         unlink("run-progress", recursive=TRUE)
-        rm(discDat, scaledDisc, discAdj, testDat, scaledTest, testAdj)
+        rm(scaledDisc, discAdj, scaledTest, testAdj)
         gc()
         vCat(verbose, indent, "Done!")
       }

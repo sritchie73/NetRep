@@ -82,16 +82,15 @@ calcSplitTestStats <- function(discProps, testProps) {
 #'  
 #' @param adj Adjacency matrix for the network.
 #' @param subsetInd Indices of the network subset.
-#' @param dat (Optional) Underlying data for the network.
 #' @param scaled (Optional) a row scaled \code{big.matrix} of \code{dat}.
 #' 
 #' @return
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=calcSplitTestStats]{Between-network statistics}}
-subsetProps <- function(adj, subsetInd, dat=NULL, scaled=NULL) {
+subsetProps <- function(adj, subsetInd, scaled=NULL) {
   props <- adjProps(adj, subsetInd)
-  if (!is.null(dat)) {
-    props <- c(props, dataProps(dat, scaled, subsetInd))
+  if (!is.null(scaled)) {
+    props <- c(props, dataProps(scaled, subsetInd))
   }
   props
 }

@@ -17,6 +17,68 @@ AdjProps <- function(pAdjacency, subsetIndices) {
     .Call('netrep_AdjProps', PACKAGE = 'netrep', pAdjacency, subsetIndices)
 }
 
+#' Check the elements of a `big.matrix`
+#' 
+#' Are all the values finite? 
+#' 
+#' @param pDat SEXP container for the pointer to the 
+#'   \code{\link[bigmemory]{big.matrix}} to be checked.
+#'
+#' @rdname chekcFinite-cpp
+CheckFinite <- function(pDat) {
+    invisible(.Call('netrep_CheckFinite', PACKAGE = 'netrep', pDat))
+}
+
+#' Network subset eigenvector and proportion of variance explained in C++
+#' 
+#' @param pDat SEXP container for the pointer to a scaled version of the 
+#'   data matrix used to construct the network.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#' 
+#' @return
+#'  A list containing:
+#'  \enumerate{
+#'   \item{\emph{"kME"}:}{
+#'     The subset kME for each node  (see details).
+#'   }
+#'   \item{\emph{"propVarExplained"}:}{
+#'     The proportion of the variance explained by the subset's summary
+#'     vector (see details).
+#'   }
+#'  }
+#'
+#' @references
+#'   \enumerate{
+#'     \item{
+#'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
+#'       network module preserved and reproducible?} PLoS Comput. Biol. 
+#'       \strong{7}, e1001057 (2011). 
+#'     }
+#'  }
+#'  
+#' @details
+#'  First, a summary vector is calculated for the network subset from the 
+#'  underlying data. This is the first right singular vector from a singular 
+#'  value decomposition (also the eigenvector of the first principal component 
+#'  \emph{(1)}). The sign of the returned eigenvector is modified to match the
+#'  average of \code{pDat}. This is to match the behaviour of
+#'  \emph{moduleEigengenes} in the \code{WGCNA} package.
+#'  
+#'  Using this summary vector, the subset kME of each node is quantified
+#'  as the correlation between that node's data, and the summary vector.
+#'  
+#'  The proportion of variance explained by this summary vector is quantified
+#'  as the average square of the subset kMEs for all nodes in the 
+#'  network subset.
+#' 
+#' @import RcppArmadillo
+#' @rdname dataProps-cpp
+#'  
+DataProps <- function(pDat, subsetIndices) {
+    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, subsetIndices)
+}
+
 #' Calculate the cor.cor and mean.cor
 #'
 #' For some statistics it does not make sense to calculate the necessary
@@ -72,70 +134,6 @@ RangeSubset <- function(pDat, subsetIndices) {
 #' @rdname range-cpp
 BigRange <- function(pDat) {
     .Call('netrep_BigRange', PACKAGE = 'netrep', pDat)
-}
-
-#' Check the elements of a `big.matrix`
-#' 
-#' Are all the values finite? 
-#' 
-#' @param pDat SEXP container for the pointer to the 
-#'   \code{\link[bigmemory]{big.matrix}} to be checked.
-#'
-#' @rdname chekcFinite-cpp
-CheckFinite <- function(pDat) {
-    invisible(.Call('netrep_CheckFinite', PACKAGE = 'netrep', pDat))
-}
-
-#' Network subset eigenvector and proportion of variance explained in C++
-#' 
-#' @param pDat SEXP container for the pointer to the data matrix used in 
-#'   network construction.
-#' @param pScaledDat SEXP container for the pointer to a scaled version of the 
-#'   data matrix used to construct the network.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#' 
-#' @return
-#'  A list containing:
-#'  \enumerate{
-#'   \item{\emph{"kME"}:}{
-#'     The subset kME for each node  (see details).
-#'   }
-#'   \item{\emph{"propVarExplained"}:}{
-#'     The proportion of the variance explained by the subset's summary
-#'     vector (see details).
-#'   }
-#'  }
-#'
-#' @references
-#'   \enumerate{
-#'     \item{
-#'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
-#'       network module preserved and reproducible?} PLoS Comput. Biol. 
-#'       \strong{7}, e1001057 (2011). 
-#'     }
-#'  }
-#'  
-#' @details
-#'  First, a summary vector is calculated for the network subset from the 
-#'  underlying data. This is the first right singular vector from a singular 
-#'  value decomposition (also the eigenvector of the first principal component 
-#'  \emph{(1)}). The sign of the returned eigenvector is modified to match the
-#'  average of \code{pDat}. This is to match the behaviour of
-#'  \emph{moduleEigengenes} in the \code{WGCNA} package.
-#'  
-#'  Using this summary vector, the subset kME of each node is quantified
-#'  as the correlation between that node's data, and the summary vector.
-#'  
-#'  The proportion of variance explained by this summary vector is quantified
-#'  as the average square of the subset kMEs for all nodes in the 
-#'  network subset.
-#' 
-#' @import RcppArmadillo
-#' @rdname dataProps-cpp
-#'  
-DataProps <- function(pDat, pScaledDat, subsetIndices) {
-    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, pScaledDat, subsetIndices)
 }
 
 #' Scale a matrix by its rows

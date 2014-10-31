@@ -3,13 +3,10 @@
 \alias{DataProps}
 \title{Network subset eigenvector and proportion of variance explained in C++}
 \usage{
-DataProps(pDat, pScaledDat, subsetIndices)
+DataProps(pDat, subsetIndices)
 }
 \arguments{
-\item{pDat}{SEXP container for the pointer to the data matrix used in
-network construction.}
-
-\item{pScaledDat}{SEXP container for the pointer to a scaled version of the
+\item{pDat}{SEXP container for the pointer to a scaled version of the
 data matrix used to construct the network.}
 
 \item{subsetIndices}{indices of the network subset of interest in
