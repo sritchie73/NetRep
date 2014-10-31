@@ -2,13 +2,10 @@
 #' 
 #' Create a new scaled \code{\link[bigmemory]{big.matrix}}.  
 #' 
-#' @param x the \code{\link[bigmemory]{big.matrix}} to scale.
-#' @param backingfile,backingpath,descriptorfile backingfile information for the
-#'   new scaled big.matrix to be stored in, see 
-#'   \code{\link[bigmemory]{big.matrix}}.
+#' @param x the matrix to scale.
+#' @param obj.dir the directory to store the object in
 #' @return
-#'  A new \code{\link[bigmemory]{big.matrix}} containing the scaled and centered
-#'  rows of \code{x}.
+#'  A descriptor to the scaled version of x.
 #' 
 #' @seealso \code{\link[base]{scale}} \code{\link[bigmemory]{big.matrix}}
 #' @note
@@ -21,13 +18,25 @@
 #'  To apply the scale function in place without creating a new results matrix,
 #'  simply call \code{Scale(x@@address, x@@address)}.
 #' 
-scaleBigMatrix <- function(
-  x, backingfile=NULL, backingpath=NULL, descriptorfile=NULL
-) {
-  res <- big.matrix(nrow(x), ncol(x), typeof(x), NULL, dimnames(x), FALSE,
-                    backingfile, backingpath, descriptorfile)
-  Scale(x@address, res@address)
-  res
+scaleBigMatrix <- function(x, obj.dir) {
+  bigx <- dynamicMatLoad(x)
+  on.exit({
+    rm(bigx, res)
+    gc()  
+  })
+  poke(bigx)
+  
+  stamp <- as.integer(Sys.time())
+  descriptorfile <- paste0("scaled", stamp, ".desc")
+  backingfile <- paste0("scaled", stamp, ".bin")
+  
+  res <- big.matrix(
+    nrow(bigx), ncol(bigx), typeof(bigx), NULL, dimnames(x), FALSE,
+    backingfile, obj.dir, descriptorfile
+  )
+  Scale(bigx@address, res@address)
+
+  return(file.path(obj.dir, descriptorfile))
 }
 
 #' Get the range of a big.matrix or its subset
@@ -50,9 +59,16 @@ rangeBigMatrix <- function(x, subsetIndices) {
 #' Check if all entries of a `big.matrix` are Finite
 #' 
 #' If there are non-finite entires (\code{NA}, \code{NaN}, \code{-Inf}, 
-#' \code{Inf}), throw an exception.
+#' \code{Inf}), throw an exception. 
 #' 
 #' @param x a \code{\link[bigmemory]{big.matrix}}
 checkFinite <- function(x) {
-  CheckFinite(x@address)
+  bigx <- dynamicMatLoad(x)
+  on.exit({
+    rm(bigx)
+    gc()
+  })
+  poke(bigx)
+  CheckFinite(bigx@address)
+  return(NULL)
 }

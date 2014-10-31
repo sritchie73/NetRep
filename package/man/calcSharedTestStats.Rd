@@ -3,10 +3,11 @@
 \alias{calcSharedTestStats}
 \title{Calculate the cor.cor and mean.cor}
 \usage{
-calcSharedTestStats(discCor, discIndices, testCor, testIndices)
+calcSharedTestStats(discCorDesc, discIndices, testCorDesc, testIndices)
 }
 \arguments{
-\item{discCor,testCor}{\code{\link[bigmemory]{big.matrix}} objects for the
+\item{discCorDesc,testCorDesc}{file path to the
+\code{\link[bigmemory]{big.matrix}} descriptor objects for the
 correlation matrices in the \emph{discovery} and \emph{test} networks
 respectively.}
 

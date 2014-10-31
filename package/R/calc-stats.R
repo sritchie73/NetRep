@@ -80,16 +80,31 @@ calcSplitTestStats <- function(discProps, testProps) {
 #' statistics drawn from random permutation. This procedure is performed by the 
 #' main function of this package, \code{\link{netRep}}.
 #'  
-#' @param adj Adjacency matrix for the network.
+#' @param adjDesc file path to the \code{\link[bigmemory]{big.matrix}} 
+#'  descriptor for the pairwise gene adjancencies.
 #' @param subsetInd Indices of the network subset.
-#' @param scaled (Optional) a row scaled \code{big.matrix} of \code{dat}.
-#' 
+#' @param scaledDesc (Optional) file path to the 
+#'   \code{\link[bigmemory]{big.matrix}} descriptor for the scaled expression 
+#'   data.
 #' @return
 #'  A list of topological properties for the given network subset 
 #' @seealso \code{\link[=calcSplitTestStats]{Between-network statistics}}
-subsetProps <- function(adj, subsetInd, scaled=NULL) {
+subsetProps <- function(adjDesc, subsetInd, scaledDesc=NULL) {
+  adj <- attach.big.matrix(adjDesc)
+  on.exit({
+    rm(adj)
+    gc()
+  })
+  poke(adj)
   props <- adjProps(adj, subsetInd)
-  if (!is.null(scaled)) {
+
+  if (!is.null(scaledDesc)) {
+    scaled <- attach.big.matrix(scaledDesc)
+    on.exit({
+      rm(scaled)
+      gc()
+    }, add=TRUE)
+    poke(scaled)
     props <- c(props, dataProps(scaled, subsetInd))
   }
   props
@@ -109,12 +124,24 @@ subsetProps <- function(adj, subsetInd, scaled=NULL) {
 #' @seealso \code{\link[=subsetProps]{Network subset topology}} 
 #'   \code{\link{netRep}}
 #'   
-#' @param discCor,testCor \code{\link[bigmemory]{big.matrix}} objects for the 
+#' @param discCorDesc,testCorDesc file path to the 
+#'  \code{\link[bigmemory]{big.matrix}} descriptor objects for the 
 #'  correlation matrices in the \emph{discovery} and \emph{test} networks 
 #'  respectively.
 #' @param discIndices,testIndices indices of the network subset in the 
 #'  \emph{discovery} and \emph{test} networks respectively.
 #' @return A vector of test statistics.
-calcSharedTestStats <- function(discCor, discIndices, testCor, testIndices) {
+calcSharedTestStats <- function(
+  discCorDesc, discIndices, testCorDesc, testIndices
+) {
+  discCor <- attach.big.matrix(discCorDesc)
+  testCor <- attach.big.matrix(testCorDesc)
+  on.exit({
+    rm(discCor)
+    rm(testCor)
+    gc()
+  })
+  poke(discCor)
+  poke(testCor)
   unlist(netStats(discCor, discIndices, testCor, testIndices))
 }

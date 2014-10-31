@@ -3,19 +3,15 @@
 \alias{scaleBigMatrix}
 \title{Scale and Center the rows of a 'big.matrix'}
 \usage{
-scaleBigMatrix(x, backingfile = NULL, backingpath = NULL,
-  descriptorfile = NULL)
+scaleBigMatrix(x, obj.dir)
 }
 \arguments{
-\item{x}{the \code{\link[bigmemory]{big.matrix}} to scale.}
+\item{x}{the matrix to scale.}
 
-\item{backingfile,backingpath,descriptorfile}{backingfile information for the
-new scaled big.matrix to be stored in, see
-\code{\link[bigmemory]{big.matrix}}.}
+\item{obj.dir}{the directory to store the object in}
 }
 \value{
-A new \code{\link[bigmemory]{big.matrix}} containing the scaled and centered
- rows of \code{x}.
+A descriptor to the scaled version of x.
 }
 \description{
 Create a new scaled \code{\link[bigmemory]{big.matrix}}.

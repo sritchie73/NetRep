@@ -178,65 +178,36 @@ netRepMain <- function(
       if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
         # Set up return list
         res[[di]][[ti]] <- rep(list(NULL), 5)
+         
+        hasDat <- FALSE # Flag useful for later
         
         # Output messages
         vCat(verbose, indent, sep="", 
              "Calculating preservation of network subsets from dataset ",
              setNames[di], ", in dataset ", setNames[ti], ".")
 
-        # Attach relevant matrices
-        vCat(verbose, indent+1, "Attaching matrices...")
-        discCor <- attach.big.matrix(corSets[[di]])
-        discAdj <- attach.big.matrix(adjSets[[di]])
-        testCor <- attach.big.matrix(corSets[[ti]])
-        testAdj <- attach.big.matrix(adjSets[[ti]])
-        if (!is.null(datSets[[di]]) && !is.null(datSets[[ti]])) {
-          discDat <- attach.big.matrix(datSets[[di]])
-          testDat <- attach.big.matrix(datSets[[ti]])
-        } else {
-          discDat <- NULL
-          testDat <- NULL
-        }        
-        
+        # Check input is ok
         vCat(verbose, indent+1, "Checking matrices...")
-        checkFinite(discCor)
-        checkFinite(discAdj)
-        checkFinite(testCor)
-        checkFinite(testAdj)
+        checkFinite(corSets[[di]])
+        checkFinite(adjSets[[di]])
+        checkFinite(corSets[[ti]])
+        checkFinite(adjSets[[ti]])
         if (!is.null(datSets[[di]]) && !is.null(datSets[[ti]])) {
-          checkFinite(discDat)
-          checkFinite(testDat)
-        }
+          checkFinite(datSets[[di]])
+          checkFinite(datSets[[ti]])
+          hasDat <- TRUE
+        }     
         
         # Create scaled data 
-        if (!is.null(discDat) && !is.null(testDat)) {
-          vCat(verbose, indent+1, "Scaling gene expression...")
+        if (hasDat) {
+          vCat(verbose, indent+1, "Creating temporary scaled gene expression...")
           if (is.null(scaledSets[[di]])) {
-            descriptor <- paste0("scaled", di, ".desc")
-            backing <- paste0("scaled", di, ".bin")
-            scaledDisc <- scaleBigMatrix(
-              discDat, backing, obj.dir, descriptor
-            )
-            scaledSets[[di]] <- file.path(obj.dir, descriptor)
-          } else {
-            scaledDisc <- attach.big.matrix(scaledSets[[di]])
-          }
+            scaledSets[[di]] <- scaleBigMatrix(datSets[[di]], obj.dir)
+          } 
           if (is.null(scaledSets[[ti]])) {
-            descriptor <- paste0("scaled", ti, ".desc")
-            backing <- paste0("scaled", ti, ".bin")
-            scaledTest <- scaleBigMatrix(
-              testDat, backing, obj.dir, descriptor
-            )
-            scaledSets[[ti]] <- file.path(obj.dir, descriptor)
-          } else {
-            scaledTest <- attach.big.matrix(scaledSets[[ti]])
+            scaledSets[[ti]] <- scaleBigMatrix(datSets[[ti]], obj.dir)
           }
-        } else {
-          scaledDisc <- NULL
-          scaledTest <- NULL
         }
-        rm(discDat, testDat)
-        gc()
         
         # Get a vector of nodes which are present in both datasets. Depends on 
         # the combination of data input provided.
@@ -282,7 +253,7 @@ netRepMain <- function(
         
         # How many network properites and statistics will we return? 
         # Numbers required for data structure allocation
-        nStats <- ifelse(is.null(scaledDisc), 4, 7)
+        nStats <- ifelse(hasDat, 7, 4)
         nSubsets <- length(oSubsets)
         
         # Calculate some basic cross-tabulation statistics so we can assess
@@ -322,16 +293,13 @@ netRepMain <- function(
         # Obtain the topological properties for each network subset in the
         # discovery dataset, we only want to calculate these once!
         vCat(verbose, indent+1, "Calculating observed test statistics...")
-        poke(discCor, discAdj, scaledDisc, testCor, testAdj, scaledTest)
         discProps <- rep(list(NULL), nSubsets)
         for (ii in seq_along(oSubsets)) {
           sNodes <- names(which(nodeLabelSets[[di]][oNodes] == oSubsets[ii]))
           # get the indices in the underlying data and adjacency matrices for 
           # the subset nodes.
           subsetInd <- match(sNodes, nodeNameSets[[di]])
-          props <- subsetProps(
-            discAdj, subsetInd, scaledDisc
-          )
+          props <- subsetProps(adjSets[[di]], subsetInd, scaledSets[[di]])
           discProps[[ii]] <- props
         }
         names(discProps) <- oSubsets
@@ -344,12 +312,10 @@ netRepMain <- function(
           sNodes <- names(which(nodeLabelSets[[di]][oNodes] == ss))
           testInd <- match(sNodes, nodeNameSets[[ti]])
           discInd <- match(sNodes, nodeNameSets[[di]])
-          testProps <- subsetProps(
-            testAdj, testInd, scaledTest
-          )
+          testProps <- subsetProps(adjSets[[ti]], testInd, scaledSets[[ti]])
           stats <- c(
             calcSplitTestStats(discProps[[ss]], testProps),
-            calcSharedTestStats(discCor, discInd, testCor, testInd)
+            calcSharedTestStats(corSets[[di]], discInd, corSets[[ti]], testInd)
           )
           observed[ii,] <- stats
           colnames(observed) <- names(stats)
@@ -370,7 +336,6 @@ netRepMain <- function(
               NULL
             }
           } else {
-            poke(discCor, discAdj, scaledDisc, testCor, testAdj, scaledTest)
             if (verbose) {
               conns <- setupParProgressLogs(chunk, nWorkers, indent+2, run.dir)
               progressBar <- conns[[1]]
@@ -397,13 +362,17 @@ netRepMain <- function(
                 
                 tryCatch({ 
                   testProps <- subsetProps(
-                    testAdj, permInd, scaledTest
+                    adjSets[[ti]], permInd, scaledSets[[ti]]
                   )
                   stats <- c(
                     calcSplitTestStats(discProps[[ss]], testProps),
-                    calcSharedTestStats(discCor, discInd, testCor, permInd)
+                    calcSharedTestStats(
+                      corSets[[di]], discInd, corSets[[ti]], permInd
+                    )
                   )
                   chunkStats[ii,,kk] <- stats
+                  rm(testProps, stats)
+                  gc()
                 }, error = function(e) {
                   warning(
                     "Calculation for subset ", oSubsets[ii], " failed on ",
@@ -428,6 +397,10 @@ netRepMain <- function(
             saveRDS(chunkStats, file.path(obj.dir, permFile))
           }
         }
+        # Get rid of discProps, we no longer need this!
+        rm(discProps)
+        gc()
+        
         # Load in results
         nulls <- array(NA, dim=c(nSubsets, nStats, nPerm))
         dimnames(nulls)[[3]] <- rep("", dim(nulls)[3])
@@ -478,13 +451,13 @@ netRepMain <- function(
         })
         
         # Order statistics: First density stats, then connectivity
-        if (is.null(scaledDisc)) {
-          statOrder <- c("mean.adj", "cor.kIM", "cor.cor", "mean.cor")
-        } else {
+        if (hasDat) {
           statOrder <- c(
             "mean.adj", "propVarExpl", "cor.cor", "cor.kIM", "cor.kME",
             "mean.cor", "mean.kME"
           ) 
+        } else {
+          statOrder <- c("mean.adj", "cor.kIM", "cor.cor", "mean.cor")
         }
         
         # Collate results

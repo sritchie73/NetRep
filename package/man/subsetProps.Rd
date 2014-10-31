@@ -3,14 +3,17 @@
 \alias{subsetProps}
 \title{Network subset properties}
 \usage{
-subsetProps(adj, subsetInd, scaled = NULL)
+subsetProps(adjDesc, subsetInd, scaledDesc = NULL)
 }
 \arguments{
-\item{adj}{Adjacency matrix for the network.}
+\item{adjDesc}{file path to the \code{\link[bigmemory]{big.matrix}}
+descriptor for the pairwise gene adjancencies.}
 
 \item{subsetInd}{Indices of the network subset.}
 
-\item{scaled}{(Optional) a row scaled \code{big.matrix} of \code{dat}.}
+\item{scaledDesc}{(Optional) file path to the
+\code{\link[bigmemory]{big.matrix}} descriptor for the scaled expression
+data.}
 }
 \value{
 A list of topological properties for the given network subset
