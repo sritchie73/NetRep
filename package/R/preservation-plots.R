@@ -362,8 +362,10 @@ orderNetwork <- function(adjacency, module.labels=NULL, summary.exp=NULL) {
 #' @export
 orderSamples <- function(gene.expr) {
   gene.expr <- dynamicMatLoad(gene.expr)
-  scaled <- scaleBigMatrix(gene.expr)
-  SEP <- dataProps(gene.expr, scaled, 1:ncol(gene.expr))$SEP
+  scaledDesc <- scaleBigMatrix(gene.expr, ".")
+  on.exit({ unlink(scaledDesc) })
+  scaled <- attach.big.matrix(scaledDesc)
+  SEP <- dataProps(scaled, 1:ncol(gene.expr))$SEP
   o <- order(SEP, decreasing=TRUE)
   o
 }
@@ -486,7 +488,8 @@ plotKME <- function(
   missing.inds = NULL
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
-  scaled <- scaleBigMatrix(gene.expr)
+  scaledDesc <- scaleBigMatrix(gene.expr, ".")
+  on.exit({ unlink(scaledDesc) })
   
   nGenes <- ncol(gene.expr)
   
@@ -552,7 +555,9 @@ plotSummaryExpression <- function(
   missing.inds = NULL, new.samples = 0
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
-  scaled <- scaleBigMatrix(gene.expr)
+  scaledDesc <- scaleBigMatrix(gene.expr)
+  on.exit({ unlink(scaledDesc) })
+  scaled <- attach.big.matrix(scaledDesc)
   
   if (missing(heatmap.gradient)) {
     heatmap.gradient <- expression.palette(is.relative)
