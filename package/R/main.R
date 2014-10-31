@@ -149,9 +149,12 @@ netRepMain <- function(
   
   # Set up temporary directory for working big.matrix objects, and permutation
   # results.
-  dir.create(".temp-objects", showWarnings=FALSE)
+  stamp <- as.integer(Sys.time())
+  obj.dir <- paste0(".temp-objects", stamp)
+  
+  dir.create(obj.dir, showWarnings=FALSE)
   on.exit({
-    unlink(".temp-objects", recursive=TRUE)
+    unlink(obj.dir, recursive=TRUE)
   }, add=TRUE)
   
   scaledSets <- NULL
@@ -212,9 +215,9 @@ netRepMain <- function(
             descriptor <- paste0("scaled", di, ".desc")
             backing <- paste0("scaled", di, ".bin")
             scaledDisc <- scaleBigMatrix(
-              discDat, backing, ".temp-objects", descriptor
+              discDat, backing, obj.dir, descriptor
             )
-            scaledSets[[di]] <- file.path(".temp-objects", descriptor)
+            scaledSets[[di]] <- file.path(obj.dir, descriptor)
           } else {
             scaledDisc <- attach.big.matrix(scaledSets[[di]])
           }
@@ -222,9 +225,9 @@ netRepMain <- function(
             descriptor <- paste0("scaled", ti, ".desc")
             backing <- paste0("scaled", ti, ".bin")
             scaledTest <- scaleBigMatrix(
-              testDat, backing, ".temp-objects", descriptor
+              testDat, backing, obj.dir, descriptor
             )
-            scaledSets[[ti]] <- file.path(".temp-objects", descriptor)
+            scaledSets[[ti]] <- file.path(obj.dir, descriptor)
           } else {
             scaledTest <- attach.big.matrix(scaledSets[[ti]])
           }
@@ -355,20 +358,21 @@ netRepMain <- function(
         # Calculate the null distribution for each of the statistics.
         vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
              "permutations...")
+        run.dir <- paste(".run-progress", stamp)
         if(verbose) {
           # To log progress, we will write our progress to a file for each chunk
-          dir.create("run-progress", showWarnings=FALSE)
+          dir.create(run.dir, showWarnings=FALSE)
         }
         foreach(chunk=ichunkTasks(verbose, nPerm, nCores)) %maybe_do_par% {
           if (verbose & length(chunk) == 1) {
             if (chunk == -1) {
-              monitorProgress(nWorkers, indent+2)
+              monitorProgress(nWorkers, indent+2, run.dir)
               NULL
             }
           } else {
             poke(discCor, discAdj, scaledDisc, testCor, testAdj, scaledTest)
             if (verbose) {
-              conns <- setupParProgressLogs(chunk, nWorkers, indent+2)
+              conns <- setupParProgressLogs(chunk, nWorkers, indent+2, run.dir)
               progressBar <- conns[[1]]
               on.exit(lapply(conns, close))
             } 
@@ -412,7 +416,7 @@ netRepMain <- function(
               if (verbose) {
                 updateParProgress(progressBar, chunk[kk])
                 if (nCores == 1) {
-                  reportProgress(indent+2)
+                  reportProgress(indent+2, run.dir)
                   if (chunk[kk] == nPerm) {
                     cat("\n")
                   }
@@ -421,16 +425,16 @@ netRepMain <- function(
             }
             chunkNum <- ceiling(chunk[1]/length(chunk))
             permFile <- paste0("chunk", chunkNum, "permutations.rds")
-            saveRDS(chunkStats, file.path(".temp-objects", permFile))
+            saveRDS(chunkStats, file.path(obj.dir, permFile))
           }
         }
         # Load in results
         nulls <- array(NA, dim=c(nSubsets, nStats, nPerm))
         dimnames(nulls)[[3]] <- rep("", dim(nulls)[3])
-        chunkFiles <- list.files(".temp-objects", "chunk[0-9]*permutations.rds")
+        chunkFiles <- list.files(obj.dir, "chunk[0-9]*permutations.rds")
         offset <- 1
         for (cf in chunkFiles) {
-          chunk <- readRDS(file.path(".temp-objects", cf))
+          chunk <- readRDS(file.path(obj.dir, cf))
           nCPerm <- dim(chunk)[3]
           nulls[,,offset:(offset+nCPerm-1)] <- chunk
           dimnames(nulls)[1:2] <- dimnames(chunk)[1:2]
@@ -503,7 +507,7 @@ netRepMain <- function(
         }
         
         vCat(verbose, indent+1, "Cleaning up temporary objects...")
-        unlink("run-progress", recursive=TRUE)
+        unlink(run.dir, recursive=TRUE)
         rm(scaledDisc, discAdj, scaledTest, testAdj)
         gc()
         vCat(verbose, indent, "Done!")

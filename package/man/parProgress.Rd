@@ -7,13 +7,13 @@
 \alias{updateParProgress}
 \title{Monitor Parallel Process Progress}
 \usage{
-setupParProgressLogs(chunk, nChunks, ind)
+setupParProgressLogs(chunk, nChunks, ind, run.dir)
 
 updateParProgress(pb, i)
 
-monitorProgress(nChunks, ind)
+monitorProgress(nChunks, ind, run.dir)
 
-reportProgress(ind)
+reportProgress(ind, run.dir)
 }
 \arguments{
 \item{chunk}{The chunk of indices for the current parallel instance of the
@@ -23,6 +23,9 @@ reportProgress(ind)
 
 \item{ind}{an integer corresponding to the level of indentation. Each
 indentation level corresponds to two spaces.}
+
+\item{run.dir}{path to the temporary directory the run progress is being
+stored in.}
 
 \item{pb}{an object of class "\code{txtProgressBar}"}
 

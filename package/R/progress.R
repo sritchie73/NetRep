@@ -11,6 +11,8 @@
 #' @param ind an integer corresponding to the level of indentation. Each
 #'   indentation level corresponds to two spaces.
 #' @param nChunks The total number of chunks.
+#' @param run.dir path to the temporary directory the run progress is being 
+#'  stored in. 
 #' @seealso \code{\link[utils]{txtProgressBar}}
 #' @name parProgress
 NULL
@@ -23,11 +25,11 @@ NULL
 #'   returned so it can be closed properly later.)
 #' @rdname parProgress
 #' @importFrom utils txtProgressBar
-setupParProgressLogs <- function(chunk, nChunks, ind) {
+setupParProgressLogs <- function(chunk, nChunks, ind, run.dir) {
   chunkNum <- ceiling(chunk[1]/length(chunk))
   
   # Setup log file
-  filename <- file.path("run-progress", paste0("chunk", chunkNum, ".log"))
+  filename <- file.path(run.dir, paste0("chunk", chunkNum, ".log"))
   file.create(filename)
   logfile <- file(filename, open="wt")
   
@@ -61,11 +63,11 @@ updateParProgress <- function(pb, i) {
 #'  \code{monitorProgress}: Monitor the progress of parallel workers.
 #' @rdname parProgress
 #' @import foreach
-monitorProgress <- function(nChunks, ind) {
+monitorProgress <- function(nChunks, ind, run.dir) {
   f <- NULL # Definition to turn off R CMD check NOTE
   init <- FALSE
   while(TRUE) {
-    files <- list.files("run-progress")
+    files <- list.files(run.dir)
     if (init & length(files) == 0) {
       break;
     } else {
@@ -78,7 +80,7 @@ monitorProgress <- function(nChunks, ind) {
     # connection closure.
     foreach (f = files) %do% {
       # Get progress from file
-      conn <- file(file.path("run-progress", f), open="rt")
+      conn <- file(file.path(run.dir, f), open="rt")
       on.exit(close(conn)) # close regardless of function success
       progress <- tail(readLines(conn, warn=FALSE), 1)
       # This on.exit overwrites previous, so need to close(conn) again.
@@ -87,7 +89,7 @@ monitorProgress <- function(nChunks, ind) {
       on.exit({ 
         close(conn)
         if (grepl("100%", progress)) {
-          file.remove(file.path("run-progress", f))
+          file.remove(file.path(run.dir, f))
         } else {
           Sys.sleep(1)
         }
@@ -113,9 +115,9 @@ monitorProgress <- function(nChunks, ind) {
 #' @description 
 #'  \code{reportProgress}: Report the progress of a sequential loop.
 #' @rdname parProgress
-reportProgress <- function(ind) {
+reportProgress <- function(ind, run.dir) {
   # Get progress from file
-  conn <- file(file.path("run-progress", file="chunk1.log"), open="rt")
+  conn <- file(file.path(run.dir, file="chunk1.log"), open="rt")
   on.exit(close(conn))
   progress <- tail(readLines(conn, warn=FALSE), 1)
   on.exit({ 
