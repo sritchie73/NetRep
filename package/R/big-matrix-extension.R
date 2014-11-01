@@ -26,9 +26,17 @@ scaleBigMatrix <- function(x, obj.dir) {
   })
   poke(bigx)
   
-  stamp <- as.integer(Sys.time())
-  descriptorfile <- paste0("scaled", stamp, ".desc")
-  backingfile <- paste0("scaled", stamp, ".bin")
+
+  while (TRUE) {
+    stamp <- getUUID()
+    descriptorfile <- paste0("scaled", stamp, ".desc")
+    backingfile <- paste0("scaled", stamp, ".bin")
+    
+    # Handle the infintesimally small chance of a UUID collision
+    if (!file.exists(descriptorfile) & !file.exists(backingfile)) {
+      break 
+    }
+  } 
   
   res <- big.matrix(
     nrow(bigx), ncol(bigx), typeof(bigx), NULL, dimnames(x), FALSE,
