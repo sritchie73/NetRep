@@ -1,36 +1,13 @@
-#' @title Distribution from Permutations
+#' @title Permutation Test
 #' 
-#' @description Distribution function, quantile function, and random generation
-#'  for an empirical distribution provided by the user in the \code{permuted}
-#'  argument. These distributions are typically drawn through permutation 
-#'  testing of some statistic.
+#' @description 
+#'  Evaluates the statistical significance of a test statistic given a vector
+#'  of "nulls": values for that test statistic drawn from random sampling.
 #'  
 #' @details 
-#'  P-values are calculated by \code{pperm} using proportions on the provided 
-#'  distribution (\emph{permuted}). An observation, \code{q}'s, p-value 
-#'  is the proportion of \emph{permuted} whom are more extreme than \code{q}. 
-#'  This is accurate strictly when:
-#'  \enumerate{
-#'    \item Each permutation is independent.
-#'    \item Permutations are sampled without replacement.
-#'  }
-#'  While these assumptions may not necessarily always be true, for our purposes
-#'  they are a reasonable approximation. If \code{q} is more extreme than the 
-#'  \code{permuted}, the tail approximation method from \emph{(2)} can be used
-#'  to estimate the p-value of \code{q} by setting \code{tail.approx} to 
-#'  \code{TRUE}.
-#'  
-#'  It is rarely possible to give an accurate value for \code{qperm} since there
-#'  is no theoretical distribution to draw from. Instead the closest possible
-#'  observation from the data is returned.
-#'  
-#' @note
-#'  It is possible for the quantile \code{p} to fall exactly halfway 
-#'  between two observations from the \emph{permuted} distribution. In this case
-#'  both data points are returned and a warning is generated. It is up to the 
-#'  user to choose which observation to take: the conservative approach is to 
-#'  choose the first observation if \code{p} < 0.5, or the second observation if
-#'  \code{p} > 0.5.
+#'  Calculates exact p-values for permutation tests when permutations are 
+#'  randomly drawn with replacement using the \code{\link[statmod]{permp}} 
+#'  function in the \code{\link{statmod}} package.
 #'  
 #' @references 
 #'   \enumerate{
@@ -126,8 +103,17 @@ permp <- function(x, nperm, ...) {
 #'  be smaller than \code{alpha}.
 #' @rdname permutation
 #' @export
-requiredPower <- function(alpha) {
-  1/alpha
+requiredPower <- function(alpha, alternative="greater") {
+  validAlts <- c("two.sided", "less", "greater")
+  altMatch <- pmatch(alternative, validAlts)
+  if (is.na(altMatch))
+    stop("Alternative must be one of ", validAlts)
+  
+  if (altMatch == 1) {
+    1/alpha*2
+  } else {
+    1/alpha
+  }
 }
 
 
