@@ -2,7 +2,8 @@
 \name{RangeSubset}
 \alias{BigRange}
 \alias{RangeSubset}
-\title{Get the range of values in a big.matrix column subset}
+\alias{range-cpp}
+\title{Get the range of a big.matrix}
 \usage{
 RangeSubset(pDat, subsetIndices)
 
@@ -13,15 +14,11 @@ BigRange(pDat)
 
 \item{subsetIndices}{indices of the network subset of interest in
   \code{pDat}.}
-
-\item{pDat}{SEXP container for the pointer to the data matrix to be scaled.}
-
-\item{subsetIndices}{indices of the network subset of interest in
-  \code{pDat}.}
 }
 \description{
-Get the range of values in a big.matrix column subset
+\code{RangeSubset}: get the range of values in the column-subset of a
+ big.matrix.
 
-Get the range of values in a big.matrix
+\code{BigRange}: get the range of values in a big.matrix
 }
 

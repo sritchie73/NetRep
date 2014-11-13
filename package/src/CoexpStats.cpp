@@ -8,7 +8,7 @@ using namespace arma;
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/MatrixAccessor.hpp>
 
-// Implementation of NetStats
+// Implementation of CoexpStats
 //
 // @param xpCoexpD,xpCoexpT external pointers to the 'big.matrix' objects for 
 //  the discovery and test correlation networks respectively.
@@ -18,10 +18,10 @@ using namespace arma;
 //  networks respectively.
 //
 // @return A list containing the
-//    - correlation of the correlation (cor.cor)
-//    - sign aware mean of the correlation (mean.cor)
+//    - correlation of the correlation (cor.coexp)
+//    - sign aware mean of the correlation (mean.coexp)
 template <typename S, typename T>
-List NetStats(
+List CoexpStats(
   XPtr<BigMatrix> xpCoexpD, MatrixAccessor<S> matCoexpD, IntegerVector dIdx,
   XPtr<BigMatrix> xpCoexpT, MatrixAccessor<T> matCoexpT, IntegerVector tIdx
 ) {
@@ -48,24 +48,26 @@ List NetStats(
 
   if (corCor(0,0) < -1 || corCor(0,0) > 1) {
     Function warning("warning");
-    warning("'cor.cor' returned a correlation outside of [-1,1]"
+    warning("'cor.coexp' returned a correlation outside of [-1,1]"
             "returning NA instead.");
     return List::create(
-      Named("cor.cor") = NA_REAL,
-      Named("mean.cor") = meanCor                                                                                                                                                                                                             
+      Named("cor.coexp") = NA_REAL,
+      Named("mean.coexp") = meanCor                                                                                                                                                                                                             
     );  
   }
   return List::create(
-    Named("cor.cor") = corCor,
-    Named("mean.cor") = meanCor
+    Named("cor.coexp") = corCor,
+    Named("mean.coexp") = meanCor
   );  
 }
 
-//' Calculate the cor.cor and mean.cor
+//' Calculate the Correlation of Coexpression and Mean Sign-Aware Coexpression
 //'
-//' For some statistics it does not make sense to calculate the necessary
-//' components in advance due to large memory overhead, or logic that doesn't
-//' separate nicely. This function deals with those statistics.
+//' Both of the coexpression statistics are calculated using all pairwise 
+//' coexpression values in both the \emph{discovery} and \emph{test} datasets
+//' respectively. For the other statistics, it makes sense to calculate the 
+//' properties for the discovery network in advance to reduce calculation time
+//' and memory. For these statistics this strategy doesn't make sense.
 //'
 //' @param pCoexpD,pCoexpT SEXP containers for the pointers to the coexpression 
 //'  matrices for the \emph{discovery} and \emph{test} networks respectively.
@@ -75,10 +77,10 @@ List NetStats(
 //' @return
 //'   A vector containing:
 //'   \enumerate{
-//'     \item{\emph{cor.cor}:}{
+//'     \item{\emph{cor.coexp}:}{
 //'       The correlation between the subset coexpression for both networks.
 //'     }
-//'     \item{\emph{mean.cor}:}{
+//'     \item{\emph{mean.coexp}:}{
 //'       The mean correlation density of the network subset.
 //'     }
 //'   }
@@ -91,9 +93,9 @@ List NetStats(
 //'       \strong{7}, e1001057 (2011). 
 //'     }
 //'  }
-//' @rdname netStats-cpp
+//' @rdname CoexpStats-cpp
 // [[Rcpp::export]]
-List NetStats(
+List CoexpStats(
   SEXP pCoexpD, IntegerVector discIndices,
   SEXP pCoexpT, IntegerVector testIndices
 ) {
@@ -131,22 +133,22 @@ List NetStats(
   
   if (typeD == 1) {
     if (typeT == 1) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<char>(*xpCoexpT), testIndices
       );
     } else if (typeT == 2) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<short>(*xpCoexpT), testIndices
       );
     } else if (typeT == 4) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
       );
     } else if (typeT == 8) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
       );
@@ -157,22 +159,22 @@ List NetStats(
     }
   } else if (typeD == 2) {
     if (typeT == 1) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<short>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<char>(*xpCoexpT), testIndices
       );
     } else if (typeT == 2) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<short>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<short>(*xpCoexpT), testIndices
       );
     } else if (typeT == 4) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<short>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
       );
     } else if (typeT == 8) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<short>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
       );
@@ -183,22 +185,22 @@ List NetStats(
     }
   } else if (typeD == 4) {
     if (typeT == 1) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<char>(*xpCoexpT), testIndices
       );
     } else if (typeT == 2) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<short>(*xpCoexpT), testIndices
       );
     } else if (typeT == 4) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
       );
     } else if (typeT == 8) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
       );
@@ -209,22 +211,22 @@ List NetStats(
     }
   } else if (typeD == 8) {
     if (typeT == 1) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<double>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<char>(*xpCoexpT), testIndices
       );
     } else if (typeT == 2) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<double>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<short>(*xpCoexpT), testIndices
       );
     } else if (typeT == 4) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<double>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
       );
     } else if (typeT == 8) {
-      return NetStats(
+      return CoexpStats(
         xpCoexpD, MatrixAccessor<double>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
       );

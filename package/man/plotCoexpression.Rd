@@ -8,6 +8,8 @@ plotCoexpression(coexpression, module.labels = NULL, heatmap.gradient,
   main = ifelse(adjacency, "Adjacencies", "Coexpression"), xlab = "genes")
 }
 \arguments{
+\item{coexpression}{a square matrix containing the pairwise gene coexpression.}
+
 \item{module.labels}{an optional named vector assigning each node to a module.}
 
 \item{heatmap.gradient}{A vector of colors to use for (or interpolate over)
@@ -26,8 +28,6 @@ automatic color palette and title selection}
 \item{main}{title for the plot}
 
 \item{xlab}{label for the x axis}
-
-\item{coexpresion}{a square matrix containing the pairwise gene coexpression.}
 }
 \description{
 Plot a triangle of the coexpression

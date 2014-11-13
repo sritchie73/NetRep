@@ -14,7 +14,7 @@ AdjProps(pAdjacency, subsetIndices)
 A List containing:
   \enumerate{
     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
-    \item{\emph{meanAdj}:}{The mean absolute edge weight of the network subset.}
+    \item{\emph{mean.adj}:}{The mean absolute edge weight of the network subset.}
   }
 }
 \description{

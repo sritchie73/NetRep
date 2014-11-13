@@ -7,7 +7,9 @@ plotModuleLegend(module.labels, module.colors)
 }
 \arguments{
 \item{module.labels}{module labels for the nodes in the corresponding
- coexpression heatmap.}
+coexpression heatmap.}
+
+\item{module.colors}{colors to represent each module}
 }
 \description{
 Render a horizontal bar that demarcates more clearly where nodes fall into

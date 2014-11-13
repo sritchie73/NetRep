@@ -9,8 +9,14 @@ plotSummaryExpression(gene.expr, heatmap.gradient, expression.range,
   missing.inds = NULL, new.samples = 0)
 }
 \arguments{
-\item{heatmap.gradient}{A vector of colors to use for (or interpolate over)
-to render the coexpression.}
+\item{gene.expr}{matrix of gene expression for the module.}
+
+\item{heatmap.gradient}{color gradient to use on heatmap. Automatically
+chosen if not supplied.}
+
+\item{expression.range}{range of values used to determine color assignment
+for each entry in the \code{gene.expr} matrix. Automatically determined if
+not supplied.}
 
 \item{is.relative}{logical; is the expression relative, i.e. centred around 0?
 This affects automated color gradient choice.}
@@ -21,6 +27,8 @@ This affects automated color gradient choice.}
 
 \item{main}{title for the plot}
 
+\item{ylab}{a title for the y axis: see \link[graphics]{title}.}
+
 \item{cex.lab}{cex for the axis label}
 
 \item{missing.inds}{locations for the missing samples}
@@ -28,10 +36,6 @@ This affects automated color gradient choice.}
 \item{new.samples}{the number of new samples in the dataset. Assumes they are
   placed at the end of the expression matrix, so draws a line to indicate
   where these fall.}
-
-\item{coexpresion}{a square matrix containing the pairwise gene coexpression.}
-
-\item{module.labels}{an optional named vector assigning each node to a module.}
 }
 \description{
 Vertical barplot.

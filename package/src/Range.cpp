@@ -34,7 +34,11 @@ List BigRange(const Mat<T>& dat) {
   );
 }
 
-//' Get the range of values in a big.matrix column subset
+//' Get the range of a big.matrix
+//' 
+//' @description
+//'  \code{RangeSubset}: get the range of values in the column-subset of a 
+//'  big.matrix.
 //' 
 //' @param pDat SEXP container for the pointer to the data matrix to be scaled.
 //' @param subsetIndices indices of the network subset of interest in 
@@ -80,13 +84,10 @@ List RangeSubset(SEXP pDat, IntegerVector subsetIndices) {
   }
 } 
 
-//' Get the range of values in a big.matrix
+//' @name range-cpp
+//' @description
+//'   \code{BigRange}: get the range of values in a big.matrix
 //' 
-//' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-//' @param subsetIndices indices of the network subset of interest in 
-//'   \code{pDat}.
-//'   
-//' @rdname range-cpp
 // [[Rcpp::export]]
 List BigRange(SEXP pDat) {
   XPtr<BigMatrix> xpDat(pDat);

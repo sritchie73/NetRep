@@ -6,7 +6,7 @@
 #'  
 #' If \code{module} is specified, genes will be ordered by connectivity. 
 #' Alternatively, if \code{moduleGenes} is given, nodes will remain in the same
-#' order as specified. \code{\link{orderNetwork}} will be useful to determine
+#' order as specified. \code{\link{orderModule}} will be useful to determine
 #' the correct order. If \code{sampleOrder} is provided, samples in the gene
 #' expression, and summary expression plots will be ordered as described. 
 #' Missing samples will be shown in grey. Samples not present in the 
@@ -93,7 +93,7 @@ preservationPlot <- function(
   # Order genes in decreasing order of connectivity if we're examining a module
   # in the discovery dataset
   if (!missing(module)) {
-    go <- orderNetwork(adj)
+    go <- orderModule(adj)
     ge <- ge[, go]
     coexp <- coexp[go, go]
     adj <- adj[go, go]
@@ -311,7 +311,7 @@ preservationPlot <- function(
 #' @return a vector of ordered nodes. 
 #'
 #' @export
-orderNetwork <- function(adjacency, module.labels=NULL, summary.exp=NULL) {
+orderModule <- function(adjacency, module.labels=NULL, summary.exp=NULL) {
   adjacency <- dynamicMatLoad(adjacency)
   if (nrow(adjacency) != ncol(adjacency))
     stop("expecting a square adjacency!")
@@ -378,7 +378,6 @@ orderSamples <- function(gene.expr) {
 #' 
 #' @param gradient A vector of colors to create the gradient
 #' @param range range of values the colors fall over
-#' @param has.missing logical; are there missing values on the plot?
 #' @param cex.axis cex for the axis text
 #' @param cex.title cex for the title text
 #' @param main title for the legend
@@ -428,6 +427,8 @@ plotLegend <- function(
 #' @param main title for the plot
 #' @param missing.inds indices for missing genes, needed to preserved order 
 #'  when comparing plots across datasets.
+#' @param col color of bars
+#' @param xlab a title for the x axis: see \link[graphics]{title}.
 #' 
 #' @export
 plotKIM <- function(
@@ -534,16 +535,19 @@ plotKME <- function(
 #' 
 #' Vertical barplot.
 #' 
-#' @param coexpresion a square matrix containing the pairwise gene coexpression.
-#' @param module.labels an optional named vector assigning each node to a module.
-#' @param heatmap.gradient A vector of colors to use for (or interpolate over)
-#'        to render the coexpression.
+#' @param gene.expr matrix of gene expression for the module. 
+#' @param heatmap.gradient color gradient to use on heatmap. Automatically 
+#'  chosen if not supplied.
+#' @param expression.range range of values used to determine color assignment 
+#'  for each entry in the \code{gene.expr} matrix. Automatically determined if
+#'  not supplied.
 #' @param is.relative logical; is the expression relative, i.e. centred around 0?
 #'   This affects automated color gradient choice.
 #' @param cex.axis cex for the axis text
 #' @param cex.lab cex for the axis label
 #' @param cex.title cex for the title text
 #' @param main title for the plot
+#' @param ylab a title for the y axis: see \link[graphics]{title}.
 #' @param missing.inds locations for the missing samples
 #' @param new.samples the number of new samples in the dataset. Assumes they are
 #'   placed at the end of the expression matrix, so draws a line to indicate 
@@ -682,7 +686,7 @@ plotExpression <- function(
 #' 
 #' Plot a triangle of the coexpression
 #' 
-#' @param coexpresion a square matrix containing the pairwise gene coexpression.
+#' @param coexpression a square matrix containing the pairwise gene coexpression.
 #' @param module.labels an optional named vector assigning each node to a module.
 #' @param heatmap.gradient A vector of colors to use for (or interpolate over)
 #'        to render the coexpression.
@@ -786,6 +790,7 @@ plotCoexpression <- function(
 #' 
 #' @param module.labels module labels for the nodes in the corresponding 
 #'  coexpression heatmap.
+#' @param module.colors colors to represent each module
 #'
 #' @export
 plotModuleLegend <- function(module.labels, module.colors) {

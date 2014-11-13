@@ -18,38 +18,34 @@ using namespace arma;
 //' @return
 //'  A list containing:
 //'  \enumerate{
-//'   \item{\emph{"kME"}:}{
-//'     The subset kME for each node  (see details).
+//'   \item{\emph{"SEP"}:}{
+//'     The Summary Expression Profile of each node (see details).
 //'   }
-//'   \item{\emph{"propVarExplained"}:}{
-//'     The proportion of the variance explained by the subset's summary
-//'     vector (see details).
+//'   \item{\emph{"MM"}:}{
+//'     The Module Membership of each node (see details).
+//'   }
+//'   \item{\emph{"pve"}:}{
+//'     The proportion of the variance explained by the subset's summary 
+//'     expression profile (see details).
 //'   }
 //'  }
-//'
-//' @references
-//'   \enumerate{
-//'     \item{
-//'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
-//'       network module preserved and reproducible?} PLoS Comput. Biol. 
-//'       \strong{7}, e1001057 (2011). 
-//'     }
-//'  }
+//'  
+//' @template Langfelder-ref
 //'  
 //' @details
-//'  First, a summary vector is calculated for the network subset from the 
-//'  underlying data. This is the first right singular vector from a singular 
-//'  value decomposition (also the eigenvector of the first principal component 
-//'  \emph{(1)}). The sign of the returned eigenvector is modified to match the
-//'  average of \code{pDat}. This is to match the behaviour of
-//'  \emph{moduleEigengenes} in the \code{WGCNA} package.
+//'  First, a summar expression profile (SEP) is calculated for the 
+//'  module from the underlying gene expression data. This corresponds to the 
+//'  first eigenvector of a principal component analysis \emph{(1)}. 
 //'  
-//'  Using this summary vector, the subset kME of each node is quantified
-//'  as the correlation between that node's data, and the summary vector.
+//'  The orientation of the eigenvector is modified so that its sign is in the
+//'  same direction as the gene expression (on average).
 //'  
-//'  The proportion of variance explained by this summary vector is quantified
-//'  as the average square of the subset kMEs for all nodes in the 
-//'  network subset.
+//'  The Module Membership (MM) is thus quantified as the correlation between each
+//'  gene in the module and the summary expression profile.
+//'  
+//'  The proportion of variance in the module's gene expression data explained 
+//'  by the summary expression profile (pve) is quantified as the average square
+//' of the Module Membership \emph{(1)}.
 //' 
 //' @import RcppArmadillo
 //' @rdname dataProps-cpp
@@ -82,9 +78,9 @@ List DataProps(
       warning("SVD failed to converge, does your data contain missing or"
               " infinite values?");
       return List::create(
-          Named("kME") = NA_REAL,
           Named("SEP") = NA_REAL,
-          Named("propVarExpl") = NA_REAL
+          Named("MM") = NA_REAL,
+          Named("pve") = NA_REAL
         );
     }
     mat summary(U.col(0));
@@ -100,14 +96,14 @@ List DataProps(
     // We want the correlation between each variable (node) in the underlying
     // data and the summary profile for that network subset.
     mat p = cor(summary, aDat.cols(subsetCols));
-    mat kME(p);
+    mat MM(p);
     
     // To make sure the resulting MAR and KIM vectors are in the correct order,
     // order the results to match the original ordering of subsetIndices.
     Function rank("rank"); // Rank only works on R objects like IntegerVector.
     uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
 
-    vec oKME = kME(idxRank);
+    vec oMM = MM(idxRank);
 
     // The proportion of variance explained is the sum of the squared 
     // correlation between the network subset summary profile, and each of the 
@@ -115,9 +111,9 @@ List DataProps(
     mat pve(mean(square(p), 1));
     
     return List::create(
-        Named("kME") = oKME,
         Named("SEP") = summary,
-        Named("propVarExpl") = pve
+        Named("MM") = oMM,
+        Named("pve") = pve
       );
   } else {
     throw Rcpp::exception(

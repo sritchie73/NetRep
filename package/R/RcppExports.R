@@ -10,7 +10,7 @@
 #'   A List containing:
 #'   \enumerate{
 #'     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
-#'     \item{\emph{meanAdj}:}{The mean absolute edge weight of the network subset.}
+#'     \item{\emph{mean.adj}:}{The mean absolute edge weight of the network subset.}
 #'   }
 #' @rdname AdjProps-cpp
 AdjProps <- function(pAdjacency, subsetIndices) {
@@ -29,61 +29,13 @@ CheckFinite <- function(pDat) {
     invisible(.Call('netrep_CheckFinite', PACKAGE = 'netrep', pDat))
 }
 
-#' Network subset eigenvector and proportion of variance explained in C++
-#' 
-#' @param pDat SEXP container for the pointer to a scaled version of the 
-#'   data matrix used to construct the network.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#' 
-#' @return
-#'  A list containing:
-#'  \enumerate{
-#'   \item{\emph{"kME"}:}{
-#'     The subset kME for each node  (see details).
-#'   }
-#'   \item{\emph{"propVarExplained"}:}{
-#'     The proportion of the variance explained by the subset's summary
-#'     vector (see details).
-#'   }
-#'  }
+#' Calculate the Correlation of Coexpression and Mean Sign-Aware Coexpression
 #'
-#' @references
-#'   \enumerate{
-#'     \item{
-#'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my 
-#'       network module preserved and reproducible?} PLoS Comput. Biol. 
-#'       \strong{7}, e1001057 (2011). 
-#'     }
-#'  }
-#'  
-#' @details
-#'  First, a summary vector is calculated for the network subset from the 
-#'  underlying data. This is the first right singular vector from a singular 
-#'  value decomposition (also the eigenvector of the first principal component 
-#'  \emph{(1)}). The sign of the returned eigenvector is modified to match the
-#'  average of \code{pDat}. This is to match the behaviour of
-#'  \emph{moduleEigengenes} in the \code{WGCNA} package.
-#'  
-#'  Using this summary vector, the subset kME of each node is quantified
-#'  as the correlation between that node's data, and the summary vector.
-#'  
-#'  The proportion of variance explained by this summary vector is quantified
-#'  as the average square of the subset kMEs for all nodes in the 
-#'  network subset.
-#' 
-#' @import RcppArmadillo
-#' @rdname dataProps-cpp
-#'  
-DataProps <- function(pDat, subsetIndices) {
-    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, subsetIndices)
-}
-
-#' Calculate the cor.cor and mean.cor
-#'
-#' For some statistics it does not make sense to calculate the necessary
-#' components in advance due to large memory overhead, or logic that doesn't
-#' separate nicely. This function deals with those statistics.
+#' Both of the coexpression statistics are calculated using all pairwise 
+#' coexpression values in both the \emph{discovery} and \emph{test} datasets
+#' respectively. For the other statistics, it makes sense to calculate the 
+#' properties for the discovery network in advance to reduce calculation time
+#' and memory. For these statistics this strategy doesn't make sense.
 #'
 #' @param pCoexpD,pCoexpT SEXP containers for the pointers to the coexpression 
 #'  matrices for the \emph{discovery} and \emph{test} networks respectively.
@@ -93,10 +45,10 @@ DataProps <- function(pDat, subsetIndices) {
 #' @return
 #'   A vector containing:
 #'   \enumerate{
-#'     \item{\emph{cor.cor}:}{
+#'     \item{\emph{cor.coexp}:}{
 #'       The correlation between the subset coexpression for both networks.
 #'     }
-#'     \item{\emph{mean.cor}:}{
+#'     \item{\emph{mean.coexp}:}{
 #'       The mean correlation density of the network subset.
 #'     }
 #'   }
@@ -109,12 +61,62 @@ DataProps <- function(pDat, subsetIndices) {
 #'       \strong{7}, e1001057 (2011). 
 #'     }
 #'  }
-#' @rdname netStats-cpp
-NetStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
-    .Call('netrep_NetStats', PACKAGE = 'netrep', pCoexpD, discIndices, pCoexpT, testIndices)
+#' @rdname CoexpStats-cpp
+CoexpStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
+    .Call('netrep_CoexpStats', PACKAGE = 'netrep', pCoexpD, discIndices, pCoexpT, testIndices)
 }
 
-#' Get the range of values in a big.matrix column subset
+#' Network subset eigenvector and proportion of variance explained in C++
+#' 
+#' @param pDat SEXP container for the pointer to a scaled version of the 
+#'   data matrix used to construct the network.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#' 
+#' @return
+#'  A list containing:
+#'  \enumerate{
+#'   \item{\emph{"SEP"}:}{
+#'     The Summary Expression Profile of each node (see details).
+#'   }
+#'   \item{\emph{"MM"}:}{
+#'     The Module Membership of each node (see details).
+#'   }
+#'   \item{\emph{"pve"}:}{
+#'     The proportion of the variance explained by the subset's summary 
+#'     expression profile (see details).
+#'   }
+#'  }
+#'  
+#' @template Langfelder-ref
+#'  
+#' @details
+#'  First, a summar expression profile (SEP) is calculated for the 
+#'  module from the underlying gene expression data. This corresponds to the 
+#'  first eigenvector of a principal component analysis \emph{(1)}. 
+#'  
+#'  The orientation of the eigenvector is modified so that its sign is in the
+#'  same direction as the gene expression (on average).
+#'  
+#'  The Module Membership (MM) is thus quantified as the correlation between each
+#'  gene in the module and the summary expression profile.
+#'  
+#'  The proportion of variance in the module's gene expression data explained 
+#'  by the summary expression profile (pve) is quantified as the average square
+#' of the Module Membership \emph{(1)}.
+#' 
+#' @import RcppArmadillo
+#' @rdname dataProps-cpp
+#'  
+DataProps <- function(pDat, subsetIndices) {
+    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, subsetIndices)
+}
+
+#' Get the range of a big.matrix
+#' 
+#' @description
+#'  \code{RangeSubset}: get the range of values in the column-subset of a 
+#'  big.matrix.
 #' 
 #' @param pDat SEXP container for the pointer to the data matrix to be scaled.
 #' @param subsetIndices indices of the network subset of interest in 
@@ -125,13 +127,10 @@ RangeSubset <- function(pDat, subsetIndices) {
     .Call('netrep_RangeSubset', PACKAGE = 'netrep', pDat, subsetIndices)
 }
 
-#' Get the range of values in a big.matrix
+#' @name range-cpp
+#' @description
+#'   \code{BigRange}: get the range of values in a big.matrix
 #' 
-#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#'   
-#' @rdname range-cpp
 BigRange <- function(pDat) {
     .Call('netrep_BigRange', PACKAGE = 'netrep', pDat)
 }

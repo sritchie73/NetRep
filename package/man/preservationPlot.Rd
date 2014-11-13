@@ -66,7 +66,7 @@ All matrix arguments will take \code{matrix}, \code{big.matrix}, or
 
 If \code{module} is specified, genes will be ordered by connectivity.
 Alternatively, if \code{moduleGenes} is given, nodes will remain in the same
-order as specified. \code{\link{orderNetwork}} will be useful to determine
+order as specified. \code{\link{orderModule}} will be useful to determine
 the correct order. If \code{sampleOrder} is provided, samples in the gene
 expression, and summary expression plots will be ordered as described.
 Missing samples will be shown in grey. Samples not present in the
