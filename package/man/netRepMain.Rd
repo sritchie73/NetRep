@@ -36,7 +36,10 @@ Instructions in Details).}
 \item{test}{a numeric vector indicating which elements of \code{exprSets}
 and/or \code{adjSets} are to be treated as the \emph{test} datasets.}
 
-\item{nPerm}{number of permutations to use.}
+\item{nPerm}{either a numeric vector or a list of numeric vectors specifying
+the number of permutations to use for all datasets, or each discovery
+dataset. If a list of numeric vectors is supplied it should be in the same
+format as the other "Sets" arguments, see Input Instructions in Details.}
 
 \item{excludeSets}{An optional list, where the elments for each
 \emph{discovery} data set are vectors specifying which sub-networks to

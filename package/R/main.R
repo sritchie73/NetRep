@@ -246,7 +246,10 @@
 #'   \emph{discovery} datasets.
 #' @param test a numeric vector indicating which elements of \code{exprSets}
 #'   and/or \code{adjSets} are to be treated as the \emph{test} datasets.
-#' @param nPerm number of permutations to use.
+#' @param nPerm either a numeric vector or a list of numeric vectors specifying
+#'   the number of permutations to use for all datasets, or each discovery 
+#'   dataset. If a list of numeric vectors is supplied it should be in the same
+#'   format as the other "Sets" arguments, see Input Instructions in Details.
 #' @param excludeSets An optional list, where the elments for each 
 #'   \emph{discovery} data set are vectors specifying which sub-networks to 
 #'   skip.
@@ -435,6 +438,15 @@ netRepMain <- function(
                setNames[di], ", in dataset ", setNames[ti], ".")
           
           # Check input is ok
+          if (length(nPerm) > 1) {
+            if(!(class(nPerm[[di]]) %in% c("numeric", "integer", "double"))) {
+              stop("'nPerm' for dataset", di, "has not been supplied")
+            }
+            thisPerm <- nPerm[[di]]
+          } else {
+            thisPerm <- nPerm
+          }
+          
           vCat(verbose, indent+1, "Checking matrices...")
           checkFinite(coexpSets[[di]])
           checkFinite(adjSets[[di]])
@@ -444,7 +456,7 @@ netRepMain <- function(
             checkFinite(exprSets[[di]])
             checkFinite(exprSets[[ti]])
             hasDat <- TRUE
-          }     
+          } 
           
           # Create scaled data 
           if (hasDat) {
@@ -596,8 +608,10 @@ netRepMain <- function(
           gc()
           
           # Calculate the null distribution for each of the statistics.
-          vCat(verbose, indent+1, "Calculating null distributions with", nPerm, 
-               "permutations...")
+          vCat(
+            verbose, indent+1, "Calculating null distributions with", thisPerm, 
+            "permutations..."
+          )
           if(verbose) {
             # To log progress, we will write our progress to a file for each chunk
             while (TRUE) {
@@ -616,7 +630,7 @@ netRepMain <- function(
               unlink(run.dir, recursive=TRUE)
             }, add=TRUE)
           }
-          foreach(chunk=ichunkTasks(verbose, nPerm, nCores)) %maybe_do_par% {
+          foreach(chunk=ichunkTasks(verbose, thisPerm, nCores)) %maybe_do_par% {
             if (verbose & length(chunk) == 1) {
               if (chunk == -1) {
                 monitorProgress(nWorkers, indent+2, run.dir)
@@ -686,7 +700,7 @@ netRepMain <- function(
                   updateParProgress(progressBar, chunk[kk])
                   if (nCores == 1) {
                     reportProgress(indent+2, run.dir)
-                    if (chunk[kk] == nPerm) {
+                    if (chunk[kk] == thisPerm) {
                       cat("\n")
                     }
                   }
@@ -702,7 +716,7 @@ netRepMain <- function(
           gc()
           
           # Load in results
-          nulls <- array(NA, dim=c(nSubsets, nStats, nPerm))
+          nulls <- array(NA, dim=c(nSubsets, nStats, thisPerm))
           dimnames(nulls)[[3]] <- rep("", dim(nulls)[3])
           chunkFiles <- list.files(obj.dir, "chunk[0-9]*permutations.rds")
           offset <- 1
