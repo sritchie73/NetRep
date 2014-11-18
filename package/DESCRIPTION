@@ -1,7 +1,7 @@
 Package: netrep
 Type: Package
 Title: Network Replication
-Version: 0.10.2
+Version: 0.10.3
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for efficiently and accurately assessing whether the
@@ -9,7 +9,7 @@ Description: Functions for efficiently and accurately assessing whether the
     another dataset.
 License: GPL-2
 Depends:
-    R (>= 3.1.0),
+    R (>= 3.0.0),
     bigmemory
 Imports:
     foreach,
