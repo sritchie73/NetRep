@@ -363,7 +363,7 @@ orderModule <- function(adjacency, module.labels=NULL, summary.exp=NULL) {
 orderSamples <- function(gene.expr) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaledDesc <- scaleBigMatrix(gene.expr, ".")
-  on.exit({ unlink(scaledDesc) })
+  on.exit({ unlink(c(scaledDesc, gsub(".desc$", ".bin", scaledDesc))) })
   scaled <- attach.big.matrix(scaledDesc)
   SEP <- dataProps(scaled, 1:ncol(gene.expr))$SEP
   o <- order(SEP, decreasing=TRUE)
@@ -490,9 +490,7 @@ plotKME <- function(
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaledDesc <- scaleBigMatrix(gene.expr, ".")
-  on.exit({ unlink(scaledDesc) })
-  scaled <- attach.big.matrix(scaledDesc)
-  
+  on.exit({ unlink(c(scaledDesc, gsub(".desc$", ".bin", scaledDesc))) })  
   nGenes <- ncol(gene.expr)
   
   if (missing(module.labels)) {
@@ -561,7 +559,7 @@ plotSummaryExpression <- function(
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaledDesc <- scaleBigMatrix(gene.expr, ".")
-  on.exit({ unlink(scaledDesc) })
+  on.exit({ unlink(c(scaledDesc, gsub(".desc$", ".bin", scaledDesc))) })
   scaled <- attach.big.matrix(scaledDesc)
   
   if (missing(heatmap.gradient)) {
