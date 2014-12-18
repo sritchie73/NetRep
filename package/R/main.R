@@ -765,10 +765,10 @@ netRepMain <- function(
               )
               
               Z.scores[ii, jj] <- observed[ii, jj]
-              Z.scores <- Z.scores - apply(nulls, c(1,2), mean)
-              Z.scores <- Z.scores/apply(nulls, c(1,2), sd)
             }
           }
+          Z.scores <- Z.scores - apply(nulls, c(1,2), mean)
+          Z.scores <- Z.scores/apply(nulls, c(1,2), sd)
                     
           # Collate results
           # First order output nicely
