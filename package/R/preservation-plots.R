@@ -490,7 +490,8 @@ plotKME <- function(
 ) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaledDesc <- scaleBigMatrix(gene.expr, ".")
-  on.exit({ unlink(c(scaledDesc, gsub(".desc$", ".bin", scaledDesc))) })  
+  on.exit({ unlink(c(scaledDesc, gsub(".desc$", ".bin", scaledDesc))) })
+  scaled <- attach.big.matrix(scaledDesc)
   nGenes <- ncol(gene.expr)
   
   if (missing(module.labels)) {
