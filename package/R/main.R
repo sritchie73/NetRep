@@ -787,15 +787,17 @@ netRepMain <- function(
           # dataset has integer coded modules, and the other has letter coded.
           if (!is.null(subsetOverlap)) {
             tryCatch({
-              cOrderR <- order(as.integer(rownames(subsetOverlap)))
+              cOrderR <- order(as.integer(rownames(subsetOverlap)[-1]))
             }, warning = function(w) {
-              cOrderR <- order(rownames(subsetOverlap))
+              cOrderR <- order(rownames(subsetOverlap)[-1])
             })
+            cOrderR <- c(1, cOrderR + 1)
             tryCatch({
-              cOrderC <- order(as.integer(colnames(subsetOverlap)))
+              cOrderC <- order(as.integer(colnames(subsetOverlap)[-1]))
             }, warning = function(w) {
-              cOrderC <- order(colnames(subsetOverlap))
+              cOrderC <- order(colnames(subsetOverlap)[-1])
             })
+            cOrderC <- c(1, cOrderC + 1)
           }
 
           
