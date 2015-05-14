@@ -26,7 +26,7 @@
 #' @param order logical; does the order of nodes in the permutation affect the 
 #'  value of the test statistic?
 #' @param alternative a character string specifying the alternative hypothesis, 
-#'  must be one of "greater" (default), "less", or "two.sider". 
+#'  must be one of "greater" (default), "less", or "two.sided". 
 #'  You can specify just the initial letter.
 #'  
 #' @aliases permutation permuted
