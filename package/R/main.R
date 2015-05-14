@@ -561,8 +561,23 @@ netRepMain <- function(
             })
             subsetOverlap <- subsetOverlap[rOrder, cOrder]
             # add information about sizes of both the discovery and test subsets
-            dSubSizes <- table(geneModuleSets[[di]][oNodes])[rOrder]
-            tSubSizes <- table(geneModuleSets[[ti]][oNodes])[cOrder]
+            tryCatch({
+              # For modules that are integer coded, make sure they're numerically
+              # ordered, not alphabetically.
+              dSubSizes <- table(geneModuleSets[[di]][oNodes])
+              dSubSizes <- dSubSizes[order(as.integer(names(dSubSizes)))]
+            }, warning=function(w) { 
+              # ignore
+            })
+            tryCatch({
+              # For modules that are integer coded, make sure they're numerically
+              # ordered, not alphabetically.
+              tSubSizes <- table(geneModuleSets[[ti]][oNodes])
+              tSubSizes <- tSubSizes[order(as.integer(names(tSubSizes)))]
+            }, warning=function(w) { 
+              # ignore
+            })
+
             subsetOverlap <- cbind(dSubSizes, subsetOverlap)
             subsetOverlap <- rbind(c(NA, tSubSizes), subsetOverlap)
             rownames(subsetOverlap)[1] <- "size"
@@ -782,25 +797,7 @@ netRepMain <- function(
             arrOrder <- order(rownames(nulls))
             vOrder <- order(propGenesPres)
           })
-          
-          # For the contigency table, we need to handle the case where one 
-          # dataset has integer coded modules, and the other has letter coded.
-          if (!is.null(subsetOverlap)) {
-            tryCatch({
-              cOrderR <- order(as.integer(rownames(subsetOverlap)[-1]))
-            }, warning = function(w) {
-              cOrderR <- order(rownames(subsetOverlap)[-1])
-            })
-            cOrderR <- c(1, cOrderR + 1)
-            tryCatch({
-              cOrderC <- order(as.integer(colnames(subsetOverlap)[-1]))
-            }, warning = function(w) {
-              cOrderC <- order(colnames(subsetOverlap)[-1])
-            })
-            cOrderC <- c(1, cOrderC + 1)
-          }
 
-          
           # Order statistics: First density stats, then connectivity
           if (hasDat) {
             statOrder <- c(
@@ -824,10 +821,8 @@ netRepMain <- function(
           )
           
           if(!is.null(subsetOverlap)) {
-            res[[di]][[ti]]<- c(
-              res[[di]][[ti]],
-              contigency=subsetOverlap[cOrderR, cOrderC]
-            )
+            res[[di]][[ti]][[length(res[[di]][[ti]]) + 1]] <- subsetOverlap
+            names(res[[di]][[ti]])[length(res[[di]][[ti]])] <- "contingency"
           }
                     
           vCat(verbose, indent+1, "Cleaning up temporary objects...")
