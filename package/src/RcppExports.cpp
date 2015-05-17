@@ -10,27 +10,21 @@ using namespace Rcpp;
 List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices);
 RcppExport SEXP netrep_AdjProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        List __result = AdjProps(pAdjacency, subsetIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(AdjProps(pAdjacency, subsetIndices));
+    return __result;
 END_RCPP
 }
 // CheckFinite
 void CheckFinite(SEXP pDat);
 RcppExport SEXP netrep_CheckFinite(SEXP pDatSEXP) {
 BEGIN_RCPP
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
-        CheckFinite(pDat);
-    }
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
+    CheckFinite(pDat);
     return R_NilValue;
 END_RCPP
 }
@@ -38,77 +32,59 @@ END_RCPP
 List CoexpStats(SEXP pCoexpD, IntegerVector discIndices, SEXP pCoexpT, IntegerVector testIndices);
 RcppExport SEXP netrep_CoexpStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pCoexpD(pCoexpDSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP );
-        Rcpp::traits::input_parameter< SEXP >::type pCoexpT(pCoexpTSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP );
-        List __result = CoexpStats(pCoexpD, discIndices, pCoexpT, testIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pCoexpD(pCoexpDSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pCoexpT(pCoexpTSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP);
+    __result = Rcpp::wrap(CoexpStats(pCoexpD, discIndices, pCoexpT, testIndices));
+    return __result;
 END_RCPP
 }
 // DataProps
 List DataProps(SEXP pDat, IntegerVector subsetIndices);
 RcppExport SEXP netrep_DataProps(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        List __result = DataProps(pDat, subsetIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(DataProps(pDat, subsetIndices));
+    return __result;
 END_RCPP
 }
 // RangeSubset
 List RangeSubset(SEXP pDat, IntegerVector subsetIndices);
 RcppExport SEXP netrep_RangeSubset(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP );
-        List __result = RangeSubset(pDat, subsetIndices);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(RangeSubset(pDat, subsetIndices));
+    return __result;
 END_RCPP
 }
 // BigRange
 List BigRange(SEXP pDat);
 RcppExport SEXP netrep_BigRange(SEXP pDatSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
-        List __result = BigRange(pDat);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
+    __result = Rcpp::wrap(BigRange(pDat));
+    return __result;
 END_RCPP
 }
 // Scale
 void Scale(SEXP pDat, SEXP spDat);
 RcppExport SEXP netrep_Scale(SEXP pDatSEXP, SEXP spDatSEXP) {
 BEGIN_RCPP
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP );
-        Rcpp::traits::input_parameter< SEXP >::type spDat(spDatSEXP );
-        Scale(pDat, spDat);
-    }
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type spDat(spDatSEXP);
+    Scale(pDat, spDat);
     return R_NilValue;
 END_RCPP
 }
