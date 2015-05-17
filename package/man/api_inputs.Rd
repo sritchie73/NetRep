@@ -29,13 +29,22 @@ interest was discovered in. See details.}
  See details.}
 }
 \value{
-A list of network properties
+A list of network properties for each module of interest.
 }
 \description{
-Get the properties of a network module
+Calculate the network properties that compose the module preservation
+statistics for one or more modules.
 }
 \details{
-If any of the arguments \code{geneExpression}, \code{coexpression},
-\code{adjacency}, or \code{modules} are provided as
+If any of the \code{geneExpression}, \code{coexpression}, \code{adjacency},
+or \code{moduleAssignments} arguments are list objects, then they all must
+be. In this case, each list element corresponds to a dataset that the
+respective network components have been calculated in. Providing the
+\code{geneExpression} is optional, but limits the scope of the analysis or
+function output. The \code{discovery} argument denotes which dataset the
+\code{modules} of interest were discovered in, and the \code{test} argument
+controls which dataset the function is calculated on. Alternatively, the
+\code{geneExpression}, \code{coexpression}, \code{adjacency}, and
+\code{moduleAssignments} can be provided only for the discovery dataset.
 }
 

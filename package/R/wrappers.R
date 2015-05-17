@@ -85,14 +85,21 @@ dataProps <- function(sge, moduleIndices) {
 
 #' Get the properties of a network module
 #' 
+#' Calculate the network properties that compose the module preservation 
+#' statistics for one or more modules.
+#' 
 #' @template api_inputs
 #' 
+#' @return 
+#'  A list of network properties for each module of interest.
+#'  
 #' @export
 networkProperties <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1
 ) {
-  #checkSets(geneExpression, coexpression, adjacency, moduleAssignments)
+  # Sanity check input for consistency.
+  checkSets(geneExpression, coexpression, adjacency, moduleAssignments)
 
   # Unify data structures for the rest of the function
   if (!is.null(geneExpression) & !is.list(geneExpression))
