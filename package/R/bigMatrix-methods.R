@@ -1,4 +1,34 @@
+# Methods to switch between attached and detached states. Used internally to
+# switch memory usage states.
+attach.bigMatrix <- function(name) {
+  if (class(name) != 'bigMatrix')
+    stop("object is not of class 'bigMatrix'")
+  if (name@attached)
+    stop("bigMatrix already in attached state")
+  name@matrix <- bigmemory::attach.big.matrix(name@descriptor)
+  poke(name@matrix)
+  name@attached <- TRUE
+  name
+}
 
+detach.bigMatrix <- function(name) {
+  if (class(name) != 'bigMatrix')
+    stop("object is not of class 'bigMatrix'")
+  if (!name@attached)
+    stop("bigMatrix already in detached state")
+  name@matrix <- NULL
+  name@attached <- FALSE
+  gc()
+  name
+}
+
+#-------------------------------------------------------------------------------
+# Methods for standard functions, e.g. dim, nrow, ncol, etc.
+# 
+# With the exception of 'show', these simply attach the big.matrix object and
+# call the appropriate function on the matrix object.
+#-------------------------------------------------------------------------------
+#' @export
 setMethod("show", signature(object = "bigMatrix"), function(object) {
   cat(
     'An object of class "bigMatrix"\n',
@@ -10,4 +40,513 @@ setMethod("show", signature(object = "bigMatrix"), function(object) {
     show(object@matrix@address)
     cat("\n")
   } 
+})
+
+#' @export
+setMethod("print", signature(x = "bigMatrix"), function(x) {
+  cat("Warning: This is not advised. Here is the head of the matrix:\n")
+  head(x)
+})
+
+#' @export
+setMethod("dim", signature(x = "bigMatrix"), function(x) {
+  # Attach the big.matrix object if not attached yet
+  is.attached <- x@attached
+  if (!is.attached)
+    x <- attach.bigMatrix(x)
+  
+  res <- dim(x@matrix)
+  
+  # detach big.matrix object if it was detached to begin with
+  if (!is.attached)
+    x <- detach.bigMatrix(x)
+  
+  res
+})
+
+#' @export
+setMethod("nrow", signature(x = "bigMatrix"), function(x) {
+  # Attach the big.matrix object if not attached yet
+  is.attached <- x@attached
+  if (!is.attached)
+    x <- attach.bigMatrix(x)
+  
+  res <- nrow(x@matrix)
+  
+  # detach big.matrix object if it was detached to begin with
+  if (!is.attached)
+    x <- detach.bigMatrix(x)
+  
+  res
+})
+
+#' @export
+setMethod("ncol", signature(x = "bigMatrix"), function(x) {
+  # Attach the big.matrix object if not attached yet
+  is.attached <- x@attached
+  if (!is.attached)
+    x <- attach.bigMatrix(x)
+  
+  res <- ncol(x@matrix)
+  
+  # detach big.matrix object if it was detached to begin with
+  if (!is.attached)
+    x <- detach.bigMatrix(x)
+  
+  res
+})
+
+#' @export
+setMethod("typeof", signature(x = "bigMatrix"), function(x) {
+  # Attach the big.matrix object if not attached yet
+  is.attached <- x@attached
+  if (!is.attached)
+    x <- attach.bigMatrix(x)
+  
+  res <- typeof(x@matrix)
+  
+  # detach big.matrix object if it was detached to begin with
+  if (!is.attached)
+    x <- detach.bigMatrix(x)
+  
+  res
+})
+
+#' @export
+setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
+  n <- min(as.integer(n), nrow(x))
+  if (n < 1 | n > nrow(x)) 
+    stop("n must be between 1 and nrow(x)")
+  x[1:n,]
+})
+
+#' @export
+setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
+  n <- min(as.integer(n), nrow(x))
+  if (n < 1 | n > nrow(x)) 
+    stop("n must be between 1 and nrow(x)")
+  x[(nrow(x) - n + 1):nrow(x),]
+})
+
+#' @export
+setMethod("dimnames", signature(x = "bigMatrix"), function(x) {
+  list(x@rownames, x@colnames)
+})
+
+#' @export
+setMethod("rownames", signature(x = "bigMatrix"), function(x) { 
+  x@rownames
+})
+
+#' @export
+setMethod("colnames", signature(x = "bigMatrix"), function(x) { 
+  x@colnames
+})
+
+#' @export
+setMethod("dimnames<-", 
+  signature(x = "bigMatrix", value="ANY"), function(x, value) {
+    if (!is.list(value))
+      stop("'dimnames' must be a list")
+    if (length(value) > 2) {
+      stop(
+        "length of 'dimnames' [", length(value), 
+        "] must match that of 'dims' [2]"
+      )
+    } else if (length(value) == 0) {
+      dn <- list(NULL, NULL)
+    } else if (length(value) == 1) {
+      dn <- list(as.character(unlist(value[[1L]])), NULL)
+    } else {
+      dn <- list(
+        as.character(unlist(value[[1L]])), 
+        as.character(unlist(value[[2L]]))
+      )
+    }
+    if (length(dn[[1L]]) == 0) {
+      dn[1L] <- list(NULL)
+    }
+    if (length(dn[[2L]]) == 0) {
+      dn[2L] <- list(NULL)
+    }
+    
+    if (!is.null(dn[[1L]]) & length(dn[[1L]]) != nrow(x)) {
+      stop(
+        "length of 'dimnames' [", length(dn[[1L]]), 
+        "] not equal to array extent"
+      )
+    }
+    if (!is.null(dn[[2L]]) & length(dn[[2L]]) != ncol(x)) {
+      stop(
+        "length of 'dimnames' [", length(dn[[2L]]), 
+        "] not equal to array extent"
+      )
+    }
+    
+    # We need to update the backing files. Make sure this is successful before
+    # updating the matrix wrapper!
+    if (!file.exists(x@descriptor))
+      stop("Could not find backing file. Have you changed working directory?")
+    rnFile <- gsub(".desc", "_rownames.txt", x@descriptor)
+    cnFile <- gsub(".desc", "_colnames.txt", x@descriptor)
+    
+    is.attached <- x@attached
+
+    if (is.null(dn[[1L]])) {
+      unlink(rnFile)
+      x@rownames <- NULL
+    } else {
+      write.table(
+        dn[[1L]], quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
+        file=rnFile
+      ) 
+      x@rownames <- dn[[1L]]
+    }
+    if (is.null(dn[[2L]])) {
+      unlink(cnFile)
+      x@colnames <- NULL
+    } else {
+      write.table(
+        dn[[2L]], quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
+        file=cnFile
+      ) 
+      x@colnames <- dn[[2L]]
+    }
+    x
+})
+
+#' @export
+setMethod("rownames<-", 
+  signature(x = "bigMatrix", value="ANY"), function(x, value) {
+    dn <- dimnames(x)
+    if (is.null(value)) {
+      dn[1L] <- list(NULL)
+    } else {
+      dn[[1L]] <- value
+    }
+    dimnames(x) <- dn
+    x
+})
+
+#' @export
+setMethod("colnames<-", 
+  signature(x = "bigMatrix", value="ANY"), function(x, value) {
+    dn <- dimnames(x)
+    if (is.null(value)) {
+      dn[2L] <- list(NULL)
+    } else {
+      dn[[2L]] <- value
+    }
+    dimnames(x) <- dn
+    x
+})
+
+
+#-------------------------------------------------------------------------------
+# Matrix subsetting methods
+#-------------------------------------------------------------------------------
+#' @export
+setMethod(
+  "[", signature(x = "bigMatrix", i="ANY", j="ANY", drop="ANY"), 
+  function(x, i, j, drop){
+
+    # Check if subscript type is valid
+    if (!(class(i) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(i), "'")
+    if (!(class(j) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(j), "'")   
+    
+    # Handle indexing by row or column names
+    if (class(i) == "character")
+      i <- match(i, x@rownames)
+    if (class(j) == "character")
+      j <- match(j, x@colnames)
+    if(any(is.na(i)) || any(is.na(j)))
+      stop("subscript out of bounds")
+    
+    # The default behaviour is for drop to be TRUE
+    if (is.null(drop) || is.na(drop) || class(drop) != "logical")
+      drop <- TRUE
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+     
+    # Fetch the results
+    ret <- x@matrix[i, j, drop=drop]
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    # Give the results the approriate row and column names
+    if (is.null(dim(ret))) {
+      if (length(ret) == 1) {
+        if (is.null(x@rownames) & !is.null(x@colnames)) {
+          names(ret) <- x@colnames[j]
+        } else if (!is.null(x@rownames) & is.null(x@colnames)) {
+          names(ret) <- x@rownames[i]
+        }
+      }
+      if (length(i) > 1 & !is.null(x@rownames)) {
+        names(ret) <- x@rownames[i]
+      } else if (length(j) > 1 & !is.null(x@colnames)) {
+        names(ret) <- x@colnames[j]
+      }
+    } else {
+      if (!is.null(x@rownames) & !is.null(x@colnames)) {
+        dimnames(ret) <- list(x@rownames[i], x@colnames[j])
+      } else if (!is.null(x@rownames)) {
+        rownames(ret) <- x@rownames[i]
+      } else if (!is.null(x@colnames)) {
+        colnames(ret) <- x@colnames[j]
+      }
+    }
+    ret
+})
+
+#' @export
+setMethod(
+  "[", signature(x = "bigMatrix", i="ANY", j="missing", drop="ANY"), 
+  function(x, i, j, drop){
+    
+    # Check if subscript type is valid
+    if (!(class(i) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(i), "'")
+
+    # Handle indexing by row or column names
+    if (class(i) == "character")
+      i <- match(i, x@rownames)
+    if(any(is.na(i)))
+      stop("subscript out of bounds")
+    
+    # The default behaviour is for drop to be TRUE
+    if (is.null(drop) || is.na(drop) || class(drop) != "logical")
+      drop <- TRUE
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # Fetch the results
+    ret <- x@matrix[i, , drop=drop]
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    # Give the results the approriate row and column names
+    if (is.null(dim(ret))) {
+      if (!is.null(x@colnames)) {
+        names(ret) <- x@colnames
+      } 
+    } else {
+      if (!is.null(x@rownames) & !is.null(x@colnames)) {
+        dimnames(ret) <- list(x@rownames[i], x@colnames)
+      } else if (!is.null(x@rownames)) {
+        rownames(ret) <- x@rownames[i]
+      } else if (!is.null(x@colnames)) {
+        colnames(ret) <- x@colnames
+      }
+    }
+    ret
+})
+
+#' @export
+setMethod(
+  "[", signature(x = "bigMatrix", i="missing", j="ANY", drop="ANY"), 
+  function(x, i, j, drop){
+    
+    # Check if subscript type is valid
+    if (!(class(j) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(j), "'")   
+    
+    # Handle indexing by row or column names
+    if (class(j) == "character")
+      j <- match(j, x@colnames)
+    if(any(is.na(j)))
+      stop("subscript out of bounds")
+    
+    # The default behaviour is for drop to be TRUE
+    if (is.null(drop) || is.na(drop) || class(drop) != "logical")
+      drop <- TRUE
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # Fetch the results
+    ret <- x@matrix[, j, drop=drop]
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    # handle the row and column names
+    if (is.null(dim(ret))) {
+      if (!is.null(x@rownames)) {
+        names(ret) <- x@rownames
+      } 
+    } else {
+      if (!is.null(x@rownames) & !is.null(x@colnames)) {
+        dimnames(ret) <- list(x@rownames, x@colnames[j])
+      } else if (!is.null(x@rownames)) {
+        rownames(ret) <- x@rownames
+      } else if (!is.null(x@colnames)) {
+        colnames(ret) <- x@colnames[j]
+      }
+    }
+    ret
+})
+
+#' @export
+setMethod(
+  "[", signature(x = "bigMatrix", i="missing", j="missing", drop="ANY"), 
+  function(x, i, j, drop){
+    
+    # The default behaviour is for drop to be TRUE
+    if (is.null(drop) || is.na(drop) || class(drop) != "logical")
+      drop <- TRUE
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # Fetch the results
+    ret <- x@matrix[,]
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    # Give the results the approriate row and column names
+    if (!is.null(x@rownames) & !is.null(x@colnames)) {
+      dimnames(ret) <- list(x@rownames, x@colnames)
+    } else if (!is.null(x@rownames)) {
+      rownames(ret) <- x@rownames
+    } else if (!is.null(x@colnames)) {
+      colnames(ret) <- x@colnames
+    }
+    ret
+})
+
+#-------------------------------------------------------------------------------
+# Matrix assignment methods
+#-------------------------------------------------------------------------------
+#' @export
+setMethod(
+  "[<-", signature(x = "bigMatrix", i="ANY", j="ANY"), 
+  function(x, i, j, value){
+    
+    # Check if subscript type is valid
+    if (!(class(i) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(i), "'")
+    if (!(class(j) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(j), "'")
+    
+    # Handle indexing by row or column names
+    if (class(i) == "character")
+      i <- match(i, x@rownames)
+    if (class(j) == "character")
+      j <- match(j, x@colnames)
+    if(any(is.na(i)) || any(is.na(j)))
+      stop("subscript out of bounds")
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # assign the value to the appropriate location
+    x@matrix[i, j] <- value
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    x
+})
+
+#' @export
+setMethod(
+  "[<-", signature(x = "bigMatrix", i="ANY", j="missing"), 
+  function(x, i, j, value){
+    
+    # Check if subscript type is valid
+    if (!(class(i) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(i), "'")
+    
+    # Handle indexing by row or column names
+    if (class(i) == "character")
+      i <- match(i, x@rownames)
+    if(any(is.na(i)))
+      stop("subscript out of bounds")
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # assign the value to the appropriate location
+    x@matrix[i,]<-value
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    x
+})
+
+#' @export
+setMethod(
+  "[<-", signature(x = "bigMatrix", i="missing", j="ANY"), 
+  function(x, i, j, value){
+    
+    # Check if subscript type is valid
+    if (!(class(j) %in% c("character", "integer", "numeric", "logical")))
+      stop("invalid subscript type '", class(j), "'")   
+    
+    # Handle indexing by row or column names
+    if (class(j) == "character")
+      j <- match(j, x@colnames)
+    if(any(is.na(j)))
+      stop("subscript out of bounds")
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # assign the value to the appropriate location
+    x@matrix[,j]<-value
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    x
+})
+
+#' @export
+setMethod(
+  "[<-", signature(x = "bigMatrix", i="missing", j="missing"), 
+  function(x, i, j, value){
+    
+    # Attach the big.matrix object if not attached yet
+    is.attached <- x@attached
+    if (!is.attached)
+      x <- attach.bigMatrix(x)
+    
+    # assign the value to the appropriate location
+    x@matrix[,j]<-value
+    
+    # detach big.matrix object if it was detached to begin with
+    if (!is.attached)
+      x <- detach.bigMatrix(x)
+    
+    x
 })

@@ -1,19 +1,24 @@
-#' bigMatrix input and output
+#' Loading in data as a 'bigMatrix'
 #' 
 #' Functions for converting to, reading in, and loading a 
 #' \code{\link{bigMatrix}} object.
 #'
-#' @param x matrix to write out as a file-backed `big.matrix`.
+#' @param x a regular matrix to convert 
 #' @param file the name of the file which the (non-bigMatrix) data are to be
-#'  read from using \code{\link[utils]{read.table}}.
+#'  read from (see \code{\link[bigmemory]{read.big.matrix}}).
 #' @param backingpath directory the bigMatrix is, or will be, stored in.
 #' @param backingname basename (filename without an extension) the
 #'  bigMatrix object is, or will be, stored in.
-#' @param the type of the atomic element 
+#' @param type the type of the atomic element 
 #'  (\code{options()$bigmemory.default.type} by default – "\code{double}" – 
 #'  but can be changed by the user to "\code{integer}", "\code{short}", or 
 #'  "\code{char}").
-#' @param ... additional arguments to pass to \code{read.table}
+#' @param row.names logical; does the first column of the file to be read in
+#'  contain row names?
+#' @param header logical; does the first line of the file to be read in contain
+#'  column names?
+#' @param ... additional arguments to pass to 
+#'  \code{\link[bigmemory]{read.big.matrix}}.
 #' 
 #' @return
 #'   \code{read.bigMatrix}, \code{load.bigMatrix}, \code{as.bigMatrix}: an 
@@ -29,91 +34,215 @@
 #' column names are stored separately in the files ending with "_rownames.txt"
 #' and "_colnames.txt". 
 #' 
-#' \code{write.bigMatrix} takes a standard matrix and writes it out as a 
+#' \code{save.as.bigMatrix} takes a standard matrix and writes it out as a 
 #' \code{bigMatrix}. This can then be loaded into an R session using 
 #' \code{load.bigMatrix}. \code{as.bigMatrix} combines these two steps, taking
 #' a standard matrix and returning a \code{bigMatrix} object. Finally, 
 #' \code{read.bigMatrix} can be used to read in matrix data from a file (i.e. 
-#' using \code{read.table}) as a \code{bigMatrix} object (note that the 
-#' appropriate backing files will also be created on disk).
+#' data recongisiable by \code{read.table}) as a \code{bigMatrix} object.
 #' 
-#' @name bigMatrix-io
+#' \code{load.bigMatrix} can also be used to load in a 
+#' \code{\link[bigmemory]{big.matrix}} as a 'bigMarix', but existing row and 
+#' column information will be stripped out from the existing backing file. This
+#' means if you later load in the data as a 'big.matrix' instead of a
+#' 'bigMatrix' the row and column names will be missing unless you convert back
+#' using \code{\link{as.big.matrix}}.
+#'
+#' 
+#' @name bigMatrix-get
 #' @seealso 
 #'  \code{\link{bigMatrix}},
 #'  \code{\link[bigmemory]{big.matrix}},
-#'  \code{\link[utils]{read.table}}
+#'  \code{\link[bigmemory]{read.big.matrix}}
 #' @export
 #' @import bigmemory
-write.bigMatrix <- function(
-  x, backingname, backingpath, type=options("bigmemory.default.type")
+save.as.bigMatrix <- function(
+  x, backingname, backingpath=".", type=options("bigmemory.default.type")[[1]]
 ) {
-  # Take a matrix x, 
-  if (class(x) != "matrix")
-    stop("'x' must be a matrix.")
+  if (!(class(x) == "matrix"))
+    stop("'x' must be a 'matrix'")
   
   # Dimension names are saved separately from the big.matrix object.
+  cnFile <- file.path(backingpath, paste0(backingname, "_colnames.txt"))
   if (!is.null(colnames(x))) {
     write.table(
-      rownames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
-      file=file.path(backingpath, paste(backingname, "_rownames.txt"))
+      colnames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
+      file=cnFile
     )
+  } else {
+    if (file.exists(cnFile))
+      unlink(cnFile)
   }
+  rnFile <- file.path(backingpath, paste0(backingname, "_rownames.txt"))
   if (!is.null(rownames(x))) {
     write.table(
-      colnames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
-      file=file.path(backingpath, paste(backingname, "_colnames.txt"))
+      rownames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
+      file=rnFile
     ) 
+  } else {
+    if (file.exists(rnFile))
+      unlink(rnFile)
   }
   
-  # Remove dimension names before saving the big.matrix
   dimnames(x) <- NULL
   
   # now save the big.matrix to disk
-  as.big.matrix(
+  bigmemory::as.big.matrix(
     x, backingpath=backingpath, type=type,
     backingfile=paste0(backingname, ".bin"),
     descriptorfile=paste0(backingname, ".desc")
   )
+  
   invisible(NULL)
 }
 
-#' @rdname bigMatrix-io
+#' @rdname bigMatrix-get
 #' @export
 load.bigMatrix <- function(
-  backingname, backingpath
+  backingname, backingpath="."
 ) {
-  
+  # Check for row and column names
   rn <- NULL
   rnFile <- file.path(backingpath, paste0(backingname, "_rownames.txt"))
   if (file.exists(rnFile))
-    rn <- read.table(rnFile)
+    rn <- as.character(read.table(rnFile, stringsAsFactors=FALSE)[,1])
   
   cn <- NULL
   cnFile <- file.path(backingpath, paste0(backingname, "_colnames.txt"))
   if (file.exists(cnFile))
-    rn <- read.table(cnFile)
+    cn <- as.character(read.table(cnFile, stringsAsFactors=FALSE)[,1])
 
+  # Check if the file is already a 'big.matrix', and handle appropriately
+  descFile <- file.path(backingpath, paste0(backingname, ".desc"))
+  if (file.exists(descFile)) {
+    d1 <- dget(descFile)
+    if (!is.null(d1@description$colNames) || !is.null(d1@description$rowNames)) {
+      warning("row and column names will be stripped from existing 'big.matrix'")
+      rn <- d1@description$rowNames
+      cn <- d1@description$colNames
+      d1@description["rowNames"] <- list(NULL)
+      d1@description["colNames"] <- list(NULL)
+      dput(d1, descFile)
+      if (!is.null(rn)) {
+        write.table(
+          rn, quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
+          file=rnFile
+        ) 
+      }
+      if (!is.null(cn)) {
+        write.table(
+          cn, quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
+          file=cnFile
+        ) 
+      }
+    }
+  }
+  
   new("bigMatrix",
-    descriptor=file.path(backingpath, paste0(backingname, ".desc")),
+    descriptor=descFile,
     rownames=rn,
     colnames=cn,
     attached=FALSE
   )
 }
 
-#' @rdname bigMatrix-io
+#' @rdname bigMatrix-get
+#' 
 #' @export
 as.bigMatrix <- function(
-  x, backingname, backingpath, type=options("bigmemory.default.type")
+  x, backingname, backingpath=".", type=options("bigmemory.default.type")[[1]]
 ) {
-  write.bigMatrix(x, backingname, backingpath, type)
+  if (class(x) == "big.matrix") 
+    stop("use load.bigMatrix to load in an existing 'big.matrix' as a 'bigMatrix")
+  if (class(x) != "matrix")
+    stop("Cannot convert from ", class(x), " to 'bigMatrix'")
+  
+  save.as.bigMatrix(x, backingname, backingpath, type)
   load.bigMatrix(backingname, backingpath)
 }
 
-#' @rdname bigMatrix-io
+#' @rdname bigMatrix-get
 #' @export
 read.bigMatrix <- function(
-  file, backingname, backingpath, type=options("bigmemory.default.type"), ...
+  file, backingname, backingpath=".", 
+  type=options("bigmemory.default.type")[[1]],
+  row.names=TRUE, header=TRUE, ...
 ) {
-  as.bigMatrix(read.table(file, ...), backingname, backingpath, type)
+  bm <- read.big.matrix(
+    filename=file, 
+    backingfile=paste0(backingname, ".bin"),
+    descriptorfile=paste0(backingname, ".desc"),
+    backingpath=backingpath, type=type,
+    has.row.names=row.names, header=header,
+    ...
+  )
+  # For some reason, read.big.matrix doesn't add the row names to the descriptor
+  # file when both rownames and colnames are present (in some cases). So we 
+  # manually override that.
+  dFile <- file.path(backingpath, paste0(backingname, ".desc"))
+  desc <- dget(dFile)
+  if (!is.null(rownames(bm))) {
+    desc@description$rowNames <- rownames(bm)
+  } else {
+    desc@description["rowNames"] <- list(NULL)
+  }
+  if (!is.null(colnames(bm))) {
+    desc@description$colNames <- colnames(bm)
+  } else {
+    desc@description["colNames"] <- list(NULL)
+  }
+  dput(desc, dFile)
+  rm(bm)
+  gc()
+  load.bigMatrix(backingname, backingpath)
 }
+
+
+#' Writing out data, or converting from, a 'bigMatrix'.
+#' 
+#' Functions for converting 'bigMatrix' objects to other classes.
+#' 
+#' @param x an object of type 'bigMatrix.
+#' 
+#' @details
+#' \code{as.big.matrix} converts to a \code{\link[bigmemory]{big.matrix}}
+#' object.
+#' \code{as.matrix} converts to a \code{\link[base]{matrix}} object.
+#' \code{write.bigMatrix} will write out the data into a regularly structure file
+#' (see \code{\link[utils]{write.table}})
+#' 
+#' @rdname bigMatrix-out
+#' @export
+setMethod(
+  "as.big.matrix", signature(x="bigMatrix"), function(x) {
+    if (!file.exists(x@descriptor))
+      stop("Could not find backing file. Have you changed working directory?")
+    rnFile <- gsub(".desc", "_rownames.txt", x@descriptor)
+    cnFile <- gsub(".desc", "_colnames.txt", x@descriptor)
+    
+    desc <- dget(x@descriptor)
+    
+    if (!is.null(x@colnames))
+      desc@description$colNames <- x@colnames
+    if (!is.null(x@rownames))
+      desc@description$rowNames <- x@rownames
+    
+    dput(desc, x@descriptor)
+    unlink(rnFile)
+    unlink(cnFile)
+    
+    bigmemory::attach.big.matrix(x@descriptor)
+})
+
+#' @rdname bigMatrix-out
+#' @export
+setMethod("as.matrix", signature(x="bigMatrix"), function(x) {
+  x[,]
+})
+
+#' @rdname bigMatrix-out
+#' @export
+write.bigMatrix <- function(x, file, ...) {
+  write.table(x=x[,], file, ...)
+}
+
