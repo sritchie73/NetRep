@@ -6,11 +6,11 @@
 \alias{wrappers}
 \title{Fast wrapper functions for Rcpp functions}
 \usage{
-coexpStats(discCoexp, discIndices, testCoexp, testIndices, lowmem = FALSE)
+coexpStats(discCoexp, discIndices, testCoexp, testIndices)
 
-adjProps(adj, moduleIndices, lowmem = FALSE)
+adjProps(adj, moduleIndices)
 
-dataProps(sge, moduleIndices, lowmem = FALSE)
+dataProps(sge, moduleIndices)
 }
 \arguments{
 \item{discCoexp}{a matrix (see Inputs section) of the pairwise coexpression
@@ -26,8 +26,6 @@ for the \emph{test} dataset.}
   sample of the same size, in the matrix of pairwise-coexpression in the
   \emph{test} dataset.}
 
-\item{lowmem}{logical; See the Minimising Memory Usage}
-
 \item{adj}{a matrix (see Inputs section) of pairwise gene adjacencies.}
 
 \item{moduleIndices}{indices for the network module of interest in the
@@ -36,6 +34,8 @@ for the \emph{test} dataset.}
 \item{sge}{a matrix (see Inputs section) of gene expression data. Assumes
  columns are genes/probes, rows are samples, and that probes have been scaled
  (This can be done using \code{\link{scaleBigMatrix}}).}
+
+\item{lowmem}{logical; See the Minimising Memory Usage}
 }
 \value{
 \code{coexpStats:} a list containing the \emph{cor.coexp} and

@@ -77,7 +77,7 @@ setClass("bigMatrix",
         } 
 
         if (!is.null(object@colnames)) {
-          if (length(object@colnames) != nrow(object@matrix)) {
+          if (length(object@colnames) != ncol(object@matrix)) {
             msg <- paste0(
               "The number of colnames provided (", length(object@colnames), 
               ") does not match the number of columns in the big.matrix object (",
@@ -107,7 +107,7 @@ setClass("bigMatrix",
         } 
         
         if (!is.null(object@colnames)) {
-          if (length(object@colnames) != nrow(tmp)) {
+          if (length(object@colnames) != ncol(tmp)) {
             msg <- paste0(
               "The number of colnames provided (", length(object@colnames), 
               ") does not match the number of columns in the big.matrix object (",

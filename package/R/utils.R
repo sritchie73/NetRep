@@ -301,3 +301,20 @@ getUUID <- function() {
 combineNulls <- function(...) {
   abind(..., along=3)
 }
+
+#' Insert NAs into a vector at specified positions
+#' 
+#' Useful for inserting NAs into the correct positions when examining module 
+#' probes that do not exist in the test dataset.
+#' 
+#' @param vec vector to insert NAs to.
+#' @param na.indices indices the NAs should be located at in the final vector.
+#' 
+#' @return
+#' The vector with NAs inserted in the correct positions.
+insert.nas <- function(vec, na.indices) {
+  res <- vector(typeof(vec), length(vec) + length(na.indices))
+  res[na.indices] <- NA
+  res[!is.na(res)] <- vec
+  res
+}

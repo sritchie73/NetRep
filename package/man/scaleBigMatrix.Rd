@@ -3,28 +3,22 @@
 \alias{scaleBigMatrix}
 \title{Scale and Center the rows of a 'big.matrix'}
 \usage{
-scaleBigMatrix(x, obj.dir)
+scaleBigMatrix(x, tmp.dir)
 }
 \arguments{
-\item{x}{the matrix to scale.}
+\item{x}{the bigMatrix to scale.}
 
-\item{obj.dir}{the directory to store the object in}
+\item{obj.dir}{directory to store the backingfiles for the bigMatrix.}
 }
 \value{
-A descriptor to the scaled version of x.
+an object of type \code{bigMatrix}.
 }
 \description{
-Create a new scaled \code{\link[bigmemory]{big.matrix}}.
+Create a new \code{\link{bigMatrix}} containing scaled gene expression. Genes
+are expected to be columns.
 }
 \note{
-Unlike \code{\link[base]{scale}} this function applies the scale function to
- the rows of the matrix instead of the columns.
-
- This function has only been implemented for
- \code{\link[bigmemory]{big.matrix}} objects of \code{type = "double"}.
-
- To apply the scale function in place without creating a new results matrix,
- simply call \code{Scale(x@address, x@address)}.
+The caller is responsible for cleaning up the temporary directory.
 }
 \seealso{
 \code{\link[base]{scale}} \code{\link[bigmemory]{big.matrix}}
