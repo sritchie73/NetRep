@@ -43,6 +43,7 @@ of \code{atttached}.}
 }}
 \seealso{
 \code{\link[bigmemory]{big.matrix}},
- \code{\link{bigMatrix-io}}
+ \code{\link{bigMatrix-get}}
+ \code{\link{bigMatrix-out}}
 }
 

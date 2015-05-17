@@ -39,7 +39,8 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' 
 #' @seealso 
 #'  \code{\link[bigmemory]{big.matrix}},
-#'  \code{\link{bigMatrix-io}}
+#'  \code{\link{bigMatrix-get}}
+#'  \code{\link{bigMatrix-out}}
 #' @import bigmemory
 #' @import methods
 #' @name bigMatrix
