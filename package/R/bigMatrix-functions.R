@@ -28,9 +28,6 @@ scaleBigMatrix <- function(x, tmp.dir) {
     }
   }
   
-  # Make sure the temporary directory exists
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   res <- big.matrix(
     nrow(x), ncol(x), typeof(x), NULL, dimnames(x), FALSE,
     backingfile, tmp.dir, descriptorfile

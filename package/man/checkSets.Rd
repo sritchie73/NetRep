@@ -3,26 +3,27 @@
 \alias{checkSets}
 \title{Check input data for consistency}
 \usage{
-checkSets(geneExpression, coexpression, adjacency, moduleAssignments)
+checkSets(geneExpression, coexpression, adjacency, moduleAssignments, discovery,
+  test)
 }
 \arguments{
-\item{geneExpression}{a \code{\link{bigMatrix}} object, or a list of
-\code{bigMatrix} objects, see details.}
+\item{geneExpression}{a list of \code{bigMatrix} objects}
 
-\item{coexpression}{a \code{\link{bigMatrix}} object, or a list of
-\code{bigMatrix} objects, see details.}
+\item{coexpression}{a list of \code{bigMatrix} objects}
 
-\item{adjacency}{a \code{\link{bigMatrix}} object, or a list of
-\code{bigMatrix} objects, see details.}
+\item{adjacency}{a list of \code{bigMatrix} objects}
 
-\item{moduleAssignments}{a vector assigning genes to modules, or a list of
-such vectors. See details.}
+\item{moduleAssignments}{a list of either NULL, or vectors assigning genes to
+modules in the \code{discovery} datasets.}
+
+\item{discovery}{name or index denoting which dataset the module of
+interest was discovered in. See details.}
+
+\item{test}{name or index denoting which dataset to apply the function to.
+See details.}
 }
 \description{
 Make sure all objects are the right class, have the same dimensions, and
 are ordered the same way across datasets.
-}
-\details{
-#'
 }
 

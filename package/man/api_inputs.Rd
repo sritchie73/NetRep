@@ -8,14 +8,17 @@ networkProperties(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1)
 }
 \arguments{
-\item{geneExpression}{a \code{\link{bigMatrix}} object, or a list of
-\code{bigMatrix} objects, see details.}
+\item{geneExpression}{the gene expression matrix for the dataset of interest,
+or a list of gene expression matrices, one for each dataset. Columns are
+expected to be genes, rows samples. See details for expected input types.}
 
-\item{coexpression}{a \code{\link{bigMatrix}} object, or a list of
-\code{bigMatrix} objects, see details.}
+\item{coexpression}{the coexpression matrix for the dataset of interest, or a
+list of coexpression matrices, one for each dataset. See details for
+expected input types.}
 
-\item{adjacency}{a \code{\link{bigMatrix}} object, or a list of
-\code{bigMatrix} objects, see details.}
+\item{adjacency}{the adjacecny matrix for the dataset of interest, or a
+list of adjacency matrices, one for each dataset. See details for
+expected input types.}
 
 \item{moduleAssignments}{a vector assigning genes to modules, or a list of
 such vectors. See details.}
@@ -26,7 +29,10 @@ such vectors. See details.}
 interest was discovered in. See details.}
 
 \item{test}{name or index denoting which dataset to apply the function to.
- See details.}
+See details.}
+
+\item{...}{additional arguments used when reading in a matrix from file. See
+ \code{\link{read.bigMatrix}}.}
 }
 \value{
 A list of network properties for each module of interest.
@@ -36,15 +42,28 @@ Calculate the network properties that compose the module preservation
 statistics for one or more modules.
 }
 \details{
-If any of the \code{geneExpression}, \code{coexpression}, \code{adjacency},
-or \code{moduleAssignments} arguments are list objects, then they all must
-be. In this case, each list element corresponds to a dataset that the
-respective network components have been calculated in. Providing the
-\code{geneExpression} is optional, but limits the scope of the analysis or
-function output. The \code{discovery} argument denotes which dataset the
-\code{modules} of interest were discovered in, and the \code{test} argument
-controls which dataset the function is calculated on. Alternatively, the
-\code{geneExpression}, \code{coexpression}, \code{adjacency}, and
-\code{moduleAssignments} can be provided only for the discovery dataset.
+The matrices containing the \code{geneExpression}, \code{coexpression}, and
+ \code{adjacency} should be \code{\link{bigMatrix}} object(s), but the
+ function will also work with regular matrices, files containing the matrix
+ data, or file paths to the descriptor files for a 'bigMatrix', in which
+ case temporary 'bigMatrix' objects will be created. It is advisable to keep
+ large matrices stored as 'bigMatrix' objects, as the conversion process
+ involves writing out the matrix as binary data to disk. 'bigMatrix' objects
+ have the added advantage of having instant load times in new R sessions, and
+ can be accessed and used the same way as regular matrices. See
+ \code{\link{bigMatrix}} for more details.
+
+ This function can be used in three ways. First, the \code{geneExpression},
+ \code{coexpression}, and \code{adjacency} can be provided as lists of
+ matrices, where each element corresponds to a dataset of interest. In this
+ case, the function will be applied to the \code{test} dataset for the subset
+ of genes corresponding to modules discovered in the \code{discovery} dataset.
+ By default, the function is applied on dataset 1, on the modules discovered
+ in dataset 1. Secondly, the function also accepts single matrices for each,
+ simplifying the input for users with only one dataset of interest. Finally,
+ \code{modules} and \code{moduleAssignments} may be omitted, in which case
+ the function is applied on all genes present in the \code{geneExpression},
+ \code{coexpression}, and \code{adjacency}. This may be useful when
+ subsetting each matrix by a custom gene set of interest.
 }
 

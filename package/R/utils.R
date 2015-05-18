@@ -240,26 +240,51 @@ is.equal <- function(vector, value) {
   })
 }
 
-# Dynamically detect and load a big matrix object depending on input type
+# Dynamically detect and load a bigMatrix object depending on input type
 dynamicMatLoad <- function(object, ...) {
-  if (class(object) == "character") {
+  basename <- paste0("tmp", getUUID())
+  if (is.null(object)) {
+    return(NULL)
+  } else if (is.list(object)) {
+    return(lapply(object, dynamicMatLoad, ...))
+  } else if (is.bigMatrix(object)) {
+    return(object)
+  } else if (class(object) == "character") {
     if (!file.exists(object))
       stop("file", object, "does not exist")
     
     # Is this file a big.matrix descriptor?
     if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
-      return(attach.big.matrix(object))
+      backingname <- basename(object)
+      backingpath <- gsub(backingname, "", object)
+      backingname <- gsub(".desc", "", backingpath)
+      return(load.bigMatrix(backingname, backingpath))
     } else {
-      mat <- as.matrix(read.table(file=object, ...))
-      return()
+      vCat(
+        TRUE, 0,
+        "Creating new 'bigMatrix' in a temporary directory for file ", object,
+        ". This could take a while."
+      )
+      return(read.bigMatrix(file=object, backingname=basename, ...))
     }
     
   } else if (class(object) == "matrix") {
-    return(as.big.matrix(object))
-  } else if (class(object) == "big.matrix") {
-    return(object)
-  }
-  stop("unable to load object of type", class(object), "as a big.matrix!")
+    vCat(
+      TRUE, 0,
+      "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
+      " This could take a while."
+    )
+    return(as.bigMatrix(object, backingname=basename, ...))
+  } 
+  stop("unable to load object of type ", class(object), " as a bigMatrix!")
+}
+
+#' Unify the datastructure to be a list of things
+#' @param x object to convert
+unifyDS <- function(x) {
+  if (!is.list(x))
+    x <- list(x)
+  x
 }
 
 #' Get a universally unique identifier
@@ -317,4 +342,19 @@ insert.nas <- function(vec, na.indices) {
   res[na.indices] <- NA
   res[!is.na(res)] <- vec
   res
+}
+
+#' Order the module vector numerically
+#' 
+#' The module assingments may be numeric, but coded as characters.
+#' 
+#' @param vec module vector to order
+#' 
+#' @return the order of the vector
+orderAsNumeric <- function(vec) {
+  tryCatch({
+    order(as.integer(vec))
+  }, warning=function(w) {
+    order(vec)
+  })
 }

@@ -3,11 +3,11 @@
 \alias{coexp_params}
 \title{Template parameters}
 \arguments{
-\item{discCoexp}{a matrix (see Inputs section) of the pairwise coexpression
-for the \emph{discovery} dataset.}
+\item{discCoexp}{a \code{\link{bigMatrix}} containing the pairwise
+coexpression for the \emph{discovery} dataset.}
 
-\item{testCoexp}{a matrix (see Inputs section) of the pairwise coexpression
-for the \emph{test} dataset.}
+\item{testCoexp}{a \code{\link{bigMatrix}} containing the pairwise
+coexpression for the \emph{test} dataset.}
 
 \item{discIndices}{indices corresponding to the network module in the matrix
 of pairwise-coexpression in the \emph{discovery} dataset.}

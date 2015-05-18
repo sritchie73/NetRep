@@ -1,25 +1,40 @@
 # Methods to switch between attached and detached states. Used internally to
 # switch memory usage states.
-attach.bigMatrix <- function(name) {
-  if (class(name) != 'bigMatrix')
+attach.bigMatrix <- function(x) {
+  if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
-  if (name@attached)
+  if (x@attached)
     stop("bigMatrix already in attached state")
-  name@matrix <- bigmemory::attach.big.matrix(name@descriptor)
-  poke(name@matrix)
-  name@attached <- TRUE
-  name
+  if (!file.exists(x@descriptor))
+    stop("Could not find backing file. Have you changed working directory?")
+  x@matrix <- bigmemory::attach.big.matrix(x@descriptor)
+  poke(x@matrix)
+  x@attached <- TRUE
+  x
 }
 
-detach.bigMatrix <- function(name) {
-  if (class(name) != 'bigMatrix')
+detach.bigMatrix <- function(x) {
+  if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
-  if (!name@attached)
+  if (!x@attached)
     stop("bigMatrix already in detached state")
-  name@matrix <- NULL
-  name@attached <- FALSE
+  x@matrix <- NULL
+  x@attached <- FALSE
   gc()
-  name
+  x
+}
+
+#' Checks if an object is a bigMatrix
+#' 
+#' @param x object to check
+#' 
+#' @return
+#'  \code{TRUE} if 'x' is a 'bigMatrix', \code{FALSE} otherwise.
+#'  
+#' @seealso \code{\link{bigMatrix}}
+#' @export
+is.bigMatrix <- function(x) {
+  return(class(x) == "bigMatrix")
 }
 
 #-------------------------------------------------------------------------------

@@ -3,7 +3,8 @@
 \alias{adj_param}
 \title{Template parameters}
 \arguments{
-\item{adj}{a matrix (see Inputs section) of pairwise gene adjacencies.}
+\item{adj}{a \code{\link{bigMatrix}} containing the pairwise gene
+ adjacencies.}
 }
 \description{
 Template parameters to be imported into other function documentation. This

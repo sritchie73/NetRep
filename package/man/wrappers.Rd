@@ -13,29 +13,28 @@ adjProps(adj, moduleIndices)
 dataProps(sge, moduleIndices)
 }
 \arguments{
-\item{discCoexp}{a matrix (see Inputs section) of the pairwise coexpression
-for the \emph{discovery} dataset.}
+\item{discCoexp}{a \code{\link{bigMatrix}} containing the pairwise
+coexpression for the \emph{discovery} dataset.}
 
 \item{discIndices}{indices corresponding to the network module in the matrix
 of pairwise-coexpression in the \emph{discovery} dataset.}
 
-\item{testCoexp}{a matrix (see Inputs section) of the pairwise coexpression
-for the \emph{test} dataset.}
+\item{testCoexp}{a \code{\link{bigMatrix}} containing the pairwise
+coexpression for the \emph{test} dataset.}
 
 \item{testIndices}{indices corresponding to the network module, or a random
   sample of the same size, in the matrix of pairwise-coexpression in the
   \emph{test} dataset.}
 
-\item{adj}{a matrix (see Inputs section) of pairwise gene adjacencies.}
+\item{adj}{a \code{\link{bigMatrix}} containing the pairwise gene
+ adjacencies.}
 
 \item{moduleIndices}{indices for the network module of interest in the
   supplied data matrix.}
 
-\item{sge}{a matrix (see Inputs section) of gene expression data. Assumes
- columns are genes/probes, rows are samples, and that probes have been scaled
- (This can be done using \code{\link{scaleBigMatrix}}).}
-
-\item{lowmem}{logical; See the Minimising Memory Usage}
+\item{sge}{a \code{\link{bigMatrix}} containing scaled gene expression data.
+  Assumes columns are genes/probes, rows are samples, and that probes have
+  been scaled (This can be done using \code{\link{scaleBigMatrix}}).}
 }
 \value{
 \code{coexpStats:} a list containing the \emph{cor.coexp} and
@@ -57,34 +56,5 @@ Wrapper functions for interfacing with the Rcpp implementations of
   \code{\link{CoexpStats}}, \code{\link{AdjProps}}, and \code{\link{DataProps}}.
   They provide a nicer interface for input handling and format the output in
   an R-friendly way.
-}
-\section{Inputs}{
-
-  The expected object type for the input matrices depends on the value of
-  \code{lowmem}. When \code{lowmem} is \code{FALSE}, they are expected to be
-  objects of type \code{\link[bigmemory]{big.matrix}}. When \code{TRUE}, they
-  are expected to be file paths pointing to descriptor files for the
-  corresponding \code{\link[bigmemory]{big.matrix}} object.
-
-  The \code{discIndices} and \code{testIndices} arguments are expected to be
-  integer vectors. If they contain missing values (\code{NA}) then C++
-  will segfault, crashing your R session and potentionally losing all your
-  data.
-}
-
-\section{Minimising Memory Usage}{
-
-  When \code{lowmem} is set to \code{TRUE}, these functions will detach the
-  \code{\link[bigmemory]{big.matrix}} objects after performing the
-  calculations, and invoke R's garbage collector, forcibly clearing the
-  virtual memory.
-}
-
-\section{Warning}{
-
-  No sanity checking of the inputs is performed by these functions. This is
-  to enhance speed, and is why these interfaces are not exported as part of
-  the package namespace. If you are going to use these wrappers anyway, you
-  should read the instructions in the Details section.
 }
 

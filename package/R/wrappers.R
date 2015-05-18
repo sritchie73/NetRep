@@ -1,8 +1,6 @@
 #' Fast wrapper functions for Rcpp functions
 #' 
 #' @template wrapper_desc
-#' @template lowmem_inputs
-#' @template no_sanity
 #' @inheritParams coexp_params
 #' @inheritParams adj_param
 #' @inheritParams ge_param
@@ -98,19 +96,32 @@ networkProperties <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1
 ) {
-  # Sanity check input for consistency.
-  checkSets(geneExpression, coexpression, adjacency, moduleAssignments)
-
-  # Unify data structures for the rest of the function
-  if (!is.null(geneExpression) & !is.list(geneExpression))
-    geneExpression <- list(geneExpression)
-  if (!is.list(coexpression))
-    coexpression <- list(coexpression)
-  if (!is.list(adjacency))
-    adjacency <- list(adjacency)
-  if (!is.list(moduleAssignments))
-    moduleAssignments <- list(moduleAssignments)
+  # Temporary directory to store new bigMatrix objects in
+  tmp.dir <- paste0(".temp-objects", getUUID())
+  dir.create(tmp.dir, showWarnings=FALSE)
+  on.exit({
+    unlink(tmp.dir, recursive=TRUE)
+  }, add=TRUE)
   
+  # Unify data structures and load in matrices
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structure
+  if (missing(moduleAssignments))
+    modules <- "1"
+  moduleAssignments <- makeModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
+  # Sanity check input for consistency.
+  checkSets(
+    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+  )
+
   if (is.null(moduleAssignments[[discovery]]))
     stop("no module assignments in the discovery dataset")
   
@@ -123,11 +134,7 @@ networkProperties <- function(
     }, error = function(e) {
       stop("Non-finite values encountered for the test dataset gene expression")
     })
-    obj.dir <- paste0(".temp-objects", getUUID())
-    sge <- scaleBigMatrix(geneExpression[[test]], obj.dir)
-    on.exit({
-      unlink(obj.dir, recursive=TRUE)
-    }, add=TRUE)
+    sge <- scaleBigMatrix(geneExpression[[test]], tmp.dir)
   }
   
   # Get the properties for each module of interest 
