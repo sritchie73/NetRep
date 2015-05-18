@@ -3,6 +3,7 @@
 \alias{adjProps}
 \alias{coexpStats}
 \alias{dataProps}
+\alias{moduleProps}
 \alias{wrappers}
 \title{Fast wrapper functions for Rcpp functions}
 \usage{
@@ -11,6 +12,8 @@ coexpStats(discCoexp, discIndices, testCoexp, testIndices)
 adjProps(adj, moduleIndices)
 
 dataProps(sge, moduleIndices)
+
+moduleProps(adj, moduleIndices, sge)
 }
 \arguments{
 \item{discCoexp}{a \code{\link{bigMatrix}} containing the pairwise
@@ -56,5 +59,7 @@ Wrapper functions for interfacing with the Rcpp implementations of
   \code{\link{CoexpStats}}, \code{\link{AdjProps}}, and \code{\link{DataProps}}.
   They provide a nicer interface for input handling and format the output in
   an R-friendly way.
+
+combines \code{dataProps} and \code{adjProps}
 }
 

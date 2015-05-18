@@ -81,6 +81,19 @@ dataProps <- function(sge, moduleIndices) {
   lapply(res, as.vector)
 }
 
+#' @rdname wrappers
+#' 
+#' @description
+#'  combines \code{dataProps} and \code{adjProps}
+moduleProps <- function(adj, moduleIndices, sge) {
+  geProps <- NULL
+  if (!is.null(sge))
+    geProps <- dataProps(sge, moduleIndices)
+  adjProps <- adjProps(adj, moduleIndices)
+  
+  c(geProps, adjProps)
+}
+
 #' Get the properties of a network module
 #' 
 #' Calculate the network properties that compose the module preservation 
