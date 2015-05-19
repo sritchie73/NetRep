@@ -324,10 +324,10 @@ modulePreservation <- function(
   
   # same for the include and exclude modules arguments
   includeModules <- formatInclude(
-    includeModules, discovery, length(coexpression), names(coexpression)
+    includeModules, discovery, length(coexpression), datasets
   )
   excludeModules <- formatExclude(
-    excludeModules, discovery, length(coexpression), names(coexpression)
+    excludeModules, discovery, length(coexpression), datasets
   )
   
   # Sanity check input data for values that will cause the calculation of 
