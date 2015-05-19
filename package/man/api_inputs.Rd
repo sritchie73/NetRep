@@ -16,7 +16,7 @@ expected to be genes, rows samples. See details for expected input types.}
 list of coexpression matrices, one for each dataset. See details for
 expected input types.}
 
-\item{adjacency}{the adjacecny matrix for the dataset of interest, or a
+\item{adjacency}{the adjacency matrix for the dataset of interest, or a
 list of adjacency matrices, one for each dataset. See details for
 expected input types.}
 

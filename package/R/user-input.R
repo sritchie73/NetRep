@@ -149,7 +149,7 @@ checkSets <- function(
 #' @return
 #'  List structure for moduleAssignments for internal calculations.
 #'
-makeModuleAssignments <- function(
+formatModuleAssignments <- function(
   moduleAssignments, discovery, nDatasets, datasetNames, 
   nDiscGenes, discGeneNames
 ) {
@@ -167,16 +167,17 @@ makeModuleAssignments <- function(
   # If we're subsetting by dataset index, make sure the ordering of datasets
   # matches.
   if (
-    length(discovery) > nDatasets || 
+    !is.null(moduleAssignments) &&
+    (length(discovery) > nDatasets || 
     (class(discovery) == "character" && any(discovery %nin% datasetNames)) ||
     (length(discovery) > 1 && (
-      !is.list(moduleAssignments) || 
-      length(moduleAssignments)) < length(discovery)
-    )
+      !is.list(moduleAssignments) ||
+      length(moduleAssignments) < length(discovery)
+    )))
   ) {
     stop(
       "mismatch between number of 'discovery' specified and ",
-      "'moduleAssignments' proivded"
+      "'moduleAssignments' provided"
     )
   }
   
@@ -186,9 +187,178 @@ makeModuleAssignments <- function(
   # Now structure the moduleAssignments list sensibly.
   if (length(moduleAssignments) < nDatasets) {
     tmp <- rep(list(NULL), nDatasets)
-    names(tmp) <- dataSetNames
+    names(tmp) <- datasetNames
     tmp[discovery] <- moduleAssignments
     moduleAssignments <- tmp
   }
   moduleAssignments
+}
+
+#' Format includeModules list
+#' 
+#' @param input input provided by the user
+#' @param discovery vector of discovery networks provided by the user
+#' @param nDatasets number of datasets
+#' @param datasetNames names of the datasets
+#' 
+#' @return
+#'  List structure to match the rest of the input data
+#'
+formatInclude <- function(
+  includeModules, discovery, nDatasets, datasetNames
+) {
+  if (missing(includeModules))
+    includeModules <- NULL
+  
+  if (class(discovery) %nin% c("character", "numeric", "integer"))
+    stop("'discovery' must be a vector of dataset names or indices")
+  
+  msg <- paste0(
+    "mismatch between number of 'discovery' specified and ",
+    "'includeModules' provided"
+  )
+  if (!is.list(includeModules)) {
+    if (length(discovery) > 1) {
+      stop(msg)
+    } else {
+      tmp <- rep(list(NULL), nDatasets)
+      names(tmp) <- datasetNames
+      tmp[[discovery]] <- includeModules
+      includeModules <- tmp
+    }
+  } else {
+    if (
+      !is.null(names(includeModules)) && 
+        !all(names(includeModules) %in% datasetNames)
+    ) {
+      stop("unable to match all names of 'includeModules' to dataset names")
+    }
+    if (length(includeModules) < nDatasets) {
+      tmp <- rep(list(NULL), nDatasets)
+      names(tmp) <- datasetNames
+      if (length(includeModules) == length(discovery)) {
+        if (is.null(names(includeModules))) {
+          tmp[discovery] <- includeModules
+        } else {
+          tmp[names(includeModules)] <- includeModules
+        }
+      } else {
+        if (is.null(names(includeModules))) {
+          stop(msg)
+        } else {
+          tmp[names(includeModules)] <- includeModules
+        }
+      }
+      includeModules <- tmp
+    }
+  }
+  includeModules
+}
+
+#' Format excludeModules list
+#' 
+#' @param input input provided by the user
+#' @param discovery vector of discovery networks provided by the user
+#' @param nDatasets number of datasets
+#' @param datasetNames names of the datasets
+#' 
+#' @return
+#'  List structure to match the rest of the input data
+#'
+formatExclude <- function(
+  excludeModules, discovery, nDatasets, datasetNames
+) {
+  if (missing(excludeModules))
+    excludeModules <- NULL
+  
+  if (class(discovery) %nin% c("character", "numeric", "integer"))
+    stop("'discovery' must be a vector of dataset names or indices")
+  
+  msg <- paste0(
+    "mismatch between number of 'discovery' specified and ",
+    "'excludeModules' provided"
+  )
+  if (!is.list(excludeModules)) {
+    if (length(discovery) > 1) {
+      stop(msg)
+    } else {
+      tmp <- rep(list(NULL), nDatasets)
+      names(tmp) <- datasetNames
+      tmp[[discovery]] <- excludeModules
+      excludeModules <- tmp
+    }
+  } else {
+    if (
+      !is.null(names(excludeModules)) && 
+      !all(names(excludeModules) %in% datasetNames)
+    ) {
+      stop("unable to match all names of 'excludeModules' to dataset names")
+    }
+    if (length(excludeModules) < nDatasets) {
+      tmp <- rep(list(NULL), nDatasets)
+      names(tmp) <- datasetNames
+      if (length(excludeModules) == length(discovery)) {
+        if (is.null(names(excludeModules))) {
+          tmp[discovery] <- excludeModules
+        } else {
+          tmp[names(excludeModules)] <- excludeModules
+        }
+      } else {
+        if (is.null(names(excludeModules))) {
+          stop(msg)
+        } else {
+          tmp[names(excludeModules)] <- excludeModules
+        }
+      }
+      excludeModules <- tmp
+    }
+  }
+  excludeModules
+}
+
+
+#' Dynamically detect and load a bigMatrix object depending on input type
+#' 
+#' @param object user input object
+#' @param ... additional arguments to pass to read.bigMatrix or as.bigMatrix,
+#'   usually a temporary directory for the backingpath
+#'   
+#' @return
+#'  A 'bigMatrix' object or error.
+dynamicMatLoad <- function(object, ...) {
+  basename <- paste0("tmp", getUUID())
+  if (is.null(object)) {
+    return(NULL)
+  } else if (is.list(object)) {
+    return(lapply(object, dynamicMatLoad, ...))
+  } else if (is.bigMatrix(object)) {
+    return(object)
+  } else if (class(object) == "character") {
+    if (!file.exists(object))
+      stop("file", object, "does not exist")
+    
+    # Is this file a big.matrix descriptor?
+    if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
+      backingname <- basename(object)
+      backingpath <- gsub(backingname, "", object)
+      backingname <- gsub(".desc", "", backingpath)
+      return(load.bigMatrix(backingname, backingpath))
+    } else {
+      vCat(
+        TRUE, 0,
+        "Creating new 'bigMatrix' in a temporary directory for file ", object,
+        ". This could take a while."
+      )
+      return(read.bigMatrix(file=object, backingname=basename, ...))
+    }
+    
+  } else if (class(object) == "matrix") {
+    vCat(
+      TRUE, 0,
+      "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
+      " This could take a while."
+    )
+    return(as.bigMatrix(object, backingname=basename, ...))
+  } 
+  stop("unable to load object of type ", class(object), " as a bigMatrix!")
 }

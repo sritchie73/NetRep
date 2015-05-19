@@ -344,8 +344,15 @@ modulePreservation <- function(
   vCat(verbose, indent, "Validating user input...")
   if (missing(moduleAssignments))
     stop("no 'moduleAssignments' provided")
-  moduleAssignments <- makeModuleAssignments(
+  moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression)
+  )
+  # same for the include and exclude modules arguments
+  includeModules <- formatInclude(
+    includeModules, discovery, length(coexpression), names(coexpression)
+  )
+  excludeModules <- formatExclude(
+    excludeModules, discovery, length(coexpression), names(coexpression)
   )
   
   # Sanity check input for consistency.
@@ -458,7 +465,7 @@ modulePreservation <- function(
           vCat(
             verbose, indent, sep="", 
             "Calculating preservation of network subsets from dataset ",
-            datasets[di], ", in dataset ", datasets[ti], "."
+            di, ", in dataset ", ti, "."
           )
           #---------------------------------------------------------------------
           # Set up variables for this comparison
@@ -519,25 +526,26 @@ modulePreservation <- function(
           if (!is.null(moduleAssignments[[ti]])) {
             # Get total number of nodes from each discovery subset in each test subset 
             contingency <- table(
-              moduleAssigments[[di]][overlapGenes], 
-              moduleAssigments[[ti]][overlapGenes]
+              moduleAssignments[[di]][overlapGenes], 
+              moduleAssignments[[ti]][overlapGenes]
             )
             # filter on subsets the user cares about
-            contingency <- contingency[modules,]
+            contingency <- contingency[modules,,drop=FALSE]
             
             # Order numerically if relevant
-            contigency <- contigency[
-              orderAsNumeric(rownames(contigency)),
-              orderAsNumeric(colnames(contigency)),
+            contingency <- contingency[
+              orderAsNumeric(rownames(contingency)),
+              orderAsNumeric(colnames(contingency)),
+              drop=FALSE
             ]
-            
+
             # add in the module sizes from the respective datasets
             contingency <- cbind(rowSums(contingency), contingency)
             testSizes <- table(moduleAssignments[[ti]][overlapGenes])
             testSizes <- testSizes[colnames(contingency)]
-            
+                        
             contingency <- rbind(
-              c(NA, testSizes[colnames(contingency)]), 
+              testSizes[colnames(contingency)], 
               contingency
             )
             rownames(contingency)[1] <- "size"

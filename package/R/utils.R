@@ -21,15 +21,12 @@
 NULL
 
 #' @rdname matchsub
-#' @export
 `%nin%` <- function(x, table) !(x %in% table)
 
 #' @rdname matchsub
-#' @export
 `%sub_in%` <- function(x, table) x[x %in% table]
 
 #' @rdname matchsub
-#' @export
 `%sub_nin%` <- function(x, table) x[x %nin% table]
 
 #' Verbose Concatenate and Print with Indentation
@@ -238,45 +235,6 @@ is.equal <- function(vector, value) {
   sapply(vector, function(element) {
     isTRUE(all.equal(element, value))
   })
-}
-
-# Dynamically detect and load a bigMatrix object depending on input type
-dynamicMatLoad <- function(object, ...) {
-  basename <- paste0("tmp", getUUID())
-  if (is.null(object)) {
-    return(NULL)
-  } else if (is.list(object)) {
-    return(lapply(object, dynamicMatLoad, ...))
-  } else if (is.bigMatrix(object)) {
-    return(object)
-  } else if (class(object) == "character") {
-    if (!file.exists(object))
-      stop("file", object, "does not exist")
-    
-    # Is this file a big.matrix descriptor?
-    if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
-      backingname <- basename(object)
-      backingpath <- gsub(backingname, "", object)
-      backingname <- gsub(".desc", "", backingpath)
-      return(load.bigMatrix(backingname, backingpath))
-    } else {
-      vCat(
-        TRUE, 0,
-        "Creating new 'bigMatrix' in a temporary directory for file ", object,
-        ". This could take a while."
-      )
-      return(read.bigMatrix(file=object, backingname=basename, ...))
-    }
-    
-  } else if (class(object) == "matrix") {
-    vCat(
-      TRUE, 0,
-      "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
-      " This could take a while."
-    )
-    return(as.bigMatrix(object, backingname=basename, ...))
-  } 
-  stop("unable to load object of type ", class(object), " as a bigMatrix!")
 }
 
 #' Unify the datastructure to be a list of things

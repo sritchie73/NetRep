@@ -4,7 +4,7 @@
 #' @param coexpression the coexpression matrix for the dataset of interest, or a
 #'   list of coexpression matrices, one for each dataset. See details for
 #'   expected input types.
-#' @param adjacency the adjacecny matrix for the dataset of interest, or a
+#' @param adjacency the adjacency matrix for the dataset of interest, or a
 #'   list of adjacency matrices, one for each dataset. See details for
 #'   expected input types.
 #' @param moduleAssignments a vector assigning genes to modules, or a list of 
