@@ -22,6 +22,8 @@
 #'  If not specified, the number of permutations will be automatically 
 #'  determined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
+#' @param lowmem logical; should memory usage be minimised? Useful on machines
+#'  with limited RAM when running in parallel.
 #' @param excludeModules optional list of vectors containing modules to exclude 
 #'  from the analysis for each \code{discovery} dataset. If unspecified, the 
 #'  preservation of all modules will be tested.
@@ -34,8 +36,8 @@
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' @param simplify logical; if \code{TRUE}, simplify the structure of the output
 #'  list if possible (see Return Value).
-#' @param lowmem logical; should memory usage be minimised? Useful on machines
-#'  with limited RAM when running in parallel.
+#' @param keepNulls logical; if \code{TRUE}, the null distributions are returned
+#'  as part of the output.
 #'  
 #' @details
 #' \subsection{Input data:}{
@@ -249,14 +251,123 @@
 #'    }
 #'  }
 #'
+#' @examples
+#' \dontrun{
+#' set.seed(1)
+#' 
+#' ## Example 1: Assess replication of all modules from one 
+#' ## cohort in an independent dataset
+#' 
+#' # First we need some example data
+#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geA) <- paste0("Gene_", 1:100)
+#' rownames(geA) <- paste0("CohortA_", 1:50)
+#' coexpA <- cor(geA) # coexpression
+#' adjA <- abs(coexpA)^5 # adjacency
+#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
+#' names(moduleAssignments) <- paste0("Gene_", 1:100)
+#' 
+#' geB <- matrix(rnorm(70*100), ncol=100) # gene expression
+#' colnames(geB) <- paste0("Gene_", 1:100) 
+#' rownames(geB) <- paste0("CohortB_", 1:70)
+#' coexpB <- cor(geB) # coexpression
+#' adjB <- abs(coexpB)^6 # adjacency
+#' 
+#' # Now format the data for input to modulePreservation
+#' geneExpression <- list(
+#'   cohortA=as.bigMatrix(geA, "geA_bm"),
+#'   cohortB=as.bigMatrix(geA, "geA_bm")    
+#' )
+#' coexpression <- list(
+#'   cohortA=as.bigMatrix(coexpA, "coexpA_bm"),
+#'   cohortB=as.bigMatrix(coexpB, "coexpB_bm")
+#' )
+#' adjacency <- list(
+#'   cohortA=as.bigMatrix(adjA, "adjA_bm"),
+#'   cohortB=as.bigMatrix(adjB, "adjB_bm")
+#' )
+#' 
+#' # Assess module preservation, using two cores
+#' replication <- modulePreservation(
+#'   geneExpression, coexpression, adjacency, moduleAssignments, 
+#'   nCores=2
+#' )
+#' 
+#' ## Example 2: assess replication of two disease-associated modules
+#' replication <- modulePreservation(
+#'   geneExpression, coexpression, adjacency, moduleAssignments,
+#'   nCores=2, includeModules = c("4", "7")
+#' )
+#' 
+#' ## Example 3: exclude a module from the analysis
+#' replication <- modulePreservation(
+#'   geneExpression, coexpression, adjacency, moduleAssignments,
+#'   nCores=2, excludeModules = "0"
+#' )
+#' 
+#' ## Example 4: assess preservation of modules across multiple
+#' ## tissues
+#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geAdipose) <- paste0("Gene_", 1:100)
+#' rownames(geAdipose) <- paste0("Sample_", 1:50)
+#' coexpAdipose <- cor(geAdipose) # coexpression
+#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
+#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
+#' names(adiposeModules) <- paste0("Gene_", 1:100)
+#' 
+#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geLiver) <- paste0("Gene_", 1:100)
+#' rownames(geLiver) <- paste0("Sample_", 1:50)
+#' coexpLiver <- cor(geLiver) # coexpression
+#' adjLiver <- abs(coexpLiver)^6 # adjacency
+#' liverModules <- sample(0:12, size=100, replace=TRUE)
+#' names(liverModules) <- paste0("Gene_", 1:100)
+#' 
+#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geHeart) <- paste0("Gene_", 1:100)
+#' rownames(geHeart) <- paste0("Sample_", 1:50)
+#' coexpHeart <- cor(geHeart) # coexpression
+#' adjHeart <- abs(coexpHeart)^4 # adjacency
+#' heartModules <- sample(0:5, size=100, replace=TRUE)
+#' names(heartModules) <- paste0("Gene_", 1:100)
+#' 
+#' # Now format the data for input to modulePreservation
+#' geneExpression <- list(
+#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
+#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
+#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
+#' )
+#' coexpression <- list(
+#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
+#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
+#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
+#' )
+#' adjacency <- list(
+#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
+#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
+#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
+#' )
+#' moduleAssignments <- list(
+#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
+#' )
+#' 
+#' # Assess the preservation of each module in each non-discovery
+#' # tissue.
+#' preservation <- modulePreservation(
+#'   geneExpression, coexpression, adjacency, moduleAssignments,
+#'   nCores=2, discovery=c("adipose", "liver", "heart"), 
+#'   test=c("adipose", "liver", "heart")
+#' )
+#' }
+#' 
 #' @import foreach
 #' @import RhpcBLASctl
 #' @export
 modulePreservation <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments,
-  discovery=1, test=2, nCores=1, nPerm, excludeModules,
+  discovery=1, test=2, nCores=1, lowmem=TRUE, nPerm, excludeModules,
   includeModules, null="overlap", alternative="greater",
-  simplify=TRUE, lowmem=TRUE, verbose=TRUE
+  simplify=TRUE, verbose=TRUE, keepNulls=FALSE
 ) {
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
@@ -778,22 +889,28 @@ modulePreservation <- function(
             statOrder <- c("mean.adj", "cor.kIM", "cor.coexp", "mean.coexp")
           }
           
-          vCat(verbose, 1, "Collating results...")
           
           #---------------------------------------------------------------------
           # Collate results
           #---------------------------------------------------------------------
+          vCat(verbose, 1, "Collating results...")
+          if (!keepNulls) {
+            nulls <- NULL # ha!
+          } else {
+            nulls <- nulls[, statOrder,]
+          }
           res[[di]][[ti]] <- list(
             observed = observed[, statOrder],
-            nulls = nulls[, statOrder,],
+            nulls = nulls,
             p.values = p.values[, statOrder],
             nGenesPresent = genesPres,
             propGenesPresent = propGenesPres,
             contingency = contingency
           )
+          # remove NULL outputs
           res[[di]][[ti]] <- res[[di]][[ti]][
             !sapply(res[[di]][[ti]], is.null)
-            ]
+          ]
           
           gc()
           on.exit({

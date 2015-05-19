@@ -4,9 +4,10 @@
 \title{Replication and preservation of network modules across datasets}
 \usage{
 modulePreservation(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, discovery = 1, test = 2, nCores = 1, nPerm,
-  excludeModules, includeModules, null = "overlap", alternative = "greater",
-  simplify = TRUE, lowmem = TRUE, verbose = TRUE)
+  moduleAssignments, discovery = 1, test = 2, nCores = 1, lowmem = TRUE,
+  nPerm, excludeModules, includeModules, null = "overlap",
+  alternative = "greater", simplify = TRUE, verbose = TRUE,
+  keepNulls = FALSE)
 }
 \arguments{
 \item{geneExpression}{A list of gene expression matrices, one for each
@@ -25,6 +26,9 @@ containing the module assignments for each gene in the respective dataset.}
 \emph{discovery} dataset.}
 
 \item{nCores}{number of cores to parallelise the permutation procedure over.}
+
+\item{lowmem}{logical; should memory usage be minimised? Useful on machines
+with limited RAM when running in parallel.}
 
 \item{nPerm}{number of permutations to use. Can be specified as a vector if
 a different number of permutations is desired for each discovery dataset.
@@ -47,10 +51,10 @@ one of "greater" (default), "less" or "two.sided" (see details).}
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}
 
-\item{lowmem}{logical; should memory usage be minimised? Useful on machines
- with limited RAM when running in parallel.}
-
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
+
+\item{keepNulls}{logical; if \code{TRUE}, the null distributions are returned
+ as part of the output.}
 }
 \value{
 The returned data structure is organised as a nested list of lists, which
@@ -252,6 +256,115 @@ format (see details).
  very small modules in a very small dataset (e.g. gene sets in a dataset with
  less than 100 genes total). However, the reported p-values will still be
  accurate (see \code{\link{perm.test}}) \emph{(2)}.
+}
+}
+\examples{
+\dontrun{
+set.seed(1)
+
+## Example 1: Assess replication of all modules from one
+## cohort in an independent dataset
+
+# First we need some example data
+geA <- matrix(rnorm(50*100), ncol=100) # gene expression
+colnames(geA) <- paste0("Gene_", 1:100)
+rownames(geA) <- paste0("CohortA_", 1:50)
+coexpA <- cor(geA) # coexpression
+adjA <- abs(coexpA)^5 # adjacency
+moduleAssignments <- sample(1:7, size=100, replace=TRUE)
+names(moduleAssignments) <- paste0("Gene_", 1:100)
+
+geB <- matrix(rnorm(70*100), ncol=100) # gene expression
+colnames(geB) <- paste0("Gene_", 1:100)
+rownames(geB) <- paste0("CohortB_", 1:70)
+coexpB <- cor(geB) # coexpression
+adjB <- abs(coexpB)^6 # adjacency
+
+# Now format the data for input to modulePreservation
+geneExpression <- list(
+  cohortA=as.bigMatrix(geA, "geA_bm"),
+  cohortB=as.bigMatrix(geA, "geA_bm")
+)
+coexpression <- list(
+  cohortA=as.bigMatrix(coexpA, "coexpA_bm"),
+  cohortB=as.bigMatrix(coexpB, "coexpB_bm")
+)
+adjacency <- list(
+  cohortA=as.bigMatrix(adjA, "adjA_bm"),
+  cohortB=as.bigMatrix(adjB, "adjB_bm")
+)
+
+# Assess module preservation, using two cores
+replication <- modulePreservation(
+  geneExpression, coexpression, adjacency, moduleAssignments,
+  nCores=2
+)
+
+## Example 2: assess replication of two disease-associated modules
+replication <- modulePreservation(
+  geneExpression, coexpression, adjacency, moduleAssignments,
+  nCores=2, includeModules = c("4", "7")
+)
+
+## Example 3: exclude a module from the analysis
+replication <- modulePreservation(
+  geneExpression, coexpression, adjacency, moduleAssignments,
+  nCores=2, excludeModules = "0"
+)
+
+## Example 4: assess preservation of modules across multiple
+## tissues
+geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
+colnames(geAdipose) <- paste0("Gene_", 1:100)
+rownames(geAdipose) <- paste0("Sample_", 1:50)
+coexpAdipose <- cor(geAdipose) # coexpression
+adjAdipose <- abs(coexpAdipose)^5 # adjacency
+adiposeModules <- sample(0:7, size=100, replace=TRUE)
+names(adiposeModules) <- paste0("Gene_", 1:100)
+
+geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
+colnames(geLiver) <- paste0("Gene_", 1:100)
+rownames(geLiver) <- paste0("Sample_", 1:50)
+coexpLiver <- cor(geLiver) # coexpression
+adjLiver <- abs(coexpLiver)^6 # adjacency
+liverModules <- sample(0:12, size=100, replace=TRUE)
+names(liverModules) <- paste0("Gene_", 1:100)
+
+geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
+colnames(geHeart) <- paste0("Gene_", 1:100)
+rownames(geHeart) <- paste0("Sample_", 1:50)
+coexpHeart <- cor(geHeart) # coexpression
+adjHeart <- abs(coexpHeart)^4 # adjacency
+heartModules <- sample(0:5, size=100, replace=TRUE)
+names(heartModules) <- paste0("Gene_", 1:100)
+
+# Now format the data for input to modulePreservation
+geneExpression <- list(
+  adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
+  liver=as.bigMatrix(geLiver, "geLiver_bm"),
+  heart=as.bigMatrix(geHeart, "geHeart_bm")
+)
+coexpression <- list(
+  adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
+  liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),
+  heart=as.bigMatrix(coexpHeart, "coexpHeart_bm")
+)
+adjacency <- list(
+  adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
+  liver=as.bigMatrix(adjLiver, "adjLiver_bm"),
+  heart=as.bigMatrix(adjHeart, "adjHeart_bm")
+)
+moduleAssignments <- list(
+  adipose=adiposeModules, liver=liverModules, heart=heartModules
+)
+
+# Assess the preservation of each module in each non-discovery
+# tissue.
+preservation <- modulePreservation(
+  geneExpression, coexpression, adjacency, moduleAssignments,
+  nCores=2, discovery=c("adipose", "liver", "heart"),
+  test=c("adipose", "liver", "heart")
+)
 }
 }
 \references{
