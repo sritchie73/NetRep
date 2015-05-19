@@ -52,6 +52,50 @@ list if possible (see Return Value).}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 }
+\value{
+The returned data structure is organised as a nested list of lists, which
+ should be accessed as \code{results[[discovery]][[test]]}. If
+ \code{simplify} is set to \code{TRUE}, then this structure will be
+ simplified as much as possible depending on the combination of dataset
+ comparisons that have been performed. For each dataset-comparison a list of
+ the following objects are returned:
+ \itemize{
+   \item{\code{observed}:}{
+     A matrix of the observed values for the module preservation statistics.
+     Rows correspond to modules, and columns to the module preservation
+     statistics.
+   }
+   \item{\code{nulls}:}{
+     A three dimensional array containing the values of the module
+     preservation statistics evaluated on random permutation of module
+     assignment in the test network. Rows correspond to modules, columns to
+     the module preservation statistics, and the third dimension to the
+     permutations.
+   }
+   \item{\code{p.values}:}{
+     A matrix of p-values for the \code{observed} module preservation
+     statistics as evaluated through a permutation test using the
+     corresponding values in \code{nulls}.
+   }
+   \item{\code{nGenesPresent}:}{
+     A vector containing the number of genes that are present in the test
+     dataset for each module.
+   }
+   \item{\code{propGenesPresent}:}{
+     A vector containing the proportion of genes present in the test dataset
+     for each module. Modules where this is less than 1 should be
+     investigated further before making judgements about preservation to
+     ensure that the missing genes are not the most connected ones.
+   }
+   \item{\code{contingency}:}{
+     If \code{moduleAssignments} are present for both the \emph{discovery}
+     and \emph{test} datasets, then a contigency table showing the overlap
+     between modules across datasets is returned. Rows correspond to modules
+     in the \emph{discovery} dataset, columns to modules in the \emph{test}
+     dataset.
+   }
+ }
+}
 \description{
 Assess whether gene coexpression modules replicate or are preserved in an
 independent dataset. Module preservation is assessed using a permutation
