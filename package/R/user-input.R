@@ -128,6 +128,13 @@ checkSets <- function(
         )
       }
     }
+    for (di in discovery) {
+      if (is.null(moduleAssignments[[di]])) {
+        stop(
+          "No 'moduleAssignments' present for discovery dataset ", di  
+        )
+      }
+    }
   }
 } 
 
@@ -207,8 +214,10 @@ formatModuleAssignments <- function(
 formatInclude <- function(
   includeModules, discovery, nDatasets, datasetNames
 ) {
-  if (missing(includeModules))
-    includeModules <- NULL
+  if (missing(includeModules)) {
+    includeModules <- rep(list(NULL), length(discovery))
+    names(includeModules) <- discovery
+  }
   
   if (class(discovery) %nin% c("character", "numeric", "integer"))
     stop("'discovery' must be a vector of dataset names or indices")
@@ -268,8 +277,10 @@ formatInclude <- function(
 formatExclude <- function(
   excludeModules, discovery, nDatasets, datasetNames
 ) {
-  if (missing(excludeModules))
-    excludeModules <- NULL
+  if (missing(excludeModules)) {
+    excludeModules <- rep(list(NULL), length(discovery))
+    names(excludeModules) <- discovery
+  }
   
   if (class(discovery) %nin% c("character", "numeric", "integer"))
     stop("'discovery' must be a vector of dataset names or indices")
@@ -330,7 +341,9 @@ dynamicMatLoad <- function(object, ...) {
   if (is.null(object)) {
     return(NULL)
   } else if (is.list(object)) {
-    return(lapply(object, dynamicMatLoad, ...))
+    ret <- lapply(object, dynamicMatLoad, ...)
+    names(ret) <- names(object)
+    return(ret)
   } else if (is.bigMatrix(object)) {
     return(object)
   } else if (class(object) == "character") {
