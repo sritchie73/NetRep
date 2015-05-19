@@ -358,6 +358,9 @@
 #'   nCores=2, discovery=c("adipose", "liver", "heart"), 
 #'   test=c("adipose", "liver", "heart")
 #' )
+#' 
+#' # Remove bigMatrix files used in examples
+#' unlink("*_bm*")
 #' }
 #' 
 #' @import foreach
