@@ -3,13 +3,13 @@
 \alias{perm.test}
 \alias{permutation}
 \alias{permuted}
-\alias{requiredPower}
+\alias{requiredPerms}
 \title{Permutation Test}
 \usage{
 perm.test(permuted, observed, subsetSize, totalSize, order = TRUE,
   alternative = "greater")
 
-requiredPower(alpha, alternative = "greater")
+requiredPerms(alpha, alternative = "greater")
 }
 \arguments{
 \item{permuted}{vector of values making up the empirical distribution.}
@@ -39,7 +39,7 @@ The minimum number of permutations required to detect any significant
 Evaluates the statistical significance of a test statistic given a vector
  of "nulls": values for that test statistic drawn from random sampling.
 
-\code{requiredPower}:  how many permutations do I need to be able to detect
+\code{requiredPerms}:  how many permutations do I need to be able to detect
  significance at a given threshold \code{alpha}?
 }
 \details{

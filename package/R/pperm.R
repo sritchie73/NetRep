@@ -94,7 +94,7 @@ permp <- function(x, nperm, ...) {
 }
 
 #' @description
-#'  \code{requiredPower}:  how many permutations do I need to be able to detect
+#'  \code{requiredPerms}:  how many permutations do I need to be able to detect
 #'  significance at a given threshold \code{alpha}?
 #' 
 #' @param alpha desired significance threshold.
@@ -103,7 +103,7 @@ permp <- function(x, nperm, ...) {
 #'  be smaller than \code{alpha}.
 #' @rdname permutation
 #' @export
-requiredPower <- function(alpha, alternative="greater") {
+requiredPerms <- function(alpha, alternative="greater") {
   validAlts <- c("two.sided", "less", "greater")
   altMatch <- pmatch(alternative, validAlts)
   if (is.na(altMatch))
