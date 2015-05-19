@@ -1,217 +1,191 @@
-#' Assessing Module Preservation
+#' Replication and preservation of network modules across datasets
 #' 
-#' @description
-#' This is the main package function that performs the module preservation test.
-#' It requires well formed input: please see details for instructions on input.
+#' Assess whether gene coexpression modules replicate or are preserved in an 
+#' independent dataset. Module preservation is assessed using a permutation
+#' procedure performed on seven module preservation statistics (see details).
+#' Each dataset requires a precalculated coexpression network and adjecency
+#' network (see details). Providing the gene expression is optional, but
+#' recommended. Matrix data is ideally stored in the \code{\link{bigMatrix}}
+#' format (see details).
 #' 
-#' In future releases, more user friendly interfaces will be provided and this
-#' function will not be exported to the namespace
-#' 
+#' @param geneExpression A list of gene expression matrices, one for each 
+#' dataset. Expects columns to be genes, rows to be samples. 
+#' @param coexpression A list of coexpression matrices, one for each dataset.
+#' @param adjacency A list of adjacency matrices, one for each dataset.
+#' @param moduleAssignments A list of vectors for each \emph{discovery} dataset
+#'  containing the module assignments for each gene in the respective dataset.
+#' @param discovery datasets where module discovery has been performed.
+#' @param test datasets to test for preservation of modules from each 
+#'  \emph{discovery} dataset.
+#' @param nPerm number of permutations to use. Can be specified as a vector if
+#'  a different number of permutations is desired for each discovery dataset.
+#'  If not specified, the number of permutations will be automatically 
+#'  determined (see details).
+#' @param nCores number of cores to parallelise the permutation procedure over.
+#' @param excludeModules optional list of vectors containing modules to exclude 
+#'  from the analysis for each \code{discovery} dataset. If unspecified, the 
+#'  preservation of all modules will be tested.
+#' @param includeModules optional list of vectors containing modules to include 
+#'  in the analysis for each \code{discovery} dataset. If unspecified, the 
+#'  preservation of all modules will be tested.
+#' @param null the type of null model, either "overlap" or "all" (see details).
+#' @param alternative The type of module preservation test to perform. Must be 
+#'   one of "greater" (default), "less" or "two.sided" (see details).
+#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
+#' @param simplify logical; if \code{TRUE}, simplify the structure of the output
+#'  list if possible (see Return Value).
+#' @param lowmem logical; should memory usage be minimised? Useful on machines
+#'  with limited RAM when running in parallel.
+#'  
 #' @details
-#' \subsection{Input Instructions:}{
-#'  Any function argument ending in \code{"Sets"} expects a list, where each 
-#'  element corresponds to a dataset. The order of datasets should match across
-#'  all \code{"Sets"} arguments. 
-#'  
-#'  \code{geneExpression}, \code{coexpression}, and \code{adjacency} should contain the 
-#'  file paths to the file-backed \code{\link[bigmemory]{big.matrix}} objects
-#'  for the gene expression, gene coexpression, and gene adjacency matrices,
-#'  respectively, for each dataset. Matrices in R can be converted to 
-#'  \code{big.matrix} objects via \code{\link[bigmemory]{as.big.matrix}}, or 
-#'  alternatively read in from disk as via \code{\link[bigmemory]{read.big.matrix}}.
-#'  After the matrices have been converted to \code{big.matrix} objects the 
-#'  original matrices or resulting pointers returned by \code{as.big.matrix} and
-#'  \code{read.big.matrix} should be removed via \code{\link{rm}}, and the 
-#'  garbage collector invoked \code{\link{gc}} to prevent unnecessary memory 
-#'  usage from the left over objects being passed around.
-#'  
-#'  A nice benefit of creating file-backed \code{big.matrix} objects is that 
-#'  they can be attached to any future R session with zero loading time.
-#'  
-#'  When converting to \code{big.matrix} objects, it is important to ensure that
-#'  the column and rownames are ignored to optimise speed. When converting 
-#'  matrices in the interactive R session via \code{as.big.matrix}, these should
-#'  be first removed by setting the \code{\link{dimnames}} to \code{NULL}. When
-#'  reading in the objects from a file using \code{read.big.matrix} the colnames
-#'  can be ignored by specifying \code{skip = 1}, and rownames can be ignored 
-#'  through a combination of \code{has.row.name = TRUE} and 
-#'  \code{ignore.row.names = TRUE}.
-#'  
-#'  The  \code{geneNameSets} argument is instead used
-#'  to hold this information. \code{netRepMain} therefore expects that for any
-#'  given dataset the order of genes is the same across the expression data,
-#'  coexpression, and gene adjacency matrices. The gene expression matrices are
-#'  expected to be in sample x gene format; that is, the genes are the columns.
-#'  Each element of \code{geneNameSets} should contain a vector of unique 
-#'  identifiers for each probe/gene in the corresponding dataset. Although 
-#'  \code{netRepMain} does not require any information about the sample order,
-#'  it may be useful to store the rownames of the gene expression data in a 
-#'  similar variable, e.g. \code{sampleNameSets}, for downstream analysis.
-#'  
-#'  For each dataset where module discovery has been performed (hereby referred 
-#'  to as the \emph{discovery} dataset), \code{geneModuleSets} should contain a
-#'  vector assigning each probe to a module (i.e. the names of the vector are 
-#'  the same as \code{geneNameSets}). The entries of \code{geneModuleSets}
-#'  corresponding to the datasets the module preservation is being tested in
-#'  (hereby referred to as the \emph{test} dataset) should be \code{NULL}. If
-#'  module detection has been performed in the \emph{test} dataset as well, then
-#'  providing the module assignments will allow \code{netRepMain} to return
-#'  a contingency table of module overlap between the two datasets.
-#'  
-#'  For datasets where only a specific module, or subset of modules, are of
-#'  interest, \code{includeSets} should contain a vector of those module labels.
-#'  Similarly, \code{excludeSets} can be used to ignore one or more modules.
+#' \subsection{Input data:}{
+#'   The topological properties used to assess module preservation are designed
+#'   for networks constructed using Weighted Gene Coexpression Network Analysis
+#'   (WGCNA, \emph{(3)}). These are calculated from the gene expression for each
+#'   dataset, the pairwise correlation between genes (coexpression) for each 
+#'   dataset, and the pairwise gene adjacencies (adjacency) for each dataset. 
+#'   The adjacency is usually the absolute value of the correlation raised to a 
+#'   power to penalise weak correlations \emph{(3)}. Module preservation can 
+#'   also be assessed on networks without the gene expression data, but only a
+#'   limited subset of the statistics will be calculated. Network modules are 
+#'   usually clusters of tightly coexpressed genes \emph{(3)}, but the procedure
+#'   is also useful for assessing known gene sets, i.e. pathways across 
+#'   conditions or tissues \emph{(1)}.
+#'   
+#'   The arguments \code{geneExpression}, \code{coexpression}, and 
+#'   \code{adjacency} should be lists, where each element of the list contains 
+#'   the matrix data for one of the datasets. \code{moduleAssignments} should 
+#'   also be a list if module discovery has been performed in more than one of 
+#'   the datasets. The \code{discovery} argument should contain the indices of 
+#'   the discovery dataset(s) in each of the \code{geneExpression}, 
+#'   \code{coexpression}, and \code{adjacency} arguments, and \code{test} should
+#'   contain the indices of the test dataset(s). For example \code{discovery=1},
+#'   \code{test=1} will test the preservation of modules in 
+#'   \code{moduleAssignments[[1]]}, comparing the data stored in
+#'   \code{geneExpression[[1]]}, \code{coexpression[[1]]}, and 
+#'   \code{adjacency[[1]]} to the data stored in \code{geneExpression[[2]]}, 
+#'   \code{coexpression[[2]]}, and \code{adjacency[[2]]}. If the lists are 
+#'   named then \code{discovery} and \code{test} can instead contain the 
+#'   respective dataset names.
+#'   
+#'   It is \strong{strongly recommended} to store each matrix using the 
+#'   \code{\link{bigMatrix}} class. A \code{bigMatrix} is an object which points
+#'   to a data matrix stored on disk, which is accessible via shared memory. 
+#'   Once stored as a 'bigMatrix', the data can be instantaneously loaded in and
+#'   accessed from any R session in the future. Methods are provided for 
+#'   converting to, loading in, and writing out 'bigMatrix' objects (see 
+#'   \code{\link{bigMatrix-get}} and \code{\link{bigMatrix-out}}).
+#'   
+#'   Regular 'matrix' data are also accepted, but will be converted to 
+#'   'bigMatrix' objects for the duration of the analysis. This is not 
+#'   recommended, as the conversion process involves writing out the entire 
+#'   matrix as a binary file on disk, which is slow for large matrices. Further,
+#'   other functions provided for downstream analysis (e.g. plotting functions
+#'   and \code{\link{networkProperties}}) also expect 'bigMatrix' objects, so 
+#'   the conversion process will be performed each time one of those functions 
+#'   is called.
 #' }
-#' 
-#' \subsection{Parallelism:}{
-#'  If \code{verbose} is \code{TRUE} and a parallel backend has been registered,
-#'  then one of the cores will be reserved for reporting the function's progress.
-#'  In this case an additional core should be registered, even if it means 
-#'  registering more "cores" than physically exist: the core reporting the 
-#'  progress will have 0 memory and CPU overhead. Note that if only 2 cores have
-#'  been registered, this is the same as running on a single core.
-#'  
-#'  \code{\link{combineNulls}} may be useful for combining the resulting null
-#'  distributions from multiple runs (e.g. when parallelising on multiple 
-#'  machines without shared memory).
+#' \subsection{Memory usage:}{
+#'   For most machines there is a trade-off between memory usage per core and
+#'   the number of cores that can be utilised in parallel. The \code{lowmem}
+#'   argument controls the RAM usage for per core. When \code{TRUE}, the
+#'   default, the permutation procedure will unload the RAM after each
+#'   permutation, allowing the permutation procedure to be parallelised over
+#'   more cores. \code{lowmem} should not be set to \code{FALSE} unless there is
+#'   sufficient RAM to load the all matrices into RAM for each dataset
+#'   comparison on each core.
 #' }
-#' 
-#' \subsection{Memory Requirements:}{
-#'  \code{netRep} operates on \code{\link[bigmemory]{big.matrix}} objects. This
-#'  has two nice consequences:
-#'  \enumerate{
-#'    \item{
-#'      R does not need to load all matrices into RAM, and the individual
-#'      matrices in \code{geneExpression}, \code{coexpression}, and \code{adjacency} may also be 
-#'      much larger than RAM.
-#'    }
-#'    \item{
-#'      The matrices are accessible from shared memory, meaning that 
-#'      \code{netRep} may be run in parallel without having to copy matrices to
-#'      each spawned R session, and without storing multiple copies of the 
-#'      matrices being operated on.
-#'    }
-#'  }
-#'  
-#'  Total runtime is dictated by the available RAM. Due to the nature of 
-#'  permutation procedures, the overall runtime for a single core will be 
-#'  minimised if all relevant matrices can be stored in RAM for each core.
-#'  
-#'  When the \code{lowmem} argument is set to \code{TRUE}, \code{netRep} will 
-#'  instead consume the minimum possible RAM required for each permutation. This
-#'  makes calculations roughly two and a half times slower, but consumes at least
-#'  three times less RAM (at peak RAM usage). It is therefore recommended to set
-#'  \code{lowmem} to \code{TRUE} on machines with limited RAM, as it will make
-#'  parallelisation over many more cores possible without thrashing the machine.
-#' }
-#' 
 #' \subsection{Module Preservation Statistics:}{
-#' There are seven module preservation statistics \emph{(1)}:
+#'  Module preservation is assessed through seven statistics \emph{(1)}:
 #'  \enumerate{
 #'    \item{\code{mean.adj}:}{
-#'      The mean adjacency, or module density, measures how densely connected a
-#'      module is in the test dataset.
+#'      The mean adjacency, or module density, measures how densely connected a 
+#'      module is in the \emph{test} dataset.
 #'    }
 #'    \item{\code{pve}:}{
-#'      The pve, short for "the proportion of variance explained in the 
-#'      underlying gene expression data for the module by its summary
-#'      expression profile in the \emph{test} dataset". The summary expression 
-#'      profile is calculated as the first eigenvector from a principal
-#'      component analysis on the module's (scaled) gene expression data.
-#'      
-#'      The summary expression profile is commonly referred to as the "module
-#'      eigengene (ME)", and \code{pve} has previously been abbreviated as 
-#'      \code{propVarExpl} \emph{(1)}.
+#'      Short for "the proportion of variance explained in the underlying gene
+#'      expression data for the module by its summary expression profile in the
+#'      \emph{test} dataset". The summary expression profile is calculated as
+#'      the first eigenvector from a principal component analysis on the
+#'      module's (scaled) gene expression data. The summary expression profile
+#'      is commonly referred to as the "module eigengene (ME)", and abbreviated
+#'      as \code{propVarExpl} in \emph{(1)}.
 #'    }
 #'    \item{\code{cor.coexp}:}{
-#'      The correlation of coexpression measures how correlated the coexpression 
-#'      patterns are across both datasets. It has previously been referred to as
-#'      the "correlation of correlation" and abbreviated as \code{cor.cor} 
+#'      The correlation of coexpression patterns for a module across the
+#'      \emph{discovery} and \emph{test} datasets. It is also referred to as
+#'      the "correlation of correlation" and abbreviated as \code{cor.cor} in 
 #'      \emph{(1)}.
 #'    }
 #'    \item{\code{cor.kIM}:}{
-#'      The correlation of intramodular connectivity, measures how correlated
-#'      the intramodular connectivity is across datasets. The intramodular 
-#'      connectivity is quantified as the sum of adjacency for a gene to all
-#'      other genes in the module.
+#'      The correlation of intramodular connectivity across the \emph{discovery}
+#'      and \emph{test} datasets. Intramodular connectivity is quantified as the
+#'      sum of adjacency for a gene to all other genes in the module.
 #'    }
 #'    \item{\code{cor.MM}:}{
-#'      The correlation of intramodular module membership measures how 
-#'      correlated the module membership is across datasets. The module 
-#'      membership is quantified as the correlation between each gene and the
-#'      summary expression profile. The module membership and summary expression
-#'      profile are calculated independently in each dataset. It has previously
-#'      been abbreviated as \code{cor.kME} \emph{(1)}.
+#'      The correlation of intramodular module membership across the
+#'      \emph{discovery} and \emph{test} datasets. Module membership denotes the
+#'      correlation between each gene and the summary expression profile for
+#'      that module in the given dataset. The statistic is abbreviated as
+#'      \code{cor.kME} in \emph{(1)}.
 #'    }
 #'    \item{\code{mean.coexp}:}{
-#'      The mean sign-aware coexpression measures the average 
-#'      coexpression for a module in the \emph{test} dataset, multiplied by the
-#'      sign of the coexpression in the \emph{discovery dataset}. It has 
-#'      previously been referred to as the "mean sign-aware correlation" and
-#'      abbreviated as \code{mean.cor} \emph{(1)}.
+#'      The mean sign-aware coexpression measures the average coexpression for a
+#'      module in the \emph{test} dataset, multiplied by the sign of the 
+#'      coexpression in the \emph{discovery} dataset. It assesses how strongly 
+#'      correlated the genes are in the test dataset (in either direction), 
+#'      penalising the module if any gene pairs whose correlation flips between
+#'      datasets. It is also referred to as the "mean sign-aware correlation"
+#'      and abbreviated as \code{mean.cor} in \emph{(1)}.
 #'    }
 #'    \item{\code{mean.MM}:}{
 #'      The mean sign-aware module membership measures the average module 
 #'      membership in the \emph{test} dataset, multiplied by the sign of the 
-#'      module membership in the \emph{discovery} dataset. It has previously
-#'      been abbreivated as \code{mean.kME}.
+#'      module membership in the \emph{discovery} dataset. It measures how 
+#'      coherent the gene expression is in the \emph{test} dataset, penalising 
+#'      the module if any genes are differentially expressed compared to the 
+#'      module in one, but not both \emph{discovery} and \emph{test} datasets. 
+#'      It is also abbreivated as \code{mean.kME} in \emph{(1)}.
 #'    }
 #'  }
 #' }
+#' \subsection{Hypothesis testing:}{
+#'  Three alternative hypotheses are available. "greater", the default, tests
+#'  whether each module preservation statistic is larger than expected by 
+#'  chance. "lesser" tests whether each module preservation statistic is smaller
+#'  than expected by chance, which may be useful for identifying modules that
+#'  are extremely different in the \emph{test} dataset. "two.sided" can be used
+#'  to test both alternate hypotheses.
+#'  
+#'  To determine whether a module preservation statistic deviates from chance, a
+#'  permutation procedure is employed. Each statistic is calculated between the
+#'  module in the \emph{discovery} dataset and \code{nPerm} random gene sets of
+#'  the same size in the \emph{test} dataset in order to assess the distribution
+#'  of each statistic under the null hypothesis. Two models for the null 
+#'  hypothesis are available. Under "overlap", the default, random sampling is
+#'  performed only for the set of genes present in both the \emph{discovery} and
+#'  \emph{test} datasets. Alternative, the argument \code{null} can be set to
+#'  "all", in which case random sampling is performed on all genes present in
+#'  the \emph{test} dataset. The latter may be suitable when assessing module
+#'  replication across species.
+#'   
+#'  The number of permutations required for any given significance threshold is 
+#'  approximately 1 / the desired significance for one sided tests, and double 
+#'  that for two-sided tests. This can be calculated with 
+#'  \code{\link{requiredPerms}}. When \code{nPerm} is not specified, the number 
+#'  of permutations is automatically calculated as the number required for a 
+#'  Bonferroni corrected significance threshold adjusting for the number of 
+#'  modules in each \emph{discovery} dataset multiplied by the number of 
+#'  \emph{test} datasets. Although assessing the replication of a small number 
+#'  of modules calls for very few permutations, we recommend using no fewer than
+#'  200 as fewer permutations are unlikely to generate representative null 
+#'  distributions. \strong{Note:} the assumptions used by 
+#'  \code{\link{requiredPerms}} break down when assessing the preservation of 
+#'  very small modules in a very small dataset (e.g. gene sets in a dataset with
+#'  less than 100 genes total). However, the reported p-values will still be 
+#'  accurate (see \code{\link{perm.test}}) \emph{(2)}.
+#' }
 #' 
-#' \subsection{Statistical Tests:}{
-#'  When a module is preserved, one would expect the module preservation 
-#'  statistics to be larger than expected by chance \emph{(1)}. This is the 
-#'  default behaviour. 
-#'  
-#'  \code{\link{requiredPower}} has been provided to determine the minimum 
-#'  number of permutations required to assess module preservation at any given
-#'  signficance threshold. Due to the nature of permutation testing, this is 
-#'  also the \emph{resolution} of the permutation test; both the smallest 
-#'  p-value obtainable, and the increment size between the range of possible
-#'  p-values. In general it is advisable to run more permutations than 
-#'  necessary for any given significance threshold. 
-#'  
-#'  There are two interpretations of the null hypothesis: first, only the probes
-#'  or genes present in both datasets are considered. In this case probes 
-#'  present in the test dataset but not in the discovery are considered "missing
-#'  information", so are excluded from the random sampling (\code{null =
-#'  "overlap"}). The second is that the module preservation statistics should be
-#'  more extreme than any random subset of the test dataset, even when
-#'  considering probes not present in the discovery dataset (\code{null =
-#'  "all"}). The former is the default behaviour, but the latter may be useful 
-#'  when performing multiple species comparisons. 
-#'  
-#'  One may also be interested in examining cases where the module preservation
-#'  statistics are much smaller than expected by chance. These also imply that 
-#'  the module is structurally distinct from the rest of the
-#'  dataset. Extremely small values for the \emph{pve} or \emph{mean.adj}
-#'  indicate that there is less concordance amongst the genes than expected by
-#'  chance. Extreme negative values for the \emph{cor.kIM}, \emph{cor.MM}, 
-#'  \emph{cor.coexp}, \emph{mean.MM}, or \emph{mean.coexp} indicate that the 
-#'  gene-gene relationships are reversed across datasets. Extreme negative 
-#'  values for the \emph{cor.coexp} and \emph{mean.coexp} should occur in
-#'  cases where the coexpression has flipped: i.e. positively correlated genes
-#'  are now negatively correlated and vice versa. Extreme negative values for 
-#'  \emph{cor.kIM} indicate that the order of gene importance (ranked by 
-#'  intramodular connectivity) is reverse. Extreme negative values for
-#'  the \emph{mean.MM} and \emph{cor.MM} may indicate that the summary 
-#'  expression is being dominated by a few genes that are negatively
-#'  correlated with the rest of the module in one of the datasets (although
-#'  one should excercise caution here, as the summary expression profile may
-#'  not be representitive of the gene expression if the \emph{pve} is low).
-#'  
-#'  If one wishes to test for cases where the module preservation statistics are
-#'  smaller than expected by chance, \code{alternative} should be set to "less".
-#'  A two-sided test may also be performed (\code{alternative = "two.sided"}),
-#'  but this requires twice as many permutations to detect extreme observations
-#'  at any given threshold.
-#'  
-#'  P-values may be calculated post-hoc using \code{\link{perm.test}} if one
-#'  wishes to evaluate an alternative hypothesis later on the returned null
-#'  distributions.
-#'}
-#'  
 #' @references 
 #'   \enumerate{
 #'     \item{
@@ -224,107 +198,12 @@
 #'       zero: calculating exact P-values when permutations are randomly drawn.}
 #'       Stat. Appl. Genet. Mol. Biol. \strong{9}, Article39 (2010). 
 #'     }
+#'     \item{
+#'       Langfelder, P. & Horvath, S. \emph{WGCNA: an R package for weighted 
+#'       correlation network analysis.} BMC Bioinformatics \strong{9}, 559 
+#'       (2008).
+#'     }
 #'   }
-#' 
-#' @param geneExpression \code{NULL}, or a list of \code{\link{big.matrix}}: one for 
-#'   each dataset (See Input Instructions in Details).
-#' @param coexpression a list of \code{\link{big.matrix}} objects: one for each 
-#'   dataset, corresponding to the pairwise-gene correlation (See Input
-#'   Instructions in Details).
-#' @param adjacency a list of \code{\link{big.matrix}} objects: one for each
-#'   dataset, corresponding to the adjacency matrix of edge weights between each
-#'   pair of nodes in the network (See Input Instructions in Details).
-#' @param geneNameSets \code{NULL}, or a list of character vectors giving the 
-#'   node names for the corresponding element of \code{geneExpression}, \code{coexpression},
-#'   and \code{adjacency} (See Input Instructions in Details).
-#' @param geneModuleSets a list, whose elements are \code{NULL} for each 
-#'   \emph{test} dataset, and a vector for each \emph{discovery} dataset 
-#'   assigning each node to a sub-network/cluster/module/component (See Input
-#'   Instructions in Details).
-#' @param discovery a numeric vector indicating which elements of
-#'   \code{geneExpression} and/or \code{adjacency} are to be treated as the 
-#'   \emph{discovery} datasets.
-#' @param test a numeric vector indicating which elements of \code{geneExpression}
-#'   and/or \code{adjacency} are to be treated as the \emph{test} datasets.
-#' @param nPerm either a numeric vector or a list of numeric vectors specifying
-#'   the number of permutations to use for all datasets, or each discovery 
-#'   dataset. If a list of numeric vectors is supplied it should be in the same
-#'   format as the other "Sets" arguments, see Input Instructions in Details.
-#' @param excludeSets An optional list, where the elments for each 
-#'   \emph{discovery} data set are vectors specifying which sub-networks to 
-#'   skip.
-#' @param includeSets An optional list, where the elments for each 
-#'   \emph{discovery} data set are vectors specifying which sub-networks to 
-#'   include.
-#' @param null the type of null model, either "overlap" or "all". See section
-#'  in Details on Statistical Tests.
-#' @param alternative The type of module preservation test to perform. Must be 
-#'   one of "greater" (default), "less" or "two.sided". See section in details
-#'   on Statistical Tests.
-#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param indent numeric; a positive value indicating the indent level to start
-#'   the output at. Defaults to 0. Each indent level adds two spaces to the 
-#'   start of each line of output.
-#' @param simplify logical; if \code{TRUE}, simplify the structure of the output
-#'  list if possible (see Return Value).
-#' @param lowmem logical; should memory usage be minimised? Useful on machines
-#'  with limited RAM when running in parallel. See section on Memory Usage in
-#'  Details.
-#'  
-#' @return
-#'  The returned data structure is organised as a nested list of lists, which 
-#'  should be accessed as \code{results[[discovery]][[test]]}. These are 
-#'  typically numeric indices, i.e. if the \emph{discovery} dataset is the first in 
-#'  the \code{"Sets"} list (see Input Instructions in details) and the 
-#'  \emph{test} dataset is the second, then the results will be stored in 
-#'  \code{results[[1]][[2]]}, while \code{results[[2]][[1]]} will be empty, and 
-#'  so on.
-#'  
-#'  If \code{simplify} is set to \code{TRUE}, then this structure will be
-#'  simplified as much as possible depending on the combination of dataset
-#'  comparisons that have been performed. 
-#'  
-#'  For each dataset-comparison a list of the following objects are returned:
-#'  \itemize{
-#'    \item{\code{observed}:}{
-#'      A matrix of the observed values for the module preservation statistics.
-#'      Rows correspond to modules, and columns to the module preservation
-#'      statistics.
-#'    }
-#'    \item{\code{nulls}:}{
-#'      A three dimensional array containing the values of the module 
-#'      preservation statistics evaluated on random permutation of module 
-#'      assignment in the test network. Rows correspond to modules, columns to
-#'      the module preservation statistics, and the third dimension to the 
-#'      permutations.
-#'    }
-#'    \item{\code{p.values}:}{
-#'      A matrix of p-values for the \code{observed} module preservation 
-#'      statistics as evaluated through a permutation test using the 
-#'      corresponding values in \code{nulls}.
-#'    }
-#'    \item{\code{Z.scores}:}{
-#'      A matrix of Z scores for the \code{observed} module preservation
-#'      statistics.
-#'    }
-#'    \item{\code{genesPresent}:}{
-#'      A vector containing the number of genes that are present in the test
-#'      dataset for each module.
-#'    }
-#'    \item{\code{propGenesPresent}:}{
-#'      A vector containing the proportion of genes present in the test dataset
-#'      for each module. Modules where this is less than 1 should be 
-#'      investigated further before making judgements about preservation to 
-#'      ensure that the missing genes are not the most connected ones.
-#'    }
-#'    \item{\code{contigency}:}{
-#'      If the corresponding \code{geneModuleSets} for the \emph{test} dataset
-#'      has also been supplied, then a contigency table is returned, showing
-#'      the overlap between modules in each dataset. Rows correspond to modules
-#'      in the \emph{discovery} dataset, columns to modules in the \emph{test}
-#'      dataset.
-#'    }
-#'  }
 #'
 #' @import foreach
 #' @import RhpcBLASctl
