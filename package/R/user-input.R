@@ -196,7 +196,7 @@ formatModuleAssignments <- function(
 
 #' Format includeModules list
 #' 
-#' @param input input provided by the user
+#' @param includeModules input provided by the user
 #' @param discovery vector of discovery networks provided by the user
 #' @param nDatasets number of datasets
 #' @param datasetNames names of the datasets
@@ -257,7 +257,7 @@ formatInclude <- function(
 
 #' Format excludeModules list
 #' 
-#' @param input input provided by the user
+#' @param excludeModules input provided by the user
 #' @param discovery vector of discovery networks provided by the user
 #' @param nDatasets number of datasets
 #' @param datasetNames names of the datasets

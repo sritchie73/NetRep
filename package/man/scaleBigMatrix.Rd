@@ -8,7 +8,8 @@ scaleBigMatrix(x, tmp.dir)
 \arguments{
 \item{x}{the bigMatrix to scale.}
 
-\item{obj.dir}{directory to store the backingfiles for the bigMatrix.}
+\item{tmp.dir}{temporary directory to store the backingfiles for the
+bigMatrix.}
 }
 \value{
 an object of type \code{bigMatrix}.

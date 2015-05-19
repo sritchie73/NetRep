@@ -13,7 +13,12 @@
 write.bigMatrix(x, file, ...)
 }
 \arguments{
-\item{x}{an object of type 'bigMatrix.}
+\item{x}{an object of type 'bigMatrix'.}
+
+\item{file}{file to write out the data from \code{x} into.}
+
+\item{...}{additional arguments to pass to
+ \code{\link[bigmemory]{write.big.matrix}}.}
 }
 \description{
 Functions for converting 'bigMatrix' objects to other classes.

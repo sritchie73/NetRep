@@ -6,13 +6,13 @@
 formatExclude(excludeModules, discovery, nDatasets, datasetNames)
 }
 \arguments{
+\item{excludeModules}{input provided by the user}
+
 \item{discovery}{vector of discovery networks provided by the user}
 
 \item{nDatasets}{number of datasets}
 
 \item{datasetNames}{names of the datasets}
-
-\item{input}{input provided by the user}
 }
 \value{
 List structure to match the rest of the input data

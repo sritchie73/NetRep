@@ -202,7 +202,10 @@ read.bigMatrix <- function(
 #' 
 #' Functions for converting 'bigMatrix' objects to other classes.
 #' 
-#' @param x an object of type 'bigMatrix.
+#' @param x an object of type 'bigMatrix'.
+#' @param file file to write out the data from \code{x} into.
+#' @param ... additional arguments to pass to 
+#'  \code{\link[bigmemory]{write.big.matrix}}.
 #' 
 #' @details
 #' \code{as.big.matrix} converts to a \code{\link[bigmemory]{big.matrix}}

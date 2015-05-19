@@ -4,7 +4,8 @@
 #' are expected to be columns.
 #' 
 #' @param x the bigMatrix to scale.
-#' @param obj.dir directory to store the backingfiles for the bigMatrix.
+#' @param tmp.dir temporary directory to store the backingfiles for the 
+#'  bigMatrix.
 #' @return
 #'  an object of type \code{bigMatrix}.
 #' 
