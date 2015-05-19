@@ -210,29 +210,56 @@
 #' @export
 modulePreservation <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments,
-  discovery, test, nPerm=10000, excludeModules=NULL, 
-  includeModules=NULL, null="overlap", alternative="greater",
-  verbose=TRUE, indent=0, simplify=TRUE, lowmem=FALSE
+  discovery=1, test=2, nCores=1, nPerm, excludeModules,
+  includeModules, null="overlap", alternative="greater",
+  simplify=TRUE, lowmem=TRUE, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
   #-----------------------------------------------------------------------------
-    
+  # Temporary directory to store new bigMatrix objects in
+  vCat(verbose, 0, "creating directory for temporary objects...")
+  tmp.dir <- paste0(".temp-objects", getUUID())
+  dir.create(tmp.dir, showWarnings=FALSE)
+  on.exit({
+    vCat(verbose, 0, "removing temporary object directory...")
+    unlink(tmp.dir, recursive=TRUE)
+  }, add=TRUE)
+  
+  vCat(verbose, 0, "Validating user input...")
+  
+  # Identify the null hypothesis to use 
+  nullModels <- c("overlap", "all")
+  if (is.na(pmatch(null, nullModels))) {
+    stop("overlap must match one of ", paste(nullModels, collapse=" "))
+  }
+  model <- pmatch(null, nullModels)
+  
+  # Identiyf the alternate hypothesis to use
+  validAlts <- c("two.sided", "less", "greater")
+  altMatch <- pmatch(alternative, validAlts)
+  if (is.na(altMatch))
+    stop("Alternative must be one of ", validAlts)
+  
+  if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)
+    stop("'nCores' must be a single number greater than 0")
+  if (!is.null(geneExpression) && !is.list(geneExpression))
+    stop("Expecting a list of gene expression matrices, one for each dataset")
+  if (!is.list(coexpression))
+    stop("Expecting a list of coexpression matrices, one for each dataset")
+  if (!is.list(adjacency))
+    stop("Expecting a list of adjacency matrices, one for each dataset")
+  
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structure.
-  vCat(verbose, indent, "Validating user input...")
-  if (missing(moduleAssignments))
-    stop("no 'moduleAssignments' provided")
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression)
   )
-  # same for the include and exclude modules arguments
-  includeModules <- formatInclude(
-    includeModules, discovery, length(coexpression), names(coexpression)
-  )
-  excludeModules <- formatExclude(
-    excludeModules, discovery, length(coexpression), names(coexpression)
-  )
+  
+  # Try to intelligently handle different types of user input
+  geneExpression <- dynamicMatLoad(geneExpression, backingpath=tmp.dir)
+  coexpression <- dynamicMatLoad(coexpression, backingpath=tmp.dir)
+  adjacency <- dynamicMatLoad(adjacency, backingpath=tmp.dir)
   
   # Sanity check input for consistency.
   checkSets(
@@ -251,27 +278,20 @@ modulePreservation <- function(
   }
   nDatasets <- length(datasets)
   
-  # The user may specify different numbers of permutations for each discovery
-  # dataset
-  if (length(nPerm) > 1) {
-    if (!is.numeric(nPerm))
-      stop("'nPerm' must be a numeric vector")
-  }
+  # same for the include and exclude modules arguments
+  includeModules <- formatInclude(
+    includeModules, discovery, length(coexpression), names(coexpression)
+  )
+  excludeModules <- formatExclude(
+    excludeModules, discovery, length(coexpression), names(coexpression)
+  )
   
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang.
-  vCat(verbose, indent, "checking matrices for non-finite values...")
+  vCat(verbose, 0, "checking matrices for non-finite values...")
   lapply(geneExpression, checkFinite)
   lapply(coexpression, checkFinite)
   lapply(adjacency, checkFinite)
-  
-  # Temporary directory to store new bigMatrix objects in
-  vCat(verbose, indent, "creating directory for temporary objects...")
-  tmp.dir <- paste0(".temp-objects", getUUID())
-  dir.create(tmp.dir, showWarnings=FALSE)
-  on.exit({
-    unlink(tmp.dir, recursive=TRUE)
-  }, add=TRUE)
   
   # Temporarily create scaled gene expression set for the calculation of the
   # summary expression profile
@@ -291,39 +311,112 @@ modulePreservation <- function(
     names(res) <- datasets
   
   #-----------------------------------------------------------------------------
-  # Set up variables for running module preservation analysis
+  # Atuomatically determine the number of permutations if unspecified
   #-----------------------------------------------------------------------------
-  
-  # Identify the null hypothesis to use 
-  nullModels <- c("overlap", "all")
-  if (is.na(pmatch(null, nullModels))) {
-    stop("overlap must match one of ", paste(nullModels, collapse=" "))
-  }
-  model <- pmatch(null, nullModels)
-  
-  # Identiyf the alternate hypothesis to use
-  validAlts <- c("two.sided", "less", "greater")
-  altMatch <- pmatch(alternative, validAlts)
-  if (is.na(altMatch))
-    stop("Alternative must be one of ", validAlts)
-  
-  # Determine set up of worker nodes for parallelisation
-  nCores <- getDoParWorkers()
-  if (verbose & nCores > 1) {
-    vCat(verbose, indent, "Verbose output is TRUE; reserving one core as the", 
-         "master, to report the progress of the worker cores who do the bulk",
-         "of the calculation.")
-    nWorkers <- nCores - 1
+  if (missing(nPerm)) {
+    # If missing, set as the required number for Bonferroni correction.
+    nPerm <- sapply(discovery, function(di) {
+      modules <- table(moduleAssignments[[di]])
+      if (!is.null(excludeModules[[di]])) {
+        modules <- modules %sub_nin% excludeModules[[di]]
+      }
+      if (!is.null(includeModules[[di]])) {
+        modules <- modules %sub_in% includeModules[[di]]
+      }
+      
+      nModules <- length(modules)
+      # Bonferroni correct for the number of modules of interest in the
+      # discovery dataset, multiplied by the number of test datasets, but
+      # force a minimum requirement to ensure a reasonable degree of accuracy.
+      max(200, requiredPerms(0.05/(nModules*length(test))))
+    })
+    names(nPerm) <- discovery
+  } else if (length(nPerm) > 1) {
+    if (!is.numeric(nPerm))
+      stop("'nPerm' must be a numeric vector")
+    if (is.null(names(nPerm))) {
+      names(nPerm) <- discovery
+    } else if (any(names(nPerm) %nin% discovery)) {
+      stop("mismatch between dataset names in 'nPerm' and 'discovery'")
+    }
+  } else if (!is.numeric(nPerm) ){
+    stop("'nPerm' must be numeric")
   } else {
-    nWorkers <- nCores
+    nPerm <- rep(nPerm, length(discovery))
+    names(nPerm) <- discovery
   }
-  vCat(verbose, indent, "Running with", nWorkers, "worker cores.")
+  
+  #-----------------------------------------------------------------------------
+  # Set up parallel backend
+  #-----------------------------------------------------------------------------
+  if (.Platform$OS.type == "windows" & nCores > 1) {
+    # Quietly load parallel backend packages. Throw our own warning and 
+    # continue
+    if(suppressWarnings(suppressMessages(require(doParallel)))) {
+      # we need an additional thread to monitor and report progress
+      if (verbose)  
+        nCores <- nCores + 1
+      cl <- makeCluster(nCores)
+      registerDoParallel(cl)
+      on.exit({
+        stopCluster(cl)
+      }, add=TRUE)
+      vCat(verbose, 0, "Running on", nCores - 1, "cores.")
+      if ((nCores - 1) > detectCores()) {
+        stop(
+          "Requested number of threads (", nCores - 1, ") is higher than the ",
+          "number of available cores (", detectCores(), "). Using too many ",
+          "threads may cause the machine to thrash/freeze."
+        )
+      }
+    } else {
+      nCores <- 1
+      # We want to immediately print a warning for the user, not at the end 
+      # once the analysis has finished.
+      vCat(
+        TRUE, 0, file=stderr(),
+        "Warning: unable to find 'doParallel' package, running on 1 core.", 
+      )
+      warning("U")
+    }
+  } else if (.Platform$OS.type == "unix" & nCores > 1) {
+    # Quietly load parallel backend packages. Throw our own warning and 
+    # continue
+    if(suppressWarnings(suppressMessages(require(doMC)))) {
+      # we need an additional thread to monitor and report progress
+      if (verbose) 
+        nCores <- nCores + 1
+      registerDoMC(nCores)
+      vCat(verbose, 0, "Running on", nCores - 1, "cores.")
+      if ((nCores - 1) > detectCores()) {
+        stop(
+          "Requested number of threads (", nCores - 1, ") is higher than the ",
+          "number of available cores (", detectCores(), "). Using too many ",
+          "threads may cause the machine to thrash/freeze."
+        )
+      }
+    } else {
+      nCores <- 1
+      # We want to immediately print a warning for the user, not at the end 
+      # once the analysis has finished.
+      vCat(
+        TRUE, 0, file=stderr(),
+        "Unable to find 'doMC' package, running on 1 core."
+      )
+    }
+  } else {
+    vCat(verbose, 0, "Running on 1 cores.")
+  }
   
   # Since we expect the user to explicitly handle the number of parallel threads,
   # we will disable the potential implicit parallelism on systems where R has
   # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
   omp_set_num_threads(1)
   blas_set_num_threads(1)
+  
+  #-----------------------------------------------------------------------------
+  # Set up variables for running module preservation analysis
+  #-----------------------------------------------------------------------------
   
   # The following declarations are for iterators declared inside each foreach 
   # loop. Declarations are required to satisfy NOTES generated by R CMD check, 
@@ -342,15 +435,13 @@ modulePreservation <- function(
       if ((di %in% discovery) & (ti %in% test) & (di != ti)) {
         tryCatch({
           vCat(
-            verbose, indent, sep="", 
+            verbose, 0, sep="", 
             "Calculating preservation of network subsets from dataset ",
             di, ", in dataset ", ti, "."
           )
           #---------------------------------------------------------------------
           # Set up variables for this comparison
           #---------------------------------------------------------------------
-          # Get the relvant number of permutations
-          thisPerm <- ifelse(length(nPerm) > 1, nPerm[di], nPerm)
           
           # Force modules to be character vectors to avoid improper indexing
           if (is.numeric(moduleAssignments[[di]])) { 
@@ -375,7 +466,7 @@ modulePreservation <- function(
           overlapAssignments <- overlapAssignments %sub_in% modules 
           overlapModules <- unique(overlapAssignments)
           overlapModules <- overlapModules[orderAsNumeric(overlapModules)]
-
+          
           if (length(overlapAssignments) == 0) {
             warning(
               "No genes for the modules of interest are present in the test",
@@ -397,7 +488,7 @@ modulePreservation <- function(
           moduleSizes <- moduleSizes[names(moduleSizes) %sub_in% modules]
           propGenesPres <- genesPres / moduleSizes
           propGenesPres <- propGenesPres[orderAsNumeric(names(propGenesPres))]
-                    
+          
           # Calculate some basic cross-tabulation statistics so we can assess 
           # which modules in both datasets map to each other, if module
           # detection has also been performed for the test network
@@ -416,13 +507,13 @@ modulePreservation <- function(
               orderAsNumeric(rownames(contingency)),
               orderAsNumeric(colnames(contingency)),
               drop=FALSE
-            ]
-
+              ]
+            
             # add in the module sizes from the respective datasets
             contingency <- cbind(rowSums(contingency), contingency)
             testSizes <- table(moduleAssignments[[ti]][overlapGenes])
             testSizes <- testSizes[colnames(contingency)]
-                        
+            
             contingency <- rbind(
               testSizes[colnames(contingency)], 
               contingency
@@ -438,7 +529,7 @@ modulePreservation <- function(
           # Get the network properties for each module in the test dataset.
           #   - We only need to calculate this once
           #---------------------------------------------------------------------
-          vCat(verbose, indent+1, "Calculating observed test statistics...")
+          vCat(verbose, 1, "Calculating observed test statistics...")
           discProps <- rep(list(NULL), nModules)
           names(discProps) <- overlapModules
           for (mi in overlapModules) {
@@ -474,7 +565,7 @@ modulePreservation <- function(
           # Run permutation procedure
           #---------------------------------------------------------------------
           vCat(
-            verbose, indent+1, "Calculating null distributions with", thisPerm, 
+            verbose, 1, "Calculating null distributions with", nPerm[di], 
             "permutations..."
           )
           if(verbose) {
@@ -495,15 +586,13 @@ modulePreservation <- function(
               unlink(run.dir, recursive=TRUE)
             }, add=TRUE)
           }
-          foreach(chunk=ichunkTasks(verbose, thisPerm, nCores)) %maybe_do_par% {
-            if (verbose & length(chunk) == 1) {
-              if (chunk == -1) {
-                monitorProgress(nWorkers, indent+2, run.dir)
-                NULL
-              }
+          foreach(chunk=ichunkTasks(verbose, nPerm[di], nCores)) %maybe_do_par% {
+            if (verbose && length(chunk) == 1 && chunk == -1) {
+              monitorProgress(nCores - 1, 2, run.dir)
+              NULL
             } else {
               if (verbose) {
-                conns <- setupParProgressLogs(chunk, nWorkers, indent+2, run.dir)
+                conns <- setupParProgressLogs(chunk, nCores - 1, 2, run.dir)
                 progressBar <- conns[[1]]
                 on.exit(lapply(conns, close))
               } 
@@ -547,7 +636,7 @@ modulePreservation <- function(
                   permInds <- match(permGenes, colnames(coexpression[[ti]]))
                   # Ensure crashes aren't fatal
                   tryCatch({
-                    permProps <-  moduleProps(adjacency[[ti]], permInds, sge[[ti]])
+                    permProps <- moduleProps(adjacency[[ti]], permInds, sge[[ti]])
                     chunkStats[mi,,pi] <- calcStats(
                       discProps[[mi]], permProps, 
                       coexpression[[di]], discInds,
@@ -567,8 +656,8 @@ modulePreservation <- function(
                 if (verbose) {
                   updateParProgress(progressBar, chunk[pi])
                   if (nCores == 1) {
-                    reportProgress(indent+2, run.dir)
-                    if (chunk[pi] == thisPerm) {
+                    reportProgress(2, run.dir)
+                    if (chunk[pi] == nPerm[di]) {
                       cat("\n")
                     }
                   }
@@ -585,7 +674,7 @@ modulePreservation <- function(
           rm(discProps)
           gc()
           
-          nulls <- array(NA, dim=c(nModules, nStatistics, thisPerm))
+          nulls <- array(NA, dim=c(nModules, nStatistics, nPerm[di]))
           dimnames(nulls)[[3]] <- rep("", dim(nulls)[3])
           chunkFiles <- list.files(tmp.dir, "chunk[0-9]*permutations.rds")
           offset <- 1
@@ -601,7 +690,7 @@ modulePreservation <- function(
           #---------------------------------------------------------------------
           # Calculate permutation p-value
           #---------------------------------------------------------------------
-          vCat(verbose, indent+1, "Calculating P-values...")
+          vCat(verbose, 1, "Calculating P-values...")
           p.values <- matrix(NA, nrow=nModules, ncol=nStatistics)
           dimnames(p.values) <- dimnames(observed)
           for (mi in overlapModules) {
@@ -631,10 +720,10 @@ modulePreservation <- function(
                 genesPres[mi], length(overlapGenes),
                 order=order, alternative=alternative
               )
-
+              
             }
           }
-
+          
           # Order statistics: First density stats, then connectivity
           if (!is.null(sge[[di]])) {
             statOrder <- c(
@@ -645,7 +734,7 @@ modulePreservation <- function(
             statOrder <- c("mean.adj", "cor.kIM", "cor.coexp", "mean.coexp")
           }
           
-          vCat(verbose, indent+1, "Collating results...")
+          vCat(verbose, 1, "Collating results...")
           
           #---------------------------------------------------------------------
           # Collate results
@@ -660,11 +749,12 @@ modulePreservation <- function(
           )
           res[[di]][[ti]] <- res[[di]][[ti]][
             !sapply(res[[di]][[ti]], is.null)
-          ]
-                    
-          vCat(verbose, indent+1, "Cleaning up temporary objects...")
+            ]
+          
           gc()
-          vCat(verbose, indent, "Done!")
+          on.exit({
+            vCat(verbose, 0, "Done!")
+          }, add=TRUE)
         }, error=function(e) {
           warning(
             "Failed with error:\n", e$message, "\nSkipping to next comparison"
@@ -685,4 +775,3 @@ modulePreservation <- function(
   }
   res
 }
-

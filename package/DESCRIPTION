@@ -1,12 +1,12 @@
 Package: netrep
 Type: Package
-Title: Network Replication
+Title: Fast permutation procedure for testing network module replication
 Version: 0.11.0
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
-Description: Functions for efficiently and accurately assessing whether the
-    topological properties of a network subset are preserved or replicate in
-    another dataset.
+Description: Functions for assessing the replication/preservation of network
+    topology for weighted gene coexpression network modules in one or more
+    independent datasets through permutation testing.
 License: GPL-2
 Depends:
     R (>= 3.0.0),
@@ -25,5 +25,7 @@ Imports:
     RColorBrewer,
     abind
 Suggests:
-    testthat
+    testthat,
+    doMC,
+    doParallel
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
