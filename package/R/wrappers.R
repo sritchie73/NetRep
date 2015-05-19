@@ -103,7 +103,8 @@ moduleProps <- function(adj, moduleIndices, sge) {
 #' 
 #' @return 
 #'  A list of network properties for each module of interest.
-#'  
+#'
+#' @rdname networkProperties
 #' @export
 networkProperties <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
