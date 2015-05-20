@@ -29,7 +29,7 @@ plotTriangleHeatmap <- function(values, palette, vlim, mas) {
       polygon(
         x=c(leftx, leftx+0.5, rightx, leftx+0.5, leftx),
         y=c(topy-0.5, topy, topy-0.5, boty, topy-0.5),
-        col=col, border=col
+        col=col, border=addAlpha(col, 0.5)
       )
     }
   }
@@ -54,7 +54,7 @@ plotTriangleHeatmap <- function(values, palette, vlim, mas) {
   )
 }
 
-#' Plot a symmetric heatmap as a square
+#' Plot a square heatmap
 #' 
 #' @param values values to plot on the heatmap
 #' @param palette color palette to interpolate over
@@ -75,7 +75,7 @@ plotSquareHeatmap <- function(values, palette, vlim, mas) {
         xright = ii + 0.5,
         ybottom = (nGenes - (jj - 1)) - 0.5,
         ytop = (nGenes - (jj - 1)) + 0.5,
-        col=col, border=col
+        col=col, border=addAlpha(col, 0.5)
       )
     }
   }
@@ -106,4 +106,21 @@ plotSquareHeatmap <- function(values, palette, vlim, mas) {
   )
 }
 
+#' Plot a color palette legend
+#' 
+#' Legend will fill an entire plot window.
+#' 
+#' @param palette color palette.
+#' @param palette.vlim limits of the values mapping to the extremities of the 
+#'  color palette.
+#' @param legend.vlim limits of the values to display on the legend
+#' @param horizontal logical; if \code{TRUE} the legend is plotted horizontally,
+#'   otherwise vertically.
+#' @param main title of the legend.
+#' 
+plotGradientLegend <- function(
+  palette, palette.vlim, legend.vlim, horizontal, main
+) {
+
+}
 
