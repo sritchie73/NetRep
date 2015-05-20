@@ -201,6 +201,11 @@ networkProperties <- function(
 #' 
 #' @template api_inputs
 #' 
+#' @param na.rm logical; Only applies when requesting the ordering of genes of
+#'  one or more modules in an independent test dataset. If \code{TRUE}, genes 
+#'  missing from the test dataset are excluded. If \code{FALSE}, missing genes
+#'  are put last in the ordering.
+#' 
 #' @references
 #' \enumerate{
 #'    \item{
@@ -231,13 +236,13 @@ networkProperties <- function(
 #' adjA <- as.bigMatrix(adjA, "adjA_bm")
 #' 
 #' # Get the order of genes in module 2
-#' orderGenes(
+#' geneOrder(
 #'   geA, coexpA, adjA, moduleAssignments, modules="2"
 #' )
 #' 
 #' ## Example 2: get the order of genes of an arbitrary subset
 #' ## (the first 10 genes)
-#' orderGenes(
+#' geneOrder(
 #'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10]
 #' )
 #' 
@@ -291,7 +296,7 @@ networkProperties <- function(
 #' 
 #' # Get the order of genes in the liver tissue for modules 
 #' # 3 and 7, which were discovered in the adipose tissue. 
-#' orderGenes(
+#' geneOrder(
 #'   geneExpression, coexpression, adjacency, moduleAssignments,
 #'   modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
@@ -299,11 +304,11 @@ networkProperties <- function(
 #' # clean up bigMatrix files from examples
 #' unlink("*_bm*")
 #' 
-#' @rdname orderGenes
+#' @rdname geneOrder
 #' @export
-orderGenes <- function(
+geneOrder <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1
+  discovery=1, test=1, na.rm=FALSE
 ) {
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules,
@@ -336,6 +341,9 @@ orderGenes <- function(
   
   # order genes
   foreach(mi = moduleOrder, .combine=c) %do% {
-    names(sort(props[[mi]]$connectivity, decreasing=TRUE))
+    names(sort(
+      props[[mi]]$connectivity, decreasing=TRUE, 
+      na.last=ifelse(na.rm, NA, TRUE)
+    ))
   }
 }

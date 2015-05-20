@@ -2,11 +2,11 @@
 
 export(as.bigMatrix)
 export(combineNulls)
+export(geneOrder)
 export(is.bigMatrix)
 export(load.bigMatrix)
 export(modulePreservation)
 export(networkProperties)
-export(orderGenes)
 export(orderModule)
 export(orderSamples)
 export(perm.test)
