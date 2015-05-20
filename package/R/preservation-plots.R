@@ -53,7 +53,7 @@
 #' @param cex.title \code{cex} for the titles
 #' @param cex.lab \code{cex} for the axis labels
 #' 
-#' @export
+#' 
 preservationPlot <- function(
   gene.expr, coexpression, adjacency, moduleLabels, module, moduleGenes,
   sampleOrder, sampleNames, includeNew=TRUE,
@@ -298,68 +298,13 @@ preservationPlot <- function(
 # Functions to organise genes and samples in a visually useful way
 #------------------------------------------------------------------
 
-#' Order genes and modules in a network
-#' 
-#' Clusters network modules by summary expression profile similarity, and 
-#' order genes within each subset by connectivity.
-#' 
-#' @param adjacency Matrix of gene adjacencies
-#' @param module.labels Optional vector of module assignments for each gene.
-#' @param summary.exp Optional \code{data.frame} of summary expression profiles
-#'  for each network subset. 
-#'  
-#' @return a vector of ordered nodes. 
-#'
-#' @export
-orderModule <- function(adjacency, module.labels=NULL, summary.exp=NULL) {
-  adjacency <- dynamicMatLoad(adjacency)
-  if (nrow(adjacency) != ncol(adjacency))
-    stop("expecting a square adjacency!")
-  
-  nGenes <- nrow(adjacency)
-  order <- NULL
-  
-  
-  if (is.null(module.labels)) {
-    module.labels = rep("a", nGenes)
-    module.order = "a"
-  } else {
-    if (!is.null(summary.exp)) {
-      h <- hclust(
-        as.dist(
-          1 - abs(cor(summary.exp, use="pairwise.complete.obs"))
-        )
-      )
-      module.order <- h$label[h$order]
-    } else {
-      module.order <- unique(module.labels)
-      tryCatch({
-        # attempt to order numerically if possible
-        module.order <- module.order[order(as.integer(module.order))]
-      }, warning = function(w) {
-        # leave order as is
-      })
-    }
-  }
-  
-  for (module in module.order) {
-    module.nodes <- which(module.labels == module)
-    
-    # Order genes within each module by their connectivity to all other genes
-    kIM <- adjProps(adjacency, module.nodes)$kIM
-    order <- c(order, module.nodes[order(kIM, decreasing=TRUE)])
-  }   
-  
-  return(order)
-}
-
 #' Order gene expression samples based on the summary expression profile
 #' 
 #' @param gene.expr matrix of gene expression data. Expects columns to be the 
 #'  genes.
 #' @return a vector of ordered nodes. 
 #'
-#' @export
+#' 
 orderSamples <- function(gene.expr) {
   gene.expr <- dynamicMatLoad(gene.expr)
   scaledDesc <- scaleBigMatrix(gene.expr, ".")
@@ -382,7 +327,7 @@ orderSamples <- function(gene.expr) {
 #' @param cex.title cex for the title text
 #' @param main title for the legend
 #' 
-#' @export
+#' 
 plotLegend <- function(
   gradient, range, cex.axis=0.8, cex.title=1, main="Legend"
 ) {
@@ -430,7 +375,7 @@ plotLegend <- function(
 #' @param col color of bars
 #' @param xlab a title for the x axis: see \link[graphics]{title}.
 #' 
-#' @export
+#' 
 plotKIM <- function(
   adjacency, module.labels, col="orange", cex.axis=1, cex.title=1.4, 
   main="Intramodular Connectivity", xlab="genes", cex.lab=cex.axis,
@@ -482,7 +427,7 @@ plotKIM <- function(
 #' @param missing.inds indices for missing genes, needed to preserved order 
 #'  when comparing plots across datasets.
 #'
-#' @export
+#' 
 plotKME <- function(
   gene.expr, module.labels, heatmap.gradient, cex.axis=1, cex.title=1.4,
   main = "Intramodular Module Membership", xlab="genes", cex.lab=cex.axis,
@@ -552,7 +497,7 @@ plotKME <- function(
 #'   placed at the end of the expression matrix, so draws a line to indicate 
 #'   where these fall.
 #' 
-#' @export
+#' 
 plotSummaryExpression <- function(
   gene.expr, heatmap.gradient, expression.range, is.relative=TRUE, cex.axis=1,
   cex.title=1.4, main="Summary\nExpression", ylab="samples", cex.lab=cex.axis,
@@ -620,7 +565,7 @@ plotSummaryExpression <- function(
 #'   placed at the end of the expression matrix, so draws a line to indicate 
 #'   where these fall. 
 #'
-#' @export
+#' 
 plotExpression <- function(
   gene.expr, heatmap.gradient, expression.range, is.relative=TRUE, 
   cex.title=1.4, main="Gene Expression", xlab="genes", ylab="samples", 
@@ -693,7 +638,7 @@ plotExpression <- function(
 #'  coexpression heatmap.
 #' @param module.colors colors to represent each module
 #'
-#' @export
+#' 
 plotModuleLegend <- function(module.labels, module.colors) {
   if (missing(module.colors)) {
     module.colors = seq_along(module.labels)
@@ -713,27 +658,6 @@ plotModuleLegend <- function(module.labels, module.colors) {
   }
   box()
   
-}
-
-#' Render gene names for coexpression plot
-#' 
-#' Create panel containing the axis with just the gene names. Adjust bot.mar to
-#' get output correct.
-#' 
-#' @param gene.labels labels for each gene to render
-#' @param bot.mar bottom margin
-#' @param cex.axis cex for the axis text
-#' 
-#' @export
-plotGeneNames <- function(gene.labels, bot.mar=5, cex.axis=1) {
-  old.mar<- par("mar")
-  par(mar=c(bot.mar, old.mar[2], 0, old.mar[4])) 
-  
-  nGenes <- length(gene.labels)
-  nullPlot(c(0, nGenes), c(0, 0))
-  
-  axis(at=(1:nGenes)-0.5, side=1, labels=gene.labels, las=2, cex.axis=cex.axis)
-  par(mar=old.mar)
 }
 
 #----------------------------
@@ -868,33 +792,5 @@ findColInGrad <- function(weight, edgeBins, colors, na.color="#AAAAAA") {
     if (weight >= edgeBins[i] & weight <= edgeBins[i + 1]) {
       return(colors[i])
     }
-  }
-}
-
-addTitle <- function(title, cex) {
-  mtext(title, side=3, cex=cex, line=0.4)
-}
-
-# Get a gradient such that the centre color lines up with 0.
-colorRampSymmetric <- function(colors, val.range, nBins) {
-  if (0 > val.range[1] & 0 < val.range[2]) {
-    ## Get the color gradient so that the colors are balanced across the axes
-    fullRange <- colorRampPalette(colors)(nBins)
-    maxVal <- max(abs(val.range))
-    r.vals <- seq(-1*maxVal, maxVal, length=nBins+1)
-    
-    min.col.index <- 0
-    max.col.index <- 0
-    for (i in 1:(length(r.vals) - 1)) {
-      if (val.range[1] >= r.vals[i] & val.range[1] <= r.vals[i + 1]) {
-        min.col.index <- i
-      }
-      if (val.range[2] >= r.vals[i] & val.range[2] <= r.vals[i + 1]) {
-        max.col.index <- i
-      }
-    }
-    fullRange[min.col.index:max.col.index]
-  } else {
-    colorRampPalette(colors)(nBins)
   }
 }
