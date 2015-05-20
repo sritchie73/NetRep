@@ -45,10 +45,6 @@ plotTriangleHeatmap <- function(values, palette, vlim, mas) {
         y=c(0, 0, height, 0)
       )
     }
-    for (mm in 2:length(breaks)) {
-      mheight <- (breaks[mm] - breaks[mm - 1])/2
-      halfway <-  mheight + breaks[mm - 1]
-    }
   }
   
   # render border of plot
@@ -57,3 +53,57 @@ plotTriangleHeatmap <- function(values, palette, vlim, mas) {
     lwd=2, xpd=TRUE
   )
 }
+
+#' Plot a symmetric heatmap as a square
+#' 
+#' @param values values to plot on the heatmap
+#' @param palette color palette to interpolate over
+#' @param vlim range of values to use when mapping values to the \code{palette}.
+#' @param mas ordered subset of the moduleAssignments vector
+#' 
+plotSquareHeatmap <- function(values, palette, vlim, mas) {
+  nGenes <- ncol(values)
+  emptyPlot(xlim=c(0.5, nGenes+0.5), ylim=c(0.5, nGenes+0.5), bty="n")
+  palette <- colorRampPalette(palette)(255)
+  
+  # render squares / triangles
+  for (ii in 1:nGenes) {
+    for (jj in 1:nGenes) {
+      col <- getColFromPalette(values[ii, jj], palette, vlim)
+      rect(
+        xleft = ii - 0.5,
+        xright = ii + 0.5,
+        ybottom = (nGenes - (jj - 1)) - 0.5,
+        ytop = (nGenes - (jj - 1)) + 0.5,
+        col=col, border=col
+      )
+    }
+  }
+  
+  # render module boundaries
+  if (length(unique(mas)) > 1) {
+    breaks <- getModuleBreaks(mas)
+    for (mi in seq_along(breaks)[-1]) {
+      rect(
+        xleft = breaks[mi - 1],
+        xright = breaks[mi],
+        ybottom = (nGenes + 0.5) - (breaks[mi] - 0.5),
+        ytop = (nGenes + 0.5) - (breaks[mi - 1] - 0.5),
+        border="black"
+      )
+    }
+  }
+  
+  # render border of plot
+  rect(
+    xleft=par("usr")[1],
+    xright=par("usr")[2],
+    ybottom=par("usr")[3],
+    ytop=par("usr")[4],
+    border="black",
+    xpd=TRUE,
+    lwd=2
+  )
+}
+
+
