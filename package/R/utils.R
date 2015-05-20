@@ -316,3 +316,28 @@ orderAsNumeric <- function(vec) {
     order(vec)
   })
 }
+
+#' Return genes without ordering
+#' 
+#' Used by the plotting functions to get the desired genes from dynamic user 
+#' input.
+#' 
+#' @template api_inputs
+#' @rdname getUnsortedGenes
+getGenes <- function(
+  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
+  discovery=1, test=1
+) {
+  props <- networkProperties(
+    geneExpression, coexpression, adjacency, moduleAssignments, modules,
+    discovery, test
+  )
+  if (missing(modules) || length(modules) == 1) {
+    props <- list(props)
+  }
+  
+  moduleOrder <- seq_along(props)
+  foreach(mi = moduleOrder, .combine=c) %do% {
+    names(props[[mi]]$connectivity)
+  }
+}

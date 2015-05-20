@@ -620,7 +620,6 @@ plotSummaryExpression <- function(
 #'   placed at the end of the expression matrix, so draws a line to indicate 
 #'   where these fall. 
 #'
-#' @importFrom RColorBrewer brewer.pal
 #' @export
 plotExpression <- function(
   gene.expr, heatmap.gradient, expression.range, is.relative=TRUE, 
@@ -679,103 +678,6 @@ plotExpression <- function(
     # demarcate new samples unique to this dataset
     abline(h=new.samples, col="red") 
   }
-}
-
-#' Coexpression plot
-#' 
-#' Plot a triangle of the coexpression
-#' 
-#' @param coexpression a square matrix containing the pairwise gene coexpression.
-#' @param module.labels an optional named vector assigning each node to a module.
-#' @param heatmap.gradient A vector of colors to use for (or interpolate over)
-#'        to render the coexpression.
-#' @param cex.title cex for the title text
-#' @param cex.lab cex for the axis label
-#' @param main title for the plot
-#' @param adjacency logical; are we plotting the adjacency instead? Affects 
-#'  automatic color palette and title selection
-#' @param xlab label for the x axis
-#' @param missing.inds indices for missing genes, needed to preserved order 
-#'  when comparing plots across datasets.
-#'        
-#' @export
-plotCoexpression <- function(
-  coexpression, module.labels=NULL, heatmap.gradient, adjacency=FALSE, 
-  cex.title=1.4, cex.lab=1, missing.inds = NULL,
-  main=ifelse(adjacency, "Adjacencies", "Coexpression"), xlab="genes"
-) {
-  coexpression <- dynamicMatLoad(coexpression)
-  if (nrow(coexpression) != ncol(coexpression))
-    stop("expecting a square edge.matrix!")
-  
-  # insert NA rows / columns if appropriate
-  if (!is.null(missing.inds)) {
-    newCoexp <- matrix(
-      NA, nrow=nrow(coexpression) + length(missing.inds), 
-      ncol=ncol(coexpression) + length(missing.inds)
-    )
-    newCoexp[-missing.inds, -missing.inds] <- coexpression[,]
-    coexpression <- newCoexp
-    diag(coexpression) <- 1
-  }
-   
-  nGenes <- nrow(coexpression)
-  
-  if(missing(heatmap.gradient)) {
-    heatmap.gradient <- custom.palette(!adjacency)
-  }
-  nColBins <- 255 
-  colGrad <- colorRampPalette(heatmap.gradient)(nColBins)
-  
-  if (adjacency) {
-    edgeBins <- seq(0, 1, length=nColBins+1)
-  } else {
-    edgeBins <- seq(-1, 1, length=nColBins+1)
-  }
-  
-  # create empty plot window
-  nullPlot(c(0, nGenes), c(0, nGenes/2), xlab, cex.lab=cex.lab)
-  
-  # render correlation squares / triangles
-  for (ii in 1:nGenes) {
-    for (jj in 1:ii) {
-      plotRow <- ii - jj
-      topy <- (plotRow + 1)/2
-      # If we're on the diagonal, plot a triangle, otherwise a diamond
-      if (plotRow == 0) {
-        boty <- 0
-      } else {
-        boty <- topy - 1
-      }
-      xOffset <- plotRow/2
-      rightx <- jj + xOffset
-      leftx <- rightx - 1
-      
-      polygon(
-        x=c(leftx, leftx+0.5, rightx, leftx+0.5, leftx),
-        y=c(topy-0.5, topy, topy-0.5, boty, topy-0.5),
-        col=findColInGrad(coexpression[ii, jj], edgeBins, colGrad),
-        border=NA
-      )
-    }
-  }
-  
-  # render module boundaries
-  if (!is.null(module.labels)) {
-    breaks <- getModuleBreaks(module.labels)
-    for (mm in 2:length(breaks)) {
-      mheight <- (breaks[mm] - breaks[mm - 1])/2
-      halfway <-  mheight + breaks[mm - 1]
-      polygon(
-        x=c(breaks[mm - 1], breaks[mm], halfway, breaks[mm - 1]),
-        y=c(0, 0, mheight, 0)
-      )
-    }
-  }
-  
-  # render border of plot
-  polygon(x=c(0, nGenes, nGenes/2, 0), y=c(0, 0, nGenes/2, 0))
-  addTitle(main, cex.title)
 }
 
 #-----------------------------------------------------------------
@@ -837,32 +739,6 @@ plotGeneNames <- function(gene.labels, bot.mar=5, cex.axis=1) {
 #----------------------------
 # Helper Functions
 #----------------------------
-
-#' Get the plot limits to set for the desired plot window
-#'
-#' \code{plot} manually adds an extra region to the plot on top of the given
-#' 'xlim' and 'ylim', amounting to 4% of the plot region in either direction.
-#' This function tells you what limits to set so that the boundaries of the plot
-#' are precisely the min and max you want.
-#' 
-#' @param dlim the limits you want to set
-#' @return
-#'  the min and max to set for the desired plot limits  
-getLimsForManualUsr <- function(dlim) {
-  A = matrix(c(1.04, -0.04, -0.04, 1.04), nrow=2, ncol=2)
-  B = matrix(dlim, nrow=2, ncol=1)
-  as.vector(solve(A, B))
-}
-
-# Identifies the break points between modules on the x axis.
-getModuleBreaks <- function(module.labels) {
-  breaks <- rle(module.labels)
-  break.points <- sapply(1:length(breaks$length), function(i) {
-    sum(breaks$length[1:i])
-  })  
-  break.points <- c(0, break.points)
-  break.points
-}
 
 # Because barplot has weird margins
 myBarPlot <- function(

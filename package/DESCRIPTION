@@ -23,7 +23,8 @@ Imports:
     BH,
     RhpcBLASctl,
     RColorBrewer,
-    abind
+    abind,
+    RColorBrewer
 Suggests:
     testthat,
     doMC,

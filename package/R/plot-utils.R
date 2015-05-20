@@ -99,3 +99,57 @@ addAlpha <- function(col, alpha) {
   }
   paste0(col, as.hexmode(floor(255*alpha)))
 }
+
+#' Color palette for coexpression and adjacency heatmaps
+#' 
+#' RColorBrewer palette "RdYlBu" with the middle color replaced with white. 
+#' This gives a nicer contrast than the "RdBu" palette
+coexpression.palette <- function() {
+  cols <- rev(brewer.pal(11, "RdYlBu"))
+  cols[6] <- "#FFFFFF"
+  cols
+}
+
+#' Color palette for expression and summary expression plots
+#' 
+#' RColorBrewer palette "PRGn" with a white middle color.
+#' 
+#' @import RColorBrewer
+expression.palette <- function() {
+  cols <- brewer.pal(6, "PRGn")
+  cols <- c(cols[1:3], "#FFFFFF", pal[4:6]) 
+  cols
+}
+
+#' Get module break points on the x-axis
+#' 
+#' @param mas ordered subset of the moduleAssignments vector
+#' 
+#' @return 
+#'  a vector of positions on the x-axis where one module begins and another ends
+getModuleBreaks <- function(mas) {
+  sizes <- rle(mas)
+  breaks = numeric(length(sizes$lengths) + 1)
+  breaks[1] <- 0.5
+  for (mi in seq_along(sizes$lengths)) {
+    breaks[mi + 1] <- breaks[mi] + sizes$lengths[mi]
+  }
+  breaks
+}
+
+#' Get module mid-points on the x-axis
+#' 
+#' @param mas ordered subset of the moduleAssignments vector
+#' 
+#' @return 
+#'  a vector of positions on the x-axis indicating the centre of a module
+getModuleMidPoints <- function(mas) {
+  breaks <- getModuleBreaks(mas)
+  mids <- numeric(length(breaks) - 1)
+  for (bi in seq_along(breaks)[-1]) {
+    mids[bi - 1] <- (breaks[bi] - breaks[bi - 1])/2 + breaks[bi - 1]
+  }
+  mids
+}
+
+

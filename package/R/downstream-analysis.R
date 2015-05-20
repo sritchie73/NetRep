@@ -127,9 +127,6 @@ networkProperties <- function(
     geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
   )
   
-  if (is.null(moduleAssignments[[discovery]]))
-    stop("no module assignments in the discovery dataset")
-  
   # Temporarily create scaled gene expression set for the calculation of the
   # summary expression profile
   sge <- NULL
