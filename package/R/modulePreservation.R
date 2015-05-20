@@ -6,7 +6,7 @@
 #' Each dataset requires a precalculated coexpression network and adjecency
 #' network (see details). Providing the gene expression is optional, but
 #' recommended. Matrix data is ideally stored in the \code{\link{bigMatrix}}
-#' format (see details).
+#' format (see details). 
 #' 
 #' @param geneExpression A list of gene expression matrices, one for each 
 #' dataset. Expects columns to be genes, rows to be samples. 
@@ -41,18 +41,18 @@
 #'  
 #' @details
 #' \subsection{Input data:}{
-#'   The topological properties used to assess module preservation are designed
-#'   for networks constructed using Weighted Gene Coexpression Network Analysis
-#'   (WGCNA, \emph{(3)}). These are calculated from the gene expression for each
-#'   dataset, the pairwise correlation between genes (coexpression) for each 
-#'   dataset, and the pairwise gene adjacencies (adjacency) for each dataset. 
-#'   The adjacency is usually the absolute value of the correlation raised to a 
-#'   power to penalise weak correlations \emph{(3)}. Module preservation can 
-#'   also be assessed on networks without the gene expression data, but only a
-#'   limited subset of the statistics will be calculated. Network modules are 
-#'   usually clusters of tightly coexpressed genes \emph{(3)}, but the procedure
-#'   is also useful for assessing known gene sets, i.e. pathways across 
-#'   conditions or tissues \emph{(1)}.
+#'   The topological properties used to assess module preservation are designed 
+#'   for networks constructed using Weighted Gene Coexpression Network Analysis 
+#'   (\pkg{WGCNA}, \emph{(3)}). These are calculated from the gene expression
+#'   for each dataset, the pairwise correlation between genes (coexpression) for
+#'   each dataset, and the pairwise gene adjacencies (adjacency) for each
+#'   dataset. The adjacency is usually the absolute value of the correlation
+#'   raised to a power to penalise weak correlations \emph{(3)}. Module
+#'   preservation can also be assessed on networks without the gene expression
+#'   data, but only a limited subset of the statistics will be calculated.
+#'   Network modules are usually clusters of tightly coexpressed genes
+#'   \emph{(3)}, but the procedure is also useful for assessing known gene sets,
+#'   i.e. pathways across conditions or tissues \emph{(1)}.
 #'   
 #'   The arguments \code{geneExpression}, \code{coexpression}, and 
 #'   \code{adjacency} should be lists, where each element of the list contains 
