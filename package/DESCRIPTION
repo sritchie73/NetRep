@@ -28,4 +28,5 @@ Suggests:
     testthat,
     doMC,
     doParallel
+Enhances: WGCNA
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
