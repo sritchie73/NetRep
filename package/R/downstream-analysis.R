@@ -316,15 +316,22 @@ orderGenes <- function(
   # order modules
   moduleOrder <- 1
   if (length(props) > 1) {
-    # Create a matrix of summary expression profiles to measure the similarity
-    seps <- matrix(
-      0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
-    )
-    colnames(seps) <- names(props)
-    for (mi in seq_along(props)) {
-      seps[,mi] <- props[[mi]]$summaryExpression
+    if (!is.null(geneExpression[[test]])) {
+      # Create a matrix of summary expression profiles to measure the similarity
+      seps <- matrix(
+        0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
+      )
+      colnames(seps) <- names(props)
+      for (mi in seq_along(props)) {
+        seps[,mi] <- props[[mi]]$summaryExpression
+      }
+      moduleOrder <- hclust(as.dist(1-cor(seps)))$order
+    } else {
+      warning(
+        "No gene expression provided, modules will be ordered as provided"
+      )
+      moduleOrder <- seq_along(props)
     }
-    moduleOrder <- hclust(as.dist(1-cor(seps)))$order
   } 
   
   # order genes
