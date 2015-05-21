@@ -71,9 +71,8 @@ expression profile in the \code{discovery} dataset (see
 connectivity and samples are ordered by their summary expression profile in
 the \code{test} dataset. If "none" no ordering is applied.}
 
-\item{orderModules}{logical; if \code{TRUE} modules ordered by the clustering
-of their summary expression profile. If \code{FALSE} modules are returned
-in the order provided.}
+\item{orderModules}{logical; if \code{TRUE} modules ordered by similarity.
+If \code{FALSE} modules are rendered in the order provided.}
 
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
 heatmap.}

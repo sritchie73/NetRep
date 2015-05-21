@@ -12,9 +12,8 @@
 #'   \code{\link{sampleOrder}}). If "test" genes are orderd by intramodular 
 #'   connectivity and samples are ordered by their summary expression profile in
 #'   the \code{test} dataset. If "none" no ordering is applied.
-#' @param orderModules logical; if \code{TRUE} modules ordered by the clustering
-#'   of their summary expression profile. If \code{FALSE} modules are returned
-#'   in the order provided.
+#' @param orderModules logical; if \code{TRUE} modules ordered by similarity. 
+#'   If \code{FALSE} modules are rendered in the order provided.
 #' @param plotGeneNames logical; if \code{TRUE}, plot the gene names below the
 #'  heatmap.
 #' @param plotSampleNames logical; if \code{TRUE} the sample names will be 
