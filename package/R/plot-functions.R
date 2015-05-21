@@ -56,7 +56,7 @@ plotTriangleHeatmap <- function(
       height <- breaks[mi + 1] - mids[mi]
       polygon(
         x=c(breaks[mi], breaks[mi+1], mids[mi], breaks[mi]),
-        y=c(0, 0, height, 0)
+        y=c(0, 0, height, 0), lwd=2
       )
     }
   }
@@ -117,7 +117,7 @@ plotSquareHeatmap <- function(
         xright = breaks[mi],
         ybottom = (nGenes + 0.5) - (breaks[mi] - 0.5),
         ytop = (nGenes + 0.5) - (breaks[mi - 1] - 0.5),
-        border="black"
+        border="black", lwd2
       )
     }
   }
