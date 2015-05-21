@@ -3,6 +3,7 @@
 \alias{api_inputs}
 \alias{plotAdjacency}
 \alias{plotCoexpression}
+\alias{plotConnectivity}
 \alias{plotModuleMembership}
 \title{Plot a topological feature of network module}
 \usage{
@@ -20,6 +21,12 @@ plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
   main = "Module Membership", palette = c("#313695", "#a50026"),
+  drawBorder = FALSE)
+
+plotConnectivity(geneExpression = NULL, coexpression, adjacency,
+  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
+  geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
+  main = "Normalised Connectivity", palette = "#feb24c",
   drawBorder = FALSE)
 }
 \arguments{
@@ -66,12 +73,14 @@ the heatmap. By default, module names are only plotted if multiple
 \item{main}{title for the plot.}
 
 \item{palette}{a vector of colors to interpolate over when plotting the
-  coexpression. The first element should correspond to the color
-  used when the coexpression between two genes is equal to -1, and the last
-  element should correspond to the color used when the coexpression between
-  two genes is equal to 1}
+coexpression. The first element should correspond to the color
+used when the coexpression between two genes is equal to -1, and the last
+element should correspond to the color used when the coexpression between
+two genes is equal to 1}
 
-\item{drawBorder}{logical; if \code{TRUE}, borders are drawn for the bars.}
+\item{drawBorder}{logical; if \code{TRUE}, borders are drawn around the bars
+ in \code{plotModuleMembership}, \code{plotConnectivity}, and
+ \code{plotSummaryExpression}.}
 }
 \description{
 Plot a topological feature of network module
