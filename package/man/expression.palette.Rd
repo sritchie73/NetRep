@@ -3,7 +3,7 @@
 \alias{expression.palette}
 \title{Color palette for expression and summary expression plots}
 \usage{
-expression.palette(diverging)
+expression.palette()
 }
 \description{
 RColorBrewer palette "PRGn" with a white middle color.
