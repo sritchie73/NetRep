@@ -117,6 +117,8 @@ networkProperties <- function(
   # easier for the user to provide a simplified list structure
   if (missing(moduleAssignments))
     modules <- "1"
+  if (!missing(moduleAssignments) && missing(modules))
+    modules <- unique(moduleAssignments[[discovery]])
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])

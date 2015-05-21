@@ -176,6 +176,8 @@ plotCoexpression <- function(
  
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
+  if (!missing(moduleAssignments) && missing(modules))
+    modules <- unique(moduleAssignments[[discovery]])
   
   # Handle genes not present in the test dataset
   na.pos <- which(geneOrder %nin% colnames(coexpression[[test]]))
@@ -278,6 +280,8 @@ plotAdjacency <- function(
   # easier for the user to provide a simplified list structure
   if (missing(moduleAssignments))
     modules <- "1"
+  if (!missing(moduleAssignments) && missing(modules))
+    modules <- unique(moduleAssignments[[discovery]])
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -407,6 +411,8 @@ plotModuleMembership <- function(
   # easier for the user to provide a simplified list structure
   if (missing(moduleAssignments))
     modules <- "1"
+  if (!missing(moduleAssignments) && missing(modules))
+    modules <- unique(moduleAssignments[[discovery]])
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -528,6 +534,8 @@ plotConnectivity <- function(
   # easier for the user to provide a simplified list structure
   if (missing(moduleAssignments))
     modules <- "1"
+  if (!missing(moduleAssignments) && missing(modules))
+    modules <- unique(moduleAssignments[[discovery]])
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -592,6 +600,8 @@ plotConnectivity <- function(
   
   # now build the (Normalised) Intramodular Connectivity vector
   kIM <- foreach(mi = seq_along(props), .combine=c) %do% {
+    # Normalise the connectivity by the maximum. The value has no meaning,
+    # just the relative sizes and ranks
     props[[mi]]$connectivity/max(na.omit(props[[mi]]$connectivity))
   }
   kIM <- kIM[geneOrder]
