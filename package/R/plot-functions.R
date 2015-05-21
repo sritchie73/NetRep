@@ -279,6 +279,6 @@ plotBar <- function(
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
-    abline(v=breaks, lwd=2)
+    abline(v=head(breaks[-1], -1), lwd=2)
   }
 }
