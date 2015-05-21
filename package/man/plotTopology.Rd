@@ -11,24 +11,26 @@
 \usage{
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Coexpression", palette = coexpression.palette(), legend = TRUE)
+  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  plotModuleNames, main = "Coexpression", palette = coexpression.palette(),
+  legend = TRUE)
 
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Adjacency", palette = adjacency.palette(), legend = TRUE)
+  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  plotModuleNames, main = "Adjacency", palette = adjacency.palette(),
+  legend = TRUE)
 
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Module Membership", palette = c("#313695", "#a50026"),
-  drawBorder = FALSE)
+  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  plotModuleNames, main = "Module Membership", palette = c("#313695",
+  "#a50026"), drawBorder = FALSE)
 
 plotConnectivity(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Normalised Connectivity", palette = "#feb24c",
+  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  plotModuleNames, main = "Normalised Connectivity", palette = "#feb24c",
   drawBorder = FALSE)
 
 plotCoexpressionLegend(palette = coexpression.palette(),
@@ -68,6 +70,10 @@ expression profile in the \code{discovery} dataset (see
 \code{\link{sampleOrder}}). If "test" genes are orderd by intramodular
 connectivity and samples are ordered by their summary expression profile in
 the \code{test} dataset. If "none" no ordering is applied.}
+
+\item{orderModules}{logical; if \code{TRUE} modules ordered by the clustering
+of their summary expression profile. If \code{FALSE} modules are returned
+in the order provided.}
 
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
 heatmap.}

@@ -204,6 +204,9 @@ networkProperties <- function(
 #'  one or more modules in an independent test dataset. If \code{TRUE}, genes 
 #'  missing from the test dataset are excluded. If \code{FALSE}, missing genes
 #'  are put last in the ordering.
+#' @param orderModules logical; if \code{TRUE} modules ordered by the clustering
+#'   of their summary expression profile. If \code{FALSE} modules are returned
+#'   in the order provided.
 #' 
 #' @references
 #' \enumerate{
@@ -307,7 +310,7 @@ networkProperties <- function(
 #' @export
 geneOrder <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, na.rm=FALSE
+  discovery=1, test=1, na.rm=FALSE, orderModules=TRUE
 ) {
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules,
@@ -319,7 +322,7 @@ geneOrder <- function(
   
   # order modules
   moduleOrder <- 1
-  if (length(props) > 1) {
+  if (length(props) > 1 && orderModules) {
     if (!is.null(geneExpression[[test]])) {
       # Create a matrix of summary expression profiles to measure the similarity
       seps <- matrix(
@@ -336,7 +339,9 @@ geneOrder <- function(
       )
       moduleOrder <- seq_along(props)
     }
-  } 
+  } else {
+    moduleOrder <- seq_along(props)
+  }
   
   # order genes
   foreach(mi = moduleOrder, .combine=c) %do% {

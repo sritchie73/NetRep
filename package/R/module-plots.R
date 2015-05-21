@@ -12,6 +12,9 @@
 #'   \code{\link{sampleOrder}}). If "test" genes are orderd by intramodular 
 #'   connectivity and samples are ordered by their summary expression profile in
 #'   the \code{test} dataset. If "none" no ordering is applied.
+#' @param orderModules logical; if \code{TRUE} modules ordered by the clustering
+#'   of their summary expression profile. If \code{FALSE} modules are returned
+#'   in the order provided.
 #' @param plotGeneNames logical; if \code{TRUE}, plot the gene names below the
 #'  heatmap.
 #' @param plotSampleNames logical; if \code{TRUE} the sample names will be 
@@ -126,7 +129,7 @@
 #' @export
 plotCoexpression <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", 
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Coexpression", 
   palette=coexpression.palette(), legend=TRUE
 ) {
@@ -152,6 +155,8 @@ plotCoexpression <- function(
   # easier for the user to provide a simplified list structure
   if (missing(moduleAssignments))
     modules <- "1"
+  if (!missing(moduleAssignments) && missing(modules))
+    modules <- unique(moduleAssignments[[discovery]])
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -170,14 +175,13 @@ plotCoexpression <- function(
   } else {
     geneOrder <- geneOrder(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, test=ifelse(orderBy == "discovery", discovery, test)
+      discovery, test=ifelse(orderBy == "discovery", discovery, test),
+      FALSE, orderModules
     )
   }
  
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
-  if (!missing(moduleAssignments) && missing(modules))
-    modules <- unique(moduleAssignments[[discovery]])
   
   # Handle genes not present in the test dataset
   na.pos <- which(geneOrder %nin% colnames(coexpression[[test]]))
@@ -228,7 +232,7 @@ plotCoexpression <- function(
     axis(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
-      labels=modules, line=line, tick=FALSE
+      labels=unique(mas), line=line, tick=FALSE
     )
   }
   if (symmetric) {
@@ -243,7 +247,7 @@ plotCoexpression <- function(
       axis(
         side=2, las=2, 
         at=length(geneOrder) + 0.5 - getModuleMidPoints(mas),
-        labels=modules, line=line, tick=FALSE
+        labels=unique(mas), line=line, tick=FALSE
       )
     }
   }
@@ -254,7 +258,7 @@ plotCoexpression <- function(
 #' @export
 plotAdjacency <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", 
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Adjacency", 
   palette=adjacency.palette(), legend=TRUE
 ) {
@@ -300,7 +304,8 @@ plotAdjacency <- function(
   } else {
     geneOrder <- geneOrder(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, test=ifelse(orderBy == "discovery", discovery, test)
+      discovery, test=ifelse(orderBy == "discovery", discovery, test),
+      FALSE, orderModules
     )
   }
   
@@ -356,7 +361,7 @@ plotAdjacency <- function(
     axis(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
-      labels=modules, line=line, tick=FALSE
+      labels=unique(mas), line=line, tick=FALSE
     )
   }
   if (symmetric) {
@@ -371,7 +376,7 @@ plotAdjacency <- function(
       axis(
         side=2, las=2, 
         at=length(geneOrder) + 0.5 - getModuleMidPoints(mas),
-        labels=modules, line=line, tick=FALSE
+        labels=unique(mas), line=line, tick=FALSE
       )
     }
   }
@@ -382,7 +387,7 @@ plotAdjacency <- function(
 #' @export
 plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", 
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
   palette=c("#313695", "#a50026"), drawBorder=FALSE
 ) {
@@ -441,7 +446,7 @@ plotModuleMembership <- function(
     # The network properties in the discovery network
     geneOrder <- geneOrder(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, discovery
+      discovery, discovery, FALSE, orderModules
     ) 
   } else if (orderBy == "none") {
     moduleOrder <- seq_along(props)
@@ -451,7 +456,7 @@ plotModuleMembership <- function(
   } else {
     # order modules
     moduleOrder <- 1
-    if (length(props) > 1) {
+    if (length(props) > 1 && orderModules) {
       # Create a matrix of summary expression profiles to measure the similarity
       seps <- matrix(
         0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
@@ -461,7 +466,9 @@ plotModuleMembership <- function(
         seps[,mi] <- props[[mi]]$summaryExpression
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
-    } 
+    } else {
+      moduleOrder <- seq_along(props)
+    }
     
     # order genes
     geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
@@ -498,7 +505,7 @@ plotModuleMembership <- function(
     axis(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
-      labels=modules, line=line, tick=FALSE
+      labels=unique(mas), line=line, tick=FALSE
     )
   }
   mtext(main, cex=par("cex.main"), font=2)
@@ -508,7 +515,7 @@ plotModuleMembership <- function(
 #' @export
 plotConnectivity <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", 
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Normalised Connectivity", 
   palette="#feb24c", drawBorder=FALSE
 ) {
@@ -561,7 +568,7 @@ plotConnectivity <- function(
     # The network properties in the discovery network
     geneOrder <- geneOrder(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, discovery
+      discovery, discovery, FALSE, orderModules
     ) 
   } else if (orderBy == "none") {
     moduleOrder <- seq_along(props)
@@ -571,7 +578,7 @@ plotConnectivity <- function(
   } else {
     # order modules
     moduleOrder <- 1
-    if (length(props) > 1) {
+    if (length(props) > 1 && orderModules) {
       if (!is.null(geneExpression[[test]])) {
         # Create a matrix of summary expression profiles to measure the similarity
         seps <- matrix(
@@ -588,7 +595,9 @@ plotConnectivity <- function(
         )
         moduleOrder <- seq_along(props)
       }
-    } 
+    } else {
+      moduleOrder <- seq_along(props)
+    }
     
     # order genes
     geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
@@ -627,7 +636,7 @@ plotConnectivity <- function(
     axis(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
-      labels=modules, line=line, tick=FALSE
+      labels=unique(mas), line=line, tick=FALSE
     )
   }
   mtext(main, cex=par("cex.main"), font=2)

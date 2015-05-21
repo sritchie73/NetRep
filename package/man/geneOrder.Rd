@@ -5,7 +5,7 @@
 \title{Order genes and modules within a network.}
 \usage{
 geneOrder(geneExpression = NULL, coexpression, adjacency, moduleAssignments,
-  modules, discovery = 1, test = 1, na.rm = FALSE)
+  modules, discovery = 1, test = 1, na.rm = FALSE, orderModules = TRUE)
 }
 \arguments{
 \item{geneExpression}{the gene expression matrix for the dataset of interest,
@@ -32,9 +32,13 @@ interest was discovered in. See details.}
  See details.}
 
 \item{na.rm}{logical; Only applies when requesting the ordering of genes of
- one or more modules in an independent test dataset. If \code{TRUE}, genes
- missing from the test dataset are excluded. If \code{FALSE}, missing genes
- are put last in the ordering.}
+one or more modules in an independent test dataset. If \code{TRUE}, genes
+missing from the test dataset are excluded. If \code{FALSE}, missing genes
+are put last in the ordering.}
+
+\item{orderModules}{logical; if \code{TRUE} modules ordered by the clustering
+  of their summary expression profile. If \code{FALSE} modules are returned
+  in the order provided.}
 }
 \value{
 A vector of ordered gene names (descending order).
