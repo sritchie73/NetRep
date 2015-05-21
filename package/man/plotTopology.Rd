@@ -71,6 +71,7 @@ the heatmap. By default, module names are only plotted if multiple
   element should correspond to the color used when the coexpression between
   two genes is equal to 1}
 
+\item{drawBorder}{logical; if \code{TRUE}, borders are drawn for the bars.}
 }
 \description{
 Plot a topological feature of network module
