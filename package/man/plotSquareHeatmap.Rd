@@ -3,7 +3,8 @@
 \alias{plotSquareHeatmap}
 \title{Plot a square heatmap}
 \usage{
-plotSquareHeatmap(values, palette, vlim, mas)
+plotSquareHeatmap(values, palette, vlim, mas, na.indices = NULL,
+  na.col = "#bdbdbd")
 }
 \arguments{
 \item{values}{values to plot on the heatmap}
@@ -13,6 +14,10 @@ plotSquareHeatmap(values, palette, vlim, mas)
 \item{vlim}{range of values to use when mapping values to the \code{palette}.}
 
 \item{mas}{ordered subset of the moduleAssignments vector}
+
+\item{na.indices}{indices of missing values to plot}
+
+\item{na.col}{color of missing values to plot.}
 }
 \description{
 Plot a square heatmap

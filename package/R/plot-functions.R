@@ -4,14 +4,20 @@
 #' @param palette color palette to interpolate over
 #' @param vlim range of values to use when mapping values to the \code{palette}.
 #' @param mas ordered subset of the moduleAssignments vector
+#' @param na.indices indices of missing values to plot
+#' @param na.col color of missing values to plot.
 #' 
-plotTriangleHeatmap <- function(values, palette, vlim, mas) {
-  nGenes <- ncol(values)
+plotTriangleHeatmap <- function(
+  values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd"
+) {
+  nGenes <- ncol(values) + length(na.indices)
   emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
   palette <- colorRampPalette(palette)(255)
   
   # render squares / triangles
+  ci <- 1
   for (ii in 1:nGenes) {
+    cj <- 1
     for (jj in 1:ii) {
       plotRow <- ii - jj
       topy <- (plotRow + 1)/2
@@ -25,12 +31,20 @@ plotTriangleHeatmap <- function(values, palette, vlim, mas) {
       rightx <- jj + xOffset + 0.5
       leftx <- rightx - 1
       
-      col <- getColFromPalette(values[ii, jj], palette, vlim)
+      if (ii %nin% na.indices && jj %nin% na.indices) {
+        col <- getColFromPalette(values[ci, cj], palette, vlim)
+        cj <- cj + 1
+      } else {
+        col <- na.col
+      }
       polygon(
         x=c(leftx, leftx+0.5, rightx, leftx+0.5, leftx),
         y=c(topy-0.5, topy, topy-0.5, boty, topy-0.5),
-        col=col, border=addAlpha(col, 0.5)
+        col=col, border=col
       )
+    }
+    if (ii %nin% na.indices) {
+      ci <- ci + 1
     }
   }
   
@@ -60,23 +74,37 @@ plotTriangleHeatmap <- function(values, palette, vlim, mas) {
 #' @param palette color palette to interpolate over
 #' @param vlim range of values to use when mapping values to the \code{palette}.
 #' @param mas ordered subset of the moduleAssignments vector
+#' @param na.indices indices of missing values to plot
+#' @param na.col color of missing values to plot.
 #' 
-plotSquareHeatmap <- function(values, palette, vlim, mas) {
-  nGenes <- ncol(values)
+plotSquareHeatmap <- function(
+  values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd"
+) {
+  nGenes <- ncol(values) + length(na.indices)
   emptyPlot(xlim=c(0.5, nGenes+0.5), ylim=c(0.5, nGenes+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
   
   # render squares / triangles
+  ci <- 1
   for (ii in 1:nGenes) {
+    cj <- 1
     for (jj in 1:nGenes) {
-      col <- getColFromPalette(values[ii, jj], palette, vlim)
+      if (ii %nin% na.indices && jj %nin% na.indices) {
+        col <- getColFromPalette(values[ci, cj], palette, vlim)
+        cj <- cj + 1
+      } else {
+        col <- na.col
+      }
       rect(
-        xleft = ii - 0.5,
-        xright = ii + 0.5,
-        ybottom = (nGenes - (jj - 1)) - 0.5,
-        ytop = (nGenes - (jj - 1)) + 0.5,
-        col=col, border=addAlpha(col, 0.5)
+        xleft = jj - 0.5,
+        xright = jj + 0.5,
+        ybottom = (nGenes - (ii - 1)) - 0.5,
+        ytop = (nGenes - (ii - 1)) + 0.5,
+        col=col, border=col
       )
+    }
+    if (ii %nin% na.indices) {
+      ci <- ci + 1
     }
   }
   
