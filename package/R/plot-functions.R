@@ -163,53 +163,31 @@ plotGradientLegend <- function(
 #' @param bar.width value between 0 and 1 controlling the proportion of space
 #'  taken by each bar.
 #' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
-#' @param horizontal logical; if \code{TRUE} bars are plotted horizontally.
 #' 
 plotBar <- function(
-  heights, heights.lim, mas, cols, bar.width=1, drawBorder=FALSE, 
-  horizontal=FALSE
+  heights, heights.lim, mas, cols, bar.width=1, drawBorder=FALSE
 ) {
   if (length(cols) == 1) 
     cols <- rep(cols, length(heights))
-  if (horizontal) {
-    emptyPlot(xlim=heights.lim, ylim=c(0.5, length(heights)+0.5), bty="n")
-    for (ii in 1:length(heights)) {
-      rect(
-        xleft=0,
-        xright=heights[ii],
-        ybottom=length(heights)-(ii-1)-bar.width/2,
-        ytop=length(heights)-(ii-1)+bar.width/2,
-        col=cols[ii],
-        border=ifelse(drawBorder, "black", NA),
-        lwd=2
-      )
-    }
-    abline(v=0, col="black", lwd=2)
-    axis(side=1, lwd=2)
-  } else {
-    emptyPlot(xlim=c(0.5, length(heights)+0.5), ylim=heights.lim, bty="n")
-    for (ii in 1:length(heights)) {
-      rect(
-        xleft=ii-bar.width/2,
-        xright=ii+bar.width/2,
-        ybottom=0,
-        ytop=heights[ii],
-        col=cols[ii],
-        border=ifelse(drawBorder, "black", NA),
-        lwd=2
-      ) 
-    }
-    abline(h=0, col="black", lwd=2)
-    axis(side=2, las=2, lwd=2)
+
+  emptyPlot(xlim=c(0.5, length(heights)+0.5), ylim=heights.lim, bty="n")
+  for (ii in 1:length(heights)) {
+    rect(
+      xleft=ii-bar.width/2,
+      xright=ii+bar.width/2,
+      ybottom=0,
+      ytop=heights[ii],
+      col=cols[ii],
+      border=ifelse(drawBorder, "black", NA),
+      lwd=2
+    ) 
   }
+  abline(h=0, col="black", lwd=2)
+  axis(side=2, las=2, lwd=2)
   
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
-    if (horizontal) {
-      abline(h=length(heights) + 0.5 - breaks, lwd=2)
-    } else {
-      abline(v=breaks, lwd=2)
-    }
+    abline(v=breaks, lwd=2)
   }
 }

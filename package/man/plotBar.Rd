@@ -3,8 +3,7 @@
 \alias{plotBar}
 \title{Custom bar plot function}
 \usage{
-plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE,
-  horizontal = FALSE)
+plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE)
 }
 \arguments{
 \item{heights}{heights of the bars.}
@@ -19,8 +18,6 @@ plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE,
 taken by each bar.}
 
 \item{drawBorder}{logical; if \code{TRUE} a border is drawn around each bar.}
-
-\item{horizontal}{logical; if \code{TRUE} bars are plotted horizontally.}
 }
 \description{
 Plot bars around 0
