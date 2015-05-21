@@ -44,7 +44,7 @@ such vectors. See details.}
 interest was discovered in. See details.}
 
 \item{test}{name or index denoting which dataset to apply the function to.
-See details.}
+ See details.}
 
 \item{symmetric}{logical; if \code{TRUE} the coexpression will be plotted as
 a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
