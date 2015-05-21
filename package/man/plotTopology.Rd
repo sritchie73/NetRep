@@ -11,31 +11,31 @@
 \usage{
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
+  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
   main = "Coexpression", palette = coexpression.palette(), legend = TRUE)
+
+plotAdjacency(geneExpression = NULL, coexpression, adjacency,
+  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
+  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
+  main = "Adjacency", palette = adjacency.palette(), legend = TRUE)
+
+plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
+  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
+  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
+  main = "Module Membership", palette = c("#313695", "#a50026"),
+  drawBorder = FALSE)
+
+plotConnectivity(geneExpression = NULL, coexpression, adjacency,
+  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
+  orderBy = "discovery", plotGeneNames = TRUE, plotModuleNames,
+  main = "Normalised Connectivity", palette = "#feb24c",
+  drawBorder = FALSE)
 
 plotCoexpressionLegend(palette = coexpression.palette(),
   main = "Coexpression", horizontal = TRUE)
 
 plotAdjacencyLegend(palette = adjacency.palette(), main = "Adjacency",
   horizontal = TRUE)
-
-plotAdjacency(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Adjacency", palette = adjacency.palette(), legend = TRUE)
-
-plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Module Membership", palette = c("#313695", "#a50026"),
-  drawBorder = FALSE)
-
-plotConnectivity(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Normalised Connectivity", palette = "#feb24c",
-  drawBorder = FALSE)
 }
 \arguments{
 \item{geneExpression}{the gene expression matrix for the dataset of interest,
@@ -61,15 +61,13 @@ interest was discovered in. See details.}
 \item{test}{name or index denoting which dataset to apply the function to.
  See details.}
 
-\item{symmetric}{logical; if \code{TRUE} the coexpression will be plotted as
-a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
-heatmap.}
-
-\item{geneOrder}{one of "discovery", "test", "none", or a vector of gene
-names. If "discovery" genes are ordered by intramodular connectivity in the
-\code{discovery} dataset (see \code{\link{geneOrder}}). If "test" genes are
-orderd by intramodular connectivity in the test dataset. If "none" no
-ordering is applied.}
+\item{orderBy}{one of "discovery", "test", or "none". If "discovery" genes
+are ordered by intramodular connectivity in the \code{discovery} dataset
+(see \code{\link{geneOrder}}) and samples are ordered by their summary
+expression profile in the \code{discovery} dataset (see
+\code{\link{sampleOrder}}). If "test" genes are orderd by intramodular
+connectivity and samples are ordered by their summary expression profile in
+the \code{test} dataset. If "none" no ordering is applied.}
 
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
 heatmap.}
@@ -89,14 +87,18 @@ two genes is equal to 1}
 \item{legend}{logical; if \code{TRUE} legends are drawn for
  \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.}
 
-\item{horizontal}{logical; if \code{TRUE} the legend is plotted horizontally.}
+\item{symmetric}{logical; if \code{TRUE} the coexpression will be plotted as
+a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
+heatmap.}
 
 \item{drawBorder}{logical; if \code{TRUE}, borders are drawn around the bars
 in \code{plotModuleMembership}, \code{plotConnectivity}, or
 \code{plotSummaryExpression}.}
+
+\item{horizontal}{logical; if \code{TRUE} the legend is plotted horizontally.}
 }
 \description{
-Plot a topological feature of network module
+Functions to plot individual components of a module's network topology.
 }
 \details{
 The matrices containing the \code{geneExpression}, \code{coexpression}, and
@@ -149,7 +151,7 @@ plotCoexpression(
 ## Example 2: Plot coexpression of the first 10 genes,
 ## without ordering them
 plotCoexpression(
- geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], geneOrder="none"
+ geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderBy="none"
 )
 
 ## Example 3: Plot the coexpression of two adipose modules in the liver

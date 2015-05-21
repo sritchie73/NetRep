@@ -3,8 +3,8 @@
 \alias{plotSquareHeatmap}
 \title{Plot a square heatmap}
 \usage{
-plotSquareHeatmap(values, palette, vlim, mas, na.indices = NULL,
-  na.col = "#bdbdbd")
+plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
+  na.indices.y = NULL, na.col = "#bdbdbd")
 }
 \arguments{
 \item{values}{values to plot on the heatmap}
@@ -15,7 +15,9 @@ plotSquareHeatmap(values, palette, vlim, mas, na.indices = NULL,
 
 \item{mas}{ordered subset of the moduleAssignments vector}
 
-\item{na.indices}{indices of missing values to plot}
+\item{na.indices.x}{indices of missing values on the x axis}
+
+\item{na.indices.y}{indices of missing values on the y axis}
 
 \item{na.col}{color of missing values to plot.}
 }

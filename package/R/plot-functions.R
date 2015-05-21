@@ -74,22 +74,25 @@ plotTriangleHeatmap <- function(
 #' @param palette color palette to interpolate over
 #' @param vlim range of values to use when mapping values to the \code{palette}.
 #' @param mas ordered subset of the moduleAssignments vector
-#' @param na.indices indices of missing values to plot
+#' @param na.indices.x indices of missing values on the x axis
+#' @param na.indices.y indices of missing values on the y axis
 #' @param na.col color of missing values to plot.
 #' 
 plotSquareHeatmap <- function(
-  values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd"
+  values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
+  na.col="#bdbdbd"
 ) {
-  nGenes <- ncol(values) + length(na.indices)
-  emptyPlot(xlim=c(0.5, nGenes+0.5), ylim=c(0.5, nGenes+0.5), bty="n")
+  nX <- ncol(values) + length(na.indices.x)
+  nY <- nrow(values) + length(na.indices.y)
+  emptyPlot(xlim=c(0.5, nX+0.5), ylim=c(0.5, nY+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
   
   # render squares / triangles
   ci <- 1
-  for (ii in 1:nGenes) {
+  for (ii in 1:nY) {
     cj <- 1
-    for (jj in 1:nGenes) {
-      if (ii %nin% na.indices && jj %nin% na.indices) {
+    for (jj in 1:nX) {
+      if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
         col <- getColFromPalette(values[ci, cj], palette, vlim)
         cj <- cj + 1
       } else {
@@ -98,12 +101,12 @@ plotSquareHeatmap <- function(
       rect(
         xleft = jj - 0.5,
         xright = jj + 0.5,
-        ybottom = (nGenes - (ii - 1)) - 0.5,
-        ytop = (nGenes - (ii - 1)) + 0.5,
+        ybottom = (nY - (ii - 1)) - 0.5,
+        ytop = (nY- (ii - 1)) + 0.5,
         col=col, border=col
       )
     }
-    if (ii %nin% na.indices) {
+    if (ii %nin% na.indices.y) {
       ci <- ci + 1
     }
   }
@@ -112,13 +115,23 @@ plotSquareHeatmap <- function(
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
     for (mi in seq_along(breaks)[-1]) {
-      rect(
-        xleft = breaks[mi - 1],
-        xright = breaks[mi],
-        ybottom = (nGenes + 0.5) - (breaks[mi] - 0.5),
-        ytop = (nGenes + 0.5) - (breaks[mi - 1] - 0.5),
-        border="black", lwd=2
-      )
+      if (nX != nY) {
+        rect(
+          xleft = breaks[mi - 1],
+          xright = breaks[mi],
+          ybottom = 0.5,
+          ytop = nY + 0.5,
+          border="black", lwd=2
+        )
+      } else {
+        rect(
+          xleft = breaks[mi - 1],
+          xright = breaks[mi],
+          ybottom = (nX + 0.5) - (breaks[mi] - 0.5),
+          ytop = (nX + 0.5) - (breaks[mi - 1] - 0.5),
+          border="black", lwd=2
+        )
+      }
     }
   }
   
