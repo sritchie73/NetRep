@@ -168,20 +168,25 @@ plotCoexpression <- function(
   
   # Handle genes not present in the test dataset
   na.pos <- which(geneOrder %nin% colnames(coexpression[[test]]))
-  presentGenes <- geneOrder[-na.pos]
+  if (length(na.pos) > 0) {
+    presentGenes <- geneOrder[-na.pos]
+  } else {
+    presentGenes <- geneOrder
+  }
   if (symmetric) {
     plotSquareHeatmap(
       coexpression[[test]][presentGenes, presentGenes], palette, vlim=c(-1, 1),
-      moduleAssignments[[discovery]][presentGenes], na.pos
+      moduleAssignments[[discovery]][geneOrder], na.pos
     )
   } else {
     plotTriangleHeatmap(
       coexpression[[test]][presentGenes , presentGenes], palette, vlim=c(-1, 1),
-      moduleAssignments[[discovery]][presentGenes], na.pos
+      moduleAssignments[[discovery]][geneOrder], na.pos
     )
   }
   
   # Add axes if specified
+  mas <- moduleAssignments[[discovery]][geneOrder]
   if (plotGeneNames) {
     axis(
       side=1, las=2, at=seq_along(geneOrder), labels=geneOrder, tick=FALSE,
@@ -192,9 +197,25 @@ plotCoexpression <- function(
     line <- ifelse(plotGeneNames, 4, -0.5)
     axis(
       side=1, las=1, 
-      at=getModuleMidPoints(moduleAssignments[[discovery]][geneOrder]),
+      at=getModuleMidPoints(mas),
       labels=modules, line=line, tick=FALSE
     )
+  }
+  if (symmetric) {
+    if (plotGeneNames) {
+      axis(
+        side=2, las=2, at=rev(seq_along(geneOrder)), labels=geneOrder, tick=FALSE,
+        line=-0.5
+      )
+    }
+    if (plotModuleNames) {
+      line <- ifelse(plotGeneNames, 4, -0.5)
+      axis(
+        side=2, las=2, 
+        at=length(geneOrder) + 0.5 - getModuleMidPoints(mas),
+        labels=modules, line=line, tick=FALSE
+      )
+    }
   }
   mtext(main, cex=par("cex.main"), font=2)
 }
