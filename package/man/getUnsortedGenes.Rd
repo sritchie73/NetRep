@@ -29,10 +29,7 @@ such vectors. See details.}
 interest was discovered in. See details.}
 
 \item{test}{name or index denoting which dataset to apply the function to.
-See details.}
-
-\item{...}{additional arguments used when reading in a matrix from file. See
- \code{\link{read.bigMatrix}}.}
+ See details.}
 }
 \description{
 Used by the plotting functions to get the desired genes from dynamic user

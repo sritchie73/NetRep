@@ -14,8 +14,6 @@
 #'  interest was discovered in. See details.
 #' @param test name or index denoting which dataset to apply the function to.
 #'  See details.
-#' @param ... additional arguments used when reading in a matrix from file. See
-#'  \code{\link{read.bigMatrix}}.
 #' 
 #' @details
 #'  The matrices containing the \code{geneExpression}, \code{coexpression}, and

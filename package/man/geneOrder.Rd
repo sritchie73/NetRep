@@ -29,15 +29,12 @@ such vectors. See details.}
 interest was discovered in. See details.}
 
 \item{test}{name or index denoting which dataset to apply the function to.
-See details.}
+ See details.}
 
 \item{na.rm}{logical; Only applies when requesting the ordering of genes of
  one or more modules in an independent test dataset. If \code{TRUE}, genes
  missing from the test dataset are excluded. If \code{FALSE}, missing genes
  are put last in the ordering.}
-
-\item{...}{additional arguments used when reading in a matrix from file. See
- \code{\link{read.bigMatrix}}.}
 }
 \value{
 A vector of ordered gene names (descending order).

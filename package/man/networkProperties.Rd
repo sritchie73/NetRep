@@ -29,10 +29,7 @@ such vectors. See details.}
 interest was discovered in. See details.}
 
 \item{test}{name or index denoting which dataset to apply the function to.
-See details.}
-
-\item{...}{additional arguments used when reading in a matrix from file. See
- \code{\link{read.bigMatrix}}.}
+ See details.}
 }
 \value{
 A list of network properties for each module of interest.
