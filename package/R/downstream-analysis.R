@@ -4,6 +4,8 @@
 #' statistics for one or more modules.
 #' 
 #' @template api_inputs
+#' @param simplify logical; if \code{TRUE} the output data structure is 
+#'  simplified.
 #' 
 #' @return 
 #'  A list of network properties for each module of interest.
@@ -99,7 +101,7 @@
 #' @export
 networkProperties <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1
+  discovery=1, test=1, simplify=TRUE
 ) {
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- paste0(".temp-objects", getUUID())
@@ -114,11 +116,15 @@ networkProperties <- function(
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
   # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structure
-  if (missing(moduleAssignments))
-    modules <- "1"
-  if (!missing(moduleAssignments) && missing(modules))
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
     modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -128,6 +134,14 @@ networkProperties <- function(
   checkSets(
     geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
   )
+  
+  if (any(modules %nin% moduleAssignments[[discovery]])) {
+    stop(
+      "Could not find module(s) ", 
+      paste(modules %sub_nin% moduleAssignments[[discovery]], collapse=", "),
+      " in the discovery dataset 'moduleAssignments'"
+    )
+  }
   
   # Temporarily create scaled gene expression set for the calculation of the
   # summary expression profile
@@ -181,7 +195,7 @@ networkProperties <- function(
     
     c(geProps, adjProps)
   })
-  if (length(res) == 1) {
+  if (simplify && length(res) == 1) {
     res <- res[[1]]
   } else {
     names(res) <- modules
@@ -193,12 +207,14 @@ networkProperties <- function(
 #' 
 #' Get the ordering of genes by intramodular connectivity and ordering of 
 #' modules by the similarity of their summary expression profiles. This function
-#' is used in the \code{\link[=plotNetwork]{plotting functions}} but may also be
+#' is used in the \code{\link[=plotModule]{plotting functions}} but may also be
 #' useful for other types of downstream analysis: gene connectivity within a
 #' module is strongly correlated with a gene's biological importance to that
 #' module \emph{(1)}.
 #' 
 #' @template api_inputs
+#' @param simplify logical; if \code{TRUE} the output data structure is 
+#'  simplified.
 #' 
 #' @param na.rm logical; Only applies when requesting the ordering of genes of
 #'  one or more modules in an independent test dataset. If \code{TRUE}, genes 
@@ -306,19 +322,16 @@ networkProperties <- function(
 #' # clean up bigMatrix files from examples
 #' unlink("*_bm*")
 #' 
-#' @rdname geneOrder
+#' @rdname orderNetwork
 #' @export
 geneOrder <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, na.rm=FALSE, orderModules=TRUE
+  discovery=1, test=1, na.rm=FALSE, orderModules=TRUE, simplify=TRUE
 ) {
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules,
-    discovery, test
+    discovery, test, simplify=FALSE
   )
-  if (missing(modules) || length(modules) == 1) {
-    props <- list(props)
-  }
   
   # order modules
   moduleOrder <- 1
@@ -344,10 +357,47 @@ geneOrder <- function(
   }
   
   # order genes
-  foreach(mi = moduleOrder, .combine=c) %do% {
-    names(sort(
+  res <- foreach(mi = moduleOrder, .combine=c) %do% {
+    rr <- names(sort(
       props[[mi]]$connectivity, decreasing=TRUE, 
       na.last=ifelse(na.rm, NA, TRUE)
     ))
+    if (!simplify)
+      rr <- list(rr)
+    rr
   }
+  if (!simplify) {
+    names(res) <- names(props)[moduleOrder]
+  }
+  res
+}
+
+#' Order samples by the summary expression profile of network module.
+#'
+#' @param simplify logical; if \code{TRUE} the output data structure is 
+#'  simplified.
+#'
+#' @rdname orderNetwork
+#' @export
+sampleOrder <- function(
+  geneExpression, coexpression, adjacency, moduleAssignments, modules,
+  discovery=1, test=1, na.rm=FALSE, simplify=TRUE
+) {
+  if (is.null(geneExpression[[test]]))
+    stop("Cannot order samples without gene expression data")
+  props <- networkProperties(
+    geneExpression, coexpression, adjacency, moduleAssignments, modules,
+    discovery, test, simplify=FALSE
+  )
+
+  res <- lapply(props, function(mip) {
+    names(sort(
+      mip$summaryExpression, decreasing=TRUE, 
+      na.last=ifelse(na.rm, NA, TRUE)
+    ))
+  })
+  if (simplify && length(res) == 1) {
+    res <- res[[1]]
+  }
+  res
 }

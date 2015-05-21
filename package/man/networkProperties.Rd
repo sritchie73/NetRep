@@ -5,7 +5,7 @@
 \title{Get the properties of a network module}
 \usage{
 networkProperties(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1)
+  moduleAssignments, modules, discovery = 1, test = 1, simplify = TRUE)
 }
 \arguments{
 \item{geneExpression}{the gene expression matrix for the dataset of interest,
@@ -30,6 +30,9 @@ interest was discovered in. See details.}
 
 \item{test}{name or index denoting which dataset to apply the function to.
  See details.}
+
+\item{simplify}{logical; if \code{TRUE} the output data structure is
+ simplified.}
 }
 \value{
 A list of network properties for each module of interest.

@@ -330,14 +330,10 @@ getGenes <- function(
 ) {
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules,
-    discovery, test
+    discovery, test, simplify=FALSE
   )
-  if (missing(modules) || length(modules) == 1) {
-    props <- list(props)
-  }
   
-  moduleOrder <- seq_along(props)
-  foreach(mi = moduleOrder, .combine=c) %do% {
-    names(props[[mi]]$connectivity)
+  foreach(mi = seq_along(props), .combine=c) %do% {
+     names(props[[mi]]$connectivity)
   }
 }

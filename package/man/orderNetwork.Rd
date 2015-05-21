@@ -2,10 +2,15 @@
 \name{api_inputs}
 \alias{api_inputs}
 \alias{geneOrder}
+\alias{sampleOrder}
 \title{Order genes and modules within a network.}
 \usage{
 geneOrder(geneExpression = NULL, coexpression, adjacency, moduleAssignments,
-  modules, discovery = 1, test = 1, na.rm = FALSE, orderModules = TRUE)
+  modules, discovery = 1, test = 1, na.rm = FALSE, orderModules = TRUE,
+  simplify = TRUE)
+
+sampleOrder(geneExpression, coexpression, adjacency, moduleAssignments, modules,
+  discovery = 1, test = 1, na.rm = FALSE, simplify = TRUE)
 }
 \arguments{
 \item{geneExpression}{the gene expression matrix for the dataset of interest,
@@ -39,6 +44,12 @@ are put last in the ordering.}
 \item{orderModules}{logical; if \code{TRUE} modules ordered by the clustering
   of their summary expression profile. If \code{FALSE} modules are returned
   in the order provided.}
+
+\item{simplify}{logical; if \code{TRUE} the output data structure is
+ simplified.}
+
+\item{simplify}{logical; if \code{TRUE} the output data structure is
+ simplified.}
 }
 \value{
 A vector of ordered gene names (descending order).
@@ -46,10 +57,12 @@ A vector of ordered gene names (descending order).
 \description{
 Get the ordering of genes by intramodular connectivity and ordering of
 modules by the similarity of their summary expression profiles. This function
-is used in the \code{\link[=plotNetwork]{plotting functions}} but may also be
+is used in the \code{\link[=plotModule]{plotting functions}} but may also be
 useful for other types of downstream analysis: gene connectivity within a
 module is strongly correlated with a gene's biological importance to that
 module \emph{(1)}.
+
+Order samples by the summary expression profile of network module.
 }
 \details{
 The matrices containing the \code{geneExpression}, \code{coexpression}, and
