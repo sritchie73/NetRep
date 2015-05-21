@@ -117,7 +117,7 @@ plotSquareHeatmap <- function(
         xright = breaks[mi],
         ybottom = (nGenes + 0.5) - (breaks[mi] - 0.5),
         ytop = (nGenes + 0.5) - (breaks[mi - 1] - 0.5),
-        border="black", lwd2
+        border="black", lwd=2
       )
     }
   }
@@ -136,7 +136,7 @@ plotSquareHeatmap <- function(
 
 #' Plot a color palette legend
 #' 
-#' Legend will fill an entire plot window.
+#' Add a legend to a plot window.
 #' 
 #' @param palette color palette.
 #' @param palette.vlim limits of the values mapping to the extremities of the 
@@ -145,11 +145,89 @@ plotSquareHeatmap <- function(
 #' @param horizontal logical; if \code{TRUE} the legend is plotted horizontally,
 #'   otherwise vertically.
 #' @param main title of the legend.
+#' @param xlim xlim relative to the plotting region of the rest of the plot.
+#' @param ylim ylim relative to the plotting region of the rest of the plot.
 #' 
-plotGradientLegend <- function(
-  palette, palette.vlim, legend.vlim, horizontal, main
+addGradientLegend <- function(
+  palette, palette.vlim, legend.vlim, horizontal, main, xlim, ylim
 ) {
-
+  palette <- colorRampPalette(palette)(255)
+  
+  if (missing(xlim))
+    xlim <- par("usr")[1:2]
+  if (missing(ylim))
+    ylim <- par("usr")[3:4]
+  
+  # Handle legends where the range of values doesn't map to the palette range 
+  # (i.e. drawing a legend for the adjacency plot using the coexpression 
+  # palette)
+  plim <- c(
+    head(which(palette == getColFromPalette(
+      legend.vlim[1], palette, palette.vlim
+    )), 1),
+    tail(which(palette == getColFromPalette(
+      legend.vlim[2], palette, palette.vlim
+    )), 1)
+  )
+  palette <- palette[plim[1]:plim[2]]
+  # Draw gradient bar
+  if (horizontal) {
+    breaks <- seq(xlim[1], xlim[2], length=length(palette) + 1)
+    for (pi in seq_along(palette)) {
+      rect(
+        xleft=breaks[pi],
+        xright=breaks[pi + 1],
+        ybottom=ylim[1],
+        ytop=ylim[2],
+        col=palette[pi],
+        border=palette[pi],
+        xpd=TRUE
+      )
+    }
+  } else {
+    breaks <- seq(ylim[1], ylim[2], length=length(palette) + 1)
+    for (pi in seq_along(palette)) {
+      rect(
+        xleft=xlim[1],
+        xright=xlim[2],
+        ybottom=breaks[pi],
+        ytop=breaks[pi+1],
+        col=palette[pi],
+        border=palette[pi],
+        xpd=TRUE
+      )
+    }
+  }
+  
+  # Render bounding box
+  rect(
+    xleft=xlim[1], xright=xlim[2], ybottom=ylim[1], ytop=ylim[2],
+    border="black", lwd=2, xpd=TRUE
+  )
+  
+  # Render axis
+  labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
+  if (horizontal) {
+    tck <- (par("usr")[4] - par("usr")[3])*0.04
+    # draw axis ticks
+    at <- seq.int(xlim[1L], xlim[2L], length.out=5)
+    sapply(at, function(aa) {
+      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=2, xpd=TRUE)
+    })
+    text(labels, x=at, y=ylim[1]-tck*3, cex=par("cex.axis"), xpd=TRUE)
+  } else {
+    at <- seq.int(ylim[1L], ylim[2L], length.out=5)
+    tck <- (par("usr")[4] - par("usr")[3])*0.04
+    # draw axis ticks
+    sapply(at, function(aa) {
+      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=2, xpd=TRUE)
+    })
+    text(labels, x=xlim[1]-tck*3, y=at, cex=par("cex.axis"), xpd=TRUE)
+  }
+  
+  # Render title
+  offset <- (par("usr")[4] - par("usr")[3]) * 0.08
+  text(main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=TRUE)
 }
 
 #' Custom bar plot function

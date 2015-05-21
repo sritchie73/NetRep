@@ -2,7 +2,9 @@
 \name{api_inputs}
 \alias{api_inputs}
 \alias{plotAdjacency}
+\alias{plotAdjacencyLegend}
 \alias{plotCoexpression}
+\alias{plotCoexpressionLegend}
 \alias{plotConnectivity}
 \alias{plotModuleMembership}
 \title{Plot a topological feature of network module}
@@ -10,12 +12,18 @@
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Coexpression", palette = coexpression.palette())
+  main = "Coexpression", palette = coexpression.palette(), legend = TRUE)
+
+plotCoexpressionLegend(palette = coexpression.palette(),
+  main = "Coexpression", horizontal = TRUE)
+
+plotAdjacencyLegend(palette = adjacency.palette(), main = "Adjacency",
+  horizontal = TRUE)
 
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   geneOrder = "discovery", plotGeneNames = TRUE, plotModuleNames,
-  main = "Adjacency", palette = coexpression.palette())
+  main = "Adjacency", palette = adjacency.palette(), legend = TRUE)
 
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
@@ -78,9 +86,14 @@ used when the coexpression between two genes is equal to -1, and the last
 element should correspond to the color used when the coexpression between
 two genes is equal to 1}
 
+\item{legend}{logical; if \code{TRUE} legends are drawn for
+ \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.}
+
+\item{horizontal}{logical; if \code{TRUE} the legend is plotted horizontally.}
+
 \item{drawBorder}{logical; if \code{TRUE}, borders are drawn around the bars
- in \code{plotModuleMembership}, \code{plotConnectivity}, and
- \code{plotSummaryExpression}.}
+in \code{plotModuleMembership}, \code{plotConnectivity}, or
+\code{plotSummaryExpression}.}
 }
 \description{
 Plot a topological feature of network module

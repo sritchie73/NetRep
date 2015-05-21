@@ -1,5 +1,6 @@
 #' Plot a topological feature of network module
 #' 
+#' Functions to plot individual components of a module's network topology.
 #' 
 #' @param symmetric logical; if \code{TRUE} the coexpression will be plotted as
 #'  a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
@@ -21,8 +22,10 @@
 #'   element should correspond to the color used when the coexpression between
 #'   two genes is equal to 1
 #' @param drawBorder logical; if \code{TRUE}, borders are drawn around the bars
-#'  in \code{plotModuleMembership}, \code{plotConnectivity}, and 
+#'  in \code{plotModuleMembership}, \code{plotConnectivity}, or
 #'  \code{plotSummaryExpression}.
+#' @param legend logical; if \code{TRUE} legends are drawn for
+#'  \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.
 #' 
 #' @template api_inputs
 #' 
@@ -120,7 +123,7 @@ plotCoexpression <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, symmetric=FALSE, geneOrder="discovery", 
   plotGeneNames=TRUE, plotModuleNames, main="Coexpression", 
-  palette=coexpression.palette()
+  palette=coexpression.palette(), legend=TRUE
 ) {
   if (class(main) != "character")
     stop("'main' must be a characer vector")
@@ -181,11 +184,28 @@ plotCoexpression <- function(
       coexpression[[test]][presentGenes, presentGenes], palette, vlim=c(-1, 1),
       moduleAssignments[[discovery]][geneOrder], na.pos
     )
+    if (legend) {
+      pd <- length(geneOrder) + 1
+      addGradientLegend(
+        palette, c(-1,1), c(-1,1), FALSE, "Coexpression",
+        xlim=c(pd - 0.5 + pd*0.2, pd - 0.5 + pd*0.25), 
+        ylim=c(pd/3, pd - 0.5 - pd*0.1)
+      )
+    }
   } else {
     plotTriangleHeatmap(
       coexpression[[test]][presentGenes , presentGenes], palette, vlim=c(-1, 1),
       moduleAssignments[[discovery]][geneOrder], na.pos
     )
+    if (legend) {
+      ph <- length(geneOrder)/2 + 0.5
+      pw <- length(geneOrder) + 1
+      addGradientLegend(
+        palette, c(-1,1), c(-1,1), TRUE, "Coexpression",
+        xlim=c(0.5 - pw*0.05, pw*0.22), 
+        ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.27)
+      )
+    }
   }
   
   # Add axes if specified
@@ -229,13 +249,124 @@ plotAdjacency <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, symmetric=FALSE, geneOrder="discovery", 
   plotGeneNames=TRUE, plotModuleNames, main="Adjacency", 
-  palette=coexpression.palette()
+  palette=adjacency.palette(), legend=TRUE
 ) {
-  plotCoexpression(
-    geneExpression, adjacency, adjacency, moduleAssignments, modules,
-    discovery, test, symmetric, geneOrder, plotGeneNames, plotModuleNames,
-    main, palette
-  ) 
+  if (class(main) != "character")
+    stop("'main' must be a characer vector")
+  
+  geneOrderArgs <- c("discovery", "test", "none")
+  geneOrder <- geneOrderArgs[pmatch(geneOrder, geneOrderArgs, nomatch=3)]
+  
+  # Temporary directory to store new bigMatrix objects in
+  tmp.dir <- paste0(".temp-objects", getUUID())
+  dir.create(tmp.dir, showWarnings=FALSE)
+  on.exit({
+    unlink(tmp.dir, recursive=TRUE)
+  }, add=TRUE)
+  
+  # Unify data structures and load in matrices
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structure
+  if (missing(moduleAssignments))
+    modules <- "1"
+  moduleAssignments <- formatModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
+  # Sanity check input for consistency.
+  checkSets(
+    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+  )
+  
+  if (geneOrder == "none") {
+    geneOrder <- getGenes(
+      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      discovery, discovery
+    )
+  } else {
+    geneOrder <- geneOrder(
+      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      discovery, test=ifelse(geneOrder == "discovery", discovery, test)
+    )
+  }
+  
+  if (missing(plotModuleNames))
+    plotModuleNames <- !missing(modules) && length(modules) > 1
+  
+  # Handle genes not present in the test dataset
+  na.pos <- which(geneOrder %nin% colnames(coexpression[[test]]))
+  if (length(na.pos) > 0) {
+    presentGenes <- geneOrder[-na.pos]
+  } else {
+    presentGenes <- geneOrder
+  }
+  if (symmetric) {
+    plotSquareHeatmap(
+      adjacency[[test]][presentGenes, presentGenes], palette, vlim=c(0, 1),
+      moduleAssignments[[discovery]][geneOrder], na.pos
+    )
+    if (legend) {
+      pd <- length(geneOrder) + 1
+      addGradientLegend(
+        palette, c(0,1), c(0,1), FALSE, "Adjacency",
+        xlim=c(pd - 0.5 + pd*0.2, pd - 0.5 + pd*0.25), 
+        ylim=c(pd/3, pd - 0.5 - pd*0.1)
+      )
+    }
+  } else {
+    plotTriangleHeatmap(
+      adjacency[[test]][presentGenes , presentGenes], palette, vlim=c(0, 1),
+      moduleAssignments[[discovery]][geneOrder], na.pos
+    )
+    if (legend) {
+      ph <- length(geneOrder)/2 + 0.5
+      pw <- length(geneOrder) + 1
+      addGradientLegend(
+        palette, c(0,1), c(0,1), TRUE, "Adjacency",
+        xlim=c(0.5 - pw*0.05, pw*0.22), 
+        ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.27)
+      )
+    }
+  }
+  
+  # Add axes if specified
+  mas <- moduleAssignments[[discovery]][geneOrder]
+  if (plotGeneNames) {
+    axis(
+      side=1, las=2, at=seq_along(geneOrder), labels=geneOrder, tick=FALSE,
+      line=-0.5
+    )
+  }
+  if (plotModuleNames) {
+    line <- ifelse(plotGeneNames, 4, -0.5)
+    axis(
+      side=1, las=1, 
+      at=getModuleMidPoints(mas),
+      labels=modules, line=line, tick=FALSE
+    )
+  }
+  if (symmetric) {
+    if (plotGeneNames) {
+      axis(
+        side=2, las=2, at=rev(seq_along(geneOrder)), labels=geneOrder, tick=FALSE,
+        line=-0.5
+      )
+    }
+    if (plotModuleNames) {
+      line <- ifelse(plotGeneNames, 4, -0.5)
+      axis(
+        side=2, las=2, 
+        at=length(geneOrder) + 0.5 - getModuleMidPoints(mas),
+        labels=modules, line=line, tick=FALSE
+      )
+    }
+  }
+  mtext(main, cex=par("cex.main"), font=2)
 }
 
 #' @rdname plotTopology
@@ -492,4 +623,24 @@ plotConnectivity <- function(
     )
   }
   mtext(main, cex=par("cex.main"), font=2)
+}
+
+#' @param horizontal logical; if \code{TRUE} the legend is plotted horizontally.
+#' 
+#' @rdname plotTopology
+#' @export
+plotCoexpressionLegend <- function(
+  palette=coexpression.palette(), main="Coexpression", horizontal=TRUE
+) {
+  emptyPlot(c(0,1), c(0,1))
+  addGradientLegend(palette, c(-1,1), c(-1,1), horizontal, main)
+}
+
+#' @rdname plotTopology
+#' @export
+plotAdjacencyLegend <- function(
+  palette=adjacency.palette(), main="Adjacency", horizontal=TRUE
+) {
+  emptyPlot(c(0,1), c(0,1))
+  addGradientLegend(palette, c(0,1), c(0,1), horizontal, main)
 }
