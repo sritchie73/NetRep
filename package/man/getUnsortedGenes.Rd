@@ -4,10 +4,20 @@
 \alias{getGenes}
 \title{Return genes without ordering}
 \usage{
-getGenes(geneExpression = NULL, coexpression, adjacency, moduleAssignments,
-  modules, discovery = 1, test = 1)
+getGenes(moduleAssignments, modules, discovery = 1, test = 1)
 }
 \arguments{
+\item{moduleAssignments}{a vector assigning genes to modules, or a list of
+such vectors. See details.}
+
+\item{modules}{a vector of modules to apply the function to. See details.}
+
+\item{discovery}{name or index denoting which dataset the module of
+interest was discovered in. See details.}
+
+\item{test}{name or index denoting which dataset to apply the function to.
+ See details.}
+
 \item{geneExpression}{the gene expression matrix for the dataset of interest,
 or a list of gene expression matrices, one for each dataset. Columns are
 expected to be genes, rows samples. See details for expected input types.}
@@ -19,17 +29,6 @@ expected input types.}
 \item{adjacency}{the adjacency matrix for the dataset of interest, or a
 list of adjacency matrices, one for each dataset. See details for
 expected input types.}
-
-\item{moduleAssignments}{a vector assigning genes to modules, or a list of
-such vectors. See details.}
-
-\item{modules}{a vector of modules to apply the function to. See details.}
-
-\item{discovery}{name or index denoting which dataset the module of
-interest was discovered in. See details.}
-
-\item{test}{name or index denoting which dataset to apply the function to.
- See details.}
 }
 \description{
 Used by the plotting functions to get the desired genes from dynamic user

@@ -325,15 +325,9 @@ orderAsNumeric <- function(vec) {
 #' @template api_inputs
 #' @rdname getUnsortedGenes
 getGenes <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1
+  moduleAssignments, modules, discovery=1, test=1
 ) {
-  props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules,
-    discovery, test, simplify=FALSE
-  )
-  
-  foreach(mi = seq_along(props), .combine=c) %do% {
-     names(props[[mi]]$connectivity)
+  foreach(mi = modules, .combine=c) %do% {
+    names(moduleAssignments[[discovery]] %sub_in% modules)
   }
 }
