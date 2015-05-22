@@ -343,7 +343,7 @@ plotMultiBar <- function(
   emptyPlot(xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)), bty="n")
   for (ii in seq_len(ncol(lengths))) {
     # we need to map from the value range to a range of 0-1
-    rr <- range(lengths[,ii])
+    rr <- lengths.lim[[ii]]
     rr.size <- rr[2] - rr[1]
     
     if (min(rr) > 0) {
@@ -373,17 +373,17 @@ plotMultiBar <- function(
     abline(v=getX(ax), col="black", lwd=2)
     # draw axis
     axis(
-      side=1, labels=FALSE, tck=-0.04, lwd=2,
+      side=1, labels=FALSE, tck=-0.03, lwd=2,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
     )
     axis(
-      side=1, tick=FALSE, line=-0.2, las=2,
+      side=1, tick=FALSE, line=0, las=2,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2]))), 
-      labels=unique(c(rr[1], ax, rr[2]))
+      labels=prettyNum(unique(c(rr[1], ax, rr[2])), digits=2)
     )
     mtext(
       colnames(lengths)[ii], side=1, at=ii-0.5, cex=par("cex.lab"), font=2,
-      line=1
+      line=3
     )
   }
   mtext(

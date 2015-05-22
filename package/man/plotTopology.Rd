@@ -8,31 +8,38 @@
 \alias{plotConnectivity}
 \alias{plotExpressionLegend}
 \alias{plotModuleMembership}
+\alias{plotSummaryExpression}
 \title{Plot a topological feature of network module}
 \usage{
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules, plotGeneNames = TRUE,
+  orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Coexpression", palette = coexpression.palette(),
   legend = TRUE)
 
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules, plotGeneNames = TRUE,
+  orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Adjacency", palette = adjacency.palette(),
   legend = TRUE)
 
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules, plotGeneNames = TRUE,
+  moduleAssignments, modules, discovery = 1, test = 1,
+  orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Module Membership", palette = c("#313695",
   "#a50026"), drawBorder = FALSE)
 
 plotConnectivity(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  moduleAssignments, modules, discovery = 1, test = 1,
+  orderGenesBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
   plotModuleNames, main = "Normalised Connectivity", palette = "#feb24c",
   drawBorder = FALSE)
+
+plotSummaryExpression(geneExpression, coexpression, adjacency,
+  moduleAssignments, modules, discovery = 1, test = 1,
+  orderSamplesBy = "test", orderModules = TRUE, plotSampleNames = TRUE,
+  plotModuleNames, main = "Summary Expression", palette = c("#762a83",
+  "#1b7837"), drawBorder = FALSE)
 
 plotExpressionLegend(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, palette = expression.palette(),
@@ -68,20 +75,28 @@ interest was discovered in. See details.}
 \item{test}{name or index denoting which dataset to apply the function to.
  See details.}
 
-\item{orderBy}{one of "discovery", "test", or "none". If "discovery" genes
-are ordered by intramodular connectivity in the \code{discovery} dataset
-(see \code{\link{geneOrder}}) and samples are ordered by their summary
-expression profile in the \code{discovery} dataset (see
-\code{\link{sampleOrder}}). If "test" genes are orderd by intramodular
-connectivity and samples are ordered by their summary expression profile in
-the \code{test} dataset. If "none" no ordering is applied.}
+\item{orderGenesBy}{one of "discovery", "test", or "none". If "discovery"
+genes are ordered by intramodular connectivity in the \code{discovery}
+dataset. If "test" genes are orderd by intramodular connectivity in the
+\code{test} dataset. If "none" no ordering is applied.}
 
-\item{orderModules}{logical; if \code{TRUE} modules ordered by similarity.
-If \code{FALSE} modules are rendered in the order provided. The default is
-to order by modules if the gene expression is provided.}
+\item{orderModules}{logical; if \code{TRUE} modules ordered by similarity of
+their summary expression profiles. If \code{FALSE} modules are rendered in
+the order provided. The default is to order by modules if the gene
+expression is provided.}
+
+\item{orderSamplesBy}{one of "discovery", "test", or "none". If
+"discovery"samples are ordered by their summary expression profile in the
+\code{discovery} dataset (see \code{\link{sampleOrder}}). If "test" samples
+are ordered by their summary expression profile in the \code{test} dataset.
+If "none" no ordering is applied.}
 
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
 heatmap.}
+
+\item{plotSampleNames}{logical; if \code{TRUE} the sample names will be
+plotted next to the gene expression heatmap and summary expression profile
+plots}
 
 \item{plotModuleNames}{logical; if \code{TRUE}, plot the module names below
 the heatmap. By default, module names are only plotted if multiple
@@ -162,7 +177,7 @@ plotCoexpression(
 ## Example 2: Plot coexpression of the first 10 genes,
 ## without ordering them
 plotCoexpression(
- geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderBy="none"
+ geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderGenesBy="none"
 )
 
 ## Example 3: Plot the coexpression of two adipose modules in the liver

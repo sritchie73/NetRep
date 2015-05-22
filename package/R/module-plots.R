@@ -5,7 +5,6 @@
 #' @param symmetric logical; if \code{TRUE} the coexpression will be plotted as
 #'  a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
 #'  heatmap.
-#' @param orderModules logical; if \code{TRUE} modules ordered by similarity. 
 #' @param orderGenesBy one of "discovery", "test", or "none". If "discovery"
 #'   genes are ordered by intramodular connectivity in the \code{discovery}
 #'   dataset. If "test" genes are orderd by intramodular connectivity in the
@@ -15,8 +14,10 @@
 #'   \code{discovery} dataset (see \code{\link{sampleOrder}}). If "test" samples
 #'   are ordered by their summary expression profile in the \code{test} dataset.
 #'   If "none" no ordering is applied.
-#'   If \code{FALSE} modules are rendered in the order provided. The default is
-#'   to order by modules if the gene expression is provided.
+#' @param orderModules logical; if \code{TRUE} modules ordered by similarity of 
+#'   their summary expression profiles. If \code{FALSE} modules are rendered in
+#'   the order provided. The default is to order by modules if the gene
+#'   expression is provided.
 #' @param plotGeneNames logical; if \code{TRUE}, plot the gene names below the
 #'  heatmap.
 #' @param plotSampleNames logical; if \code{TRUE} the sample names will be 
@@ -466,7 +467,7 @@ plotModuleMembership <- function(
 
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderGenesBy == "discovery") {
+  if (orderGenesBy == "discovery" && discovery != test)  {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
@@ -594,7 +595,7 @@ plotConnectivity <- function(
   
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderGenesBy == "discovery") {
+  if (orderGenesBy == "discovery" && discovery != test) {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
@@ -675,6 +676,154 @@ plotConnectivity <- function(
     )
   }
   mtext(main, cex=par("cex.main"), font=2)
+}
+
+#' @rdname plotTopology
+#' @export
+plotSummaryExpression <- function(
+  geneExpression, coexpression, adjacency, moduleAssignments, modules,
+  discovery=1, test=1, orderSamplesBy="test", orderModules=TRUE,
+  plotSampleNames=TRUE, plotModuleNames, main="Summary Expression", 
+  palette=c("#762a83", "#1b7837"), drawBorder=FALSE
+) {
+  if (is.null(geneExpression))
+    stop("Cannot plot summary expression without gene expression data")
+  
+  if (class(main) != "character")
+    stop("'main' must be a characer vector")
+  
+  orderByArgs <- c("discovery", "test", "none")
+  orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
+  
+  # Temporary directory to store new bigMatrix objects in
+  tmp.dir <- paste0(".temp-objects", getUUID())
+  dir.create(tmp.dir, showWarnings=FALSE)
+  on.exit({
+    unlink(tmp.dir, recursive=TRUE)
+  }, add=TRUE)
+  
+  # Unify data structures and load in matrices
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
+    modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
+  # Format optional input data so it doesn't cause cascading error crashes
+  moduleAssignments <- formatModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
+  if (is.null(geneExpression[[test]]))
+    stop("Cannot plot summary expression without gene expression data")
+  
+
+  # Get the summary expression for each module in the test network.
+  props <- networkProperties(
+    geneExpression, coexpression, adjacency, moduleAssignments, modules, 
+    discovery, test, FALSE
+  )
+  
+  # If test == discovery, we order samples and modules by discovery, and plot
+  # the discovery. So we need to make sure the gene expression exists in the
+  # discovery
+  if (orderSamplesBy == "discovery" && discovery != test) {
+    if (is.null(geneExpression[[discovery]])) {
+      stop(
+        "Expecting gene expression data for the discovery dataset in order",
+        " to sort samples"
+      )
+    }
+    propsDisc <- networkProperties(
+      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      discovery, discovery, FALSE
+    ) 
+    moduleOrder <- names(propsDisc)
+    if (length(propsDisc) > 1 && orderModules) {
+      # Create a matrix of summary expression profiles to measure the similarity
+      seps <- matrix(
+        0, ncol=length(propsDisc), 
+        nrow=length(propsDisc[[1]]$summaryExpression)
+      )
+      colnames(seps) <- names(propsDisc)
+      for (mi in seq_along(propsDisc)) {
+        seps[,mi] <- propsDisc[[mi]]$summaryExpression
+      }
+      moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
+    }
+    sampleOrder <- names(sort(
+      propsDisc[[1]]$summaryExpression, decreasing=TRUE
+    ))
+  } else if (orderSamplesBy == "none") {
+    sampleOrder <- rownames(geneExpression[[test]])
+    moduleOrder <- modules
+  } else {
+    # Order modules and samples by the test network
+    moduleOrder <- names(props)
+    if (length(props) > 1 && orderModules) {
+      seps <- matrix(
+        0, ncol=length(props), 
+        nrow=length(props[[1]]$summaryExpression)
+      )
+      colnames(seps) <- names(props)
+      for (mi in seq_along(props)) {
+        seps[,mi] <- props[[mi]]$summaryExpression
+      }
+      moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
+    }
+    sampleOrder <- names(sort(
+      props[moduleOrder][[1]]$summaryExpression, decreasing=TRUE
+    ))
+  }
+  
+  # Handle missing samples
+  if (all(sampleOrder %nin% rownames(geneExpression[[test]]))) {
+    stop(
+      "No samples from the 'orderSamplesBy' dataset are present in the",
+      " 'test' dataset"
+    )
+  }
+  na.pos <- which(sampleOrder %nin% rownames(geneExpression[[test]]))
+  if (length(na.pos) > 0) {
+    presentSamples <- sampleOrder[-na.pos]
+  } else {
+    presentSamples <- sampleOrder
+  }
+  
+  # now build the Summary Expression matrix
+  SEP <- foreach(mi = moduleOrder, .combine=cbind) %do% {
+    matrix(
+      insert.nas(props[[mi]]$summaryExpression[presentSamples], na.pos),
+      ncol=1
+    )
+  }
+  colnames(SEP) <- moduleOrder
+  
+  # Now build the colors
+  cols <- matrix(palette[1], nrow(SEP), ncol(SEP))
+  cols[SEP > 0] <- palette[2]
+  
+  # Plot bar chart
+  plotMultiBar(
+    SEP, rep(list(range(SEP)), ncol(SEP)),
+    cols=cols, drawBorder=drawBorder, main=main
+  )
+  
+  if (plotSampleNames) {
+    axis(
+      side=2, tick=FALSE, las=2, at=1:length(sampleOrder)-0.5,
+      labels=sampleOrder, line=0
+    )
+  }
 }
 
 #' @rdname plotTopology
