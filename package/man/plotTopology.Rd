@@ -6,6 +6,7 @@
 \alias{plotCoexpression}
 \alias{plotCoexpressionLegend}
 \alias{plotConnectivity}
+\alias{plotExpressionLegend}
 \alias{plotModuleMembership}
 \title{Plot a topological feature of network module}
 \usage{
@@ -32,6 +33,10 @@ plotConnectivity(geneExpression = NULL, coexpression, adjacency,
   orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
   plotModuleNames, main = "Normalised Connectivity", palette = "#feb24c",
   drawBorder = FALSE)
+
+plotExpressionLegend(geneExpression, coexpression, adjacency, moduleAssignments,
+  modules, discovery = 1, test = 1, palette = expression.palette(),
+  main = "Expression", horizontal = TRUE)
 
 plotCoexpressionLegend(palette = coexpression.palette(),
   main = "Coexpression", horizontal = TRUE)

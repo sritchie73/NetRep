@@ -123,8 +123,8 @@ adjacency.palette <- function() {
 #' 
 #' @import RColorBrewer
 expression.palette <- function() {
-  cols <- brewer.pal(6, "PRGn")
-  cols <- c(cols[1:3], "#FFFFFF", pal[4:6]) 
+  cols <- brewer.pal(9, "PRGn")
+  cols[5] <- "#FFFFFF"
   cols
 }
 

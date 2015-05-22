@@ -681,6 +681,56 @@ plotConnectivity <- function(
   mtext(main, cex=par("cex.main"), font=2)
 }
 
+#' @rdname plotTopology
+#' @export
+plotExpressionLegend <- function(
+  geneExpression, coexpression, adjacency, moduleAssignments, modules,
+  discovery=1, test=1, palette=expression.palette(), main="Expression", 
+  horizontal=TRUE
+) {
+  if (is.null(geneExpression))
+    stop("Cannot plot expression legend without gene expression data")
+  
+  # Unify data structures and load in matrices
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
+    modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
+  # Format optional input data so it doesn't cause cascading error crashes
+  moduleAssignments <- formatModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
+  if (is.null(geneExpression[[test]]))
+    stop("Cannot plot summary expression without gene expression data")
+  
+  modGenes <- getGenes(moduleAssignments, modules, discovery)
+  modGenes <- modGenes %sub_in% colnames(geneExpression[[test]])
+  if (length(modGenes) == 0)
+    stop("None of the module genes are present in the test dataset")
+  rg <- range(geneExpression[[test]][,modGenes])
+  emptyPlot(c(0,1), c(0,1))
+  if (all(rg < 0)) {
+    addGradientLegend(head(palette, length(palette)/2), rg, rg, horizontal, main)
+  } else if (all(rg > 0)) {
+    addGradientLegend(tail(palette, length(palette)/2), rg, rg, horizontal, main)
+  } else {
+    plim <- c(-max(abs(rg)), max(abs(rg)))
+    addGradientLegend(palette, plim, rg, horizontal, main)
+  }
+}
+
 #' @param horizontal logical; if \code{TRUE} the legend is plotted horizontally.
 #' 
 #' @rdname plotTopology
