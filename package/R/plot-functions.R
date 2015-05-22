@@ -311,3 +311,83 @@ plotBar <- function(
     abline(v=head(breaks[-1], -1), lwd=2)
   }
 }
+
+#' Plot multiple horizontal bar plots
+#' 
+#' @param lengths a matrix whose columns contain the lengths of each bar for 
+#'  the given property (e.g. each column should be a module, or phenotype).
+#' @param lengths.lim a list of limits for the lengths axes.
+#' @param cols a matrix of colors for each bar.
+#' @param bar.width value between 0 and 1 controlling the proportion of space
+#'  taken by each bar.
+#' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
+#' @param main title for the plot
+#' 
+plotMultiBar <- function(
+  lengths, lengths.lim, cols, bar.width=1, drawBorder=FALSE, main=""
+) {
+  if (!is.matrix(lengths))
+    lengths <- matrix(lengths, ncol=lengths)
+  if (missing(lengths.lim)) {
+    lengths.lim <- lapply(seq_len(ncol(lengths)), function(ci) {
+      range(lengths[,ci])
+    })
+  }
+  if (!is.list(lengths.lim))
+    lengths.lim <- list(lengths.lim)
+  if (length(cols) == 1) 
+    cols <- matrix(cols, nrow=nrow(lengths), ncol=ncol(lengths))
+  
+  pw <- 0.7 # width of each plot within the 0-1 space
+  
+  emptyPlot(xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)), bty="n")
+  for (ii in seq_len(ncol(lengths))) {
+    # we need to map from the value range to a range of 0-1
+    rr <- range(lengths[,ii])
+    rr.size <- rr[2] - rr[1]
+    
+    if (min(rr) > 0) {
+      ax <- min(rr)
+    } else if (max(rr) < 0) {
+      ax <- max(rr)
+    } else {
+      ax <- 0
+    }
+    
+    # Get x position for an value in range rr
+    getX <- function(val) {
+      (ii - 1) + (1-pw)/2 + pw/rr.size * (val - rr[1])
+    }
+    for (jj in seq_len(nrow(lengths))) {
+        rect(
+          xleft=getX(ax),
+          xright=getX(lengths[jj,ii]),
+          ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
+          ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
+          col=cols[jj, ii],
+          border=ifelse(drawBorder, "black", NA),
+          lwd=2
+        ) 
+    }
+    # draw 0 axis
+    abline(v=getX(ax), col="black", lwd=2)
+    # draw axis
+    axis(
+      side=1, labels=FALSE, tck=-0.04, lwd=2,
+      at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
+    )
+    axis(
+      side=1, tick=FALSE, line=-0.2, las=2,
+      at=unique(c(getX(rr[1]), getX(ax), getX(rr[2]))), 
+      labels=unique(c(rr[1], ax, rr[2]))
+    )
+    mtext(
+      colnames(lengths)[ii], side=1, at=ii-0.5, cex=par("cex.lab"), font=2,
+      line=1
+    )
+  }
+  mtext(
+    main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, line=1, 
+    adj=0.5
+  )
+}
