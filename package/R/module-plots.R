@@ -5,14 +5,16 @@
 #' @param symmetric logical; if \code{TRUE} the coexpression will be plotted as
 #'  a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
 #'  heatmap.
-#' @param orderBy one of "discovery", "test", or "none". If "discovery" genes 
-#'   are ordered by intramodular connectivity in the \code{discovery} dataset 
-#'   (see \code{\link{geneOrder}}) and samples are ordered by their summary
-#'   expression profile in the \code{discovery} dataset (see
-#'   \code{\link{sampleOrder}}). If "test" genes are orderd by intramodular 
-#'   connectivity and samples are ordered by their summary expression profile in
-#'   the \code{test} dataset. If "none" no ordering is applied.
 #' @param orderModules logical; if \code{TRUE} modules ordered by similarity. 
+#' @param orderGenesBy one of "discovery", "test", or "none". If "discovery"
+#'   genes are ordered by intramodular connectivity in the \code{discovery}
+#'   dataset. If "test" genes are orderd by intramodular connectivity in the
+#'   \code{test} dataset. If "none" no ordering is applied.
+#' @param orderSamplesBy one of "discovery", "test", or "none". If
+#'   "discovery"samples are ordered by their summary expression profile in the
+#'   \code{discovery} dataset (see \code{\link{sampleOrder}}). If "test" samples
+#'   are ordered by their summary expression profile in the \code{test} dataset.
+#'   If "none" no ordering is applied.
 #'   If \code{FALSE} modules are rendered in the order provided. The default is
 #'   to order by modules if the gene expression is provided.
 #' @param plotGeneNames logical; if \code{TRUE}, plot the gene names below the
@@ -63,7 +65,7 @@
 #' ## Example 2: Plot coexpression of the first 10 genes, 
 #' ## without ordering them
 #' plotCoexpression(
-#'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderBy="none"
+#'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderGenesBy="none"
 #' )
 #' 
 #' ## Example 3: Plot the coexpression of two adipose modules in the liver
@@ -129,7 +131,7 @@
 #' @export
 plotCoexpression <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules,
+  discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Coexpression", 
   palette=coexpression.palette(), legend=TRUE
 ) {
@@ -137,7 +139,7 @@ plotCoexpression <- function(
     stop("'main' must be a characer vector")
 
   orderByArgs <- c("discovery", "test", "none")
-  orderBy <- orderByArgs[pmatch(orderBy, orderByArgs, nomatch=3)]
+  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
 
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- paste0(".temp-objects", getUUID())
@@ -172,12 +174,9 @@ plotCoexpression <- function(
   )
   
   # Get gene ordering
-  if (orderBy == "none") {
-    geneOrder <- getGenes(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, discovery
-    )
-  } else if (orderBy == "discovery") {
+  if (orderGenesBy == "none") {
+    geneOrder <- getGenes(moduleAssignments, modules, discovery)
+  } else if (orderGenesBy == "discovery") {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     geneOrder <- geneOrder(
@@ -271,7 +270,7 @@ plotCoexpression <- function(
 #' @export
 plotAdjacency <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules,
+  discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Adjacency", 
   palette=adjacency.palette(), legend=TRUE
 ) {
@@ -279,7 +278,7 @@ plotAdjacency <- function(
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderBy <- orderByArgs[pmatch(orderBy, orderByArgs, nomatch=3)]
+  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- paste0(".temp-objects", getUUID())
@@ -319,12 +318,9 @@ plotAdjacency <- function(
   )
   
   # Get gene ordering
-  if (orderBy == "none") {
-    geneOrder <- getGenes(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, discovery
-    )
-  } else if (orderBy == "discovery") {
+  if (orderGenesBy == "none") {
+    geneOrder <- getGenes(moduleAssignments, modules, discovery)
+  } else if (orderGenesBy == "discovery") {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     geneOrder <- geneOrder(
@@ -418,7 +414,7 @@ plotAdjacency <- function(
 #' @export
 plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules,
+  discovery=1, test=1, orderGenesBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
   palette=c("#313695", "#a50026"), drawBorder=FALSE
 ) {
@@ -429,7 +425,7 @@ plotModuleMembership <- function(
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderBy <- orderByArgs[pmatch(orderBy, orderByArgs, nomatch=3)]
+  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- paste0(".temp-objects", getUUID())
@@ -470,7 +466,7 @@ plotModuleMembership <- function(
 
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderBy == "discovery") {
+  if (orderGenesBy == "discovery") {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
@@ -479,7 +475,7 @@ plotModuleMembership <- function(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
       discovery, discovery, FALSE, orderModules
     ) 
-  } else if (orderBy == "none") {
+  } else if (orderGenesBy == "none") {
     moduleOrder <- seq_along(props)
     geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(props[[mi]]$connectivity)
@@ -548,7 +544,7 @@ plotModuleMembership <- function(
 #' @export
 plotConnectivity <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
+  discovery=1, test=1, orderGenesBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Normalised Connectivity", 
   palette="#feb24c", drawBorder=FALSE
 ) {
@@ -556,7 +552,7 @@ plotConnectivity <- function(
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderBy <- orderByArgs[pmatch(orderBy, orderByArgs, nomatch=3)]
+  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- paste0(".temp-objects", getUUID())
@@ -590,7 +586,7 @@ plotConnectivity <- function(
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
   
-  # Get the module membership for each module in the test network.
+  # Get the connectivity for each module in the test network.
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
     discovery, test, FALSE
@@ -598,7 +594,7 @@ plotConnectivity <- function(
   
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderBy == "discovery") {
+  if (orderGenesBy == "discovery") {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
@@ -607,7 +603,7 @@ plotConnectivity <- function(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
       discovery, discovery, FALSE, orderModules
     ) 
-  } else if (orderBy == "none") {
+  } else if (orderGenesBy == "none") {
     moduleOrder <- seq_along(props)
     geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(props[[mi]]$connectivity)
