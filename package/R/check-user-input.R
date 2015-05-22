@@ -40,7 +40,9 @@ checkSets <- function(
     sapply(adjacency, class)
   )
   if (!is.null(geneExpression)) {
-    classes2 <- c(sapply(geneExpression, class), classes2)      
+    geClasses <- sapply(geneExpression, class)
+    geClasses <- geClasses[geClasses != "NULL"]
+    classes2 <- c(geClasses, classes2)      
   }
   if(!all(classes2 == "bigMatrix")) {
     stop(
@@ -327,6 +329,26 @@ formatExclude <- function(
   excludeModules
 }
 
+#' Format the gene expression lists
+#' 
+#' Allows the user to set \code{geneExpression} to \code{NULL} without the data
+#' causing cascading input-check errors.
+#' 
+#' @param geneExpression geneExpression data
+#' @param nDatasets total number of datasets
+#' @param datasetNames names of the datasets
+#' 
+#' @return
+#'  A formatted list of gene expression data
+formatGeneExpression <- function(geneExpression, nDatasets, datasetNames) {
+  if (is.null(geneExpression) || identical(geneExpression, list(NULL))) {
+    res <- rep(list(NULL), nDatasets)
+    names(res) <- datasetNames
+    res
+  } else {
+    geneExpression
+  }
+}
 
 #' Dynamically detect and load a bigMatrix object depending on input type
 #' 

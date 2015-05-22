@@ -13,7 +13,8 @@
 #'   connectivity and samples are ordered by their summary expression profile in
 #'   the \code{test} dataset. If "none" no ordering is applied.
 #' @param orderModules logical; if \code{TRUE} modules ordered by similarity. 
-#'   If \code{FALSE} modules are rendered in the order provided.
+#'   If \code{FALSE} modules are rendered in the order provided. The default is
+#'   to order by modules if the gene expression is provided.
 #' @param plotGeneNames logical; if \code{TRUE}, plot the gene names below the
 #'  heatmap.
 #' @param plotSampleNames logical; if \code{TRUE} the sample names will be 
@@ -128,7 +129,7 @@
 #' @export
 plotCoexpression <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Coexpression", 
   palette=coexpression.palette(), legend=TRUE
 ) {
@@ -160,26 +161,35 @@ plotCoexpression <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
+  # Format optional input data so it doesn't cause cascading error crashes 
+  geneExpression <- formatGeneExpression(
+    geneExpression, length(coexpression), names(coexpression)
+  )
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
   
-  # Sanity check input for consistency.
-  checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
-  )
-  
+  # Get gene ordering
   if (orderBy == "none") {
     geneOrder <- getGenes(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
       discovery, discovery
     )
-  } else {
+  } else if (orderBy == "discovery") {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     geneOrder <- geneOrder(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, test=ifelse(orderBy == "discovery", discovery, test),
-      FALSE, orderModules
+      discovery, discovery, FALSE, orderModules
+    )
+  } else {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
+    geneOrder <- geneOrder(
+      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      discovery, test, FALSE, orderModules
     )
   }
  
@@ -261,7 +271,7 @@ plotCoexpression <- function(
 #' @export
 plotAdjacency <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Adjacency", 
   palette=adjacency.palette(), legend=TRUE
 ) {
@@ -293,6 +303,11 @@ plotAdjacency <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
+  # Format optional input data so it doesn't cause cascading error crashes 
+  geneExpression <- formatGeneExpression(
+    geneExpression, length(coexpression), names(coexpression)
+  )
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -303,16 +318,25 @@ plotAdjacency <- function(
     geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
   )
   
+  # Get gene ordering
   if (orderBy == "none") {
     geneOrder <- getGenes(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
       discovery, discovery
     )
-  } else {
+  } else if (orderBy == "discovery") {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     geneOrder <- geneOrder(
       geneExpression, coexpression, adjacency, moduleAssignments, modules,
-      discovery, test=ifelse(orderBy == "discovery", discovery, test),
-      FALSE, orderModules
+      discovery, discovery, FALSE, orderModules
+    )
+  } else {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
+    geneOrder <- geneOrder(
+      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      discovery, test, FALSE, orderModules
     )
   }
   
@@ -394,7 +418,7 @@ plotAdjacency <- function(
 #' @export
 plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules=TRUE,
+  discovery=1, test=1, symmetric=FALSE, orderBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
   palette=c("#313695", "#a50026"), drawBorder=FALSE
 ) {
@@ -428,7 +452,8 @@ plotModuleMembership <- function(
   } else if (missing(moduleAssignments) && !missing(modules)) {
     stop("'modules' provided but not 'moduleAssignments'")
   }
-  
+
+  # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -448,6 +473,8 @@ plotModuleMembership <- function(
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
   if (orderBy == "discovery") {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
     # The network properties in the discovery network
     geneOrder <- geneOrder(
@@ -460,6 +487,8 @@ plotModuleMembership <- function(
       names(props[[mi]]$connectivity)
     }
   } else {
+    if (missing(orderModules))
+      orderModules <- TRUE
     # order modules
     moduleOrder <- 1
     if (length(props) > 1 && orderModules) {
@@ -553,6 +582,11 @@ plotConnectivity <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
+  # Format optional input data so it doesn't cause cascading error crashes 
+  geneExpression <- formatGeneExpression(
+    geneExpression, length(coexpression), names(coexpression)
+  )
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -569,6 +603,8 @@ plotConnectivity <- function(
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
   if (orderBy == "discovery") {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
     # The network properties in the discovery network
     geneOrder <- geneOrder(
@@ -581,6 +617,8 @@ plotConnectivity <- function(
       names(props[[mi]]$connectivity)
     }
   } else {
+    if (missing(orderModules))
+      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
     # order modules
     moduleOrder <- 1
     if (length(props) > 1 && orderModules) {

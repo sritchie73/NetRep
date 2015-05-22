@@ -125,6 +125,11 @@ networkProperties <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
+  # Format optional input data so it doesn't cause cascading error crashes 
+  geneExpression <- formatGeneExpression(
+    geneExpression, length(coexpression), names(coexpression)
+  )
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -146,7 +151,7 @@ networkProperties <- function(
   # Temporarily create scaled gene expression set for the calculation of the
   # summary expression profile
   sge <- NULL
-  if (!is.null(geneExpression)) {
+  if (!is.null(geneExpression[[test]])) {
     tryCatch({
       checkFinite(geneExpression[[test]]) 
     }, error = function(e) {

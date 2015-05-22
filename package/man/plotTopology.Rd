@@ -11,19 +11,19 @@
 \usage{
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  orderBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Coexpression", palette = coexpression.palette(),
   legend = TRUE)
 
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  orderBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Adjacency", palette = adjacency.palette(),
   legend = TRUE)
 
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
-  orderBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
+  orderBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Module Membership", palette = c("#313695",
   "#a50026"), drawBorder = FALSE)
 
@@ -72,7 +72,8 @@ connectivity and samples are ordered by their summary expression profile in
 the \code{test} dataset. If "none" no ordering is applied.}
 
 \item{orderModules}{logical; if \code{TRUE} modules ordered by similarity.
-If \code{FALSE} modules are rendered in the order provided.}
+If \code{FALSE} modules are rendered in the order provided. The default is
+to order by modules if the gene expression is provided.}
 
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
 heatmap.}
