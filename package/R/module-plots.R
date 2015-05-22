@@ -465,11 +465,9 @@ plotModuleMembership <- function(
   # Get the module membership for each module in the test network.
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
-    discovery, test
+    discovery, test, FALSE
   )
-  if (length(modules) == 1)
-    props <- list(props)
-  
+
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
   if (orderBy == "discovery") {
@@ -595,10 +593,8 @@ plotConnectivity <- function(
   # Get the module membership for each module in the test network.
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
-    discovery, test
+    discovery, test, FALSE
   )
-  if (length(modules) == 1)
-    props <- list(props)
   
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
