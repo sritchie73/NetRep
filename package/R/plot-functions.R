@@ -218,7 +218,6 @@ addGradientLegend <- function(
     border="black", lwd=2, xpd=TRUE
   )
   
-
   # Render axis, but make sure it's balanced around 0
   if (length(unique(sign(legend.vlim))) == 1) {
     labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
@@ -283,9 +282,11 @@ addGradientLegend <- function(
 #' @param bar.width value between 0 and 1 controlling the proportion of space
 #'  taken by each bar.
 #' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
+#' @param na.col color of missing values to plot.
 #' 
 plotBar <- function(
-  heights, heights.lim, mas, cols, bar.width=1, drawBorder=FALSE
+  heights, heights.lim, mas, cols, bar.width=1, drawBorder=FALSE, 
+  na.col="#bdbdbd"
 ) {
   if (length(cols) == 1) 
     cols <- rep(cols, length(heights))
@@ -322,9 +323,11 @@ plotBar <- function(
 #'  taken by each bar.
 #' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
 #' @param main title for the plot
+#' @param na.col color of missing values to plot.
 #' 
 plotMultiBar <- function(
-  lengths, lengths.lim, cols, bar.width=1, drawBorder=FALSE, main=""
+  lengths, lengths.lim, cols, bar.width=1, drawBorder=FALSE, main="",
+  na.col="red"
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -359,6 +362,9 @@ plotMultiBar <- function(
       (ii - 1) + (1-pw)/2 + pw/rr.size * (val - rr[1])
     }
     for (jj in seq_len(nrow(lengths))) {
+      if (is.na(lengths[jj, ii])) {
+        # not sure how to handle nas
+      } else {
         rect(
           xleft=getX(ax),
           xright=getX(lengths[jj,ii]),
@@ -368,6 +374,7 @@ plotMultiBar <- function(
           border=ifelse(drawBorder, "black", NA),
           lwd=2
         ) 
+      }
     }
     # draw 0 axis
     abline(v=getX(ax), col="black", lwd=2)

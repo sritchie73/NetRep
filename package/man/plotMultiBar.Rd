@@ -4,7 +4,7 @@
 \title{Plot multiple horizontal bar plots}
 \usage{
 plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorder = FALSE,
-  main = "")
+  main = "", na.col = "red")
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for
@@ -20,6 +20,8 @@ taken by each bar.}
 \item{drawBorder}{logical; if \code{TRUE} a border is drawn around each bar.}
 
 \item{main}{title for the plot}
+
+\item{na.col}{color of missing values to plot.}
 }
 \description{
 Plot multiple horizontal bar plots

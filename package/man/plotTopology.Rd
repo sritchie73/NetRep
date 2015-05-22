@@ -6,11 +6,18 @@
 \alias{plotCoexpression}
 \alias{plotCoexpressionLegend}
 \alias{plotConnectivity}
+\alias{plotExpression}
 \alias{plotExpressionLegend}
 \alias{plotModuleMembership}
 \alias{plotSummaryExpression}
 \title{Plot a topological feature of network module}
 \usage{
+plotExpression(geneExpression, coexpression, adjacency, moduleAssignments,
+  modules, discovery = 1, test = 1, orderSamplesBy = "test",
+  orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
+  plotSampleNames = TRUE, plotModuleNames, main = "Gene expression",
+  palette = expression.palette(), legend = TRUE)
+
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
@@ -37,9 +44,9 @@ plotConnectivity(geneExpression = NULL, coexpression, adjacency,
 
 plotSummaryExpression(geneExpression, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
-  orderSamplesBy = "test", orderModules = TRUE, plotSampleNames = TRUE,
-  plotModuleNames, main = "Summary Expression", palette = c("#762a83",
-  "#1b7837"), drawBorder = FALSE)
+  orderSamplesBy = "test", orderGenesBy = "discovery", orderModules,
+  plotSampleNames = TRUE, plotModuleNames, main = "Summary Expression",
+  palette = c("#762a83", "#1b7837"), drawBorder = FALSE)
 
 plotExpressionLegend(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, palette = expression.palette(),
@@ -75,6 +82,12 @@ interest was discovered in. See details.}
 \item{test}{name or index denoting which dataset to apply the function to.
  See details.}
 
+\item{orderSamplesBy}{one of "discovery", "test", or "none". If
+"discovery"samples are ordered by their summary expression profile in the
+\code{discovery} dataset (see \code{\link{sampleOrder}}). If "test" samples
+are ordered by their summary expression profile in the \code{test} dataset.
+If "none" no ordering is applied.}
+
 \item{orderGenesBy}{one of "discovery", "test", or "none". If "discovery"
 genes are ordered by intramodular connectivity in the \code{discovery}
 dataset. If "test" genes are orderd by intramodular connectivity in the
@@ -84,12 +97,6 @@ dataset. If "test" genes are orderd by intramodular connectivity in the
 their summary expression profiles. If \code{FALSE} modules are rendered in
 the order provided. The default is to order by modules if the gene
 expression is provided.}
-
-\item{orderSamplesBy}{one of "discovery", "test", or "none". If
-"discovery"samples are ordered by their summary expression profile in the
-\code{discovery} dataset (see \code{\link{sampleOrder}}). If "test" samples
-are ordered by their summary expression profile in the \code{test} dataset.
-If "none" no ordering is applied.}
 
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
 heatmap.}

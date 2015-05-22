@@ -3,7 +3,8 @@
 \alias{plotBar}
 \title{Custom bar plot function}
 \usage{
-plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE)
+plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE,
+  na.col = "#bdbdbd")
 }
 \arguments{
 \item{heights}{heights of the bars.}
@@ -18,6 +19,8 @@ plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE)
 taken by each bar.}
 
 \item{drawBorder}{logical; if \code{TRUE} a border is drawn around each bar.}
+
+\item{na.col}{color of missing values to plot.}
 }
 \description{
 Plot bars around 0
