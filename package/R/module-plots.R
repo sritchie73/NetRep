@@ -151,11 +151,15 @@ plotCoexpression <- function(
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
   # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structure
-  if (missing(moduleAssignments))
-    modules <- "1"
-  if (!missing(moduleAssignments) && missing(modules))
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
     modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -280,11 +284,15 @@ plotAdjacency <- function(
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
   # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structure
-  if (missing(moduleAssignments))
-    modules <- "1"
-  if (!missing(moduleAssignments) && missing(modules))
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
     modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
@@ -412,19 +420,18 @@ plotModuleMembership <- function(
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
   # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structure
-  if (missing(moduleAssignments))
-    modules <- "1"
-  if (!missing(moduleAssignments) && missing(modules))
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
     modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
-  )
-  
-  # Sanity check input for consistency.
-  checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
   )
   
   if (is.null(geneExpression[[test]]))
@@ -537,19 +544,18 @@ plotConnectivity <- function(
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
   # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structure
-  if (missing(moduleAssignments))
-    modules <- "1"
-  if (!missing(moduleAssignments) && missing(modules))
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
     modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
-  )
-  
-  # Sanity check input for consistency.
-  checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
   )
   
   # Get the module membership for each module in the test network.
