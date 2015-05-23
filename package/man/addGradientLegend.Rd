@@ -4,7 +4,7 @@
 \title{Plot a color palette legend}
 \usage{
 addGradientLegend(palette, palette.vlim, legend.vlim, horizontal, main, xlim,
-  ylim)
+  ylim, tick.size = 0.04, axis.line = 3)
 }
 \arguments{
 \item{palette}{color palette.}
@@ -22,6 +22,12 @@ otherwise vertically.}
 \item{xlim}{xlim relative to the plotting region of the rest of the plot.}
 
 \item{ylim}{ylim relative to the plotting region of the rest of the plot.}
+
+\item{tick.size}{size of the legend axis ticks relative to the size of the
+plot window.}
+
+\item{axis.line}{distance from the axis to render the axis labels as a
+multiple of \code{tick.size}.}
 }
 \description{
 Add a legend to a plot window.

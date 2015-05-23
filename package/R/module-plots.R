@@ -37,96 +37,22 @@
 #'  \code{plotSummaryExpression}.
 #' @param legend logical; if \code{TRUE} legends are drawn for
 #'  \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.
-#' 
+#' @param gaxt.line the number of lines into the margin at which the gene
+#'  names will be drawn.
+#' @param saxt.line the number of lines into the margin at which the sample
+#'  names will be drawn.
+#' @param maxt.line the number of lines into the margin at which the module 
+#'  names will be drawn.
+#' @param legend.position the distance from the plot to start the legend, as a
+#'  proportion of the plot width.
+#' @param legend.tick.size size of the ticks on the axis legend.
+#' @param laxt.line the distance from the legend to render the legend axis 
+#'  labels, as multiple of \code{legend.tick.size}.
+#' @param cex.axis relative size of the gene and sample names.
+#' @param cex.lab relative size of the module names and legend titles.
+#' @param cex.main relative size of the plot titles.
+#'  
 #' @template api_inputs
-#' 
-#' @examples
-#' \dontrun{
-#' ## Example 1: Plot coexpression of a single module
-#' 
-#' # First we need some example data
-#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geA) <- paste0("Gene_", 1:100)
-#' rownames(geA) <- paste0("CohortA_", 1:50)
-#' coexpA <- cor(geA) # coexpression
-#' adjA <- abs(coexpA)^5 # adjacency
-#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-#' names(moduleAssignments) <- paste0("Gene_", 1:100)
-#' 
-#' # Create bigMatrix objects for each matrix.
-#' geA <- as.bigMatrix(geA, "geA_bm")
-#' coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
-#' adjA <- as.bigMatrix(adjA, "adjA_bm")
-#' 
-#' # Plot coexpression of module 2
-#' plotCoexpression(
-#'   geA, coexpA, adjA, moduleAssignments, modules="2"
-#' )
-#' 
-#' ## Example 2: Plot coexpression of the first 10 genes, 
-#' ## without ordering them
-#' plotCoexpression(
-#'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderGenesBy="none"
-#' )
-#' 
-#' ## Example 3: Plot the coexpression of two adipose modules in the liver
-#' ## dataset
-#' 
-#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geAdipose) <- paste0("Gene_", 1:100)
-#' rownames(geAdipose) <- paste0("Sample_", 1:50)
-#' coexpAdipose <- cor(geAdipose) # coexpression
-#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
-#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
-#' names(adiposeModules) <- paste0("Gene_", 1:100)
-#' 
-#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geLiver) <- paste0("Gene_", 1:100)
-#' rownames(geLiver) <- paste0("Sample_", 1:50)
-#' coexpLiver <- cor(geLiver) # coexpression
-#' adjLiver <- abs(coexpLiver)^6 # adjacency
-#' liverModules <- sample(0:12, size=100, replace=TRUE)
-#' names(liverModules) <- paste0("Gene_", 1:100)
-#'
-#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geHeart) <- paste0("Gene_", 1:100)
-#' rownames(geHeart) <- paste0("Sample_", 1:50)
-#' coexpHeart <- cor(geHeart) # coexpression
-#' adjHeart <- abs(coexpHeart)^4 # adjacency
-#' heartModules <- sample(0:5, size=100, replace=TRUE)
-#' names(heartModules) <- paste0("Gene_", 1:100)
-#' 
-#' # Store each input type as a list, where each element corresponds
-#' # to one of the datasets
-#' geneExpression <- list(
-#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
-#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
-#' )
-#' coexpression <- list(
-#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
-#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
-#' )
-#' adjacency <- list(
-#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
-#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
-#' )
-#' moduleAssignments <- list(
-#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
-#' )
-#' 
-#' # Plot coexpression for adipose modules 3 and 7 in the heart tissue.
-#' plotCoexpression(
-#'   geneExpression, coexpression, adjacency, moduleAssignments,
-#'   modules=c("3", "7"), discovery="adipose", test="heart",
-#'   main="Heart", plotGeneNames=FALSE
-#' )
-#' 
-#' # clean up bigMatrix files from examples
-#' unlink("*_bm*") 
-#' }
 #' 
 #' @rdname plotTopology
 #' @export
@@ -135,8 +61,27 @@ plotExpression <- function(
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotGeneNames=TRUE, plotSampleNames=TRUE, 
   plotModuleNames, main="Gene expression", palette=expression.palette(), 
-  legend=TRUE
+  legend=TRUE, gaxt.line=-0.5, saxt.line=-0.5, maxt.line=2, 
+  legend.position=0.1, legend.tick.size=0.04, laxt.line=2.5, cex.axis=0.8, 
+  cex.lab=1, cex.main=1.2
 ) {
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input and unify data structures
+  #-----------------------------------------------------------------------------
   if (is.null(geneExpression))
     stop("Cannot plot gene expression without gene expression data")
   
@@ -190,8 +135,10 @@ plotExpression <- function(
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
-  
-  # Get the summary expression for each module in the test network.
+  #-----------------------------------------------------------------------------
+  # Get ordering of genes and samples in the 'test' dataset in the dataset 
+  # specified in 'orderGenesBy' and 'orderSamplesBy'.
+  #-----------------------------------------------------------------------------
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
     discovery, test, FALSE
@@ -281,7 +228,10 @@ plotExpression <- function(
     ))
   }
   
-  # Handle missing samples
+  #-----------------------------------------------------------------------------
+  # Identify genes and samples from the 'discovery' dataset not present in the 
+  # 'test' dataset.
+  #-----------------------------------------------------------------------------
   if (all(sampleOrder %nin% rownames(geneExpression[[test]]))) {
     stop(
       "No samples from the 'orderSamplesBy' dataset are present in the",
@@ -303,7 +253,11 @@ plotExpression <- function(
     presentGenes <- geneOrder
   }
   
-  # Handle expression palette and values
+  #-----------------------------------------------------------------------------
+  # Plot the gene expression 
+  #-----------------------------------------------------------------------------
+  # First we need to set up the color palette for the gene expression, which 
+  # includes the fact that the range may be unbalanced around 0.
   ge <- geneExpression[[test]][presentSamples, presentGenes]
   range.ge <- range(ge)
   if (all(rr > 0)) {
@@ -313,44 +267,20 @@ plotExpression <- function(
   } else {
     range.pal <- c(-max(abs(range.ge)), max(abs(range.ge)))
   }
+  xaxt <- NULL
+  if (plotGeneNames)
+    xaxt <- geneOrder
+  yaxt <- NULL
+  if (plotSampleNames)
+    yaxt <- sampleOrder
   plotSquareHeatmap(
-    ge, palette, vlim=range.pal,
-    moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y
+    ge, palette, vlim=range.pal, legend.lim=range.ge,
+    moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
+    xaxt=xaxt, yaxt=yaxt, legend=legend, main=main,
+    legend.main="Expression", plotModuleNames=plotModuleNames,
+    xaxt.line=gaxt.line, yaxt.line=saxt.line, legend.tick.size=legend.tick.size,
+    laxt.line=laxt.line, legend.line=legend.position
   )
-  if (legend) {
-    pw <- length(geneOrder) + 1
-    ph <- length(sampleOrder) + 1
-    addGradientLegend(
-      palette, range.pal, range.ge, FALSE, "Expression",
-      xlim=c(pw - 0.5 + pw*0.2, pw - 0.5 + pw*0.25), 
-      ylim=c(ph/3, ph - 0.5 - ph*0.1)
-    )
-  }
-
-  # Add axes if specified
-  mas <- moduleAssignments[[discovery]][geneOrder]
-  if (plotGeneNames) {
-    axis(
-      side=1, las=2, at=seq_along(geneOrder), labels=geneOrder, tick=FALSE,
-      line=-0.5
-    )
-  }
-  if (plotModuleNames) {
-    line <- ifelse(plotGeneNames, 4, -0.5)
-    axis(
-      side=1, las=1, 
-      at=getModuleMidPoints(mas),
-      labels=unique(mas), line=line, tick=FALSE,
-      cex.axis=par("cex.lab")
-    )
-  }
-  if (plotSampleNames) {
-    axis(
-      side=2, las=2, at=rev(seq_along(sampleOrder)), labels=sampleOrder, 
-      tick=FALSE, line=-0.5
-    )
-  }
-  mtext(main, cex=par("cex.main"), font=2)
 }
 
 #' @rdname plotTopology

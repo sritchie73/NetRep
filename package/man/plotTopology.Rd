@@ -16,7 +16,10 @@ plotExpression(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, orderSamplesBy = "test",
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "Gene expression",
-  palette = expression.palette(), legend = TRUE)
+  palette = expression.palette(), legend = TRUE, gaxt.line = -0.5,
+  saxt.line = -0.5, maxt.line = 2, legend.position = 0.1,
+  legend.tick.size = 0.04, laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
@@ -118,7 +121,30 @@ element should correspond to the color used when the coexpression between
 two genes is equal to 1}
 
 \item{legend}{logical; if \code{TRUE} legends are drawn for
- \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.}
+\code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.}
+
+\item{gaxt.line}{the number of lines into the margin at which the gene
+names will be drawn.}
+
+\item{saxt.line}{the number of lines into the margin at which the sample
+names will be drawn.}
+
+\item{maxt.line}{the number of lines into the margin at which the module
+names will be drawn.}
+
+\item{legend.position}{the distance from the plot to start the legend, as a
+proportion of the plot width.}
+
+\item{legend.tick.size}{size of the ticks on the axis legend.}
+
+\item{laxt.line}{the distance from the legend to render the legend axis
+labels, as multiple of \code{legend.tick.size}.}
+
+\item{cex.axis}{relative size of the gene and sample names.}
+
+\item{cex.lab}{relative size of the module names and legend titles.}
+
+\item{cex.main}{relative size of the plot titles.}
 
 \item{symmetric}{logical; if \code{TRUE} the coexpression will be plotted as
 a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
@@ -157,93 +183,5 @@ The matrices containing the \code{geneExpression}, \code{coexpression}, and
  the function is applied on all genes present in the \code{geneExpression},
  \code{coexpression}, and \code{adjacency}. This may be useful when
  subsetting each matrix by a custom gene set of interest.
-}
-\examples{
-\dontrun{
-## Example 1: Plot coexpression of a single module
-
-# First we need some example data
-geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geA) <- paste0("Gene_", 1:100)
-rownames(geA) <- paste0("CohortA_", 1:50)
-coexpA <- cor(geA) # coexpression
-adjA <- abs(coexpA)^5 # adjacency
-moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-names(moduleAssignments) <- paste0("Gene_", 1:100)
-
-# Create bigMatrix objects for each matrix.
-geA <- as.bigMatrix(geA, "geA_bm")
-coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
-adjA <- as.bigMatrix(adjA, "adjA_bm")
-
-# Plot coexpression of module 2
-plotCoexpression(
-  geA, coexpA, adjA, moduleAssignments, modules="2"
-)
-
-## Example 2: Plot coexpression of the first 10 genes,
-## without ordering them
-plotCoexpression(
- geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], orderGenesBy="none"
-)
-
-## Example 3: Plot the coexpression of two adipose modules in the liver
-## dataset
-
-geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geAdipose) <- paste0("Gene_", 1:100)
-rownames(geAdipose) <- paste0("Sample_", 1:50)
-coexpAdipose <- cor(geAdipose) # coexpression
-adjAdipose <- abs(coexpAdipose)^5 # adjacency
-adiposeModules <- sample(0:7, size=100, replace=TRUE)
-names(adiposeModules) <- paste0("Gene_", 1:100)
-
-geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geLiver) <- paste0("Gene_", 1:100)
-rownames(geLiver) <- paste0("Sample_", 1:50)
-coexpLiver <- cor(geLiver) # coexpression
-adjLiver <- abs(coexpLiver)^6 # adjacency
-liverModules <- sample(0:12, size=100, replace=TRUE)
-names(liverModules) <- paste0("Gene_", 1:100)
-
-geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geHeart) <- paste0("Gene_", 1:100)
-rownames(geHeart) <- paste0("Sample_", 1:50)
-coexpHeart <- cor(geHeart) # coexpression
-adjHeart <- abs(coexpHeart)^4 # adjacency
-heartModules <- sample(0:5, size=100, replace=TRUE)
-names(heartModules) <- paste0("Gene_", 1:100)
-
-# Store each input type as a list, where each element corresponds
-# to one of the datasets
-geneExpression <- list(
-  adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-  liver=as.bigMatrix(geLiver, "geLiver_bm"),
-  heart=as.bigMatrix(geHeart, "geHeart_bm")
-)
-coexpression <- list(
-  adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-  liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),
-  heart=as.bigMatrix(coexpHeart, "coexpHeart_bm")
-)
-adjacency <- list(
-  adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-  liver=as.bigMatrix(adjLiver, "adjLiver_bm"),
-  heart=as.bigMatrix(adjHeart, "adjHeart_bm")
-)
-moduleAssignments <- list(
-  adipose=adiposeModules, liver=liverModules, heart=heartModules
-)
-
-# Plot coexpression for adipose modules 3 and 7 in the heart tissue.
-plotCoexpression(
-  geneExpression, coexpression, adjacency, moduleAssignments,
-  modules=c("3", "7"), discovery="adipose", test="heart",
-  main="Heart", plotGeneNames=FALSE
-)
-
-# clean up bigMatrix files from examples
-unlink("*_bm*")
-}
 }
 

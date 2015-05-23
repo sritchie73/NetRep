@@ -4,22 +4,60 @@
 \title{Plot a square heatmap}
 \usage{
 plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
-  na.indices.y = NULL, na.col = "#bdbdbd")
+  na.indices.y = NULL, na.col = "#bdbdbd", xaxt = NULL, yaxt = NULL,
+  plotModuleNames = TRUE, main = "", legend = TRUE, legend.main = "",
+  legend.lim, xaxt.line = -0.5, yaxt.line = -0.5, maxt.line = 3,
+  legend.tick.size = 0.04, laxt.line = 2.5, legend.line = 0.1)
 }
 \arguments{
-\item{values}{values to plot on the heatmap}
+\item{values}{values to plot on the heatmap.}
 
-\item{palette}{color palette to interpolate over}
+\item{palette}{color palette to interpolate over.}
 
 \item{vlim}{range of values to use when mapping values to the \code{palette}.}
 
-\item{mas}{ordered subset of the moduleAssignments vector}
+\item{mas}{ordered subset of the moduleAssignments vector.}
 
-\item{na.indices.x}{indices of missing values on the x axis}
+\item{na.indices.x}{indices of missing values on the x axis.}
 
-\item{na.indices.y}{indices of missing values on the y axis}
+\item{na.indices.y}{indices of missing values on the y axis.}
 
 \item{na.col}{color of missing values to plot.}
+
+\item{xaxt}{character vector of names to print along the x axis.}
+
+\item{yaxt}{character vector of names to print along the y axis.}
+
+\item{plotModuleNames}{logical; if \code{TRUE} the names of the modules are
+plotted along the x axis if \code{values} is not symmetric, and along both
+axes if \code{values} is symettric.}
+
+\item{main}{title for the plot.}
+
+\item{legend}{logical; if \code{TRUE} a legend is added to the right side of
+the plot.}
+
+\item{legend.main}{title for the legend.}
+
+\item{legend.lim}{range of values to show on the legend.}
+
+\item{xaxt.line}{the number of lines into the margin at which the x axis
+labels will be drawn.}
+
+\item{yaxt.line}{the number of lines into the margin at which the y axis
+labels will be drawn.}
+
+\item{maxt.line}{the number of lines into the margin at which the module
+names will be drawn.}
+
+\item{legend.tick.size}{size of the ticks on the axis legend as a proportion
+of the horizontal size of the plot window.}
+
+\item{laxt.line}{the distance from the legend to render the legend axis
+labels, as multiple of \code{legend.tick.size}.}
+
+\item{legend.line}{the distance from the plot to render the legend as a
+proportion of the horizontal size of the plot window.}
 }
 \description{
 Plot a square heatmap

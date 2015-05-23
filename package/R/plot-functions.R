@@ -70,17 +70,42 @@ plotTriangleHeatmap <- function(
 
 #' Plot a square heatmap
 #' 
-#' @param values values to plot on the heatmap
-#' @param palette color palette to interpolate over
+#' @param values values to plot on the heatmap.
+#' @param palette color palette to interpolate over.
 #' @param vlim range of values to use when mapping values to the \code{palette}.
-#' @param mas ordered subset of the moduleAssignments vector
-#' @param na.indices.x indices of missing values on the x axis
-#' @param na.indices.y indices of missing values on the y axis
+#' @param mas ordered subset of the moduleAssignments vector.
+#' @param na.indices.x indices of missing values on the x axis.
+#' @param na.indices.y indices of missing values on the y axis.
 #' @param na.col color of missing values to plot.
+#' @param xaxt character vector of names to print along the x axis.
+#' @param yaxt character vector of names to print along the y axis.
+#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+#'  plotted along the x axis if \code{values} is not symmetric, and along both
+#'  axes if \code{values} is symettric.
+#' @param main title for the plot.
+#' @param legend logical; if \code{TRUE} a legend is added to the right side of
+#'  the plot.
+#' @param legend.main title for the legend.
+#' @param legend.lim range of values to show on the legend.
+#' @param xaxt.line the number of lines into the margin at which the x axis 
+#'  labels will be drawn.
+#' @param yaxt.line the number of lines into the margin at which the y axis 
+#'  labels will be drawn.
+#' @param maxt.line the number of lines into the margin at which the module 
+#'  names will be drawn.
+#' @param legend.tick.size size of the ticks on the axis legend as a proportion
+#'  of the horizontal size of the plot window.
+#' @param laxt.line the distance from the legend to render the legend axis 
+#'  labels, as multiple of \code{legend.tick.size}.
+#' @param legend.line the distance from the plot to render the legend as a 
+#'  proportion of the horizontal size of the plot window.
 #' 
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
-  na.col="#bdbdbd"
+  na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
+  main="", legend=TRUE, legend.main="", legend.lim, xaxt.line=-0.5, 
+  yaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
+  legend.line=0.1
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
@@ -133,6 +158,22 @@ plotSquareHeatmap <- function(
         )
       }
     }
+    if (plotModuleNames) {
+      axis(
+        side=1, las=1, 
+        at=getModuleMidPoints(mas),
+        labels=unique(mas), line=maxt.line, tick=FALSE,
+        cex.axis=par("cex.lab")
+      )
+      if (nX == nY) {
+        axis(
+          side=2, las=2,
+          at=nY + 0.5 - getModuleMidPoints(mas),
+          labels=unique(mas), line=maxt.line, tick=FALSE,
+          cex.axis=par("cex.lab")
+        )
+      }
+    }
   }
   
   # render border of plot
@@ -145,6 +186,35 @@ plotSquareHeatmap <- function(
     xpd=TRUE,
     lwd=2
   )
+  
+  # Render axes
+  if (!is.null(xaxt)) {
+    axis(
+      side=1, las=2, tick=FALSE, line=xaxt.line,
+      at=1:nX, labels=xaxt
+    )
+  }
+  if (!is.null(yaxt)) {
+    axis(
+      side=2, las=2, tick=FALSE, line=yaxt.line,
+      at=nY:1, labels=yaxt
+    )
+  }
+  mtext(main, side=3, cex=par("cex.main"), font=2)
+  
+  # Add legend if specified
+  if (legend) {
+    if (missing(legend.lim))
+      legend.lim <- vlim
+    pw <- nX + 1
+    ph <- nY + 1
+    addGradientLegend(
+      palette, vlim, legend.lim, FALSE, "Expression",
+      xlim=c(pw - 0.5 + pw*legend.line, pw - 0.5 + pw*(legend.line+0.05)), 
+      ylim=c(ph/3, ph - 0.5 - ph*0.1), tick.size=legend.tick.size,
+      axis.line=laxt.line
+    )
+  }
 }
 
 #' Plot a color palette legend
@@ -160,9 +230,14 @@ plotSquareHeatmap <- function(
 #' @param main title of the legend.
 #' @param xlim xlim relative to the plotting region of the rest of the plot.
 #' @param ylim ylim relative to the plotting region of the rest of the plot.
+#' @param tick.size size of the legend axis ticks relative to the size of the 
+#'  plot window.
+#' @param axis.line distance from the axis to render the axis labels as a 
+#'  multiple of \code{tick.size}.
 #' 
 addGradientLegend <- function(
-  palette, palette.vlim, legend.vlim, horizontal, main, xlim, ylim
+  palette, palette.vlim, legend.vlim, horizontal, main, xlim, ylim, 
+  tick.size=0.04, axis.line=3
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -229,7 +304,7 @@ addGradientLegend <- function(
   }
   labels <- prettyNum(labels, digits=2)
   if (horizontal) {
-    tck <- (par("usr")[4] - par("usr")[3])*0.04
+    tck <- (par("usr")[4] - par("usr")[3])*tick.size
     # draw axis ticks
     if (length(unique(sign(legend.vlim))) == 1) {
       at <- seq.int(xlim[1L], xlim[2L], length.out=5)
@@ -245,7 +320,7 @@ addGradientLegend <- function(
     sapply(at, function(aa) {
       lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=2, xpd=TRUE)
     })
-    text(labels, x=at, y=ylim[1]-tck*3, cex=par("cex.axis"), xpd=TRUE)
+    text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=TRUE)
   } else {
     if (length(unique(sign(legend.vlim))) == 1) {
       at <- seq.int(ylim[1L], ylim[2L], length.out=5)
@@ -258,17 +333,20 @@ addGradientLegend <- function(
         seq.int(zero, ylim[2L], length.out=3)[-1]
       )
     }
-    tck <- (par("usr")[4] - par("usr")[3])*0.04
+    tck <- (par("usr")[4] - par("usr")[3])*tick.size
     # draw axis ticks
     sapply(at, function(aa) {
       lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=2, xpd=TRUE)
     })
-    text(labels, x=xlim[1]-tck*3, y=at, cex=par("cex.axis"), xpd=TRUE)
+    text(labels, x=xlim[1]-tck*axis.line, y=at, cex=par("cex.axis"), xpd=TRUE)
   }
   
   # Render title
-  offset <- (par("usr")[4] - par("usr")[3]) * 0.08
-  text(main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=TRUE)
+  offset <- (par("usr")[4] - par("usr")[3]) * 0.05
+  text(
+    main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=TRUE,
+    cex=par("cex.lab")
+  )
 }
 
 #' Custom bar plot function
