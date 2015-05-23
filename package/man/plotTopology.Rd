@@ -16,22 +16,26 @@ plotExpression(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, orderSamplesBy = "test",
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "Gene expression",
-  palette = expression.palette(), legend = TRUE, gaxt.line = -0.5,
-  saxt.line = -0.5, maxt.line = 2, legend.position = 0.1,
-  legend.tick.size = 0.04, laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2)
+  palette = expression.palette(), plotLegend = TRUE,
+  legend.main = "Expression", gaxt.line = -0.5, saxt.line = -0.5,
+  maxt.line = 2, legend.position = 0.2, legend.tick.size = 0.03,
+  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Coexpression", palette = coexpression.palette(),
-  legend = TRUE)
+  plotLegend = TRUE, legend.main = "Coexpression", gaxt.line = -0.5,
+  maxt.line = 2, legend.position, legend.tick.size = 0.03,
+  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Adjacency", palette = adjacency.palette(),
-  legend = TRUE)
+  plotLegend = TRUE, legend.main = "Adjacency", gaxt.line = -0.5,
+  maxt.line = 2, legend.position, legend.tick.size = 0.03,
+  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
@@ -120,8 +124,10 @@ used when the coexpression between two genes is equal to -1, and the last
 element should correspond to the color used when the coexpression between
 two genes is equal to 1}
 
-\item{legend}{logical; if \code{TRUE} legends are drawn for
+\item{plotLegend}{logical; if \code{TRUE} legends are drawn for
 \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.}
+
+\item{legend.main}{title for the plot legend.}
 
 \item{gaxt.line}{the number of lines into the margin at which the gene
 names will be drawn.}

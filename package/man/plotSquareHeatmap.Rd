@@ -5,9 +5,10 @@
 \usage{
 plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
   na.indices.y = NULL, na.col = "#bdbdbd", xaxt = NULL, yaxt = NULL,
-  plotModuleNames = TRUE, main = "", legend = TRUE, legend.main = "",
-  legend.lim, xaxt.line = -0.5, yaxt.line = -0.5, maxt.line = 3,
-  legend.tick.size = 0.04, laxt.line = 2.5, legend.line = 0.1)
+  plotModuleNames = TRUE, main = "", plotLegend = TRUE,
+  legend.main = "", legend.lim, xaxt.line = -0.5, yaxt.line = -0.5,
+  maxt.line = 3, legend.tick.size = 0.04, laxt.line = 2.5,
+  legend.line = 0.1)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -34,9 +35,6 @@ axes if \code{values} is symettric.}
 
 \item{main}{title for the plot.}
 
-\item{legend}{logical; if \code{TRUE} a legend is added to the right side of
-the plot.}
-
 \item{legend.main}{title for the legend.}
 
 \item{legend.lim}{range of values to show on the legend.}
@@ -58,6 +56,9 @@ labels, as multiple of \code{legend.tick.size}.}
 
 \item{legend.line}{the distance from the plot to render the legend as a
 proportion of the horizontal size of the plot window.}
+
+\item{legend}{logical; if \code{TRUE} a legend is added to the right side of
+the plot.}
 }
 \description{
 Plot a square heatmap

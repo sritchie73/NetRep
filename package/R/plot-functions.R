@@ -1,14 +1,36 @@
 #' Plot a symmetric heatmap as a triangle
 #' 
-#' @param values values to plot on the heatmap
-#' @param palette color palette to interpolate over
+#' @param values values to plot on the heatmap.
+#' @param palette color palette to interpolate over.
 #' @param vlim range of values to use when mapping values to the \code{palette}.
-#' @param mas ordered subset of the moduleAssignments vector
-#' @param na.indices indices of missing values to plot
+#' @param mas ordered subset of the moduleAssignments vector.
+#' @param na.indices indices of missing values on the x axis.
 #' @param na.col color of missing values to plot.
+#' @param xaxt character vector of names to print along the x axis.
+#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+#'  plotted along the x axis if \code{values} is not symmetric, and along both
+#'  axes if \code{values} is symettric.
+#' @param main title for the plot.
+#' @param legend logical; if \code{TRUE} a legend is added to the right side of
+#'  the plot.
+#' @param legend.main title for the legend.
+#' @param legend.lim range of values to show on the legend.
+#' @param xaxt.line the number of lines into the margin at which the x axis 
+#'  labels will be drawn.
+#' @param maxt.line the number of lines into the margin at which the module 
+#'  names will be drawn.
+#' @param legend.tick.size size of the ticks on the axis legend as a proportion
+#'  of the horizontal size of the plot window.
+#' @param laxt.line the distance from the legend to render the legend axis 
+#'  labels, as multiple of \code{legend.tick.size}.
+#' @param legend.line the distance from the left of the plot to render the 
+#'  legend as a proportion of the horizontal size of the plot window.
 #' 
 plotTriangleHeatmap <- function(
-  values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd"
+  values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
+  plotModuleNames=TRUE, main="", plotLegend=TRUE, legend.main="", legend.lim, 
+  xaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
+  legend.line=0.1
 ) {
   nGenes <- ncol(values) + length(na.indices)
   emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
@@ -60,12 +82,43 @@ plotTriangleHeatmap <- function(
       )
     }
   }
+  if (plotModuleNames) {
+    axis(
+      side=1, las=1, 
+      at=getModuleMidPoints(mas),
+      labels=unique(mas), line=maxt.line, tick=FALSE,
+      cex.axis=par("cex.lab")
+    )
+  }
   
   # render border of plot
   polygon(
     x=c(0.5, nGenes+0.5, nGenes/2+0.5, 0.5), y=c(0, 0, nGenes/2, 0),
     lwd=2, xpd=TRUE
   )
+  
+  # Render axes
+  if (!is.null(xaxt)) {
+    axis(
+      side=1, las=2, tick=FALSE, line=xaxt.line,
+      at=1:nGenes, labels=xaxt
+    )
+  }
+  mtext(main, side=3, cex=par("cex.main"), font=2)
+  
+  # Add legend if specified
+  if (plotLegend) {
+    if (missing(legend.lim))
+      legend.lim <- vlim
+    ph <- nGenes/2
+    pw <- nGenes
+    addGradientLegend(
+      palette, vlim, legend.lim, TRUE, legend.main,
+      xlim=c(0.5 - pw*legend.line, pw*0.27), 
+      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.27), tick.size=legend.tick.size,
+      axis.line=laxt.line
+    )
+  }
 }
 
 #' Plot a square heatmap
@@ -103,7 +156,7 @@ plotTriangleHeatmap <- function(
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
-  main="", legend=TRUE, legend.main="", legend.lim, xaxt.line=-0.5, 
+  main="", plotLegend=TRUE, legend.main="", legend.lim, xaxt.line=-0.5, 
   yaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
   legend.line=0.1
 ) {
@@ -158,21 +211,21 @@ plotSquareHeatmap <- function(
         )
       }
     }
-    if (plotModuleNames) {
+  }
+  if (plotModuleNames) {
+    axis(
+      side=1, las=1, 
+      at=getModuleMidPoints(mas),
+      labels=unique(mas), line=maxt.line, tick=FALSE,
+      cex.axis=par("cex.lab")
+    )
+    if (nX == nY) {
       axis(
-        side=1, las=1, 
-        at=getModuleMidPoints(mas),
+        side=2, las=2,
+        at=nY + 0.5 - getModuleMidPoints(mas),
         labels=unique(mas), line=maxt.line, tick=FALSE,
         cex.axis=par("cex.lab")
       )
-      if (nX == nY) {
-        axis(
-          side=2, las=2,
-          at=nY + 0.5 - getModuleMidPoints(mas),
-          labels=unique(mas), line=maxt.line, tick=FALSE,
-          cex.axis=par("cex.lab")
-        )
-      }
     }
   }
   
@@ -203,13 +256,13 @@ plotSquareHeatmap <- function(
   mtext(main, side=3, cex=par("cex.main"), font=2)
   
   # Add legend if specified
-  if (legend) {
+  if (plotLegend) {
     if (missing(legend.lim))
       legend.lim <- vlim
     pw <- nX + 1
     ph <- nY + 1
     addGradientLegend(
-      palette, vlim, legend.lim, FALSE, "Expression",
+      palette, vlim, legend.lim, FALSE, legend.main,
       xlim=c(pw - 0.5 + pw*legend.line, pw - 0.5 + pw*(legend.line+0.05)), 
       ylim=c(ph/3, ph - 0.5 - ph*0.1), tick.size=legend.tick.size,
       axis.line=laxt.line
