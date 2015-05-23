@@ -519,7 +519,7 @@ plotAdjacency <- function(
   }
   
   #-----------------------------------------------------------------------------
-  # Plot the gene coexpression 
+  # Plot the gene adjacency
   #-----------------------------------------------------------------------------
   gaxt <- NULL
   if (plotGeneNames)
@@ -556,8 +556,26 @@ plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
-  palette=c("#313695", "#a50026"), drawBorder=FALSE
+  palette=c("#313695", "#a50026"), drawBorder=FALSE,
+  gaxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input and unify data structures
+  #-----------------------------------------------------------------------------
   if (is.null(geneExpression))
     stop("Cannot plot module membership without gene expression data")
   
@@ -598,6 +616,13 @@ plotModuleMembership <- function(
   if (is.null(geneExpression[[test]]))
     stop("Cannot plot module membership without gene expression data")
   
+  if (missing(plotModuleNames))
+    plotModuleNames <- !missing(modules) && length(modules) > 1
+  
+  #-----------------------------------------------------------------------------
+  # Get ordering of genes in the 'test' dataset by the dataset specified in 
+  # 'orderGenesBy'.
+  #-----------------------------------------------------------------------------
   # Get the module membership for each module in the test network.
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
@@ -647,6 +672,9 @@ plotModuleMembership <- function(
     }
   }
   
+  #-----------------------------------------------------------------------------
+  # Plot the Module Membership
+  #-----------------------------------------------------------------------------
   # now build the Module Membership vector
   MM <- foreach(mi = seq_along(props), .combine=c) %do% {
     props[[mi]]$moduleMembership
@@ -656,29 +684,10 @@ plotModuleMembership <- function(
   # Plot bar chart
   plotBar(
     MM, c(-1,1), moduleAssignments[[discovery]][geneOrder],
-    ifelse(MM > 0, palette[2], palette[1]), drawBorder=drawBorder
+    ifelse(MM > 0, palette[2], palette[1]), drawBorder=drawBorder,
+    xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
+    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main
   )
-  
-  # Add axes if specified
-  if (missing(plotModuleNames))
-    plotModuleNames <- !missing(modules) && length(modules) > 1
-  mas <- moduleAssignments[[discovery]][geneOrder]
-  if (plotGeneNames) {
-    axis(
-      side=1, las=2, at=seq_along(geneOrder), labels=geneOrder, tick=FALSE,
-      line=-0.5
-    )
-  }
-  if (plotModuleNames) {
-    line <- ifelse(plotGeneNames, 4, -0.5)
-    axis(
-      side=1, las=1, 
-      at=getModuleMidPoints(mas),
-      labels=unique(mas), line=line, tick=FALSE,
-      cex.axis=par("cex.lab")
-    )
-  }
-  mtext(main, cex=par("cex.main"), font=2)
 }
 
 #' @rdname plotTopology

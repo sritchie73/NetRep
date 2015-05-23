@@ -25,8 +25,7 @@ plotTriangleHeatmap(values, palette, vlim, mas, na.indices = NULL,
 \item{xaxt}{character vector of names to print along the x axis.}
 
 \item{plotModuleNames}{logical; if \code{TRUE} the names of the modules are
-plotted along the x axis if \code{values} is not symmetric, and along both
-axes if \code{values} is symettric.}
+plotted along the x axis.}
 
 \item{main}{title for the plot.}
 

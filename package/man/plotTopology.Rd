@@ -18,7 +18,7 @@ plotExpression(geneExpression, coexpression, adjacency, moduleAssignments,
   plotSampleNames = TRUE, plotModuleNames, main = "Gene expression",
   palette = expression.palette(), plotLegend = TRUE,
   legend.main = "Expression", gaxt.line = -0.5, saxt.line = -0.5,
-  maxt.line = 2, legend.position = 0.2, legend.tick.size = 0.03,
+  maxt.line = 3, legend.position = 0.2, legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
@@ -26,7 +26,7 @@ plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Coexpression", palette = coexpression.palette(),
   plotLegend = TRUE, legend.main = "Coexpression", gaxt.line = -0.5,
-  maxt.line = 2, legend.position, legend.tick.size = 0.03,
+  maxt.line = 3, legend.position, legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
@@ -34,14 +34,15 @@ plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Adjacency", palette = adjacency.palette(),
   plotLegend = TRUE, legend.main = "Adjacency", gaxt.line = -0.5,
-  maxt.line = 2, legend.position, legend.tick.size = 0.03,
+  maxt.line = 3, legend.position, legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Module Membership", palette = c("#313695",
-  "#a50026"), drawBorder = FALSE)
+  "#a50026"), drawBorder = FALSE, gaxt.line = -0.5, maxt.line = 3,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotConnectivity(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,

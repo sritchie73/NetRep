@@ -4,7 +4,8 @@
 \title{Custom bar plot function}
 \usage{
 plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE,
-  na.col = "#bdbdbd")
+  na.col = "#bdbdbd", xaxt = TRUE, plotModuleNames = TRUE, main = "",
+  xaxt.line = -0.5, maxt.line = 3)
 }
 \arguments{
 \item{heights}{heights of the bars.}
@@ -21,6 +22,20 @@ taken by each bar.}
 \item{drawBorder}{logical; if \code{TRUE} a border is drawn around each bar.}
 
 \item{na.col}{color of missing values to plot.}
+
+\item{xaxt}{logical; If \code{TRUE}, the names of \code{heights} will be
+rendered underneath the bar chart}
+
+\item{plotModuleNames}{logical; if \code{TRUE} the names of the modules are
+plotted along the x axis.}
+
+\item{main}{title for the plot.}
+
+\item{xaxt.line}{the number of lines into the margin at which the x axis
+labels will be drawn.}
+
+\item{maxt.line}{the number of lines into the margin at which the module
+names will be drawn.}
 }
 \description{
 Plot bars around 0

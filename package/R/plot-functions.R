@@ -8,8 +8,7 @@
 #' @param na.col color of missing values to plot.
 #' @param xaxt character vector of names to print along the x axis.
 #' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
-#'  plotted along the x axis if \code{values} is not symmetric, and along both
-#'  axes if \code{values} is symettric.
+#'  plotted along the x axis.
 #' @param main title for the plot.
 #' @param legend logical; if \code{TRUE} a legend is added to the right side of
 #'  the plot.
@@ -414,10 +413,20 @@ addGradientLegend <- function(
 #'  taken by each bar.
 #' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
 #' @param na.col color of missing values to plot.
+#' @param xaxt logical; If \code{TRUE}, the names of \code{heights} will be 
+#'  rendered underneath the bar chart
+#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+#'  plotted along the x axis.
+#' @param main title for the plot.
+#' @param xaxt.line the number of lines into the margin at which the x axis 
+#'  labels will be drawn.
+#' @param maxt.line the number of lines into the margin at which the module 
+#'  names will be drawn.
 #' 
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorder=FALSE, 
-  na.col="#bdbdbd"
+  na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
+  maxt.line=3
 ) {
   if (length(cols) == 1) 
     cols <- rep(cols, length(heights))
@@ -442,6 +451,24 @@ plotBar <- function(
     breaks <- getModuleBreaks(mas)
     abline(v=head(breaks[-1], -1), lwd=2)
   }
+  
+  if (plotModuleNames) {
+    axis(
+      side=1, las=1, 
+      at=getModuleMidPoints(mas),
+      labels=unique(mas), line=maxt.line, tick=FALSE,
+      cex.axis=par("cex.lab")
+    )
+  }
+  
+  # Render axes
+  if (!is.null(xaxt)) {
+    axis(
+      side=1, las=2, tick=FALSE, line=xaxt.line,
+      at=1:length(heights), labels=names(heights)
+    )
+  }
+  mtext(main, side=3, cex=par("cex.main"), font=2)
 }
 
 #' Plot multiple horizontal bar plots
