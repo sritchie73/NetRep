@@ -556,8 +556,8 @@ plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
-  palette=c("#313695", "#a50026"), drawBorder=FALSE,
-  gaxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  palette=c("#313695", "#a50026"), drawBorder=FALSE, gaxt.line=-0.5, 
+  maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -696,8 +696,29 @@ plotConnectivity <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Normalised Connectivity", 
-  palette="#feb24c", drawBorder=FALSE
+  palette="#feb24c", drawBorder=FALSE, gaxt.line=-0.5, maxt.line=3, 
+  cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input and unify data structures
+  #-----------------------------------------------------------------------------
+  if (is.null(geneExpression))
+    stop("Cannot plot module membership without gene expression data")
+  
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
@@ -726,17 +747,23 @@ plotConnectivity <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
-  # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
-  )
-  
+  # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
   
-  # Get the connectivity for each module in the test network.
+  if (is.null(geneExpression[[test]]))
+    stop("Cannot plot module membership without gene expression data")
+  
+  if (missing(plotModuleNames))
+    plotModuleNames <- !missing(modules) && length(modules) > 1
+  
+  #-----------------------------------------------------------------------------
+  # Get ordering of genes in the 'test' dataset by the dataset specified in 
+  # 'orderGenesBy'.
+  #-----------------------------------------------------------------------------
+  # Get the module membership for each module in the test network.
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
     discovery, test, FALSE
@@ -744,7 +771,7 @@ plotConnectivity <- function(
   
   # Now we will order the genes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderGenesBy == "discovery" && discovery != test) {
+  if (orderGenesBy == "discovery" && discovery != test)  {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
     # Ordering genes by the discovery network however means we have to calculate
@@ -760,26 +787,19 @@ plotConnectivity <- function(
     }
   } else {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
+      orderModules <- TRUE
     # order modules
     moduleOrder <- 1
     if (length(props) > 1 && orderModules) {
-      if (!is.null(geneExpression[[test]])) {
-        # Create a matrix of summary expression profiles to measure the similarity
-        seps <- matrix(
-          0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
-        )
-        colnames(seps) <- names(props)
-        for (mi in seq_along(props)) {
-          seps[,mi] <- props[[mi]]$summaryExpression
-        }
-        moduleOrder <- hclust(as.dist(1-cor(seps)))$order
-      } else {
-        warning(
-          "No gene expression provided, modules will be ordered as provided"
-        )
-        moduleOrder <- seq_along(props)
+      # Create a matrix of summary expression profiles to measure the similarity
+      seps <- matrix(
+        0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
+      )
+      colnames(seps) <- names(props)
+      for (mi in seq_along(props)) {
+        seps[,mi] <- props[[mi]]$summaryExpression
       }
+      moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
       moduleOrder <- seq_along(props)
     }
@@ -792,6 +812,9 @@ plotConnectivity <- function(
     }
   }
   
+  #-----------------------------------------------------------------------------
+  # Plot the Connectivity
+  #-----------------------------------------------------------------------------
   # now build the (Normalised) Intramodular Connectivity vector
   kIM <- foreach(mi = seq_along(props), .combine=c) %do% {
     # Normalise the connectivity by the maximum. The value has no meaning,
@@ -803,29 +826,10 @@ plotConnectivity <- function(
   # Plot bar chart
   plotBar(
     kIM, c(0,1), moduleAssignments[[discovery]][geneOrder],
-    palette, drawBorder=drawBorder
+    palette, drawBorder=drawBorder,
+    xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
+    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main
   )
-  
-  # Add axes if specified
-  if (missing(plotModuleNames))
-    plotModuleNames <- !missing(modules) && length(modules) > 1
-  mas <- moduleAssignments[[discovery]][geneOrder]
-  if (plotGeneNames) {
-    axis(
-      side=1, las=2, at=seq_along(geneOrder), labels=geneOrder, tick=FALSE,
-      line=-0.5
-    )
-  }
-  if (plotModuleNames) {
-    line <- ifelse(plotGeneNames, 4, -0.5)
-    axis(
-      side=1, las=1, 
-      at=getModuleMidPoints(mas),
-      labels=unique(mas), line=line, tick=FALSE,
-      cex.axis=par("cex.lab")
-    )
-  }
-  mtext(main, cex=par("cex.main"), font=2)
 }
 
 #' @rdname plotTopology

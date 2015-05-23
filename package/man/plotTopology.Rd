@@ -48,7 +48,8 @@ plotConnectivity(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderGenesBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
   plotModuleNames, main = "Normalised Connectivity", palette = "#feb24c",
-  drawBorder = FALSE)
+  drawBorder = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
+  cex.lab = 1, cex.main = 1.2)
 
 plotSummaryExpression(geneExpression, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
