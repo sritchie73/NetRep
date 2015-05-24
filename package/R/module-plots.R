@@ -838,15 +838,34 @@ plotSummaryExpression <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotSampleNames=TRUE, plotModuleNames, 
-  main="Summary Expression", palette=c("#762a83", "#1b7837"), drawBorder=FALSE
+  main="Summary Expression", palette=c("#762a83", "#1b7837"), drawBorder=FALSE, 
+  saxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input and unify data structures
+  #-----------------------------------------------------------------------------
   if (is.null(geneExpression))
-    stop("Cannot plot summary expression without gene expression data")
+    stop("Cannot plot gene expression without gene expression data")
   
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
+  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
@@ -871,23 +890,37 @@ plotSummaryExpression <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
-  # Format optional input data so it doesn't cause cascading error crashes
+  # Format optional input data so it doesn't cause cascading error crashes 
+  geneExpression <- formatGeneExpression(
+    geneExpression, length(coexpression), names(coexpression)
+  )
+  
   moduleAssignments <- formatModuleAssignments(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
   
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot plot summary expression without gene expression data")
+  # Sanity check input for consistency.
+  checkSets(
+    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+  )
   
-  # Get the summary expression for each module in the test network.
+  if (is.null(geneExpression[[test]]))
+    stop("Cannot plot gene expression without gene expression data")
+  
+  if (missing(plotModuleNames))
+    plotModuleNames <- !missing(modules) && length(modules) > 1
+  
+  #-----------------------------------------------------------------------------
+  # Get ordering of genes and samples in the 'test' dataset by the dataset 
+  # specified in 'orderGenesBy' and 'orderSamplesBy'.
+  #-----------------------------------------------------------------------------
   props <- networkProperties(
     geneExpression, coexpression, adjacency, moduleAssignments, modules, 
     discovery, test, FALSE
   )
   
-  # We use gene ordering to determine module ordering for consistency with
-  # 'plotExpression'. 
+  # Determine gene ordering, then sample ordering.
   if (orderGenesBy == "discovery" && discovery != test) {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
@@ -958,7 +991,10 @@ plotSummaryExpression <- function(
     ))
   }
   
-  # Handle missing samples
+  #-----------------------------------------------------------------------------
+  # Identify genes and samples from the 'discovery' dataset not present in the 
+  # 'test' dataset.
+  #-----------------------------------------------------------------------------
   if (all(sampleOrder %nin% rownames(geneExpression[[test]]))) {
     stop(
       "No samples from the 'orderSamplesBy' dataset are present in the",
@@ -972,18 +1008,18 @@ plotSummaryExpression <- function(
     presentSamples <- sampleOrder
   }
   
-  # now build the Summary Expression matrix
+  
+  #-----------------------------------------------------------------------------
+  # Plot the summary expression profiles 
+  #-----------------------------------------------------------------------------
   SEP <- foreach(mi = moduleOrder, .combine=cbind) %do% {
     matrix(
       insert.nas(props[[mi]]$summaryExpression[presentSamples], na.pos),
       ncol=1
     )
   }
-  if (plotModuleNames) {
-    colnames(SEP) <- moduleOrder
-  } else {
-    colnames(SEP) <- NULL
-  }
+  colnames(SEP) <- moduleOrder
+  rownames(SEP) <- sampleOrder
   
   # Now build the colors
   cols <- matrix(palette[1], nrow(SEP), ncol(SEP))
@@ -992,15 +1028,9 @@ plotSummaryExpression <- function(
   # Plot bar chart
   plotMultiBar(
     SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
-    cols=cols, drawBorder=drawBorder, main=main
+    cols=cols, drawBorder=drawBorder, main=main, yaxt=plotSampleNames,
+    plotModuleNames=plotModuleNames, yaxt.line=saxt.line, maxt.line=maxt.line 
   )
-  
-  if (plotSampleNames) {
-    axis(
-      side=2, tick=FALSE, las=2, at=1:length(sampleOrder)-0.5,
-      labels=sampleOrder, line=0
-    )
-  }
 }
 
 #' @rdname plotTopology

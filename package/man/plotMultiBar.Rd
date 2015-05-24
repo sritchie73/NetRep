@@ -4,7 +4,8 @@
 \title{Plot multiple horizontal bar plots}
 \usage{
 plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorder = FALSE,
-  main = "", na.col = "red")
+  main = "", na.col = "#bdbdbd", yaxt = TRUE, plotModuleNames = TRUE,
+  yaxt.line = 0, maxt.line = 2.5)
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for
@@ -22,6 +23,18 @@ taken by each bar.}
 \item{main}{title for the plot}
 
 \item{na.col}{color of missing values to plot.}
+
+\item{yaxt}{logical; If \code{TRUE}, the rownames of \code{heights} will be
+rendered to the left of the bars.}
+
+\item{plotModuleNames}{logical; if \code{TRUE} the names of the modules are
+plotted along the x axis.}
+
+\item{yaxt.line}{the number of lines into the margin at which the y axis
+labels will be drawn.}
+
+\item{maxt.line}{the number of lines into the margin at which the module
+labels will be drawn.}
 }
 \description{
 Plot multiple horizontal bar plots

@@ -86,7 +86,7 @@ plotTriangleHeatmap <- function(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
       labels=unique(mas), line=maxt.line, tick=FALSE,
-      cex.axis=par("cex.lab")
+      cex.axis=par("cex.lab"), font=2
     )
   }
   
@@ -216,14 +216,14 @@ plotSquareHeatmap <- function(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
       labels=unique(mas), line=maxt.line, tick=FALSE,
-      cex.axis=par("cex.lab")
+      cex.axis=par("cex.lab"), font=2
     )
     if (nX == nY) {
       axis(
         side=2, las=2,
         at=nY + 0.5 - getModuleMidPoints(mas),
         labels=unique(mas), line=maxt.line, tick=FALSE,
-        cex.axis=par("cex.lab")
+        cex.axis=par("cex.lab"), font=2
       )
     }
   }
@@ -431,8 +431,26 @@ plotBar <- function(
   if (length(cols) == 1) 
     cols <- rep(cols, length(heights))
 
-  emptyPlot(xlim=c(0.5, length(heights)+0.5), ylim=heights.lim, bty="n")
-  for (ii in 1:length(heights)) {
+  ylim <- heights.lim
+  ylim[2] <- ylim[2] + (ylim[2] - ylim[1])*0.01
+  ylim[1] <- ylim[1] - (ylim[2] - ylim[1])*0.01
+  emptyPlot(xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n")
+  
+  # draw NAs
+  for (ii in seq_along(heights)) {
+    if (is.na(heights[ii])) {
+      rect(
+        xleft=ii - 0.5,
+        xright=ii + 0.5,
+        ybottom=heights.lim[1],
+        ytop=heights.lim[2],
+        col=na.col,
+        border=NA
+      ) 
+    }
+  }
+  
+  for (ii in seq_along(heights)) {
     rect(
       xleft=ii-bar.width/2,
       xright=ii+bar.width/2,
@@ -449,7 +467,9 @@ plotBar <- function(
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
-    abline(v=head(breaks[-1], -1), lwd=2)
+    for (bi in head(breaks[-1], -1)) {
+      lines(x=rep(bi, 2), y=heights.lim, lwd=2)
+    }
   }
   
   if (plotModuleNames) {
@@ -457,7 +477,7 @@ plotBar <- function(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
       labels=unique(mas), line=maxt.line, tick=FALSE,
-      cex.axis=par("cex.lab")
+      cex.axis=par("cex.lab"), font=2
     )
   }
   
@@ -482,10 +502,18 @@ plotBar <- function(
 #' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
 #' @param main title for the plot
 #' @param na.col color of missing values to plot.
-#' 
+#' @param yaxt logical; If \code{TRUE}, the rownames of \code{heights} will be 
+#'  rendered to the left of the bars.
+#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+#'  plotted along the x axis.
+#' @param yaxt.line the number of lines into the margin at which the y axis 
+#'  labels will be drawn.
+#' @param maxt.line the number of lines into the margin at which the module 
+#'  labels will be drawn.
+#'
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorder=FALSE, main="",
-  na.col="red"
+  na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -502,6 +530,21 @@ plotMultiBar <- function(
   pw <- 0.7 # width of each plot within the 0-1 space
   
   emptyPlot(xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)), bty="n")
+  
+  # draw NAs
+  for (jj in seq_len(nrow(lengths))) {
+    if (all(is.na(lengths[jj,]))) {
+      rect(
+        xleft=0,
+        xright=ncol(lengths),
+        ybottom=nrow(lengths) - jj,
+        ytop=nrow(lengths) - (jj - 1),
+        col=na.col,
+        border=NA
+      ) 
+    }
+  }
+  
   for (ii in seq_len(ncol(lengths))) {
     # we need to map from the value range to a range of 0-1
     rr <- lengths.lim[[ii]]
@@ -520,25 +563,23 @@ plotMultiBar <- function(
       (ii - 1) + (1-pw)/2 + pw/rr.size * (val - rr[1])
     }
     for (jj in seq_len(nrow(lengths))) {
-      if (is.na(lengths[jj, ii])) {
-        # not sure how to handle nas
-      } else {
-        rect(
-          xleft=getX(ax),
-          xright=getX(lengths[jj,ii]),
-          ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
-          ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
-          col=cols[jj, ii],
-          border=ifelse(drawBorder, "black", NA),
-          lwd=2
-        ) 
-      }
+      rect(
+        xleft=getX(ax),
+        xright=getX(lengths[jj,ii]),
+        ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
+        ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
+        col=cols[jj, ii],
+        border=ifelse(drawBorder, "black", NA),
+        lwd=2
+      ) 
     }
+    
     # draw 0 axis
     abline(v=getX(ax), col="black", lwd=2)
+    
     # draw axis
     axis(
-      side=1, labels=FALSE, tck=-0.03, lwd=2,
+      side=1, labels=FALSE, tck=-0.025, lwd=2,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
     )
     axis(
@@ -546,13 +587,25 @@ plotMultiBar <- function(
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2]))), 
       labels=prettyNum(unique(c(rr[1], ax, rr[2])), digits=2)
     )
-    mtext(
-      colnames(lengths)[ii], side=1, at=ii-0.5, cex=par("cex.lab"), font=2,
-      line=3
-    )
+    if (plotModuleNames) {
+      mtext(
+        colnames(lengths)[ii], side=1, at=ii-0.5, cex=par("cex.lab"), font=2,
+        line=maxt.line
+      )
+    }
   }
+    
+  # Draw title
   mtext(
     main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, line=1, 
     adj=0.5
   )
+   
+  # Draw sample names
+  if (yaxt) {
+    axis(
+      side=2, tick=FALSE, las=2, at=1:nrow(lengths)-0.5,
+      labels=rownames(lengths), line=yaxt.line
+    )
+  }
 }

@@ -55,7 +55,8 @@ plotSummaryExpression(geneExpression, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderSamplesBy = "test", orderGenesBy = "discovery", orderModules,
   plotSampleNames = TRUE, plotModuleNames, main = "Summary Expression",
-  palette = c("#762a83", "#1b7837"), drawBorder = FALSE)
+  palette = c("#762a83", "#1b7837"), drawBorder = FALSE, saxt.line = -0.5,
+  maxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotExpressionLegend(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, palette = expression.palette(),
