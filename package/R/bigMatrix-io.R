@@ -62,6 +62,8 @@ save.as.bigMatrix <- function(
   if (!(class(x) == "matrix"))
     stop("'x' must be a 'matrix'")
   
+  backingpath <- normalizePath(backingpath)
+  
   # Dimension names are saved separately from the big.matrix object.
   cnFile <- file.path(backingpath, paste0(backingname, "_colnames.txt"))
   if (!is.null(colnames(x))) {
@@ -101,6 +103,8 @@ save.as.bigMatrix <- function(
 load.bigMatrix <- function(
   backingname, backingpath="."
 ) {
+  backingpath <- normalizePath(backingpath)
+  
   # Check for row and column names
   rn <- NULL
   rnFile <- file.path(backingpath, paste0(backingname, "_rownames.txt"))
@@ -168,6 +172,8 @@ read.bigMatrix <- function(
   type=options("bigmemory.default.type")[[1]],
   row.names=TRUE, header=TRUE, ...
 ) {
+  backingpath <- normalizePath(backingpath)
+  
   bm <- read.big.matrix(
     filename=file, 
     backingfile=paste0(backingname, ".bin"),
