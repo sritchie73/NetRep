@@ -15,16 +15,16 @@
 plotExpression(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, orderSamplesBy = "test",
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames, main = "Gene expression",
+  plotSampleNames = TRUE, plotModuleNames, main = "",
   palette = expression.palette(), plotLegend = TRUE,
   legend.main = "Expression", gaxt.line = -0.5, saxt.line = -0.5,
-  maxt.line = 3, legend.position = 0.2, legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  maxt.line = 3, legend.position = 0.15, legend.tick.size = 0.03,
+  laxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotCoexpression(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
-  plotModuleNames, main = "Coexpression", palette = coexpression.palette(),
+  plotModuleNames, main = "", palette = coexpression.palette(),
   plotLegend = TRUE, legend.main = "Coexpression", gaxt.line = -0.5,
   maxt.line = 3, legend.position, legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
@@ -32,7 +32,7 @@ plotCoexpression(geneExpression = NULL, coexpression, adjacency,
 plotAdjacency(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1, symmetric = FALSE,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
-  plotModuleNames, main = "Adjacency", palette = adjacency.palette(),
+  plotModuleNames, main = "", palette = adjacency.palette(),
   plotLegend = TRUE, legend.main = "Adjacency", gaxt.line = -0.5,
   maxt.line = 3, legend.position, legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
@@ -40,23 +40,23 @@ plotAdjacency(geneExpression = NULL, coexpression, adjacency,
 plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
-  plotModuleNames, main = "Module Membership", palette = c("#313695",
-  "#a50026"), drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  plotModuleNames, main = "", palette = c("#313695", "#a50026"),
+  drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
+  cex.lab = 1, cex.main = 1.2)
 
 plotConnectivity(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderGenesBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
-  plotModuleNames, main = "Normalised Connectivity", palette = "#feb24c",
-  drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2)
+  plotModuleNames, main = "", palette = "#feb24c", drawBorders = FALSE,
+  gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 
 plotSummaryExpression(geneExpression, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderSamplesBy = "test", orderGenesBy = "discovery", orderModules,
-  plotSampleNames = TRUE, plotModuleNames, main = "Summary Expression",
+  plotSampleNames = TRUE, plotModuleNames, main = "",
   palette = c("#762a83", "#1b7837"), drawBorders = FALSE,
-  saxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  saxt.line = -0.5, maxt.line = 0, cex.axis = 0.8, cex.lab = 1,
   cex.main = 1.2)
 
 plotExpressionLegend(geneExpression, coexpression, adjacency, moduleAssignments,

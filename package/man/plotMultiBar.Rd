@@ -3,9 +3,9 @@
 \alias{plotMultiBar}
 \title{Plot multiple horizontal bar plots}
 \usage{
-plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorder = FALSE,
+plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorders = FALSE,
   main = "", na.col = "#bdbdbd", yaxt = TRUE, plotModuleNames = TRUE,
-  yaxt.line = 0, maxt.line = 2.5)
+  yaxt.line = 0, maxt.line = 2.5, xlab = "", cex.modules = 0.7)
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for
@@ -18,7 +18,7 @@ the given property (e.g. each column should be a module, or phenotype).}
 \item{bar.width}{value between 0 and 1 controlling the proportion of space
 taken by each bar.}
 
-\item{drawBorder}{logical; if \code{TRUE} a border is drawn around each bar.}
+\item{drawBorders}{logical; if \code{TRUE} a border is drawn around each bar.}
 
 \item{main}{title for the plot}
 
@@ -35,6 +35,10 @@ labels will be drawn.}
 
 \item{maxt.line}{the number of lines into the margin at which the module
 labels will be drawn.}
+
+\item{xlab}{x axis label}
+
+\item{cex.modules}{relative size of module names.}
 }
 \description{
 Plot multiple horizontal bar plots

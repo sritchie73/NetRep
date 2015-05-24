@@ -61,9 +61,9 @@ plotExpression <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotGeneNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
-  main="Gene expression", palette=expression.palette(), plotLegend=TRUE, 
+  main="", palette=expression.palette(), plotLegend=TRUE, 
   legend.main="Expression", gaxt.line=-0.5, saxt.line=-0.5, maxt.line=3, 
-  legend.position=0.2, legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, 
+  legend.position=0.15, legend.tick.size=0.03, laxt.line=3, cex.axis=0.8, 
   cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -105,16 +105,6 @@ plotExpression <- function(
   coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
-  # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structuren
-  if (!missing(moduleAssignments) && missing(modules)) {
-    modules <- unique(moduleAssignments[[discovery]])
-  } else if (missing(moduleAssignments) && missing(modules)) {
-    modules <- "1"
-  } else if (missing(moduleAssignments) && !missing(modules)) {
-    stop("'modules' provided but not 'moduleAssignments'")
-  }
-  
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
     geneExpression, length(coexpression), names(coexpression)
@@ -124,6 +114,16 @@ plotExpression <- function(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
+    modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
   
   # Sanity check input for consistency.
   checkSets(
@@ -261,9 +261,9 @@ plotExpression <- function(
   # includes the fact that the range may be unbalanced around 0.
   ge <- geneExpression[[test]][presentSamples, presentGenes]
   range.ge <- range(ge)
-  if (all(rr > 0)) {
+  if (all(range.ge > 0)) {
     palette <- tail(palette, length(palette)/2)
-  } else if (all(rr < 0)) {
+  } else if (all(range.ge < 0)) {
     palette <- head(palette, length(palette)/2)
   } else {
     range.pal <- c(-max(abs(range.ge)), max(abs(range.ge)))
@@ -289,7 +289,7 @@ plotExpression <- function(
 plotCoexpression <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="Coexpression", 
+  plotGeneNames=TRUE, plotModuleNames, main="", 
   palette=coexpression.palette(), plotLegend=TRUE, legend.main="Coexpression",
   gaxt.line=-0.5, maxt.line=3, legend.position, legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
@@ -329,6 +329,16 @@ plotCoexpression <- function(
   coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
+  # Format optional input data so it doesn't cause cascading error crashes 
+  geneExpression <- formatGeneExpression(
+    geneExpression, length(coexpression), names(coexpression)
+  )
+  
+  moduleAssignments <- formatModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structuren
   if (!missing(moduleAssignments) && missing(modules)) {
@@ -339,15 +349,6 @@ plotCoexpression <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
-  # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
-  )
-  
-  moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
-  )
   
   #-----------------------------------------------------------------------------
   # Get ordering of genes in the 'test' dataset by the dataset specified in 
@@ -422,7 +423,7 @@ plotCoexpression <- function(
 plotAdjacency <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="Adjacency", 
+  plotGeneNames=TRUE, plotModuleNames, main="", 
   palette=adjacency.palette(), plotLegend=TRUE, legend.main="Adjacency",
   gaxt.line=-0.5, maxt.line=3, legend.position, legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
@@ -462,16 +463,6 @@ plotAdjacency <- function(
   coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
-  # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structuren
-  if (!missing(moduleAssignments) && missing(modules)) {
-    modules <- unique(moduleAssignments[[discovery]])
-  } else if (missing(moduleAssignments) && missing(modules)) {
-    modules <- "1"
-  } else if (missing(moduleAssignments) && !missing(modules)) {
-    stop("'modules' provided but not 'moduleAssignments'")
-  }
-  
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
     geneExpression, length(coexpression), names(coexpression)
@@ -481,6 +472,16 @@ plotAdjacency <- function(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
+    modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
   
   #-----------------------------------------------------------------------------
   # Get ordering of genes in the 'test' dataset by the dataset specified in 
@@ -555,7 +556,7 @@ plotAdjacency <- function(
 plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
+  plotGeneNames=TRUE, plotModuleNames, main="", 
   palette=c("#313695", "#a50026"), drawBorders=FALSE, gaxt.line=-0.5, 
   maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -597,6 +598,12 @@ plotModuleMembership <- function(
   coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
+  # Format optional input data so it doesn't cause cascading error crashes
+  moduleAssignments <- formatModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structuren
   if (!missing(moduleAssignments) && missing(modules)) {
@@ -606,12 +613,6 @@ plotModuleMembership <- function(
   } else if (missing(moduleAssignments) && !missing(modules)) {
     stop("'modules' provided but not 'moduleAssignments'")
   }
-
-  # Format optional input data so it doesn't cause cascading error crashes
-  moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
-  )
   
   if (is.null(geneExpression[[test]]))
     stop("Cannot plot module membership without gene expression data")
@@ -686,7 +687,8 @@ plotModuleMembership <- function(
     MM, c(-1,1), moduleAssignments[[discovery]][geneOrder],
     ifelse(MM > 0, palette[2], palette[1]), drawBorders=drawBorders,
     xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
-    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main
+    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
+    ylab="Module membership"
   )
 }
 
@@ -695,7 +697,7 @@ plotModuleMembership <- function(
 plotConnectivity <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules=TRUE,
-  plotGeneNames=TRUE, plotModuleNames, main="Normalised Connectivity", 
+  plotGeneNames=TRUE, plotModuleNames, main="", 
   palette="#feb24c", drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -716,9 +718,6 @@ plotConnectivity <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  if (is.null(geneExpression))
-    stop("Cannot plot module membership without gene expression data")
-  
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
@@ -737,6 +736,12 @@ plotConnectivity <- function(
   coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
+  # Format optional input data so it doesn't cause cascading error crashes
+  moduleAssignments <- formatModuleAssignments(
+    moduleAssignments, discovery, length(coexpression), names(coexpression),
+    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+  )
+  
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structuren
   if (!missing(moduleAssignments) && missing(modules)) {
@@ -746,15 +751,6 @@ plotConnectivity <- function(
   } else if (missing(moduleAssignments) && !missing(modules)) {
     stop("'modules' provided but not 'moduleAssignments'")
   }
-  
-  # Format optional input data so it doesn't cause cascading error crashes
-  moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
-  )
-  
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot plot module membership without gene expression data")
   
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
@@ -790,7 +786,7 @@ plotConnectivity <- function(
       orderModules <- TRUE
     # order modules
     moduleOrder <- 1
-    if (length(props) > 1 && orderModules) {
+    if (length(props) > 1 && orderModules && !is.null(geneExpression[[test]])) {
       # Create a matrix of summary expression profiles to measure the similarity
       seps <- matrix(
         0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
@@ -828,7 +824,8 @@ plotConnectivity <- function(
     kIM, c(0,1), moduleAssignments[[discovery]][geneOrder],
     palette, drawBorders=drawBorders,
     xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
-    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main
+    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
+    ylab="Normalised connectivity"
   )
 }
 
@@ -838,8 +835,8 @@ plotSummaryExpression <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotSampleNames=TRUE, plotModuleNames, 
-  main="Summary Expression", palette=c("#762a83", "#1b7837"), drawBorders=FALSE, 
-  saxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  main="", palette=c("#762a83", "#1b7837"), drawBorders=FALSE, 
+  saxt.line=-0.5, maxt.line=0, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -880,16 +877,6 @@ plotSummaryExpression <- function(
   coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
   adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
   
-  # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structuren
-  if (!missing(moduleAssignments) && missing(modules)) {
-    modules <- unique(moduleAssignments[[discovery]])
-  } else if (missing(moduleAssignments) && missing(modules)) {
-    modules <- "1"
-  } else if (missing(moduleAssignments) && !missing(modules)) {
-    stop("'modules' provided but not 'moduleAssignments'")
-  }
-  
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
     geneExpression, length(coexpression), names(coexpression)
@@ -899,6 +886,16 @@ plotSummaryExpression <- function(
     moduleAssignments, discovery, length(coexpression), names(coexpression),
     ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
   )
+  
+  # If module discovery has not been performed for all datasets, it may be
+  # easier for the user to provide a simplified list structuren
+  if (!missing(moduleAssignments) && missing(modules)) {
+    modules <- unique(moduleAssignments[[discovery]])
+  } else if (missing(moduleAssignments) && missing(modules)) {
+    modules <- "1"
+  } else if (missing(moduleAssignments) && !missing(modules)) {
+    stop("'modules' provided but not 'moduleAssignments'")
+  }
   
   # Sanity check input for consistency.
   checkSets(
@@ -1029,7 +1026,8 @@ plotSummaryExpression <- function(
   plotMultiBar(
     SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
     cols=cols, drawBorders=drawBorders, main=main, yaxt=plotSampleNames,
-    plotModuleNames=plotModuleNames, yaxt.line=saxt.line, maxt.line=maxt.line 
+    plotModuleNames=plotModuleNames, yaxt.line=saxt.line, maxt.line=maxt.line,
+    xlab="Summary Expression"
   )
 }
 

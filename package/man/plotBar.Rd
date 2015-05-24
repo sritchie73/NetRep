@@ -3,9 +3,9 @@
 \alias{plotBar}
 \title{Custom bar plot function}
 \usage{
-plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE,
+plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorders = FALSE,
   na.col = "#bdbdbd", xaxt = TRUE, plotModuleNames = TRUE, main = "",
-  xaxt.line = -0.5, maxt.line = 3)
+  xaxt.line = -0.5, maxt.line = 3, ylab = "")
 }
 \arguments{
 \item{heights}{heights of the bars.}
@@ -19,7 +19,7 @@ plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorder = FALSE,
 \item{bar.width}{value between 0 and 1 controlling the proportion of space
 taken by each bar.}
 
-\item{drawBorder}{logical; if \code{TRUE} a border is drawn around each bar.}
+\item{drawBorders}{logical; if \code{TRUE} a border is drawn around each bar.}
 
 \item{na.col}{color of missing values to plot.}
 
@@ -36,6 +36,8 @@ labels will be drawn.}
 
 \item{maxt.line}{the number of lines into the margin at which the module
 names will be drawn.}
+
+\item{ylab}{label for the yaxis}
 }
 \description{
 Plot bars around 0

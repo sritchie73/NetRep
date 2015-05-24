@@ -3,7 +3,7 @@
 \alias{emptyPlot}
 \title{Create an empty plot window with the specified limits}
 \usage{
-emptyPlot(..., xlim, ylim, hardlim = TRUE)
+emptyPlot(..., xlim, ylim, xlab = "", ylab = "", hardlim = TRUE)
 }
 \arguments{
 \item{...}{extra arguments to pass to \code{\link[graphics]{plot}}.}
@@ -11,6 +11,10 @@ emptyPlot(..., xlim, ylim, hardlim = TRUE)
 \item{xlim}{limits for the x axis.}
 
 \item{ylim}{limits for the y axis.}
+
+\item{xlab}{label for the x axis.}
+
+\item{ylab}{label for the y axis.}
 
 \item{hardlim}{logical; if \code{TRUE}, the plot window is exactly
 constrained to the specified \code{xlim} and \code{ylim}.}

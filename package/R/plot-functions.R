@@ -93,7 +93,7 @@ plotTriangleHeatmap <- function(
   # render border of plot
   polygon(
     x=c(0.5, nGenes+0.5, nGenes/2+0.5, 0.5), y=c(0, 0, nGenes/2, 0),
-    lwd=2, xpd=TRUE
+    lwd=2, xpd=NA
   )
   
   # Render axes
@@ -212,12 +212,14 @@ plotSquareHeatmap <- function(
     }
   }
   if (plotModuleNames) {
-    axis(
-      side=1, las=1, 
-      at=getModuleMidPoints(mas),
-      labels=unique(mas), line=maxt.line, tick=FALSE,
-      cex.axis=par("cex.lab"), font=2
-    )
+    if(!(nX == nY && is.null(xaxt) && !is.null(yaxt))) {
+      axis(
+        side=1, las=1, 
+        at=getModuleMidPoints(mas),
+        labels=unique(mas), line=maxt.line, tick=FALSE,
+        cex.axis=par("cex.lab"), font=2
+      )
+    }
     if (nX == nY) {
       axis(
         side=2, las=2,
@@ -235,7 +237,7 @@ plotSquareHeatmap <- function(
     ybottom=par("usr")[3],
     ytop=par("usr")[4],
     border="black",
-    xpd=TRUE,
+    xpd=NA,
     lwd=2
   )
   
@@ -321,7 +323,7 @@ addGradientLegend <- function(
         ytop=ylim[2],
         col=palette[pi],
         border=palette[pi],
-        xpd=TRUE
+        xpd=NA
       )
     }
   } else {
@@ -334,7 +336,7 @@ addGradientLegend <- function(
         ytop=breaks[pi+1],
         col=palette[pi],
         border=palette[pi],
-        xpd=TRUE
+        xpd=NA
       )
     }
   }
@@ -342,7 +344,7 @@ addGradientLegend <- function(
   # Render bounding box
   rect(
     xleft=xlim[1], xright=xlim[2], ybottom=ylim[1], ytop=ylim[2],
-    border="black", lwd=2, xpd=TRUE
+    border="black", lwd=2, xpd=NA
   )
   
   # Render axis, but make sure it's balanced around 0
@@ -368,11 +370,11 @@ addGradientLegend <- function(
     
     # Now plot the lines and text
     sapply(at, function(aa) {
-      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=2, xpd=TRUE)
+      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=2, xpd=NA)
     })
-    text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=TRUE)
+    text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA)
   } else {
-    tck <- (par("usr")[4] - par("usr")[3])*tick.size
+    tck <- (par("usr")[2] - par("usr")[1])*tick.size
     
     # for mapping from vlim to plot space
     v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
@@ -386,15 +388,15 @@ addGradientLegend <- function(
     
     # draw axis ticks
     sapply(at, function(aa) {
-      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=2, xpd=TRUE)
+      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=2, xpd=NA)
     })
-    text(labels, x=xlim[1]-tck*axis.line, y=at, cex=par("cex.axis"), xpd=TRUE)
+    text(labels, x=xlim[1]-tck*axis.line, y=at, cex=par("cex.axis"), xpd=NA)
   }
   
   # Render title
-  offset <- (par("usr")[4] - par("usr")[3]) * 0.05
+  offset <- (par("usr")[4] - par("usr")[3]) * 0.07
   text(
-    main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=TRUE,
+    main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=NA,
     cex=par("cex.lab")
   )
 }
@@ -409,7 +411,7 @@ addGradientLegend <- function(
 #' @param cols colors of each bar.
 #' @param bar.width value between 0 and 1 controlling the proportion of space
 #'  taken by each bar.
-#' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
+#' @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
 #' @param na.col color of missing values to plot.
 #' @param xaxt logical; If \code{TRUE}, the names of \code{heights} will be 
 #'  rendered underneath the bar chart
@@ -420,11 +422,12 @@ addGradientLegend <- function(
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
+#' @param ylab label for the yaxis
 #' 
 plotBar <- function(
-  heights, heights.lim, mas, cols, bar.width=1, drawBorder=FALSE, 
+  heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
-  maxt.line=3
+  maxt.line=3, ylab=""
 ) {
   if (length(cols) == 1) 
     cols <- rep(cols, length(heights))
@@ -432,7 +435,9 @@ plotBar <- function(
   ylim <- heights.lim
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1])*0.01
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1])*0.01
-  emptyPlot(xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n")
+  emptyPlot(
+    xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n", ylab=ylab, xpd=NA
+  )
   
   # draw NAs
   for (ii in seq_along(heights)) {
@@ -455,7 +460,7 @@ plotBar <- function(
       ybottom=0,
       ytop=heights[ii],
       col=cols[ii],
-      border=ifelse(drawBorder, "black", NA),
+      border=ifelse(drawBorders, "black", NA),
       lwd=2
     ) 
   }
@@ -475,12 +480,12 @@ plotBar <- function(
       side=1, las=1, 
       at=getModuleMidPoints(mas),
       labels=unique(mas), line=maxt.line, tick=FALSE,
-      cex.axis=par("cex.lab"), font=2
+      cex.axis=par("cex.lab"), font=2, xpd=NA
     )
   }
   
   # Render axes
-  if (!is.null(xaxt)) {
+  if (xaxt) {
     axis(
       side=1, las=2, tick=FALSE, line=xaxt.line,
       at=1:length(heights), labels=names(heights)
@@ -497,7 +502,7 @@ plotBar <- function(
 #' @param cols a matrix of colors for each bar.
 #' @param bar.width value between 0 and 1 controlling the proportion of space
 #'  taken by each bar.
-#' @param drawBorder logical; if \code{TRUE} a border is drawn around each bar.
+#' @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
 #' @param main title for the plot
 #' @param na.col color of missing values to plot.
 #' @param yaxt logical; If \code{TRUE}, the rownames of \code{heights} will be 
@@ -508,10 +513,13 @@ plotBar <- function(
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  labels will be drawn.
+#' @param xlab x axis label
+#' @param cex.modules relative size of module names.
 #'
 plotMultiBar <- function(
-  lengths, lengths.lim, cols, bar.width=1, drawBorder=FALSE, main="",
-  na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5
+  lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="",
+  na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5,
+  xlab="", cex.modules=0.7
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -527,7 +535,10 @@ plotMultiBar <- function(
   
   pw <- 0.7 # width of each plot within the 0-1 space
   
-  emptyPlot(xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n")
+  emptyPlot(
+    xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n", xlab=xlab,
+    xpd=NA
+  )
   
   # draw NAs
   for (jj in seq_len(nrow(lengths))) {
@@ -567,7 +578,7 @@ plotMultiBar <- function(
         ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
         ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
         col=cols[jj, ii],
-        border=ifelse(drawBorder, "black", NA),
+        border=ifelse(drawBorders, "black", NA),
         lwd=2
       ) 
     }
@@ -581,13 +592,13 @@ plotMultiBar <- function(
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
     )
     axis(
-      side=1, tick=FALSE, line=0, las=2,
+      side=1, tick=FALSE, line=-0.6, las=2,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2]))), 
       labels=prettyNum(unique(c(rr[1], ax, rr[2])), digits=2)
     )
     if (plotModuleNames) {
       mtext(
-        colnames(lengths)[ii], side=1, at=ii-0.5, cex=par("cex.lab"), font=2,
+        colnames(lengths)[ii], side=3, at=ii-0.5, cex=cex.modules, font=2,
         line=maxt.line
       )
     }
@@ -596,7 +607,7 @@ plotMultiBar <- function(
   # Draw title
   mtext(
     main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, adj=0.5,
-    line=0.3
+    line=1
   )
    
   # Draw sample names

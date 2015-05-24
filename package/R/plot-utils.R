@@ -47,35 +47,38 @@ forceLim <- function(dlim) {
 #' @param ... extra arguments to pass to \code{\link[graphics]{plot}}.
 #' @param xlim limits for the x axis.
 #' @param ylim limits for the y axis.
+#' @param xlab label for the x axis.
+#' @param ylab label for the y axis.
 #' @param hardlim logical; if \code{TRUE}, the plot window is exactly 
 #'  constrained to the specified \code{xlim} and \code{ylim}.
 #'  
-emptyPlot <- function(..., xlim, ylim, hardlim=TRUE) {
+emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
   if (!missing(xlim) & !missing(ylim)) {
     if(hardlim) {
       xlim <- forceLim(xlim)
       ylim <- forceLim(ylim)
     }
     plot(
-      ..., 0, type='n', xaxt='n', yaxt='n', xlim=xlim, ylim=ylim, xlab="", ylab=""
+      ..., 0, type='n', xaxt='n', yaxt='n', xlim=xlim, ylim=ylim, xlab=xlab, 
+      ylab=ylab
     )
   } else if (!missing(ylim)) {
     if (hardlim) {
       ylim <- forceLim(ylim)
     }
     plot(
-      ..., ylim=ylim, type='n', xaxt='n', yaxt='n', xlab="", ylab=""
+      ..., ylim=ylim, type='n', xaxt='n', yaxt='n', xlab=xlab, ylab=ylab
     )
   } else if (!missing(xlim)) {
     if (hardlim) {
       xlim <- forceLim(xlim)
     }
     plot(
-      ..., xlim=xlim, type='n', xaxt='n', yaxt='n', xlab="", ylab=""
+      ..., xlim=xlim, type='n', xaxt='n', yaxt='n', xlab=xlab, ylab=ylab
     )
   } else {
     plot(
-      ..., type='n', xaxt='n', yaxt='n', xlab="", ylab=""
+      ..., type='n', xaxt='n', yaxt='n', xlab=xlab, ylab=ylab
     )
   }
 }
