@@ -346,46 +346,44 @@ addGradientLegend <- function(
   )
   
   # Render axis, but make sure it's balanced around 0
-  if (length(unique(sign(legend.vlim))) == 1) {
+  labels <- c(
+    seq.int(legend.vlim[1L], 0, length.out=3),
+    seq.int(0, legend.vlim[2L], length.out=3)[-1]
+  )
+  if (length(unique(labels)) == 3)
     labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
-  } else {
-    labels <- c(
-      seq.int(legend.vlim[1L], 0, length.out=3),
-      seq.int(0, legend.vlim[2L], length.out=3)[-1]
-    )
-  }
   labels <- prettyNum(labels, digits=2)
   if (horizontal) {
     tck <- (par("usr")[4] - par("usr")[3])*tick.size
-    # draw axis ticks
-    if (length(unique(sign(legend.vlim))) == 1) {
+    
+    # for mapping from vlim to plot space
+    v.per.x <- (xlim[2] - xlim[1])/(legend.vlim[2] - legend.vlim[1])
+    zero <- xlim[1] +  v.per.x * (0 - legend.vlim[1])
+    at <- c(
+      seq.int(xlim[1L], zero, length.out=3),
+      seq.int(zero, xlim[2L], length.out=3)[-1]
+    )
+    if(length(unique(at)) == 3)
       at <- seq.int(xlim[1L], xlim[2L], length.out=5)
-    } else {
-      # for mapping from vlim to plot space
-      v.per.x <- (xlim[2] - xlim[1])/(legend.vlim[2] - legend.vlim[1])
-      zero <- xlim[1] +  v.per.x * (0 - legend.vlim[1])
-      at <- c(
-        seq.int(xlim[1L], zero, length.out=3),
-        seq.int(zero, xlim[2L], length.out=3)[-1]
-      )
-    }
+    
+    # Now plot the lines and text
     sapply(at, function(aa) {
       lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=2, xpd=TRUE)
     })
     text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=TRUE)
   } else {
-    if (length(unique(sign(legend.vlim))) == 1) {
-      at <- seq.int(ylim[1L], ylim[2L], length.out=5)
-    } else {
-      # for mapping from vlim to plot space
-      v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
-      zero <- ylim[1] +  v.per.y * (0 - legend.vlim[1])
-      at <- c(
-        seq.int(ylim[1L], zero, length.out=3),
-        seq.int(zero, ylim[2L], length.out=3)[-1]
-      )
-    }
     tck <- (par("usr")[4] - par("usr")[3])*tick.size
+    
+    # for mapping from vlim to plot space
+    v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
+    zero <- ylim[1] +  v.per.y * (0 - legend.vlim[1])
+    at <- c(
+      seq.int(ylim[1L], zero, length.out=3),
+      seq.int(zero, ylim[2L], length.out=3)[-1]
+    )
+    if(length(unique(at)) == 3)
+      at <- seq.int(ylim[1L], ylim[2L], length.out=5)
+    
     # draw axis ticks
     sapply(at, function(aa) {
       lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=2, xpd=TRUE)
@@ -597,8 +595,8 @@ plotMultiBar <- function(
     
   # Draw title
   mtext(
-    main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, line=1, 
-    adj=0.5
+    main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, adj=0.5,
+    line=0.3
   )
    
   # Draw sample names

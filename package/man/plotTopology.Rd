@@ -41,32 +41,36 @@ plotModuleMembership(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotModuleNames, main = "Module Membership", palette = c("#313695",
-  "#a50026"), drawBorder = FALSE, gaxt.line = -0.5, maxt.line = 3,
+  "#a50026"), drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotConnectivity(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderGenesBy = "discovery", orderModules = TRUE, plotGeneNames = TRUE,
   plotModuleNames, main = "Normalised Connectivity", palette = "#feb24c",
-  drawBorder = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
+  drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
   cex.lab = 1, cex.main = 1.2)
 
 plotSummaryExpression(geneExpression, coexpression, adjacency,
   moduleAssignments, modules, discovery = 1, test = 1,
   orderSamplesBy = "test", orderGenesBy = "discovery", orderModules,
   plotSampleNames = TRUE, plotModuleNames, main = "Summary Expression",
-  palette = c("#762a83", "#1b7837"), drawBorder = FALSE, saxt.line = -0.5,
-  maxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  palette = c("#762a83", "#1b7837"), drawBorders = FALSE,
+  saxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 
 plotExpressionLegend(geneExpression, coexpression, adjacency, moduleAssignments,
   modules, discovery = 1, test = 1, palette = expression.palette(),
-  main = "Expression", horizontal = TRUE)
+  horizontal = TRUE, legend.main = "Expression", legend.tick.size = 0.03,
+  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
-plotCoexpressionLegend(palette = coexpression.palette(),
-  main = "Coexpression", horizontal = TRUE)
+plotCoexpressionLegend(palette = coexpression.palette(), horizontal = TRUE,
+  legend.main = "Coexpression", legend.tick.size = 0.03, laxt.line = 2.5,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
-plotAdjacencyLegend(palette = adjacency.palette(), main = "Adjacency",
-  horizontal = TRUE)
+plotAdjacencyLegend(palette = adjacency.palette(), horizontal = TRUE,
+  legend.main = "Adjacency", legend.tick.size = 0.03, laxt.line = 2.5,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 }
 \arguments{
 \item{geneExpression}{the gene expression matrix for the dataset of interest,
@@ -159,7 +163,7 @@ labels, as multiple of \code{legend.tick.size}.}
 a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
 heatmap.}
 
-\item{drawBorder}{logical; if \code{TRUE}, borders are drawn around the bars
+\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the bars
 in \code{plotModuleMembership}, \code{plotConnectivity}, or
 \code{plotSummaryExpression}.}
 

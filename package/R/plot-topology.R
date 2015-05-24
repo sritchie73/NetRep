@@ -2,6 +2,8 @@
 #' 
 #' Functions to plot individual components of a module's network topology.
 #' 
+#' @template api_inputs
+#' 
 #' @param symmetric logical; if \code{TRUE} the coexpression will be plotted as
 #'  a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
 #'  heatmap.
@@ -32,7 +34,7 @@
 #'   used when the coexpression between two genes is equal to -1, and the last
 #'   element should correspond to the color used when the coexpression between
 #'   two genes is equal to 1
-#' @param drawBorder logical; if \code{TRUE}, borders are drawn around the bars
+#' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
 #'  in \code{plotModuleMembership}, \code{plotConnectivity}, or
 #'  \code{plotSummaryExpression}.
 #' @param plotLegend logical; if \code{TRUE} legends are drawn for
@@ -52,8 +54,6 @@
 #' @param cex.axis relative size of the gene and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.
-#'  
-#' @template api_inputs
 #' 
 #' @rdname plotTopology
 #' @export
@@ -528,7 +528,7 @@ plotAdjacency <- function(
     if (missing(legend.position))
       legend.position <- 0.2
     plotSquareHeatmap(
-      adjacency[[test]][presentGenes, presentGenes], palette, c(-1, 1), 
+      adjacency[[test]][presentGenes, presentGenes], palette, c(0, 1), 
       moduleAssignments[[discovery]][geneOrder], na.pos, na.pos, 
       xaxt=gaxt, yaxt=gaxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -540,7 +540,7 @@ plotAdjacency <- function(
     if (missing(legend.position))
       legend.position <- 0.1
     plotTriangleHeatmap(
-      adjacency[[test]][presentGenes , presentGenes], palette, c(-1, 1),
+      adjacency[[test]][presentGenes , presentGenes], palette, c(0, 1),
       moduleAssignments[[discovery]][geneOrder], na.pos, xaxt=gaxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
@@ -556,7 +556,7 @@ plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules,
   plotGeneNames=TRUE, plotModuleNames, main="Module Membership", 
-  palette=c("#313695", "#a50026"), drawBorder=FALSE, gaxt.line=-0.5, 
+  palette=c("#313695", "#a50026"), drawBorders=FALSE, gaxt.line=-0.5, 
   maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -684,7 +684,7 @@ plotModuleMembership <- function(
   # Plot bar chart
   plotBar(
     MM, c(-1,1), moduleAssignments[[discovery]][geneOrder],
-    ifelse(MM > 0, palette[2], palette[1]), drawBorder=drawBorder,
+    ifelse(MM > 0, palette[2], palette[1]), drawBorders=drawBorders,
     xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main
   )
@@ -696,7 +696,7 @@ plotConnectivity <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules=TRUE,
   plotGeneNames=TRUE, plotModuleNames, main="Normalised Connectivity", 
-  palette="#feb24c", drawBorder=FALSE, gaxt.line=-0.5, maxt.line=3, 
+  palette="#feb24c", drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -826,7 +826,7 @@ plotConnectivity <- function(
   # Plot bar chart
   plotBar(
     kIM, c(0,1), moduleAssignments[[discovery]][geneOrder],
-    palette, drawBorder=drawBorder,
+    palette, drawBorders=drawBorders,
     xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main
   )
@@ -838,7 +838,7 @@ plotSummaryExpression <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotSampleNames=TRUE, plotModuleNames, 
-  main="Summary Expression", palette=c("#762a83", "#1b7837"), drawBorder=FALSE, 
+  main="Summary Expression", palette=c("#762a83", "#1b7837"), drawBorders=FALSE, 
   saxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1028,7 +1028,7 @@ plotSummaryExpression <- function(
   # Plot bar chart
   plotMultiBar(
     SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
-    cols=cols, drawBorder=drawBorder, main=main, yaxt=plotSampleNames,
+    cols=cols, drawBorders=drawBorders, main=main, yaxt=plotSampleNames,
     plotModuleNames=plotModuleNames, yaxt.line=saxt.line, maxt.line=maxt.line 
   )
 }
@@ -1037,9 +1037,27 @@ plotSummaryExpression <- function(
 #' @export
 plotExpressionLegend <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, palette=expression.palette(), main="Expression", 
-  horizontal=TRUE
+  discovery=1, test=1, palette=expression.palette(), horizontal=TRUE, 
+  legend.main="Expression", legend.tick.size=0.03, laxt.line=2.5, 
+  cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input
+  #-----------------------------------------------------------------------------
   if (is.null(geneExpression))
     stop("Cannot plot expression legend without gene expression data")
   
@@ -1067,19 +1085,35 @@ plotExpressionLegend <- function(
   if (is.null(geneExpression[[test]]))
     stop("Cannot plot summary expression without gene expression data")
   
+  #-----------------------------------------------------------------------------
+  # Get the range of gene expression for the modules in the test dataset 
+  #-----------------------------------------------------------------------------
   modGenes <- getGenes(moduleAssignments, modules, discovery)
   modGenes <- modGenes %sub_in% colnames(geneExpression[[test]])
   if (length(modGenes) == 0)
     stop("None of the module genes are present in the test dataset")
   rg <- range(geneExpression[[test]][,modGenes])
-  emptyPlot(c(0,1), c(0,1))
+  
+  #-----------------------------------------------------------------------------
+  # Plot the legend
+  #-----------------------------------------------------------------------------
+  emptyPlot(c(0,1), c(0,1), bty="n")
   if (all(rg < 0)) {
-    addGradientLegend(head(palette, length(palette)/2), rg, rg, horizontal, main)
+    addGradientLegend(
+      head(palette, length(palette)/2), rg, rg, horizontal, legend.main, 
+      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line
+    )
   } else if (all(rg > 0)) {
-    addGradientLegend(tail(palette, length(palette)/2), rg, rg, horizontal, main)
+    addGradientLegend(
+      tail(palette, length(palette)/2), rg, rg, horizontal, legend.main, 
+      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line
+    )
   } else {
     plim <- c(-max(abs(rg)), max(abs(rg)))
-    addGradientLegend(palette, plim, rg, horizontal, main)
+    addGradientLegend(
+      palette, plim, rg, horizontal, legend.main, xlim=c(0,1), ylim=c(0,1), 
+      tick.size=legend.tick.size, axis.line=laxt.line
+    )
   }
 }
 
@@ -1088,17 +1122,61 @@ plotExpressionLegend <- function(
 #' @rdname plotTopology
 #' @export
 plotCoexpressionLegend <- function(
-  palette=coexpression.palette(), main="Coexpression", horizontal=TRUE
+  palette=coexpression.palette(),  horizontal=TRUE, legend.main="Coexpression",
+  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
-  emptyPlot(c(0,1), c(0,1))
-  addGradientLegend(palette, c(-1,1), c(-1,1), horizontal, main)
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Render legend
+  #-----------------------------------------------------------------------------
+  emptyPlot(c(0,1), c(0,1), bty="n")
+  addGradientLegend(
+    palette, c(-1,1), c(-1,1), horizontal, legend.main,
+    xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
+    axis.line=laxt.line
+  )
 }
 
 #' @rdname plotTopology
 #' @export
 plotAdjacencyLegend <- function(
-  palette=adjacency.palette(), main="Adjacency", horizontal=TRUE
+  palette=adjacency.palette(),  horizontal=TRUE, legend.main="Adjacency",
+  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
-  emptyPlot(c(0,1), c(0,1))
-  addGradientLegend(palette, c(0,1), c(0,1), horizontal, main)
+  #-----------------------------------------------------------------------------
+  # Set graphical parameters
+  #-----------------------------------------------------------------------------
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  par(cex.axis=cex.axis)
+  par(cex.lab=cex.lab)
+  par(cex.main=cex.main)
+  # make sure to restore old values once finishing the plot
+  on.exit({
+    par(cex.axis=old.par[[1]])
+    par(cex.lab=old.par[[2]])
+    par(cex.main=old.par[[3]])
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Render legend
+  #-----------------------------------------------------------------------------
+  emptyPlot(c(0,1), c(0,1), bty="n")
+  addGradientLegend(
+    palette, c(0,1), c(0,1), horizontal, legend.main,
+    xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
+    axis.line=laxt.line
+  )
 }
