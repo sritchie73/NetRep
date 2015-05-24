@@ -529,7 +529,7 @@ plotMultiBar <- function(
   
   pw <- 0.7 # width of each plot within the 0-1 space
   
-  emptyPlot(xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)), bty="n")
+  emptyPlot(xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n")
   
   # draw NAs
   for (jj in seq_len(nrow(lengths))) {
@@ -575,7 +575,7 @@ plotMultiBar <- function(
     }
     
     # draw 0 axis
-    abline(v=getX(ax), col="black", lwd=2)
+    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=2)
     
     # draw axis
     axis(
