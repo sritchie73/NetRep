@@ -2,8 +2,6 @@
 #' 
 #' Plot the topology of one or more network modules. 
 #' 
-#' @template api_inputs
-#' 
 #' @param orderGenesBy one of "discovery", "test", or "none". If "discovery"
 #'   genes are ordered by intramodular connectivity in the \code{discovery}
 #'   dataset. If "test" genes are orderd by intramodular connectivity in the
@@ -347,7 +345,7 @@ plotModule <- function(
     plotBar(
       kIM, c(0,1), moduleAssignments[[discovery]][geneOrder], "#feb24c", 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
-      xaxt=plotGeneNames, xaxt.line=gaxt.line, maxt.line=maxt.line, main="",
+      xaxt=plotGeneNames, xaxt.line=gaxt.line, main="",
       ylab="Normalised connectivity", maxt.line=maxt.line
     )
   } else {
@@ -414,7 +412,7 @@ plotModule <- function(
       moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
       xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="Expression", plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, legend.tick.size=legend.tick.size/tickMult,
+      xaxt.line=gaxt.line, legend.tick.size=legend.tick.size/4,
       laxt.line=laxt.line, legend.line=legend.position*1.5, 
       maxt.line=maxt.line
     )

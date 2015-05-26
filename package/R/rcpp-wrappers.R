@@ -1,6 +1,10 @@
 #' Fast wrapper functions for Rcpp functions
 #' 
-#' @template wrapper_desc
+#' Wrapper functions for interfacing with the Rcpp implementations of 
+#' \code{\link{CoexpStats}}, \code{\link{AdjProps}}, and \code{\link{DataProps}}.
+#' They provide a nicer interface for input handling and format the output in
+#' an R-friendly way.
+#'  
 #' @inheritParams coexp_params
 #' @inheritParams adj_param
 #' @inheritParams ge_param

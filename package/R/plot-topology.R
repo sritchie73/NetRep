@@ -2,7 +2,7 @@
 #' 
 #' Functions to plot individual components of a module's network topology.
 #' 
-#' @template api_inputs
+#' 
 #' 
 #' @param symmetric logical; if \code{TRUE} the coexpression will be plotted as
 #'  a symmetric heatmap, if \code{FALSE} it will be plotted as a triangular
@@ -1058,6 +1058,13 @@ plotExpressionLegend <- function(
   #-----------------------------------------------------------------------------
   if (is.null(geneExpression))
     stop("Cannot plot expression legend without gene expression data")
+  
+  # Temporary directory to store new bigMatrix objects in
+  tmp.dir <- paste0(".temp-objects", getUUID())
+  dir.create(tmp.dir, showWarnings=FALSE)
+  on.exit({
+    unlink(tmp.dir, recursive=TRUE)
+  }, add=TRUE)
   
   # Unify data structures and load in matrices
   geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))

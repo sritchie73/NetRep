@@ -30,7 +30,14 @@ using namespace arma;
 //'   }
 //'  }
 //'  
-//' @template Langfelder-ref
+//' @references
+//'  \enumerate{
+//'     \item{
+//'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
+//'       network module preserved and reproducible?} PLoS Comput. Biol. 
+//'       \strong{7}, e1001057 (2011). 
+//'     }
+//'  }
 //'  
 //' @details
 //'  First, a summar expression profile (SEP) is calculated for the 
