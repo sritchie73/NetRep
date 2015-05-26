@@ -429,8 +429,10 @@ plotBar <- function(
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
   maxt.line=3, ylab=""
 ) {
-  if (length(cols) == 1) 
+  if (length(cols) == 1)
     cols <- rep(cols, length(heights))
+  if (length(cols) < length(heights))
+    cols <- rep(cols, ceiling(length(heights))/length(cols))[1:length(heights)]
 
   ylim <- heights.lim
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1])*0.01
