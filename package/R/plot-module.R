@@ -44,7 +44,7 @@ plotModule <- function(
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotGeneNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
   main="Module Topology", drawBorders=FALSE, gaxt.line=-0.5, 
-  saxt.line=-0.5, maxt.line, legend.position=0.1, legend.tick.size=0.04, 
+  saxt.line=-0.5, maxt.line, legend.tick.size=0.04, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ plotModule <- function(
     moduleAssignments[[discovery]][geneOrder], na.pos.x, plotLegend=TRUE, 
     main="", legend.main="Coexpression", plotModuleNames=FALSE, 
     legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
-    legend.line=legend.position, maxt.line=maxt.line
+    legend.line=0.1, maxt.line=maxt.line
   )
   mtext(main, side=3, line=1, cex=par('cex.main'), font=2, xpd=NA)
   
@@ -336,7 +336,7 @@ plotModule <- function(
     c(0, 1), moduleAssignments[[discovery]][geneOrder], na.pos.x, 
     plotLegend=TRUE, main="", legend.main="Adjacency", 
     plotModuleNames=FALSE, legend.tick.size=legend.tick.size, 
-    laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line
+    laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line
   )
   
   # Plot Intamodular Connectivity
@@ -377,31 +377,8 @@ plotModule <- function(
       range.pal <- c(-max(abs(range.ge)), max(abs(range.ge)))
     }
     
-    # Plot gene expression legend
-    par(mar=c(0.5,4,1,4))
+    par(mar=c(1,1,1,1))
     emptyPlot(c(0,1), c(0,1), bty="n")
-    if (all(range.ge < 0)) {
-      addGradientLegend(
-        head(palette, length(palette)/2), range.ge, range.ge, TRUE, 
-        xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, main="",
-        axis.line=laxt.line*2
-      )
-    } else if (all(range.ge > 0)) {
-      addGradientLegend(
-        tail(palette, length(palette)/2), range.ge, range.ge, TRUE, 
-        xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, main="",
-        axis.line=laxt.line*2
-      )
-    } else {
-      plim <- c(-max(abs(range.ge)), max(abs(range.ge)))
-      addGradientLegend(
-        palette, plim, range.ge, TRUE, xlim=c(0,1), main="",
-        ylim=c(0,1), tick.size=legend.tick.size*4, axis.line=laxt.line*2
-      )
-    }
-    mtext(
-      side=3, "Gene expression", at=0.5, font=2, cex=par('cex.axis')*0.8
-    )
 
     yaxt <- NULL
     if (plotSampleNames)
@@ -411,11 +388,39 @@ plotModule <- function(
       ge, palette, vlim=range.pal, legend.lim=range.ge,
       moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
       xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
-      legend.main="Expression", plotModuleNames=plotModuleNames,
+      legend.main="", plotModuleNames=plotModuleNames,
       xaxt.line=gaxt.line, legend.tick.size=legend.tick.size/4,
-      laxt.line=laxt.line, legend.line=legend.position*1.5, 
+      laxt.line=laxt.line, legend.line=0.1*1.5, 
       maxt.line=maxt.line
     )
+    
+    # Plot gene expression legend
+    if (all(range.ge < 0)) {
+      addGradientLegend(
+        head(palette, length(palette)/2), range.ge, range.ge, TRUE, 
+        xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
+        ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3), 
+        tick.size=legend.tick.size, 
+        main="Gene expression", axis.line=laxt.line
+      )
+    } else if (all(range.ge > 0)) {
+      addGradientLegend(
+        tail(palette, length(palette)/2), range.ge, range.ge, TRUE, 
+        xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
+        ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3), 
+        tick.size=legend.tick.size, 
+        main="Gene expression", axis.line=laxt.line
+      )
+    } else {
+      plim <- c(-max(abs(range.ge)), max(abs(range.ge)))
+      addGradientLegend(
+        palette, plim, range.ge, TRUE, main="Gene expression",
+        xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
+        ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3),  
+        tick.size=legend.tick.size, 
+        axis.line=laxt.line
+      )
+    }
     
     # Plot bar chart
     xlab <- "Summary Expression"
