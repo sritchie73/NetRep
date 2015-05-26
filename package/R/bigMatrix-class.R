@@ -41,9 +41,23 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #'  \code{\link[bigmemory]{big.matrix}},
 #'  \code{\link{bigMatrix-get}}
 #'  \code{\link{bigMatrix-out}}
+#'  
+#' @aliases 
+#'  [,bigMatrix,ANY,ANY,ANY-method 
+#'  [,bigMatrix,ANY,missing,ANY-method
+#'  [,bigMatrix,missing,ANY,ANY-method
+#'  [,bigMatrix,missing,missing,ANY-method
+#'  [<-,bigMatrix,ANY,ANY-method
+#'  [<-,bigMatrix,ANY,missing-method
+#'  [<-,bigMatrix,missing,ANY-method
+#'  [<-,bigMatrix,missing,missing-method
+#'  dim,bigMatrix-method
+#'  dimnames,bigMatrix-method
+#'  dimnames<-,bigMatrix,ANY-method
+#'  
 #' @import bigmemory
 #' @import methods
-#' @name bigMatrix
+#' @name bigMatrix-class
 setClass("bigMatrix",
     slots=list(
       descriptor="character",

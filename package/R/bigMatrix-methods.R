@@ -153,14 +153,6 @@ setMethod("dimnames", signature(x = "bigMatrix"), function(x) {
   list(x@rownames, x@colnames)
 })
 
-setMethod("rownames", signature(x = "bigMatrix"), function(x) { 
-  x@rownames
-})
-
-setMethod("colnames", signature(x = "bigMatrix"), function(x) { 
-  x@colnames
-})
-
 setMethod("dimnames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
     if (!is.list(value))
@@ -229,30 +221,6 @@ setMethod("dimnames<-",
       ) 
       x@colnames <- dn[[2L]]
     }
-    x
-})
-
-setMethod("rownames<-", 
-  signature(x = "bigMatrix", value="ANY"), function(x, value) {
-    dn <- dimnames(x)
-    if (is.null(value)) {
-      dn[1L] <- list(NULL)
-    } else {
-      dn[[1L]] <- value
-    }
-    dimnames(x) <- dn
-    x
-})
-
-setMethod("colnames<-", 
-  signature(x = "bigMatrix", value="ANY"), function(x, value) {
-    dn <- dimnames(x)
-    if (is.null(value)) {
-      dn[2L] <- list(NULL)
-    } else {
-      dn[[2L]] <- value
-    }
-    dimnames(x) <- dn
     x
 })
 
