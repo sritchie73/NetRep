@@ -106,8 +106,8 @@ independent dataset. Module preservation is assessed using a permutation
 procedure performed on seven module preservation statistics (see details).
 Each dataset requires a precalculated coexpression network and adjecency
 network (see details). Providing the gene expression is optional, but
-recommended. Matrix data is ideally stored in the \code{\link{bigMatrix}}
-format (see details).
+recommended. Matrix data is ideally stored in the
+\code{\link[=bigMatrix-class]{bigMatrix}} format (see details).
 }
 \details{
 \subsection{Input data:}{
@@ -141,12 +141,13 @@ format (see details).
   respective dataset names.
 
   It is \strong{strongly recommended} to store each matrix using the
-  \code{\link{bigMatrix}} class. A \code{bigMatrix} is an object which points
-  to a data matrix stored on disk, which is accessible via shared memory.
-  Once stored as a 'bigMatrix', the data can be instantaneously loaded in and
-  accessed from any R session in the future. Methods are provided for
-  converting to, loading in, and writing out 'bigMatrix' objects (see
-  \code{\link{bigMatrix-get}} and \code{\link{bigMatrix-out}}).
+  \code{\link[=bigMatrix-class]{bigMatrix}} class. A \code{bigMatrix} is an
+  object which points to a data matrix stored on disk, which is accessible
+  via shared memory. Once stored as a 'bigMatrix', the data can be
+  instantaneously loaded in and accessed from any R session in the future.
+  Methods are provided for converting to, loading in, and writing out
+  'bigMatrix' objects (see \code{\link{bigMatrix-get}} and
+  \code{\link{bigMatrix-out}}).
 
   Regular 'matrix' data are also accepted, but will be converted to
   'bigMatrix' objects for the duration of the analysis. This is not

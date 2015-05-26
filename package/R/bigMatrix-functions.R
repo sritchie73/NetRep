@@ -1,7 +1,7 @@
 #' Scale and Center the rows of a 'big.matrix'
 #' 
-#' Create a new \code{\link{bigMatrix}} containing scaled gene expression. Genes
-#' are expected to be columns.
+#' Create a new \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled gene
+#' expression. Genes are expected to be columns.
 #' 
 #' @param x the bigMatrix to scale.
 #' @param tmp.dir temporary directory to store the backingfiles for the 
@@ -71,7 +71,7 @@ rangeBigMatrix <- function(x, subsetIndices) {
 #' If there are non-finite entires (\code{NA}, \code{NaN}, \code{-Inf}, 
 #' \code{Inf}), throw an exception. 
 #' 
-#' @param x a \code{\link{bigMatrix}}
+#' @param x a \code{\link[=bigMatrix-class]{bigMatrix}}
 checkFinite <- function(x) {
   is.attached <- x@attached
   if (!is.attached)

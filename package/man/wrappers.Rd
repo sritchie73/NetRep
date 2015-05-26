@@ -16,28 +16,29 @@ dataProps(sge, moduleIndices)
 moduleProps(adj, moduleIndices, sge)
 }
 \arguments{
-\item{discCoexp}{a \code{\link{bigMatrix}} containing the pairwise
-coexpression for the \emph{discovery} dataset.}
+\item{discCoexp}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+pairwise coexpression for the \emph{discovery} dataset.}
 
 \item{discIndices}{indices corresponding to the network module in the matrix
 of pairwise-coexpression in the \emph{discovery} dataset.}
 
-\item{testCoexp}{a \code{\link{bigMatrix}} containing the pairwise
-coexpression for the \emph{test} dataset.}
+\item{testCoexp}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+pairwise coexpression for the \emph{test} dataset.}
 
 \item{testIndices}{indices corresponding to the network module, or a random
   sample of the same size, in the matrix of pairwise-coexpression in the
   \emph{test} dataset.}
 
-\item{adj}{a \code{\link{bigMatrix}} containing the pairwise gene
- adjacencies.}
+\item{adj}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+  pairwise gene adjacencies.}
 
 \item{moduleIndices}{indices for the network module of interest in the
   supplied data matrix.}
 
-\item{sge}{a \code{\link{bigMatrix}} containing scaled gene expression data.
-  Assumes columns are genes/probes, rows are samples, and that probes have
-  been scaled (This can be done using \code{\link{scaleBigMatrix}}).}
+\item{sge}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled gene
+  expression data. Assumes columns are genes/probes, rows are samples, and
+  that probes have been scaled (This can be done using
+  \code{\link{scaleBigMatrix}}).}
 }
 \value{
 \code{coexpStats:} a list containing the \emph{cor.coexp} and

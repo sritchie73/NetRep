@@ -45,7 +45,7 @@ detach.bigMatrix <- function(x) {
 #' @return
 #'  \code{TRUE} if 'x' is a 'bigMatrix', \code{FALSE} otherwise.
 #'  
-#' @seealso \code{\link{bigMatrix}}
+#' @seealso \code{\link[=bigMatrix-class]{bigMatrix}}
 #' @export
 is.bigMatrix <- function(x) {
   return(class(x) == "bigMatrix")

@@ -3,9 +3,10 @@
 \alias{ge_param}
 \title{Template parameters}
 \arguments{
-\item{sge}{a \code{\link{bigMatrix}} containing scaled gene expression data.
-  Assumes columns are genes/probes, rows are samples, and that probes have
-  been scaled (This can be done using \code{\link{scaleBigMatrix}}).}
+\item{sge}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled gene
+  expression data. Assumes columns are genes/probes, rows are samples, and
+  that probes have been scaled (This can be done using
+  \code{\link{scaleBigMatrix}}).}
 }
 \description{
 Template parameters to be imported into other function documentation. This

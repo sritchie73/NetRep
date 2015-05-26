@@ -4,9 +4,9 @@
 #' or more modules in a user specified dataset.
 #' 
 #' @param geneExpression optional; \code{NULL} or a list of 
-#'   \code{\link{bigMatrix}} objects, each containing the gene expression data 
-#'   for a datset of interest (see details). Columns are expected to be genes, 
-#'   rows samples.
+#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
+#'   expression data for a datset of interest (see details). Columns are
+#'   expected to be genes, rows samples.
 #' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
 #'   coexpression for a dataset of interest (see details).
 #' @param adjacency a list of 'bigMatrix' objects, each containing the gene
@@ -50,18 +50,18 @@
 #'   \code{coexpression}, and \code{adjacency}, in that same dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link{bigMatrix}} data, regular
-#'   'matrix' objects are also accepted. In this case, the 'matrix' data is
-#'   temporarily converted to 'bigMatrix' by the function. This conversion
-#'   process involves writing out each matrix as a binary file on disk, which
-#'   can take a long time for large datasets. It is strongly recommended for the
-#'   user to store their data as 'bigMatrix' objects, as the
-#'   \link{modulePreservation} function, \link[=plotModule]{plotting}
-#'   \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and
-#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects.
-#'   Further, 'bigMatrix' objects have a number of benefits, including
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
+#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
+#'   conversion process involves writing out each matrix as a binary file on
+#'   disk, which can take a long time for large datasets. It is strongly
+#'   recommended for the user to store their data as 'bigMatrix' objects, as the
+#'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
+#'   \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and 
+#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
+#'   Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
-#'   mutliple independent R sessions. Methods are provided for
+#'   mutliple independent R sessions. Methods are provided for 
 #'   \link[=bigMatrix-get]{converting to, loading in}, and 
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }
@@ -306,9 +306,9 @@ networkProperties <- function(
 #' importance within a given module \emph{(1)}.
 #' 
 #' @param geneExpression optional; \code{NULL} or a list of 
-#'   \code{\link{bigMatrix}} objects, each containing the gene expression data 
-#'   for a datset of interest (see details). Columns are expected to be genes, 
-#'   rows samples.
+#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
+#'   expression data for a datset of interest (see details). Columns are
+#'   expected to be genes, rows samples.
 #' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
 #'   coexpression for a dataset of interest (see details).
 #' @param adjacency a list of 'bigMatrix' objects, each containing the gene
@@ -360,18 +360,18 @@ networkProperties <- function(
 #'   \code{coexpression}, and \code{adjacency}, in that same dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link{bigMatrix}} data, regular
-#'   'matrix' objects are also accepted. In this case, the 'matrix' data is
-#'   temporarily converted to 'bigMatrix' by the function. This conversion
-#'   process involves writing out each matrix as a binary file on disk, which
-#'   can take a long time for large datasets. It is strongly recommended for the
-#'   user to store their data as 'bigMatrix' objects, as the
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
+#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
+#'   conversion process involves writing out each matrix as a binary file on
+#'   disk, which can take a long time for large datasets. It is strongly
+#'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link{networkProperties} function, 
-#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and
-#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects.
-#'   Further, 'bigMatrix' objects have a number of benefits, including
+#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 
+#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
+#'   Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
-#'   mutliple independent R sessions. Methods are provided for
+#'   mutliple independent R sessions. Methods are provided for 
 #'   \link[=bigMatrix-get]{converting to, loading in}, and 
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }
@@ -533,9 +533,9 @@ geneOrder <- function(
 #' importance within a given module \emph{(1)}.
 #' 
 #' @param geneExpression optional; \code{NULL} or a list of 
-#'   \code{\link{bigMatrix}} objects, each containing the gene expression data 
-#'   for a datset of interest (see details). Columns are expected to be genes, 
-#'   rows samples.
+#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
+#'   expression data for a datset of interest (see details). Columns are
+#'   expected to be genes, rows samples.
 #' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
 #'   coexpression for a dataset of interest (see details).
 #' @param adjacency a list of 'bigMatrix' objects, each containing the gene
@@ -584,18 +584,18 @@ geneOrder <- function(
 #'   \code{coexpression}, and \code{adjacency}, in that same dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link{bigMatrix}} data, regular
-#'   'matrix' objects are also accepted. In this case, the 'matrix' data is
-#'   temporarily converted to 'bigMatrix' by the function. This conversion
-#'   process involves writing out each matrix as a binary file on disk, which
-#'   can take a long time for large datasets. It is strongly recommended for the
-#'   user to store their data as 'bigMatrix' objects, as the
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
+#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
+#'   conversion process involves writing out each matrix as a binary file on
+#'   disk, which can take a long time for large datasets. It is strongly
+#'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link{networkProperties} function, 
-#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and
-#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects.
-#'   Further, 'bigMatrix' objects have a number of benefits, including
+#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 
+#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
+#'   Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
-#'   mutliple independent R sessions. Methods are provided for
+#'   mutliple independent R sessions. Methods are provided for 
 #'   \link[=bigMatrix-get]{converting to, loading in}, and 
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }

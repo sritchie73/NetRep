@@ -1,7 +1,7 @@
 #' Loading in data as a 'bigMatrix'
 #' 
 #' Functions for converting to, reading in, and loading a 
-#' \code{\link{bigMatrix}} object.
+#' \code{\link[=bigMatrix-class]{bigMatrix}} object.
 #'
 #' @param x a regular matrix to convert 
 #' @param file the name of the file which the (non-bigMatrix) data are to be
@@ -22,17 +22,17 @@
 #' 
 #' @return
 #'   \code{read.bigMatrix}, \code{load.bigMatrix}, \code{as.bigMatrix}: an 
-#'   object of class \code{\link{bigMatrix}}.
+#'   object of class \code{\link[=bigMatrix-class]{bigMatrix}}.
 #'
 #' @details 
-#' \code{\link{bigMatrix}} objects are stored on disk using across four 
-#' different files per object. The \code{backingname} designates the basename 
-#' of these files, and the backingpath designates the directory they are stored 
-#' in. The matrix data are stored in the file with the ".bin" extension. The 
-#' file with the ".desc" extension contains a description allowing R to load in
-#' this data (see \code{\link[bigmemory]{attach.big.matrix}}). Row and 
-#' column names are stored separately in the files ending with "_rownames.txt"
-#' and "_colnames.txt". 
+#' \code{\link[=bigMatrix-class]{bigMatrix}} objects are stored on disk using
+#' across four different files per object. The \code{backingname} designates the
+#' basename of these files, and the backingpath designates the directory they
+#' are stored in. The matrix data are stored in the file with the ".bin"
+#' extension. The file with the ".desc" extension contains a description
+#' allowing R to load in this data (see
+#' \code{\link[bigmemory]{attach.big.matrix}}). Row and column names are stored
+#' separately in the files ending with "_rownames.txt" and "_colnames.txt".
 #' 
 #' \code{save.as.bigMatrix} takes a standard matrix and writes it out as a 
 #' \code{bigMatrix}. This can then be loaded into an R session using 
@@ -50,7 +50,7 @@
 #' 
 #' @name bigMatrix-get
 #' @seealso 
-#'  \code{\link{bigMatrix}},
+#'  \code{\link[=bigMatrix-class]{bigMatrix}},
 #'  \code{\link[bigmemory]{big.matrix}},
 #'  \code{\link[bigmemory]{read.big.matrix}}
 #' @export
@@ -256,3 +256,4 @@ setMethod(
     unlink(cnFile)
     
     bigmemory::attach.big.matrix(x@descriptor)
+  })

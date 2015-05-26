@@ -15,6 +15,6 @@ is.bigMatrix(x)
 Checks if an object is a bigMatrix
 }
 \seealso{
-\code{\link{bigMatrix}}
+\code{\link[=bigMatrix-class]{bigMatrix}}
 }
 

@@ -46,21 +46,21 @@ column names?}
 }
 \value{
 \code{read.bigMatrix}, \code{load.bigMatrix}, \code{as.bigMatrix}: an
-  object of class \code{\link{bigMatrix}}.
+  object of class \code{\link[=bigMatrix-class]{bigMatrix}}.
 }
 \description{
 Functions for converting to, reading in, and loading a
-\code{\link{bigMatrix}} object.
+\code{\link[=bigMatrix-class]{bigMatrix}} object.
 }
 \details{
-\code{\link{bigMatrix}} objects are stored on disk using across four
-different files per object. The \code{backingname} designates the basename
-of these files, and the backingpath designates the directory they are stored
-in. The matrix data are stored in the file with the ".bin" extension. The
-file with the ".desc" extension contains a description allowing R to load in
-this data (see \code{\link[bigmemory]{attach.big.matrix}}). Row and
-column names are stored separately in the files ending with "_rownames.txt"
-and "_colnames.txt".
+\code{\link[=bigMatrix-class]{bigMatrix}} objects are stored on disk using
+across four different files per object. The \code{backingname} designates the
+basename of these files, and the backingpath designates the directory they
+are stored in. The matrix data are stored in the file with the ".bin"
+extension. The file with the ".desc" extension contains a description
+allowing R to load in this data (see
+\code{\link[bigmemory]{attach.big.matrix}}). Row and column names are stored
+separately in the files ending with "_rownames.txt" and "_colnames.txt".
 
 \code{save.as.bigMatrix} takes a standard matrix and writes it out as a
 \code{bigMatrix}. This can then be loaded into an R session using
@@ -77,7 +77,7 @@ means if you later load in the data as a 'big.matrix' instead of a
 using \code{\link{as.big.matrix}}.
 }
 \seealso{
-\code{\link{bigMatrix}},
+\code{\link[=bigMatrix-class]{bigMatrix}},
  \code{\link[bigmemory]{big.matrix}},
  \code{\link[bigmemory]{read.big.matrix}}
 }

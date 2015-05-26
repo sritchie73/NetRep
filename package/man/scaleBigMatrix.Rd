@@ -15,8 +15,8 @@ bigMatrix.}
 an object of type \code{bigMatrix}.
 }
 \description{
-Create a new \code{\link{bigMatrix}} containing scaled gene expression. Genes
-are expected to be columns.
+Create a new \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled gene
+expression. Genes are expected to be columns.
 }
 \note{
 The caller is responsible for cleaning up the temporary directory.
