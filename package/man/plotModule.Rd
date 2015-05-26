@@ -48,7 +48,7 @@ is \code{TRUE} if gene expression for the \code{test} dataset is provided.}
 \item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names on the
 bottom axis.}
 
-\item{plotSampleNames}{logical; if \code{TRUE}, plot the sample names of the
+\item{plotSampleNames}{logical; if \code{TRUE}, plot the sample names on the
 left axis next to the summary expression profiles.}
 
 \item{plotModuleNames}{logical; if \code{TRUE}, plot the module names on the

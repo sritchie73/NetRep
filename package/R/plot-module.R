@@ -35,7 +35,7 @@
 #'  is \code{TRUE} if gene expression for the \code{test} dataset is provided.
 #' @param plotGeneNames logical; if \code{TRUE}, plot the gene names on the 
 #'  bottom axis.
-#' @param plotSampleNames logical; if \code{TRUE}, plot the sample names of the
+#' @param plotSampleNames logical; if \code{TRUE}, plot the sample names on the
 #'  left axis next to the summary expression profiles.
 #' @param plotModuleNames logical; if \code{TRUE}, plot the module names on the
 #'  bottom axis and above the summary expression profiles. By default, the 
