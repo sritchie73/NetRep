@@ -12,10 +12,11 @@ plotModule(geneExpression, coexpression, adjacency, moduleAssignments, modules,
   cex.main = 1.2)
 }
 \arguments{
-\item{geneExpression}{optional; \code{NULL} or a list of
+\item{geneExpression}{optional; a list of
 \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
 expression data for a datset of interest (see details). Columns are
-expected to be genes, rows samples.}
+expected to be genes, rows samples. If not provided, the expression,
+module membership, and summary expression will not be plotted.}
 
 \item{coexpression}{a list of 'bigMatrix' objects, each containing the gene
 coexpression for a dataset of interest (see details).}
@@ -34,58 +35,52 @@ was discovered in (see details).}
 \item{test}{name or index denoting which dataset to apply the function to
 (see details).}
 
-\item{orderSamplesBy}{one of "discovery", "test", or "none". If
-"discovery"samples are ordered by their summary expression profile in the
-\code{discovery} dataset (see \code{\link{sampleOrder}}). If "test" samples
-are ordered by their summary expression profile in the \code{test} dataset.
-If "none" no ordering is applied.}
+\item{orderSamplesBy}{one of "discovery", "test", or "none" indicating which
+dataset the function should use to order the samples (see details).}
 
-\item{orderGenesBy}{one of "discovery", "test", or "none". If "discovery"
-genes are ordered by intramodular connectivity in the \code{discovery}
-dataset. If "test" genes are orderd by intramodular connectivity in the
-\code{test} dataset. If "none" no ordering is applied.}
+\item{orderGenesBy}{one of "discovery", "test", or "none" indicating which
+dataset the function should use to order the genes (see details).}
 
-\item{orderModules}{logical; if \code{TRUE} modules ordered by similarity of
-their summary expression profiles. If \code{FALSE} modules are rendered in
-the order provided. The default is to order by modules if the gene
-expression is provided.}
+\item{orderModules}{logical; if \code{TRUE} modules will be ordered by the
+similarity of their summary expression profiles (see details). The default
+is \code{TRUE} if gene expression for the \code{test} dataset is provided.}
 
-\item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names below the
-heatmap.}
+\item{plotGeneNames}{logical; if \code{TRUE}, plot the gene names on the
+bottom axis.}
 
-\item{plotSampleNames}{logical; if \code{TRUE} the sample names will be
-plotted next to the gene expression heatmap and summary expression profile
-plots}
+\item{plotSampleNames}{logical; if \code{TRUE}, plot the sample names of the
+left axis next to the summary expression profiles.}
 
-\item{plotModuleNames}{logical; if \code{TRUE}, plot the module names below
-the heatmap. By default, module names are only plotted if multiple
-\code{modules} are provided.}
+\item{plotModuleNames}{logical; if \code{TRUE}, plot the module names on the
+bottom axis and above the summary expression profiles. By default, the
+module names are rendered only if multiple \code{modules} are specified.}
 
 \item{main}{title for the plot.}
 
-\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the bars
-in \code{plotModuleMembership}, \code{plotConnectivity}, or
-\code{plotSummaryExpression}.}
+\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the
+connectivity, module membership, and summary expression bar plots.}
 
-\item{gaxt.line}{the number of lines into the margin at which the gene
+\item{gaxt.line}{the number of lines into the bottom margin at which the gene
 names will be drawn.}
 
-\item{saxt.line}{the number of lines into the margin at which the sample
+\item{saxt.line}{the number of lines into the left margin at which the sample
 names will be drawn.}
 
-\item{maxt.line}{the number of lines into the margin at which the module
-names will be drawn.}
+\item{maxt.line}{the number of lines into the bottom margin at which the
+module names will be drawn.}
 
-\item{legend.tick.size}{size of the ticks on the axis legend.}
+\item{legend.tick.size}{size of the ticks on each axis legend relative to the
+size of the coexpression, adjacency, and gene expression heatmaps.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis
 labels, as multiple of \code{legend.tick.size}.}
 
 \item{cex.axis}{relative size of the gene and sample names.}
 
-\item{cex.lab}{relative size of the module names and legend titles.}
+\item{cex.lab}{relative size of the module names, legend titles, and axis
+labels.}
 
-\item{cex.main}{relative size of the plot titles.}
+\item{cex.main}{relative size of the plot title.}
 }
 \description{
 Plot the coexpression, adjacency, (normalised) intramodular connectivity,
@@ -192,7 +187,8 @@ Individual components of the module plot can be plotted using
   \code{cex.main} controls the relative text size of the plot title
   (specified by the \code{main} argument). \code{cex.axis} controls the
   relative text size of the gene and sample labels. \code{cex.lab} controls
-  the relative text size of the bar plot axis labels and module labels.
+  the relative text size of the bar plot axis labels, module labels, and the
+  legend titles.
 
   The rendering of gene, sample, and module names can be disabled by setting
   \code{plotGeneNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
