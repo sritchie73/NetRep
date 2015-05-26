@@ -35,6 +35,9 @@ axes if \code{values} is symettric.}
 
 \item{main}{title for the plot.}
 
+\item{plotLegend}{logical; if \code{TRUE} a legend is added to the right side of
+the plot.}
+
 \item{legend.main}{title for the legend.}
 
 \item{legend.lim}{range of values to show on the legend.}
@@ -56,9 +59,6 @@ labels, as multiple of \code{legend.tick.size}.}
 
 \item{legend.line}{the distance from the plot to render the legend as a
 proportion of the horizontal size of the plot window.}
-
-\item{legend}{logical; if \code{TRUE} a legend is added to the right side of
-the plot.}
 }
 \description{
 Plot a square heatmap

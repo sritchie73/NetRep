@@ -10,7 +10,7 @@
 #' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
 #'  plotted along the x axis.
 #' @param main title for the plot.
-#' @param legend logical; if \code{TRUE} a legend is added to the right side of
+#' @param plotLegend logical; if \code{TRUE} a legend is added to the right side of
 #'  the plot.
 #' @param legend.main title for the legend.
 #' @param legend.lim range of values to show on the legend.
@@ -135,7 +135,7 @@ plotTriangleHeatmap <- function(
 #'  plotted along the x axis if \code{values} is not symmetric, and along both
 #'  axes if \code{values} is symettric.
 #' @param main title for the plot.
-#' @param legend logical; if \code{TRUE} a legend is added to the right side of
+#' @param plotLegend logical; if \code{TRUE} a legend is added to the right side of
 #'  the plot.
 #' @param legend.main title for the legend.
 #' @param legend.lim range of values to show on the legend.
