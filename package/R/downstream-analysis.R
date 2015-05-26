@@ -475,7 +475,7 @@ networkProperties <- function(
 #' unlink("*_bm*")
 #' }
 #' 
-#' @rdname geneOrder
+#' @name geneOrder
 #' @export
 geneOrder <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
@@ -699,7 +699,7 @@ geneOrder <- function(
 #' unlink("*_bm*")
 #' }
 #' 
-#' @rdname geneOrder
+#' @name sampleOrder
 #' @export
 sampleOrder <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
