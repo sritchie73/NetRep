@@ -317,15 +317,25 @@ orderAsNumeric <- function(vec) {
   })
 }
 
-#' Return genes without ordering
+#' Get unordered genes
 #' 
-#' Used by the plotting functions to get the desired genes from dynamic user 
-#' input.
+#' Get the genes for the user specified modules in the order they appear in 
+#' the moduleAssignments vector for the discovery dataset.
 #' 
-#' @template api_inputs
+#' @param moduleAssignments a vector assigning genes to modules, or a list of 
+#'  such vectors.
+#' @param modules a vector of modules to apply the function to.
+#' @param discovery name or index denoting which dataset the module of
+#'  interest was discovered in.
+#'  
+#' @details
+#'  Genes are retrieved from the discovery dataset, rather than the test 
+#'  dataset, because some genes from the discovery dataset may not appear in
+#'  the test dataset. 
+#'  
 #' @rdname getUnsortedGenes
 getGenes <- function(
-  moduleAssignments, modules, discovery=1, test=1
+  coexpression, moduleAssignments, modules, discovery=1
 ) {
   foreach(mi = modules, .combine=c) %do% {
     names(moduleAssignments[[discovery]] %sub_in% modules)
