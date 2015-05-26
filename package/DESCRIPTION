@@ -22,7 +22,6 @@ Imports:
     RcppArmadillo,
     BH,
     RhpcBLASctl,
-    RColorBrewer,
     abind,
     RColorBrewer
 Suggests:
