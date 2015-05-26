@@ -10,7 +10,7 @@
 #' @param backingname basename (filename without an extension) the
 #'  bigMatrix object is, or will be, stored in.
 #' @param type the type of the atomic element 
-#'  (\code{options()$bigmemory.default.type} by default – "\code{double}" – 
+#'  (\code{options()$bigmemory.default.type} by default - "\code{double}" - 
 #'  but can be changed by the user to "\code{integer}", "\code{short}", or 
 #'  "\code{char}").
 #' @param row.names logical; does the first column of the file to be read in
@@ -47,7 +47,6 @@
 #' means if you later load in the data as a 'big.matrix' instead of a
 #' 'bigMatrix' the row and column names will be missing unless you convert back
 #' using \code{\link{as.big.matrix}}.
-#'
 #' 
 #' @name bigMatrix-get
 #' @seealso 

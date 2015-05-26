@@ -28,7 +28,7 @@ bigMatrix object is, or will be, stored in.}
 \item{backingpath}{directory the bigMatrix is, or will be, stored in.}
 
 \item{type}{the type of the atomic element
-(\code{options()$bigmemory.default.type} by default – "\code{double}" –
+(\code{options()$bigmemory.default.type} by default - "\code{double}" -
 but can be changed by the user to "\code{integer}", "\code{short}", or
 "\code{char}").}
 
