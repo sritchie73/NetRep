@@ -73,11 +73,7 @@
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the network properties from. These arguments are
-#'   ignored if data is provided for only one dataset. Otherwise, the function
-#'   defaults to calculating the network properties for \code{modules} from the 
-#'   first dataset specified in the list structure of \code{geneExpression}, 
-#'   \code{coexpression}, and \code{adjacency}, in that same dataset.
+#'   which dataset to test the replication/preservation of each module.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
@@ -86,7 +82,7 @@
 #'   conversion process involves writing out each matrix as a binary file on
 #'   disk, which can take a long time for large datasets. It is strongly
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
-#'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
+#'   \link{networkProperties} function, \link[=plotModule]{plotting} 
 #'   \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and 
 #'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
 #'   Further, 'bigMatrix' objects have a number of benefits, including 

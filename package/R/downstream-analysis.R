@@ -48,11 +48,8 @@
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the network properties from. These arguments are
-#'   ignored if data is provided for only one dataset. Otherwise, the function
-#'   defaults to calculating the network properties for \code{modules} from the 
-#'   first dataset specified in the list structure of \code{geneExpression}, 
-#'   \code{coexpression}, and \code{adjacency}, in that same dataset.
+#'   which dataset to calculate the network properties in. These arguments are
+#'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
@@ -363,11 +360,9 @@ networkProperties <- function(
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the network properties from. These arguments are
-#'   ignored if data is provided for only one dataset. Otherwise, the function
-#'   defaults to calculating the network properties for \code{modules} from the 
-#'   first dataset specified in the list structure of \code{geneExpression}, 
-#'   \code{coexpression}, and \code{adjacency}, in that same dataset.
+#'   which dataset to calculate the intramodular connectivity in to determine 
+#'   the ordering of genes. These arguments are ignored if data is provided for 
+#'   only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
@@ -592,11 +587,9 @@ geneOrder <- function(
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the network properties from. These arguments are
-#'   ignored if data is provided for only one dataset. Otherwise, the function
-#'   defaults to calculating the network properties for \code{modules} from the 
-#'   first dataset specified in the list structure of \code{geneExpression}, 
-#'   \code{coexpression}, and \code{adjacency}, in that same dataset.
+#'   which dataset to calculate the summary expression in for determining the
+#'   order of the samples. These arguments are ignored if data is provided for 
+#'   only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
@@ -607,7 +600,7 @@ geneOrder <- function(
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link{networkProperties} function, 
 #'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 
-#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
+#'   \link[=geneOrder]{gene} ordering also expect 'bigMatrix' objects. 
 #'   Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 

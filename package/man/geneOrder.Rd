@@ -80,11 +80,9 @@ importance within a given module \emph{(1)}.
 
   The \code{discovery} arguments specifies which dataset the \code{modules}
   of interest were discovered in, and the \code{test} argument specifies
-  which dataset to calculate the network properties from. These arguments are
-  ignored if data is provided for only one dataset. Otherwise, the function
-  defaults to calculating the network properties for \code{modules} from the
-  first dataset specified in the list structure of \code{geneExpression},
-  \code{coexpression}, and \code{adjacency}, in that same dataset.
+  which dataset to calculate the intramodular connectivity in to determine
+  the ordering of genes. These arguments are ignored if data is provided for
+  only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
