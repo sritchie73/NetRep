@@ -69,17 +69,14 @@ importance within a given module \emph{(1)}.
   Similarly, the \code{moduleAssignments} argument expects a list of named
   vectors, which contain the the module assignments for each gene in the
   respective dataset. List elements corresponding to datasets where module
-  discovery has not been performed should contain \code{NULL}. These
-  \code{NULL} elements can be excluded if the datasets are named throughout
-  the function arguments, i.e. where the \code{\link{names}} of
-  \code{geneExpression}, \code{coexpression}, and \code{adjacency} correspond
-  to the names of each dataset of interest, the names of the \code{discovery}
-  dataset can be used to look up the respective module assignments in the
-  \code{moduleAssignments} list. If module discovery has only been performed
-  in one dataset, then the list structure may be omitted. In this case, the
-  function assumes that the discovery dataset corresponds to the first list
-  element of each of the \code{geneExpression}, \code{coexpression},
-  \code{adjacency} arguments.
+  discovery has not been performed should contain \code{NULL}, unless the
+  datasets are named throughout the function arguments. I.e. where the
+  \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
+  \code{adjacency} correspond to the names of each dataset of interest, the
+  names of the \code{discovery} dataset can be used to look up the respective
+  module assignments in the \code{moduleAssignments} list. If module
+  discovery has only been performed in one dataset, then the
+  \code{moduleAssignments} will also accept a named vector.
 
   The \code{discovery} arguments specifies which dataset the \code{modules}
   of interest were discovered in, and the \code{test} argument specifies

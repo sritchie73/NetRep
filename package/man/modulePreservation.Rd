@@ -110,13 +110,13 @@ recommended. Matrix data is ideally stored in the
 \code{\link[=bigMatrix-class]{bigMatrix}} format (see details).
 }
 \details{
-\subsection{Input data:}{
+\subsection{Input data structure:}{
   The topological properties used to assess module preservation are designed
   for networks constructed using Weighted Gene Coexpression Network Analysis
-  (\pkg{WGCNA}, \emph{(3)}). These are calculated from the gene expression
+  (\pkg{\link[WGCNA]{WGCNA}}, \emph{(3)}). These are calculated from the gene expression
   for each dataset, the pairwise correlation between genes (coexpression) for
   each dataset, and the pairwise gene adjacencies (adjacency) for each
-  dataset. The adjacency is usually the absolute value of the correlation
+  dataset. The adjacency is typically the absolute value of the correlation
   raised to a power to penalise weak correlations \emph{(3)}. Module
   preservation can also be assessed on networks without the gene expression
   data, but only a limited subset of the statistics will be calculated.
@@ -125,38 +125,45 @@ recommended. Matrix data is ideally stored in the
   i.e. pathways across conditions or tissues \emph{(1)}.
 
   The arguments \code{geneExpression}, \code{coexpression}, and
-  \code{adjacency} should be lists, where each element of the list contains
-  the matrix data for one of the datasets. \code{moduleAssignments} should
-  also be a list if module discovery has been performed in more than one of
-  the datasets. The \code{discovery} argument should contain the indices of
-  the discovery dataset(s) in each of the \code{geneExpression},
-  \code{coexpression}, and \code{adjacency} arguments, and \code{test} should
-  contain the indices of the test dataset(s). For example \code{discovery=1},
-  \code{test=1} will test the preservation of modules in
-  \code{moduleAssignments[[1]]}, comparing the data stored in
-  \code{geneExpression[[1]]}, \code{coexpression[[1]]}, and
-  \code{adjacency[[1]]} to the data stored in \code{geneExpression[[2]]},
-  \code{coexpression[[2]]}, and \code{adjacency[[2]]}. If the lists are
-  named then \code{discovery} and \code{test} can instead contain the
-  respective dataset names.
+  \code{adjacency} each expect a \code{\link{list}} where each element
+  contains the matrix data for each respective dataset. This matrix data
+  should be stored as a 'bigMatrix' object (see
+  \link[=bigMatrix-get]{converting matrix data to 'bigMatrix' data}).
+  Similarly, the \code{moduleAssignments} argument expects a list of named
+  vectors, which contain the the module assignments for each gene in the
+  respective dataset. List elements corresponding to datasets where module
+  discovery has not been performed should contain \code{NULL}, unless the
+  datasets are named throughout the function arguments. I.e. where the
+  \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
+  \code{adjacency} correspond to the names of each dataset of interest, the
+  names of the \code{discovery} dataset can be used to look up the respective
+  module assignments in the \code{moduleAssignments} list. If module
+  discovery has only been performed in one dataset, then the
+  \code{moduleAssignments} will also accept a named vector.
 
-  It is \strong{strongly recommended} to store each matrix using the
-  \code{\link[=bigMatrix-class]{bigMatrix}} class. A \code{bigMatrix} is an
-  object which points to a data matrix stored on disk, which is accessible
-  via shared memory. Once stored as a 'bigMatrix', the data can be
-  instantaneously loaded in and accessed from any R session in the future.
-  Methods are provided for converting to, loading in, and writing out
-  'bigMatrix' objects (see \code{\link{bigMatrix-get}} and
-  \code{\link{bigMatrix-out}}).
-
-  Regular 'matrix' data are also accepted, but will be converted to
-  'bigMatrix' objects for the duration of the analysis. This is not
-  recommended, as the conversion process involves writing out the entire
-  matrix as a binary file on disk, which is slow for large matrices. Further,
-  other functions provided for downstream analysis (e.g. plotting functions
-  and \code{\link{networkProperties}}) also expect 'bigMatrix' objects, so
-  the conversion process will be performed each time one of those functions
-  is called.
+  The \code{discovery} arguments specifies which dataset the \code{modules}
+  of interest were discovered in, and the \code{test} argument specifies
+  which dataset to calculate the network properties from. These arguments are
+  ignored if data is provided for only one dataset. Otherwise, the function
+  defaults to calculating the network properties for \code{modules} from the
+  first dataset specified in the list structure of \code{geneExpression},
+  \code{coexpression}, and \code{adjacency}, in that same dataset.
+}
+\subsection{'bigMatrix' vs. 'matrix' input data:}{
+  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
+  data, regular 'matrix' objects are also accepted. In this case, the
+  'matrix' data is temporarily converted to 'bigMatrix' by the function. This
+  conversion process involves writing out each matrix as a binary file on
+  disk, which can take a long time for large datasets. It is strongly
+  recommended for the user to store their data as 'bigMatrix' objects, as the
+  \link{modulePreservation} function, \link[=plotModule]{plotting}
+  \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and
+  \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects.
+  Further, 'bigMatrix' objects have a number of benefits, including
+  instantaneous load time from any future R session, and parallel access from
+  mutliple independent R sessions. Methods are provided for
+  \link[=bigMatrix-get]{converting to, loading in}, and
+  \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 }
 \subsection{Memory usage:}{
   For most machines there is a trade-off between memory usage per core and
