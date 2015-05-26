@@ -273,7 +273,7 @@ getUUID <- function() {
 #' Combine null distribution calculations
 #' 
 #' @param ... any number of three dimensional arrays holding the null 
-#'   distributions calculated by \code{\link{netRepMain}}.
+#'   distributions calculated by \code{\link{modulePreservation}}.
 #'
 #' @return
 #'  A three dimensional array combined from the input. The rows correspond to

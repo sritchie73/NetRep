@@ -7,7 +7,7 @@ combineNulls(...)
 }
 \arguments{
 \item{...}{any number of three dimensional arrays holding the null
-  distributions calculated by \code{\link{netRepMain}}.}
+  distributions calculated by \code{\link{modulePreservation}}.}
 }
 \value{
 A three dimensional array combined from the input. The rows correspond to
