@@ -119,8 +119,12 @@ load.bigMatrix <- function(
   descFile <- file.path(backingpath, paste0(backingname, ".desc"))
   if (file.exists(descFile)) {
     d1 <- dget(descFile)
-    if (!is.null(d1@description$colNames) || !is.null(d1@description$rowNames)) {
-      warning("row and column names will be stripped from existing 'big.matrix'")
+    if (!is.null(d1@description$colNames) || 
+        !is.null(d1@description$rowNames)) 
+    {
+      warning(
+        "row and column names will be stripped from existing 'big.matrix'"
+      )
       rn <- d1@description$rowNames
       cn <- d1@description$colNames
       d1@description["rowNames"] <- list(NULL)
@@ -156,7 +160,9 @@ as.bigMatrix <- function(
   x, backingname, backingpath=".", type=options("bigmemory.default.type")[[1]]
 ) {
   if (class(x) == "big.matrix") 
-    stop("use load.bigMatrix to load in an existing 'big.matrix' as a 'bigMatrix")
+    stop(
+      "use load.bigMatrix to load in an existing 'big.matrix' as a 'bigMatrix"
+    )
   if (class(x) != "matrix")
     stop("Cannot convert from ", class(x), " to 'bigMatrix'")
   
