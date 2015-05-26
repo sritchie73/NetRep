@@ -219,8 +219,7 @@ read.bigMatrix <- function(
 #' \code{write.bigMatrix} will write out the data into a regularly structure file
 #' (see \code{\link[utils]{write.table}})
 #' 
-#' @rdname bigMatrix-out
-#' @export
+#' @name bigMatrix-out
 setMethod(
   "as.big.matrix", signature(x="bigMatrix"), function(x) {
     if (!file.exists(x@descriptor))

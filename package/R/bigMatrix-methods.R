@@ -1,5 +1,18 @@
-# Methods to switch between attached and detached states. Used internally to
-# switch memory usage states.
+#' Attaching and detaching a bigMatrix
+#' 
+#' In the attached state, R is aware of the \code{\link[bigmemory]{big.matrix}}
+#' pointer object. Repeated access of different parts of the matrix, i.e. 
+#' through random sampling for permutation analysis will eventually load the 
+#' entire matrix into RAM. In the detached state, R is only aware of the 
+#' location of the 'big.matrix' descriptor file, and the big.matrix is attached
+#' and removed every time its elements are requested.
+#' 
+#' @param x the bigMatrix object to attach or detach
+#' 
+#' @return
+#'  The bigMatrix object with its state updated.
+#'  
+#' @name bigMatrix-state
 attach.bigMatrix <- function(x) {
   if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
@@ -13,6 +26,7 @@ attach.bigMatrix <- function(x) {
   x
 }
 
+#' @rdname bigMatrix-state
 detach.bigMatrix <- function(x) {
   if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
@@ -43,7 +57,6 @@ is.bigMatrix <- function(x) {
 # With the exception of 'show', these simply attach the big.matrix object and
 # call the appropriate function on the matrix object.
 #-------------------------------------------------------------------------------
-#' @export
 setMethod("show", signature(object = "bigMatrix"), function(object) {
   cat(
     'An object of class "bigMatrix"\n',
@@ -57,13 +70,11 @@ setMethod("show", signature(object = "bigMatrix"), function(object) {
   } 
 })
 
-#' @export
 setMethod("print", signature(x = "bigMatrix"), function(x) {
   cat("Warning: This is not advised. Here is the head of the matrix:\n")
   head(x)
 })
 
-#' @export
 setMethod("dim", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -79,7 +90,6 @@ setMethod("dim", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @export
 setMethod("nrow", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -95,7 +105,6 @@ setMethod("nrow", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @export
 setMethod("ncol", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -111,7 +120,6 @@ setMethod("ncol", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @export
 setMethod("typeof", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -127,7 +135,6 @@ setMethod("typeof", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @export
 setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
   if (n < 1 | n > nrow(x)) 
@@ -135,7 +142,6 @@ setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
   x[1:n,]
 })
 
-#' @export
 setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
   if (n < 1 | n > nrow(x)) 
@@ -143,22 +149,18 @@ setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
   x[(nrow(x) - n + 1):nrow(x),]
 })
 
-#' @export
 setMethod("dimnames", signature(x = "bigMatrix"), function(x) {
   list(x@rownames, x@colnames)
 })
 
-#' @export
 setMethod("rownames", signature(x = "bigMatrix"), function(x) { 
   x@rownames
 })
 
-#' @export
 setMethod("colnames", signature(x = "bigMatrix"), function(x) { 
   x@colnames
 })
 
-#' @export
 setMethod("dimnames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
     if (!is.list(value))
@@ -230,7 +232,6 @@ setMethod("dimnames<-",
     x
 })
 
-#' @export
 setMethod("rownames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
     dn <- dimnames(x)
@@ -243,7 +244,6 @@ setMethod("rownames<-",
     x
 })
 
-#' @export
 setMethod("colnames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
     dn <- dimnames(x)
@@ -260,7 +260,6 @@ setMethod("colnames<-",
 #-------------------------------------------------------------------------------
 # Matrix subsetting methods
 #-------------------------------------------------------------------------------
-#' @export
 setMethod(
   "[", signature(x = "bigMatrix", i="ANY", j="ANY", drop="ANY"), 
   function(x, i, j, drop){
@@ -321,7 +320,6 @@ setMethod(
     ret
 })
 
-#' @export
 setMethod(
   "[", signature(x = "bigMatrix", i="ANY", j="missing", drop="ANY"), 
   function(x, i, j, drop){
@@ -369,7 +367,6 @@ setMethod(
     ret
 })
 
-#' @export
 setMethod(
   "[", signature(x = "bigMatrix", i="missing", j="ANY", drop="ANY"), 
   function(x, i, j, drop){
@@ -417,7 +414,6 @@ setMethod(
     ret
 })
 
-#' @export
 setMethod(
   "[", signature(x = "bigMatrix", i="missing", j="missing", drop="ANY"), 
   function(x, i, j, drop){
@@ -452,7 +448,6 @@ setMethod(
 #-------------------------------------------------------------------------------
 # Matrix assignment methods
 #-------------------------------------------------------------------------------
-#' @export
 setMethod(
   "[<-", signature(x = "bigMatrix", i="ANY", j="ANY"), 
   function(x, i, j, value){
@@ -486,7 +481,6 @@ setMethod(
     x
 })
 
-#' @export
 setMethod(
   "[<-", signature(x = "bigMatrix", i="ANY", j="missing"), 
   function(x, i, j, value){
@@ -516,7 +510,6 @@ setMethod(
     x
 })
 
-#' @export
 setMethod(
   "[<-", signature(x = "bigMatrix", i="missing", j="ANY"), 
   function(x, i, j, value){
@@ -546,7 +539,6 @@ setMethod(
     x
 })
 
-#' @export
 setMethod(
   "[<-", signature(x = "bigMatrix", i="missing", j="missing"), 
   function(x, i, j, value){
