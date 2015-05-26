@@ -335,7 +335,7 @@ orderAsNumeric <- function(vec) {
 #'  
 #' @rdname getUnsortedGenes
 getGenes <- function(
-  coexpression, moduleAssignments, modules, discovery=1
+  moduleAssignments, modules, discovery=1
 ) {
   foreach(mi = modules, .combine=c) %do% {
     names(moduleAssignments[[discovery]] %sub_in% modules)

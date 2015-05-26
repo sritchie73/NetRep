@@ -3,7 +3,7 @@
 \alias{getGenes}
 \title{Get unordered genes}
 \usage{
-getGenes(coexpression, moduleAssignments, modules, discovery = 1)
+getGenes(moduleAssignments, modules, discovery = 1)
 }
 \arguments{
 \item{moduleAssignments}{a vector assigning genes to modules, or a list of
