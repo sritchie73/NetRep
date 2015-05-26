@@ -14,19 +14,7 @@
 #'   }
 #' @rdname AdjProps-cpp
 AdjProps <- function(pAdjacency, subsetIndices) {
-    .Call('netrep_AdjProps', PACKAGE = 'netrep', pAdjacency, subsetIndices)
-}
-
-#' Check the elements of a `big.matrix`
-#' 
-#' Are all the values finite? 
-#' 
-#' @param pDat SEXP container for the pointer to the 
-#'   \code{\link[bigmemory]{big.matrix}} to be checked.
-#'
-#' @rdname chekcFinite-cpp
-CheckFinite <- function(pDat) {
-    invisible(.Call('netrep_CheckFinite', PACKAGE = 'netrep', pDat))
+    .Call('fastModPres_AdjProps', PACKAGE = 'fastModPres', pAdjacency, subsetIndices)
 }
 
 #' Calculate the Correlation of Coexpression and Mean Sign-Aware Coexpression
@@ -63,7 +51,42 @@ CheckFinite <- function(pDat) {
 #'  }
 #' @rdname CoexpStats-cpp
 CoexpStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
-    .Call('netrep_CoexpStats', PACKAGE = 'netrep', pCoexpD, discIndices, pCoexpT, testIndices)
+    .Call('fastModPres_CoexpStats', PACKAGE = 'fastModPres', pCoexpD, discIndices, pCoexpT, testIndices)
+}
+
+#' Get the range of a big.matrix
+#' 
+#' @description
+#'  \code{RangeSubset}: get the range of values in the column-subset of a 
+#'  big.matrix.
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#'   
+#' @rdname range-cpp
+RangeSubset <- function(pDat, subsetIndices) {
+    .Call('fastModPres_RangeSubset', PACKAGE = 'fastModPres', pDat, subsetIndices)
+}
+
+#' @name range-cpp
+#' @description
+#'   \code{BigRange}: get the range of values in a big.matrix
+#' 
+BigRange <- function(pDat) {
+    .Call('fastModPres_BigRange', PACKAGE = 'fastModPres', pDat)
+}
+
+#' Check the elements of a `big.matrix`
+#' 
+#' Are all the values finite? 
+#' 
+#' @param pDat SEXP container for the pointer to the 
+#'   \code{\link[bigmemory]{big.matrix}} to be checked.
+#'
+#' @rdname chekcFinite-cpp
+CheckFinite <- function(pDat) {
+    invisible(.Call('fastModPres_CheckFinite', PACKAGE = 'fastModPres', pDat))
 }
 
 #' Network subset eigenvector and proportion of variance explained in C++
@@ -116,30 +139,7 @@ CoexpStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
 #' @rdname dataProps-cpp
 #'  
 DataProps <- function(pDat, subsetIndices) {
-    .Call('netrep_DataProps', PACKAGE = 'netrep', pDat, subsetIndices)
-}
-
-#' Get the range of a big.matrix
-#' 
-#' @description
-#'  \code{RangeSubset}: get the range of values in the column-subset of a 
-#'  big.matrix.
-#' 
-#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#'   
-#' @rdname range-cpp
-RangeSubset <- function(pDat, subsetIndices) {
-    .Call('netrep_RangeSubset', PACKAGE = 'netrep', pDat, subsetIndices)
-}
-
-#' @name range-cpp
-#' @description
-#'   \code{BigRange}: get the range of values in a big.matrix
-#' 
-BigRange <- function(pDat) {
-    .Call('netrep_BigRange', PACKAGE = 'netrep', pDat)
+    .Call('fastModPres_DataProps', PACKAGE = 'fastModPres', pDat, subsetIndices)
 }
 
 #' Scale a matrix by its rows
@@ -150,6 +150,6 @@ BigRange <- function(pDat) {
 #'   will be stored in.
 #' @rdname scale-cpp
 Scale <- function(pDat, spDat) {
-    invisible(.Call('netrep_Scale', PACKAGE = 'netrep', pDat, spDat))
+    invisible(.Call('fastModPres_Scale', PACKAGE = 'fastModPres', pDat, spDat))
 }
 
