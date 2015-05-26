@@ -1,4 +1,5 @@
 context("Testing bigMatrix implementation")
+library(bigmemory)
 
 test_that("Testing with no column and rownames", {
   m1 <- matrix(1:9.0, nrow=3)

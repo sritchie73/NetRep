@@ -1,5 +1,7 @@
 context("Testing C++ S4 Method Extensions for big.matrix")
 
+library(bigmemory)
+
 # Complete Adjacency
 adj <- matrix(rnorm(100), 10, 10)
 adjPtr <- as.big.matrix(adj)
@@ -11,41 +13,37 @@ ns2 <- matrix(rnorm(30), 10)
 ns2Ptr <- as.big.matrix(ns2)
 
 test_that("scaleBigMatrix is correct", {
-  on.exit(unlink(c("*.bin", "*.desc")))
   m <- matrix(1:9, 3)
-  as.big.matrix(
-    m, type="double", backingfile="tmp.bin", descriptorfile="tmp.desc"
-  )
-  s <- scaleBigMatrix("tmp.desc", ".")
-  scaled <- attach.big.matrix(s)
-  expect_equivalent(scaled[,], scale(m))
+  bm <- as.bigMatrix(m, "tmp1")
+  s <- scaleBigMatrix(bm, ".")
+  expect_equivalent(s[,], scale(m))
 })
 
 test_that("checkFinite is correct", {
-  on.exit(unlink(c("*.bin", "*.desc")))
-  set.seed(1)
   options(bigmemory.typecast.warning=FALSE)
-  m1 <- matrix(sample(c(1:4, NA), 9, TRUE), 3)
-  m2 <- matrix(sample(c(1:4, Inf), 9, TRUE), 3)
-  m3 <- matrix(sample(c(1:4, NaN), 9, TRUE), 3)
-  m4 <- matrix(sample(c(1:4), 9, TRUE), 3)
+  set.seed(1)
+  m1 <- matrix(sample(c(1:2, NA), 9, TRUE), 3)
+  m2 <- matrix(sample(c(1:2, Inf), 9, TRUE), 3)
+  m3 <- matrix(sample(c(1:2, NaN), 9, TRUE), 3)
+  m4 <- matrix(sample(c(1:2), 9, TRUE), 3)
   types <- c("char", "short", "integer", "double")
   for (i in 1:4) {
-    as.big.matrix(
-      m1, type=types[i], backingfile="tmp1.bin", descriptorfile="tmp1.desc"
-    )
-    as.big.matrix(
-      m4, type=types[i], backingfile="tmp4.bin", descriptorfile="tmp4.desc"
-    )
-    expect_error(checkFinite("tmp1.desc"))
-    expect_null(checkFinite("tmp4.desc"))
+    bm1 <- as.bigMatrix(m1, "tmp1", type=types[i])
+    bm4 <- as.bigMatrix(m4, "tmp4", type=types[i])
+    expect_error(checkFinite(bm1))
+    expect_null(checkFinite(bm4))
   }
-  bigm2 <- as.big.matrix(
-    m2, type="double", backingfile="tmp2.bin", descriptorfile="tmp2.desc"
-  )
-  bigm3 <- as.big.matrix(
-    m3, type="double", backingfile="tmp3.bin", descriptorfile="tmp3.desc"
-  )
-  expect_error(checkFinite("tmp2.desc"))
-  expect_error(checkFinite("tmp3.desc"))
+  bm2 <- as.bigMatrix(m2, "tmp2")
+  bm3 <- as.bigMatrix(m3, "tmp3")
+  expect_error(checkFinite(bm2))
+  expect_error(checkFinite(bm3))
 })
+
+test_that("rangeBigMatrix is correct", {
+  m1 <- matrix(rnorm(30), ncol=10)
+  bm1 <- as.bigMatrix(m1, "tmp")
+  expect_equivalent(rangeBigMatrix(bm1), range(m1))
+  expect_equivalent(rangeBigMatrix(bm1, c(2,4,5,1)), range(m1[,c(2,4,5,1)]))
+})
+
+unlink(c("tmp*", "scaled*"))

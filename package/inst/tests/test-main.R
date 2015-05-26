@@ -1,5 +1,4 @@
 context("Testing Main Routine...")
-library(netrep)
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
 
@@ -30,7 +29,8 @@ test_that("Network properties function runs without error", {
 
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
-    exprSets, coexpSets, adjSets, moduleAssignments, 1, 2
+    exprSets, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10, 
+    keepNulls=TRUE, lowmem=FALSE
   )
   expect_equal(dim(res1$nulls), c(7, 7, 10))
   expect_equal(dim(res1$observed), c(7, 7))
@@ -38,7 +38,8 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(length(res1$propGenesPresent), 7)
   expect_equal(length(res1$nGenesPresent), 7)
   res2 <- modulePreservation(
-    NULL, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10
+    NULL, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10,
+    keepNulls=TRUE, lowmem=FALSE
   )
   expect_equal(dim(res2$nulls), c(7, 4, 10))
   expect_equal(dim(res2$observed), c(7, 4))
@@ -50,7 +51,7 @@ test_that("Main routine runs and produces sane output", {
   names(moduleAssignments[[2]]) <- gn2
   res1 <- modulePreservation(
     exprSets, coexpSets, rev(adjSets), moduleAssignments, "a", "b", nPerm=10,
-    includeModules=c(1,2,3)
+    includeModules=c(1,2,3), keepNulls=TRUE, lowmem=FALSE
   )
 })
 unlink('tmp*')
