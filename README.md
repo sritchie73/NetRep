@@ -1,4 +1,5 @@
-# Fast permutation procedure for testing network module replication
+# fastModPres
+##### Fast permutation procedure for testing network module replication
 
 An R package containing functions for assessing the replication/preservation of 
 network topology for weighted gene coexpression network modules in one or more
