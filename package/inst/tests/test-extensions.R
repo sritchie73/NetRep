@@ -1,17 +1,5 @@
 context("Testing C++ S4 Method Extensions for big.matrix")
 
-library(bigmemory)
-
-# Complete Adjacency
-adj <- matrix(rnorm(100), 10, 10)
-adjPtr <- as.big.matrix(adj)
-
-# Non square matrix
-ns <- matrix(rnorm(30), 3)
-nsPtr <- as.big.matrix(ns)
-ns2 <- matrix(rnorm(30), 10)
-ns2Ptr <- as.big.matrix(ns2)
-
 test_that("scaleBigMatrix is correct", {
   m <- matrix(1:9, 3)
   bm <- as.bigMatrix(m, "tmp1")

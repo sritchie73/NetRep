@@ -20,17 +20,18 @@ test_that("Network properties function runs without error", {
       exprSets, coexpSets, adjSets, moduleAssignments, modules="1"
     ), "list"
   )
-  expect_is(
-    networkProperties(
-      exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10]
-    ), "list"
+  sink("tmp.log") # ignore warnings
+  props <- networkProperties(
+    exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10]
   )
+  sink()
+  expect_is(props, "list")
 })
 
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10, 
-    keepNulls=TRUE, lowmem=FALSE
+    keepNulls=TRUE, lowmem=FALSE, verbose=FALSE
   )
   expect_equal(dim(res1$nulls), c(7, 7, 10))
   expect_equal(dim(res1$observed), c(7, 7))
@@ -39,7 +40,7 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(length(res1$nGenesPresent), 7)
   res2 <- modulePreservation(
     NULL, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10,
-    keepNulls=TRUE, lowmem=FALSE
+    keepNulls=TRUE, lowmem=FALSE, verbose=FALSE
   )
   expect_equal(dim(res2$nulls), c(7, 4, 10))
   expect_equal(dim(res2$observed), c(7, 4))
@@ -51,7 +52,7 @@ test_that("Main routine runs and produces sane output", {
   names(moduleAssignments[[2]]) <- gn2
   res1 <- modulePreservation(
     exprSets, coexpSets, rev(adjSets), moduleAssignments, "a", "b", nPerm=10,
-    includeModules=c(1,2,3), keepNulls=TRUE, lowmem=FALSE
+    includeModules=c(1,2,3), keepNulls=TRUE, lowmem=FALSE, verbose=FALSE
   )
 })
 unlink('tmp*')

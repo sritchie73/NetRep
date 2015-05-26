@@ -21,7 +21,8 @@ test_that("Testing with no column and rownames", {
   # Test casting to and from big.matrix
   d2 <- as.big.matrix(d1)
   expect_identical(d2[,], d1[,])
-  d3 <- load.bigMatrix("tmp1") # Test loading from a "big.matrix"
+  # Test loading from a "big.matrix"
+  d3 <- load.bigMatrix("tmp1")
   expect_identical(d3, d1)
   # Make sure the row and column names are put in the right files
   d4 <- load.bigMatrix("tmp1")
@@ -56,7 +57,8 @@ test_that("Testing with rownames only", {
   # Test casting to and from big.matrix
   d2 <- as.big.matrix(d1)
   expect_identical(d2[,], d1[,])
-  d3 <- load.bigMatrix("tmp2") # Test loading from a "big.matrix"
+  # Test loading from a "big.matrix"
+  expect_warning(d3 <- load.bigMatrix("tmp2")) 
   expect_identical(d3, d1)
   # Make sure the row and column names are put in the right files
   d4 <- load.bigMatrix("tmp2")
@@ -91,7 +93,8 @@ test_that("Testing with colnames only", {
   # Test casting to and from big.matrix
   d2 <- as.big.matrix(d1)
   expect_identical(d2[,], d1[,])
-  d3 <- load.bigMatrix("tmp3") # Test loading from a "big.matrix"
+  # Test loading from a "big.matrix"
+  expect_warning(d3 <- load.bigMatrix("tmp3")) 
   expect_identical(d3, d1)
   # Make sure the row and column names are put in the right files
   d4 <- load.bigMatrix("tmp3")
@@ -127,7 +130,8 @@ test_that("Testing with both row and column names", {
   # Test casting to and from big.matrix
   d2 <- as.big.matrix(d1)
   expect_identical(d2[,], d1[,])
-  d3 <- load.bigMatrix("tmp4") # Test loading from a "big.matrix"
+  # Test loading from a "big.matrix"
+  expect_warning(d3 <- load.bigMatrix("tmp4")) 
   expect_identical(d3, d1)
   # Make sure the row and column names are put in the right files
   d4 <- load.bigMatrix("tmp4")
