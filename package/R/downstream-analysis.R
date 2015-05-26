@@ -12,7 +12,7 @@
 #' @param adjacency a list of 'bigMatrix' objects, each containing the gene
 #'   adjacencies for a dataset of interest (see details).
 #' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   in each dataset of interest (see details).
+#'   for each datast of interest (see details).
 #' @param modules a vector of modules to apply the function to (see details).
 #' @param discovery name or index denoting which dataset the module of interest
 #'   was discovered in (see details).
@@ -34,12 +34,20 @@
 #'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
 #'   will also each accept a single 'bigMatrix' object.
 #'   
-#'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors assigning genes to modules in each dataset module discovery has 
-#'   been performed in. Alternatively, a named vector is also accepted for cases
-#'   where module discovery has been performed in only one dataset. 
-#'   If \code{moduleAssignments} is not specified, then the network properties
-#'   will be calculated for all genes in the specified dataset(s).
+#'   Similarly, the \code{moduleAssignments} argument expects a list of named 
+#'   vectors, which contain the the module assignments for each gene in the 
+#'   respective dataset. List elements corresponding to datasets where module 
+#'   discovery has not been performed should contain \code{NULL}. These 
+#'   \code{NULL} elements can be excluded if the datasets are named throughout 
+#'   the function arguments, i.e. where the \code{\link{names}} of 
+#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} correspond
+#'   to the names of each dataset of interest, the names of the \code{discovery}
+#'   dataset can be used to look up the respective module assignments in the
+#'   \code{moduleAssignments} list. If module discovery has only been performed
+#'   in one dataset, then the list structure may be omitted. In this case, the
+#'   function assumes that the discovery dataset corresponds to the first list
+#'   element of each of the \code{geneExpression}, \code{coexpression},
+#'   \code{adjacency} arguments.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
@@ -314,7 +322,7 @@ networkProperties <- function(
 #' @param adjacency a list of 'bigMatrix' objects, each containing the gene
 #'   adjacencies for a dataset of interest (see details).
 #' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   in each dataset of interest (see details).
+#'   for each datast of interest (see details).
 #' @param modules a vector of modules to apply the function to (see details).
 #' @param discovery name or index denoting which dataset the module of interest
 #'   was discovered in (see details).
@@ -344,12 +352,20 @@ networkProperties <- function(
 #'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
 #'   will also each accept a single 'bigMatrix' object.
 #'   
-#'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors assigning genes to modules in each dataset module discovery has 
-#'   been performed in. Alternatively, a named vector is also accepted for cases
-#'   where module discovery has been performed in only one dataset. 
-#'   If \code{moduleAssignments} is not specified, then the network properties
-#'   will be calculated for all genes in the specified dataset(s).
+#'   Similarly, the \code{moduleAssignments} argument expects a list of named 
+#'   vectors, which contain the the module assignments for each gene in the 
+#'   respective dataset. List elements corresponding to datasets where module 
+#'   discovery has not been performed should contain \code{NULL}. These 
+#'   \code{NULL} elements can be excluded if the datasets are named throughout 
+#'   the function arguments, i.e. where the \code{\link{names}} of 
+#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} correspond
+#'   to the names of each dataset of interest, the names of the \code{discovery}
+#'   dataset can be used to look up the respective module assignments in the
+#'   \code{moduleAssignments} list. If module discovery has only been performed
+#'   in one dataset, then the list structure may be omitted. In this case, the
+#'   function assumes that the discovery dataset corresponds to the first list
+#'   element of each of the \code{geneExpression}, \code{coexpression},
+#'   \code{adjacency} arguments.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
@@ -541,7 +557,7 @@ geneOrder <- function(
 #' @param adjacency a list of 'bigMatrix' objects, each containing the gene
 #'   adjacencies for a dataset of interest (see details).
 #' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   in each dataset of interest (see details).
+#'   for each datast of interest (see details).
 #' @param modules a vector of modules to apply the function to (see details).
 #' @param discovery name or index denoting which dataset the module of interest
 #'   was discovered in (see details).
@@ -568,12 +584,20 @@ geneOrder <- function(
 #'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
 #'   will also each accept a single 'bigMatrix' object.
 #'   
-#'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors assigning genes to modules in each dataset module discovery has 
-#'   been performed in. Alternatively, a named vector is also accepted for cases
-#'   where module discovery has been performed in only one dataset. 
-#'   If \code{moduleAssignments} is not specified, then the network properties
-#'   will be calculated for all genes in the specified dataset(s).
+#'   Similarly, the \code{moduleAssignments} argument expects a list of named 
+#'   vectors, which contain the the module assignments for each gene in the 
+#'   respective dataset. List elements corresponding to datasets where module 
+#'   discovery has not been performed should contain \code{NULL}. These 
+#'   \code{NULL} elements can be excluded if the datasets are named throughout 
+#'   the function arguments, i.e. where the \code{\link{names}} of 
+#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} correspond
+#'   to the names of each dataset of interest, the names of the \code{discovery}
+#'   dataset can be used to look up the respective module assignments in the
+#'   \code{moduleAssignments} list. If module discovery has only been performed
+#'   in one dataset, then the list structure may be omitted. In this case, the
+#'   function assumes that the discovery dataset corresponds to the first list
+#'   element of each of the \code{geneExpression}, \code{coexpression},
+#'   \code{adjacency} arguments.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
@@ -584,11 +608,11 @@ geneOrder <- function(
 #'   \code{coexpression}, and \code{adjacency}, in that same dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
-#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+#'   data, regular 'matrix' objects are also accepted. In this case, the 
 #'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-#'   conversion process involves writing out each matrix as a binary file on
-#'   disk, which can take a long time for large datasets. It is strongly
+#'   conversion process involves writing out each matrix as a binary file on 
+#'   disk, which can take a long time for large datasets. It is strongly 
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link{networkProperties} function, 
 #'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 

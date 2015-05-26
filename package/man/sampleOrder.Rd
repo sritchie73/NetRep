@@ -19,7 +19,7 @@ coexpression for a dataset of interest (see details).}
 adjacencies for a dataset of interest (see details).}
 
 \item{moduleAssignments}{a list of named vectors assigning genes to modules
-in each dataset of interest (see details).}
+for each datast of interest (see details).}
 
 \item{modules}{a vector of modules to apply the function to (see details).}
 
@@ -62,11 +62,19 @@ importance within a given module \emph{(1)}.
   will also each accept a single 'bigMatrix' object.
 
   Similarly, the \code{moduleAssignments} argument expects a list of named
-  vectors assigning genes to modules in each dataset module discovery has
-  been performed in. Alternatively, a named vector is also accepted for cases
-  where module discovery has been performed in only one dataset.
-  If \code{moduleAssignments} is not specified, then the network properties
-  will be calculated for all genes in the specified dataset(s).
+  vectors, which contain the the module assignments for each gene in the
+  respective dataset. List elements corresponding to datasets where module
+  discovery has not been performed should contain \code{NULL}. These
+  \code{NULL} elements can be excluded if the datasets are named throughout
+  the function arguments, i.e. where the \code{\link{names}} of
+  \code{geneExpression}, \code{coexpression}, and \code{adjacency} correspond
+  to the names of each dataset of interest, the names of the \code{discovery}
+  dataset can be used to look up the respective module assignments in the
+  \code{moduleAssignments} list. If module discovery has only been performed
+  in one dataset, then the list structure may be omitted. In this case, the
+  function assumes that the discovery dataset corresponds to the first list
+  element of each of the \code{geneExpression}, \code{coexpression},
+  \code{adjacency} arguments.
 
   The \code{discovery} arguments specifies which dataset the \code{modules}
   of interest were discovered in, and the \code{test} argument specifies
