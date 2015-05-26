@@ -216,10 +216,21 @@ read.bigMatrix <- function(
 #' \code{as.big.matrix} converts to a \code{\link[bigmemory]{big.matrix}}
 #' object.
 #' \code{as.matrix} converts to a \code{\link[base]{matrix}} object.
-#' \code{write.bigMatrix} will write out the data into a regularly structure file
-#' (see \code{\link[utils]{write.table}})
+#' \code{write.bigMatrix} will write out the data into a regularly structure
+#' file (see \code{\link[utils]{write.table}})
 #' 
 #' @name bigMatrix-out
+#' @export
+write.bigMatrix <- function(x, file, ...) {
+  write.table(x=x[,], file, ...)
+}
+
+#' @rdname bigMatrix-out
+setMethod("as.matrix", signature(x="bigMatrix"), function(x) {
+  x[,]
+})
+
+#' @rdname bigMatrix-out
 setMethod(
   "as.big.matrix", signature(x="bigMatrix"), function(x) {
     if (!file.exists(x@descriptor))
@@ -239,17 +250,3 @@ setMethod(
     unlink(cnFile)
     
     bigmemory::attach.big.matrix(x@descriptor)
-})
-
-#' @rdname bigMatrix-out
-#' @export
-setMethod("as.matrix", signature(x="bigMatrix"), function(x) {
-  x[,]
-})
-
-#' @rdname bigMatrix-out
-#' @export
-write.bigMatrix <- function(x, file, ...) {
-  write.table(x=x[,], file, ...)
-}
-
