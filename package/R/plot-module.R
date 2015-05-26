@@ -165,12 +165,12 @@
 #' }
 #' 
 #' @seealso
-#' \code{\link{plotCoexpression}} 
-#' \code{\link{plotAdjacency}}
-#' \code{\link{plotConnectivity}}
-#' \code{\link{plotModuleMembership}}
-#' \code{\link{plotExpression}}
-#' \code{\link{plotSummaryExpression}}
+#' \code{\link{plotCoexpression}}, 
+#' \code{\link{plotAdjacency}},
+#' \code{\link{plotConnectivity}},
+#' \code{\link{plotModuleMembership}},
+#' \code{\link{plotExpression}}, and
+#' \code{\link{plotSummaryExpression}}.
 #'  
 #' @references
 #' \enumerate{
