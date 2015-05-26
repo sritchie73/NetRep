@@ -1,7 +1,30 @@
 #' Plot the topology of a gene coexpression module
 #' 
-#' Plot the topology of one or more network modules. 
+#' @description 
+#' Plot the coexpression, adjacency, (normalised) intramodular connectivity, 
+#' module membership, gene expression, and summary expression profiles of one or
+#' more network modules in the discovery dataset or independent test dataset.
 #' 
+#' Individual components of the module plot can be plotted using 
+#' \code{\link{plotCoexpression}}, \code{\link{plotAdjacency}}, 
+#' \code{\link{plotConnectivity}}, \code{\link{plotModuleMembership}}, 
+#' \code{\link{plotExpression}}, and \code{\link{plotSummaryExpression}}.
+#' 
+#' @param geneExpression optional; \code{NULL} or a list of 
+#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
+#'   expression data for a datset of interest (see details). Columns are
+#'   expected to be genes, rows samples.
+#' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
+#'   coexpression for a dataset of interest (see details).
+#' @param adjacency a list of 'bigMatrix' objects, each containing the gene
+#'   adjacencies for a dataset of interest (see details).
+#' @param moduleAssignments a list of named vectors assigning genes to modules 
+#'   in each dataset of interest (see details).
+#' @param modules a vector of modules to apply the function to (see details).
+#' @param discovery name or index denoting which dataset the module of interest
+#'   was discovered in (see details).
+#' @param test name or index denoting which dataset to apply the function to 
+#'   (see details).
 #' @param orderGenesBy one of "discovery", "test", or "none". If "discovery"
 #'   genes are ordered by intramodular connectivity in the \code{discovery}
 #'   dataset. If "test" genes are orderd by intramodular connectivity in the
@@ -24,20 +47,225 @@
 #'   the heatmap. By default, module names are only plotted if multiple
 #'   \code{modules} are provided.
 #' @param main title for the plot.
-#' @param symmetric logical; if \code{TRUE} the coexpression and adjacecny 
-#'  heatmaps will be plotted as symmetric heatmaps, if \code{FALSE} the will be 
-#'  plotted as a triangular heatmap.
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
 #'  in \code{plotModuleMembership}, \code{plotConnectivity}, or
 #'  \code{plotSummaryExpression}.
+#' @param gaxt.line the number of lines into the margin at which the gene
+#'  names will be drawn.
+#' @param saxt.line the number of lines into the margin at which the sample
+#'  names will be drawn.
+#' @param maxt.line the number of lines into the margin at which the module 
+#'  names will be drawn.
+#' @param legend.tick.size size of the ticks on the axis legend.
+#' @param laxt.line the distance from the legend to render the legend axis 
+#'  labels, as multiple of \code{legend.tick.size}.
 #' @param cex.axis relative size of the gene and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.
 #' 
-#' @seealso \code{\link[=plotTopology]{Functions}} for plotting individual
-#'  components of the module topology plot.
+#' @details
+#'  \subsection{Input data structure:}{
+#'   This function allows for input data formatted in a number of ways. Where 
+#'   there are multiple datasets of interest (e.g. multiple tissues, or a 
+#'   discovery dataset and an independent test dataset) the arguments 
+#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+#'   \code{\link[=list]{lists}} where each element contains the matrix data for 
+#'   each respective dataset. This matrix data should be stored as a 'bigMatrix'
+#'   object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
+#'   data}). Alternatively, if only one dataset is of interest, the
+#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
+#'   will also each accept a single 'bigMatrix' object.
+#'   
+#'   Similarly, the \code{moduleAssignments} argument expects a list of named
+#'   vectors, which contain the the module assignments for each gene in the
+#'   respective dataset. List elements corresponding to datasets where module
+#'   discovery has not been performed should contain \code{NULL}, unless the
+#'   datasets are named throughout the function arguments. I.e. where the
+#'   \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
+#'   \code{adjacency} correspond to the names of each dataset of interest, the
+#'   names of the \code{discovery} dataset can be used to look up the respective
+#'   module assignments in the \code{moduleAssignments} list. If module
+#'   discovery has only been performed in one dataset, then the
+#'   \code{moduleAssignments} will also accept a named vector.
+#'   
+#'   The \code{discovery} arguments specifies which dataset the \code{modules} 
+#'   of interest were discovered in, and the \code{test} argument specifies 
+#'   which dataset to plot those module(s) in. The \code{orderGenesBy} and
+#'   \code{orderSamplesBy} arguments control how genes and samples are ordered
+#'   on the plot. These arguments are ignored if data is provided for only one 
+#'   dataset.
+#' }
+#' \subsection{'bigMatrix' vs. 'matrix' input data:}{
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
+#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
+#'   conversion process involves writing out each matrix as a binary file on
+#'   disk, which can take a long time for large datasets. It is strongly
+#'   recommended for the user to store their data as 'bigMatrix' objects, as the
+#'   \link{modulePreservation} function, \link{networkProperties} function,
+#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions},
+#'   \link[=geneOrder]{gene} and \link[=sampleOrder]{sample} ordering also
+#'   expect 'bigMatrix' objects. Further, 'bigMatrix' objects have a number of
+#'   benefits, including instantaneous load time from any future R session, and
+#'   parallel access from mutliple independent R sessions. Methods are provided
+#'   for \link[=bigMatrix-get]{converting to, loading in}, and 
+#'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
+#' }
+#' \subsection{Gene and sample ordering:}{
+#'   By default, genes are ordered in decreasing order of intramodular 
+#'   connectivity in the \code{discovery} dataset (see \code{\link{geneOrder}}). 
+#'   This facilitates the visual comparison of modules across datasets, as the 
+#'   gene ordering will be preserved. Missing genes are colored in grey. This 
+#'   behaviour can be change by setting \code{orderGenesBy} to "test", in which
+#'   cases genes will be ordered in decreasing order of intramodular 
+#'   connectivity in the discovery dataset. Alternatively \code{orderGenesBy}
+#'   can be set to "none", in which case genes are rendered in the order they
+#'   appear in the discovery dataset.
+#'   
+#'   When multiple modules are specified, modules are ordered by the similarity
+#'   of their summary expression profiles in the \code{orderGenesBy} dataset. 
+#'   To disable this behaviour, set \code{orderModules} to \code{FALSE}.
+#'   
+#'   By default, samples are ordered in descending order of the summary 
+#'   expression profile for the left-most module appearing on the plot (see 
+#'   \code{\link{sampleOrder}}. By default, the summary expression profile is
+#'   calculated in the \code{test} dataset. This behaviour can be changed
+#'   through the \code{orderSamplesBy} argument, however setting
+#'   \code{orderSamplesBy} to "discovery" will only work if samples are present
+#'   in both datasets.
+#' }
+#' \subsection{Normalised intramodular connectivity:}{
+#'   The gene connectivity is normalised by the maximum connectivity in any 
+#'   given module when rendered on the bar plot. This facilitates visual 
+#'   comparison on genes within a module when multiple modules of differing 
+#'   sizes or densities are rendered. Further, although the relative
+#'   intramodular connectivity provides information about a genes biological
+#'   importance to a module \emph{(1)}, the numeric value is meaningless.
+#'   Normalising the connectivity is therefore useful for visual inspection.
+#' }
+#' \subsection{Plot customisation:}{
+#'   Although reasonable default values for most parameters have been provided,
+#'   the rendering of axes and titles may need adjusting depending on the size
+#'   of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
+#'   \code{maxt.line}, and \code{laxt.line} control the distance from each plot
+#'   window that the gene labels, sample labels, module labels, and legend 
+#'   labels are rendered. 
+#'   
+#'   \code{legend.tick.size} controls the length of the 
+#'   axis ticks on each of the legends relative to the coexpression, adjacency,
+#'   and gene expression plot windows. 
+#'   
+#'   \code{cex.main} controls the relative text size of the plot title
+#'   (specified by the \code{main} argument). \code{cex.axis} controls the
+#'   relative text size of the gene and sample labels. \code{cex.lab} controls
+#'   the relative text size of the bar plot axis labels and module labels.
+#'   
+#'   The rendering of gene, sample, and module names can be disabled by setting
+#'   \code{plotGeneNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
+#'   \code{FALSE}.
+#'   
+#'   The \code{drawBorders} argument controls whether borders are drawn around
+#'   the connectivity, module membership, or summary expression bar plots.
+#' }
+#' 
+#' @seealso
+#' \code{\link{plotCoexpression}} 
+#' \code{\link{plotAdjacency}}
+#' \code{\link{plotConnectivity}}
+#' \code{\link{plotModuleMembership}}
+#' \code{\link{plotExpression}}
+#' \code{\link{plotSummaryExpression}}
 #'  
-#' @rdname plotModule
+#' @references
+#' \enumerate{
+#'    \item{
+#'      Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
+#'      selection better than standard meta-analysis?} PLoS One \strong{8}, 
+#'      e61505 (2013).
+#'    }
+#' }
+#' 
+#' @examples
+#' \dontrun{
+#' ## Create some example data
+#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geA) <- paste0("Gene_", 1:100)
+#' rownames(geA) <- paste0("CohortA_", 1:50)
+#' coexpA <- cor(geA) # coexpression
+#' adjA <- abs(coexpA)^5 # adjacency
+#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
+#' names(moduleAssignments) <- paste0("Gene_", 1:100)
+#' 
+#' # Create bigMatrix objects for each matrix.
+#' geA <- as.bigMatrix(geA, "geA_bm")
+#' coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
+#' adjA <- as.bigMatrix(adjA, "adjA_bm")
+#' 
+#' ## Example 1: Plot Module 2 in cohort A.
+#' plotModule(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' 
+#' ## Example 2: Plot an arbitrary set of genes in cohort A
+#' plotModule(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' 
+#' ## Example 3: Plot the topology of two adipose tissue modules in the liver
+#' ## tissue data 
+#' 
+#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geAdipose) <- paste0("Gene_", 1:100)
+#' rownames(geAdipose) <- paste0("Sample_", 1:50)
+#' coexpAdipose <- cor(geAdipose) # coexpression
+#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
+#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
+#' names(adiposeModules) <- paste0("Gene_", 1:100)
+#' 
+#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geLiver) <- paste0("Gene_", 1:100)
+#' rownames(geLiver) <- paste0("Sample_", 1:50)
+#' coexpLiver <- cor(geLiver) # coexpression
+#' adjLiver <- abs(coexpLiver)^6 # adjacency
+#' liverModules <- sample(0:12, size=100, replace=TRUE)
+#' names(liverModules) <- paste0("Gene_", 1:100)
+#'
+#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
+#' colnames(geHeart) <- paste0("Gene_", 1:100)
+#' rownames(geHeart) <- paste0("Sample_", 1:50)
+#' coexpHeart <- cor(geHeart) # coexpression
+#' adjHeart <- abs(coexpHeart)^4 # adjacency
+#' heartModules <- sample(0:5, size=100, replace=TRUE)
+#' names(heartModules) <- paste0("Gene_", 1:100)
+#' 
+#' # Store each input type as a list, where each element corresponds
+#' # to one of the datasets
+#' geneExpression <- list(
+#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
+#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
+#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
+#' )
+#' coexpression <- list(
+#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
+#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
+#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
+#' )
+#' adjacency <- list(
+#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
+#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
+#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
+#' )
+#' moduleAssignments <- list(
+#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
+#' )
+#' 
+#' # Show the plot
+#' plotModule(
+#'   geneExpression, coexpression, adjacency, moduleAssignments,
+#'   modules=c("3", "7"), discovery="adipose", test="liver"
+#' )
+#' 
+#' # clean up bigMatrix files from examples
+#' unlink("*_bm*")
+#' }
+#' 
+#' @name plotModule
 #' @export
 plotModule <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
@@ -389,9 +617,7 @@ plotModule <- function(
       moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
       xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, legend.tick.size=legend.tick.size/4,
-      laxt.line=laxt.line, legend.line=0.1*1.5, 
-      maxt.line=maxt.line
+      xaxt.line=gaxt.line, maxt.line=maxt.line
     )
     
     # Plot gene expression legend
