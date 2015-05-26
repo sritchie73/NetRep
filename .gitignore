@@ -1,17 +1,13 @@
+# Ignore project files and automatic files
 .Rproj.user
 .Rhistory
 .Rprofile
 .RData
-.rda
-.gitignore
 *.Rproj
 *.Rcheck
-*.png
 
 # Compiled Rcpp code
-src/*.o
-src/*.so
-src/*.dll
+package/src/*.o
+package/src/*.so
+package/src/*.dll
 
-# Reference material for project.
-ref-*/
