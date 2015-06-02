@@ -72,6 +72,11 @@ List RangeSubset(SEXP pDat, IntegerVector subsetIndices) {
       arma::Mat<int>((int *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
       subsetIndices
     );
+  } else if (type == 6) {
+    return RangeSubset(
+      arma::Mat<float>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );
   } else if (type == 8) {
     return RangeSubset(
       arma::Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
@@ -105,6 +110,10 @@ List BigRange(SEXP pDat) {
   } else if (type == 4) {
     return BigRange(
       arma::Mat<int>((int *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false)
+    );
+  } else if (type == 6) {
+    return BigRange(
+      arma::Mat<int>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false)
     );
   } else if (type == 8) {
     return BigRange(

@@ -87,6 +87,11 @@ List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices) {
       arma::Mat<int>((int *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
+  } else if (type == 6) {
+    return AdjProps(
+      arma::Mat<float>((float *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
+      subsetIndices
+    );
   } else if (type == 8) {
     return AdjProps(
       arma::Mat<double>((double *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),

@@ -147,7 +147,12 @@ List CoexpStats(
         xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
       );
-    } else if (typeT == 8) {
+    } else if (typeT == 6) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<float>(*xpCoexpT), testIndices
+      );
+    }else if (typeT == 8) {
       return CoexpStats(
         xpCoexpD, MatrixAccessor<char>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
@@ -172,6 +177,11 @@ List CoexpStats(
       return CoexpStats(
         xpCoexpD, MatrixAccessor<short>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
+      );
+    } else if (typeT == 6) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<short>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<float>(*xpCoexpT), testIndices
       );
     } else if (typeT == 8) {
       return CoexpStats(
@@ -199,9 +209,45 @@ List CoexpStats(
         xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
       );
+    } else if (typeT == 6) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<float>(*xpCoexpT), testIndices
+      );
     } else if (typeT == 8) {
       return CoexpStats(
         xpCoexpD, MatrixAccessor<int>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
+      );
+    } else {
+      /* We should never get here, unless the underlying implementation of
+      bigmemory changes */
+      throw Rcpp::exception("Undefined type for pCoexpT 'big.matrix' object");
+    }
+  } else if (typeD == 6) {
+    if (typeT == 1) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<float>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<char>(*xpCoexpT), testIndices
+      );
+    } else if (typeT == 2) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<float>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<short>(*xpCoexpT), testIndices
+      );
+    } else if (typeT == 4) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<float>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
+      );
+    } else if (typeT == 6) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<float>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<float>(*xpCoexpT), testIndices
+      );
+    } else if (typeT == 8) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<float>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<double>(*xpCoexpT), testIndices
       );
     } else {
@@ -224,6 +270,11 @@ List CoexpStats(
       return CoexpStats(
         xpCoexpD, MatrixAccessor<double>(*xpCoexpD), discIndices,
         xpCoexpT, MatrixAccessor<int>(*xpCoexpT), testIndices
+      );
+    } else if (typeT == 6) {
+      return CoexpStats(
+        xpCoexpD, MatrixAccessor<double>(*xpCoexpD), discIndices,
+        xpCoexpT, MatrixAccessor<float>(*xpCoexpT), testIndices
       );
     } else if (typeT == 8) {
       return CoexpStats(

@@ -46,10 +46,23 @@ void Scale(SEXP pDat, SEXP spDat) {
     for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
       asDat.col(jj) = (aDat.col(jj) - meanExpr(jj))/sdExpr(jj);
     }
+  } else if (xpDat->matrix_type() == 6) { 
+    // Cast both matrices to Armadillo types
+    Mat<float> aDat((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
+    Mat<float> asDat((float *)xspDat->matrix(), xspDat->nrow(), xspDat->ncol(), false);
+    
+    // Get the mean and std for each column (network node)
+    Row<float> meanExpr(mean(aDat));
+    Row<float> sdExpr(stddev(aDat));
+  
+    // Store scaled data
+    for (unsigned int jj = 0; jj < xpDat->ncol(); jj++) {
+      asDat.col(jj) = (aDat.col(jj) - meanExpr(jj))/sdExpr(jj);
+    }
   } else {
     throw Rcpp::exception(
       "Network statistics calculated from the underlying data only work on"
-      " big.matrix objects of type 'double'."
+      " big.matrix objects of type 'double' or 'float'."
     );
   }
 } 

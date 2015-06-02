@@ -8,6 +8,72 @@ using namespace arma;
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/BigMatrix.h>
 
+/* Implementation of DataProps
+ *
+ * @param dat the armadillo compatible gene expression matrix
+ * @param subsetIndices indices of the network subset of interest.
+ * @return
+ *    A List containing:
+ *     - The Summary Expression Profile of each node (SEP).
+ *     - The Module Membership of each node (MM).
+ *     - The proportion of the variance explained by the subset's summary 
+ *       expression profile (pve).
+ */
+template <typename T>
+List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
+
+    // Cast the BigMatrix to an arma::Mat<double>
+    Mat<T> U, V;
+    Col<T> S;
+    uvec subsetCols = sort(as<uvec>(subsetIndices) - 1);
+    
+    // Get the summary profile for the network subset from the SVD.
+    bool success = svd_econ(U, S, V, aDat.cols(subsetCols), "left", "dc");
+    if (!success) {
+      Function warning("warning");
+      warning("SVD failed to converge, does your data contain missing or"
+              " infinite values?");
+      return List::create(
+          Named("SEP") = NA_REAL,
+          Named("MM") = NA_REAL,
+          Named("pve") = NA_REAL
+        );
+    }
+    Mat<T> summary(U.col(0));
+
+    // Flip the sign of the summary profile so that the eigenvector is 
+    // positively correlated with the average scaled value of the underlying
+    // data for the network subset.
+    Mat<T> ap = cor(mean(aDat.cols(subsetCols), 1), summary);
+    if (ap(0,0) < 0) {
+      summary *= -1; 
+    }
+    
+    // We want the correlation between each variable (node) in the underlying
+    // data and the summary profile for that network subset.
+    Mat<T> p = cor(summary, aDat.cols(subsetCols));
+    Mat<T> MM(p);
+    
+    // To make sure the resulting MAR and KIM vectors are in the correct order,
+    // order the results to match the original ordering of subsetIndices.
+    Function rank("rank"); // Rank only works on R objects like IntegerVector.
+    uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
+
+    Col<T> oMM = MM(idxRank);
+
+    // The proportion of variance explained is the sum of the squared 
+    // correlation between the network subset summary profile, and each of the 
+    // variables in the data that correspond to nodes in the network subset.
+    Mat<T> pve(mean(square(p), 1));
+    
+    return List::create(
+      Named("SEP") = summary,
+      Named("MM") = oMM,
+      Named("pve") = pve
+    );
+  }
+}
+
 //' Network subset eigenvector and proportion of variance explained in C++
 //' 
 //' @param pDat SEXP container for the pointer to a scaled version of the 
@@ -58,9 +124,7 @@ using namespace arma;
 //' @rdname dataProps-cpp
 //'  
 // [[Rcpp::export]]
-List DataProps(
-  SEXP pDat, IntegerVector subsetIndices
-) {
+List DataProps(SEXP pDat, IntegerVector subsetIndices) {
   XPtr<BigMatrix> xpDat(pDat);
   
   // Make sure we're not indexing out of range.
@@ -69,63 +133,22 @@ List DataProps(
     throw std::out_of_range("Some of requested indices are outside of range!");
   }
   
-  // We can only work with BigMatrix objects of type double here due to SVD 
-  // requirements.
-  if (xpDat->matrix_type() == 8) {
-    // Cast the BigMatrix to an arma::Mat<double>
-    mat aDat((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false);
-    mat U, V;
-    vec S;
-    uvec subsetCols = sort(as<uvec>(subsetIndices) - 1);
-    
-    // Get the summary profile for the network subset from the SVD.
-    bool success = svd_econ(U, S, V, aDat.cols(subsetCols), "left", "dc");
-    if (!success) {
-      Function warning("warning");
-      warning("SVD failed to converge, does your data contain missing or"
-              " infinite values?");
-      return List::create(
-          Named("SEP") = NA_REAL,
-          Named("MM") = NA_REAL,
-          Named("pve") = NA_REAL
-        );
-    }
-    mat summary(U.col(0));
-
-    // Flip the sign of the summary profile so that the eigenvector is 
-    // positively correlated with the average scaled value of the underlying
-    // data for the network subset.
-    mat ap = cor(mean(aDat.cols(subsetCols), 1), summary);
-    if (ap(0,0) < 0) {
-      summary *= -1; 
-    }
-    
-    // We want the correlation between each variable (node) in the underlying
-    // data and the summary profile for that network subset.
-    mat p = cor(summary, aDat.cols(subsetCols));
-    mat MM(p);
-    
-    // To make sure the resulting MAR and KIM vectors are in the correct order,
-    // order the results to match the original ordering of subsetIndices.
-    Function rank("rank"); // Rank only works on R objects like IntegerVector.
-    uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
-
-    vec oMM = MM(idxRank);
-
-    // The proportion of variance explained is the sum of the squared 
-    // correlation between the network subset summary profile, and each of the 
-    // variables in the data that correspond to nodes in the network subset.
-    mat pve(mean(square(p), 1));
-    
-    return List::create(
-        Named("SEP") = summary,
-        Named("MM") = oMM,
-        Named("pve") = pve
-      );
+  // Dispatch function for all types of big.matrix.
+  unsigned short type = xpAdj->matrix_type();
+  if (type == 6) {
+    return DataProps(
+      arma::Mat<float>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );
+  } else if (type == 8) {
+    return DataProps(
+      arma::Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
+      subsetIndices
+    );
   } else {
     throw Rcpp::exception(
       "SVD can only be calculated on a big.matrix whose underlying type is"
-      "'double'."
+      "'double' or 'float'."
     );
   }
 }
