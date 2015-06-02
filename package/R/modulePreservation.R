@@ -920,9 +920,7 @@ modulePreservation <- function(
           ]
           
           gc()
-          on.exit({
-            vCat(verbose, 0, "Done!")
-          }, add=TRUE)
+          vCat(verbose, 0, "Done!")
         }, error=function(e) {
           warning(
             "Failed with error:\n", e$message, "\nSkipping to next comparison"
