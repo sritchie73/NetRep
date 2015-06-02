@@ -5,6 +5,7 @@
 .RData
 *.Rproj
 *.Rcheck
+.gitignore
 
 # Compiled Rcpp code
 package/src/*.o
