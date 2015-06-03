@@ -17,9 +17,7 @@ The bigMatrix object with its state updated.
 }
 \description{
 In the attached state, R is aware of the \code{\link[bigmemory]{big.matrix}}
-pointer object. Repeated access of different parts of the matrix, i.e.
-through random sampling for permutation analysis will eventually load the
-entire matrix into RAM. In the detached state, R is only aware of the
+pointer object. In the detached state, R is only aware of the
 location of the 'big.matrix' descriptor file, and the big.matrix is attached
 and removed every time its elements are requested.
 }

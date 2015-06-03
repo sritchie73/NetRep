@@ -18,16 +18,21 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' \code{\link[bigmemory]{big.matrix}} object from the 
 #' \code{\link[bigmemory]{bigmemory}} package. 
 #' 
-#' When using a \code{big.matrix} object, R will eventually load the full matrix
-#' into RAM when performing permutation testing due to the random sampling. The
-#' \code{bigMatrix} wrapper allows the \code{big.matrix} to exist in either
-#' attached or detached states, allowing \code{netRep} to optimise memory usage,
-#' which is advantageous when parallelising on a machine with limited memory.
+#' The advantage of the \code{bigMatrix} over \code{big.matrix} is that it keeps
+#' the object in a "detached" state: the \code{big.matrix} is only attached on
+#' access through some other method (e.g. subsetting or element access). This
+#' allows for finer control over memory usage in the 
+#' \code{\link{modulePreservation}} routine for users with limited RAM who wish 
+#' to run \code{modulePreservation} in the background on their laptop or 
+#' desktop. This is also nice for RStudio users, as it prevents R from crashing 
+#' when reloading a session containing the \code{bigMatrix} objects.
 #' 
 #' The authors of the \code{bigmemory} package also explicitly warn against
 #' storage of row and column names in a \code{big.matrix} as it can slow down 
 #' computation. A \code{bigMatrix} object handles these by keeping the dimension
-#' names stored in R.
+#' names stored in R, which offers (minor) speed improvements when running 
+#' \code{modulePreservation} in comparison to keeping to row and column names 
+#' stored in shared memory data structure.
 #' 
 #' @slot descriptor path of the descriptor file for the big.matrix.
 #' @slot matrix either the big.matrix object, or empty, depending on the value
