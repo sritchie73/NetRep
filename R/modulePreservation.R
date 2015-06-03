@@ -22,8 +22,7 @@
 #'  If not specified, the number of permutations will be automatically 
 #'  determined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
-#' @param lowmem logical; should memory usage be minimised? Useful on machines
-#'  with limited RAM when running in parallel.
+#' @param lowmem logical; should memory usage be minimised (see details)?
 #' @param excludeModules optional list of vectors containing modules to exclude 
 #'  from the analysis for each \code{discovery} dataset. If unspecified, the 
 #'  preservation of all modules will be tested.
@@ -92,14 +91,12 @@
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }
 #' \subsection{Memory usage:}{
-#'   For most machines there is a trade-off between memory usage per core and
-#'   the number of cores that can be utilised in parallel. The \code{lowmem}
-#'   argument controls the RAM usage for per core. When \code{TRUE}, the
-#'   default, the permutation procedure will unload the RAM after each
-#'   permutation, allowing the permutation procedure to be parallelised over
-#'   more cores. \code{lowmem} should not be set to \code{FALSE} unless there is
-#'   sufficient RAM to load the all matrices into RAM for each dataset
-#'   comparison on each core.
+#'   If the \code{lowmem} argument is set to \code{TRUE}, all matrix data will 
+#'   be unloaded back to disk and RAM will be cleared after each permutation. 
+#'   This may be desirable if the procedure is consuming all available RAM on 
+#'   the machine and the user wishes to continue performing other tasks while
+#'   running the permutation tests in the background. However, the procedure 
+#'   will take 2-3 times longer to complete.
 #' }
 #' \subsection{Module Preservation Statistics:}{
 #'  Module preservation is assessed through seven statistics \emph{(1)}:
@@ -372,7 +369,7 @@
 #' @export
 modulePreservation <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments,
-  discovery=1, test=2, nCores=1, lowmem=TRUE, nPerm, excludeModules,
+  discovery=1, test=2, nCores=1, lowmem=FALSE, nPerm, excludeModules,
   includeModules, null="overlap", alternative="greater",
   simplify=TRUE, verbose=TRUE, keepNulls=FALSE
 ) {
