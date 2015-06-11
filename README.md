@@ -29,6 +29,23 @@ library(devtools)
 install_github("sritchie73/fastModPres")
 ```
 
+## Software dependencies: Installation troubleshooting
+
+`fastModPres` and its dependencies require several third party libraries to be
+installed. If not found, installation of the package will fail.
+
+The `g++` compiler is required for the `bigmemory` package to install, 
+`gfortran` is required for the `statmod` package to install, and a `BLAS` 
+library is required for `RcppArmadillo` to install.
+
+BLAS libraries must be installed prior to the installation of R, otherwise R 
+won't link to them correctly and `RcppArmadillo` will fail to install. You've 
+encountered this error if `RcppArmadillo` partially compiles, but then throws 
+an error about failing to link to `-llapack`. LAPACK libraries come bundled with
+most BLAS libraries.
+
+Operating specific instructions to follow. 
+
 ## Testing
 To ensure the package has installed correctly and will run on your system, run the following:
 
