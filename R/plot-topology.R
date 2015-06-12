@@ -46,6 +46,7 @@
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
 #'  in \code{plotModuleMembership}, \code{plotConnectivity}, and
 #'  \code{plotSummaryExpression}.
+#' @param border.width line width for borders.
 #' @param plotLegend logical; controls whether a legend is drawn when using
 #'  \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.
 #' @param gaxt.line the number of lines into the bottom margin at which the gene
@@ -375,7 +376,7 @@ plotExpression <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotGeneNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
-  main="", palette=expression.palette(), plotLegend=TRUE, 
+  main="", palette=expression.palette(), border.width=2, plotLegend=TRUE, 
   legend.main="Expression", gaxt.line=-0.5, saxt.line=-0.5, maxt.line=3, 
   legend.position=0.15, legend.tick.size=0.03, laxt.line=3, cex.axis=0.8, 
   cex.lab=1, cex.main=1.2
@@ -592,9 +593,10 @@ plotExpression <- function(
     ge, palette, vlim=range.pal, legend.lim=range.ge,
     moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
     xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
-    legend.main=legend.main, plotModuleNames=plotModuleNames,
+    legend.main=legend.main, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, yaxt.line=saxt.line, legend.tick.size=legend.tick.size,
-    laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line
+    laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line,
+    border.width=border.width
   )
 }
 
@@ -606,8 +608,8 @@ plotExpression <- function(
 plotCoexpression <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="", 
-  palette=coexpression.palette(), plotLegend=TRUE, legend.main="Coexpression",
+  plotGeneNames=TRUE, plotModuleNames, main="", palette=coexpression.palette(), 
+  border.width=2, plotLegend=TRUE, legend.main="Coexpression",
   gaxt.line=-0.5, maxt.line=3, legend.position, legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -717,7 +719,7 @@ plotCoexpression <- function(
       moduleAssignments[[discovery]][geneOrder], na.pos, na.pos, 
       xaxt=gaxt, yaxt=gaxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, yaxt.line=gaxt.line, 
+      xaxt.line=gaxt.line, yaxt.line=gaxt.line, border.width=border.width,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line
     )
@@ -730,7 +732,8 @@ plotCoexpression <- function(
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
-      legend.line=legend.position, maxt.line=maxt.line
+      legend.line=legend.position, maxt.line=maxt.line, 
+      border.width=border.width
     )
   }
 }
@@ -743,8 +746,8 @@ plotCoexpression <- function(
 plotAdjacency <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="", 
-  palette=adjacency.palette(), plotLegend=TRUE, legend.main="Adjacency",
+  plotGeneNames=TRUE, plotModuleNames, main="", palette=adjacency.palette(), 
+  border.width=2, plotLegend=TRUE, legend.main="Adjacency",
   gaxt.line=-0.5, maxt.line=3, legend.position, legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -855,7 +858,8 @@ plotAdjacency <- function(
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=gaxt.line, yaxt.line=gaxt.line, 
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
-      legend.line=legend.position, maxt.line=maxt.line
+      legend.line=legend.position, maxt.line=maxt.line,
+      border.width=border.width
     )
   } else {
     if (missing(legend.position))
@@ -866,7 +870,8 @@ plotAdjacency <- function(
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
-      legend.line=legend.position, maxt.line=maxt.line
+      legend.line=legend.position, maxt.line=maxt.line, 
+      border.width=border.width
     )
   }
 }
@@ -880,7 +885,7 @@ plotAdjacency <- function(
 plotModuleMembership <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="", 
+  plotGeneNames=TRUE, plotModuleNames, main="", border.width=2, 
   palette=c("#313695", "#a50026"), drawBorders=FALSE, gaxt.line=-0.5, 
   maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -1012,7 +1017,7 @@ plotModuleMembership <- function(
     ifelse(MM > 0, palette[2], palette[1]), drawBorders=drawBorders,
     xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
-    ylab="Module membership"
+    ylab="Module membership", border.width=border.width
   )
 }
 
@@ -1025,8 +1030,8 @@ plotModuleMembership <- function(
 plotConnectivity <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderGenesBy="discovery", orderModules=TRUE,
-  plotGeneNames=TRUE, plotModuleNames, main="", 
-  palette="#feb24c", drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, 
+  plotGeneNames=TRUE, plotModuleNames, main="", palette="#feb24c", 
+  border.width=2,  drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1153,7 +1158,7 @@ plotConnectivity <- function(
     palette, drawBorders=drawBorders,
     xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
-    ylab="Normalised connectivity"
+    ylab="Normalised connectivity", border.width=border.width
   )
 }
 
@@ -1166,8 +1171,8 @@ plotConnectivity <- function(
 plotSummaryExpression <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
-  orderModules, plotSampleNames=TRUE, plotModuleNames, 
-  main="", palette=c("#762a83", "#1b7837"), drawBorders=FALSE, 
+  orderModules, plotSampleNames=TRUE, plotModuleNames, main="", 
+  palette=c("#762a83", "#1b7837"), border.width=2, drawBorders=FALSE, 
   saxt.line=-0.5, maxt.line=0, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1359,7 +1364,7 @@ plotSummaryExpression <- function(
     SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
     cols=cols, drawBorders=drawBorders, main=main, yaxt=plotSampleNames,
     plotModuleNames=plotModuleNames, yaxt.line=saxt.line, maxt.line=maxt.line,
-    xlab="Summary Expression"
+    xlab="Summary Expression", border.width=border.width
   )
 }
 
@@ -1371,9 +1376,9 @@ plotSummaryExpression <- function(
 #' @export
 plotExpressionLegend <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, palette=expression.palette(), horizontal=TRUE, 
-  legend.main="Expression", legend.tick.size=0.03, laxt.line=2.5, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2
+  discovery=1, test=1, palette=expression.palette(), border.width=2, 
+  horizontal=TRUE, legend.main="Expression", legend.tick.size=0.03, 
+  laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -1442,18 +1447,20 @@ plotExpressionLegend <- function(
   if (all(rg < 0)) {
     addGradientLegend(
       head(palette, length(palette)/2), rg, rg, horizontal, legend.main, 
-      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line
+      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line,
+      border.width=border.width
     )
   } else if (all(rg > 0)) {
     addGradientLegend(
       tail(palette, length(palette)/2), rg, rg, horizontal, legend.main, 
-      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line
+      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line,
+      border.width=border.width
     )
   } else {
     plim <- c(-max(abs(rg)), max(abs(rg)))
     addGradientLegend(
       palette, plim, rg, horizontal, legend.main, xlim=c(0,1), ylim=c(0,1), 
-      tick.size=legend.tick.size, axis.line=laxt.line
+      tick.size=legend.tick.size, axis.line=laxt.line, border.width=border.width
     )
   }
 }
@@ -1463,8 +1470,9 @@ plotExpressionLegend <- function(
 #' @rdname plotTopology
 #' @export
 plotCoexpressionLegend <- function(
-  palette=coexpression.palette(),  horizontal=TRUE, legend.main="Coexpression",
-  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  palette=coexpression.palette(), border.width=2, horizontal=TRUE, 
+  legend.main="Coexpression", legend.tick.size=0.03, laxt.line=2.5, 
+  cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -1487,7 +1495,7 @@ plotCoexpressionLegend <- function(
   addGradientLegend(
     palette, c(-1,1), c(-1,1), horizontal, legend.main,
     xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
-    axis.line=laxt.line
+    axis.line=laxt.line, border.width=border.width
   )
 }
 
@@ -1496,8 +1504,9 @@ plotCoexpressionLegend <- function(
 #' @rdname plotTopology
 #' @export
 plotAdjacencyLegend <- function(
-  palette=adjacency.palette(),  horizontal=TRUE, legend.main="Adjacency",
-  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  palette=adjacency.palette(), border.width=2, horizontal=TRUE, 
+  legend.main="Adjacency", legend.tick.size=0.03, laxt.line=2.5, 
+  cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -1520,6 +1529,6 @@ plotAdjacencyLegend <- function(
   addGradientLegend(
     palette, c(0,1), c(0,1), horizontal, legend.main,
     xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
-    axis.line=laxt.line
+    axis.line=laxt.line, border.width=border.width
   )
 }

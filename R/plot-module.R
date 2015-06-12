@@ -43,6 +43,7 @@
 #' @param main title for the plot.
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the 
 #'  connectivity, module membership, and summary expression bar plots.
+#' @param border.width line width for borders.
 #' @param gaxt.line the number of lines into the bottom margin at which the gene
 #'  names will be drawn.
 #' @param saxt.line the number of lines into the left margin at which the sample
@@ -267,7 +268,7 @@ plotModule <- function(
   geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
   orderModules, plotGeneNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
-  main="Module Topology", drawBorders=FALSE, gaxt.line=-0.5, 
+  main="Module Topology", drawBorders=FALSE, border.width=2, gaxt.line=-0.5, 
   saxt.line=-0.5, maxt.line, legend.tick.size=0.04, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -549,7 +550,7 @@ plotModule <- function(
     moduleAssignments[[discovery]][geneOrder], na.pos.x, plotLegend=TRUE, 
     main="", legend.main="Coexpression", plotModuleNames=FALSE, 
     legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
-    legend.line=0.1, maxt.line=maxt.line
+    legend.line=0.1, maxt.line=maxt.line, border.width=border.width
   )
   mtext(main, side=3, line=1, cex=par('cex.main'), font=2, xpd=NA)
   
@@ -560,7 +561,8 @@ plotModule <- function(
     c(0, 1), moduleAssignments[[discovery]][geneOrder], na.pos.x, 
     plotLegend=TRUE, main="", legend.main="Adjacency", 
     plotModuleNames=FALSE, legend.tick.size=legend.tick.size, 
-    laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line
+    laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,
+    border.width=border.width
   )
   
   # Plot Intamodular Connectivity
@@ -570,13 +572,15 @@ plotModule <- function(
       kIM, c(0,1), moduleAssignments[[discovery]][geneOrder], "#feb24c", 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
       xaxt=plotGeneNames, xaxt.line=gaxt.line, main="",
-      ylab="Normalised connectivity", maxt.line=maxt.line
+      ylab="Normalised connectivity", maxt.line=maxt.line, 
+      border.width=border.width
     )
   } else {
     plotBar(
       kIM, c(0,1), moduleAssignments[[discovery]][geneOrder], "#feb24c", 
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
-      ylab="Normalised\nconnectivity", maxt.line=maxt.line
+      ylab="Normalised\nconnectivity", maxt.line=maxt.line, 
+      border.width=border.width
     )
   }
   
@@ -586,7 +590,7 @@ plotModule <- function(
     plotBar(
       MM, c(-1,1), moduleAssignments[[discovery]][geneOrder], MM.cols,
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
-      ylab="Module\nMembership", maxt.line=maxt.line
+      ylab="Module\nMembership", maxt.line=maxt.line, border.width=border.width
     )
     
     # Plot the gene expression
@@ -613,7 +617,7 @@ plotModule <- function(
       moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
       xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, maxt.line=maxt.line
+      xaxt.line=gaxt.line, maxt.line=maxt.line, border.width=border.width
     )
     
     # Plot gene expression legend
@@ -622,7 +626,7 @@ plotModule <- function(
         head(palette, length(palette)/2), range.ge, range.ge, TRUE, 
         xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
         ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3), 
-        tick.size=legend.tick.size, 
+        tick.size=legend.tick.size, border.width=border.width,
         main="Gene expression", axis.line=laxt.line
       )
     } else if (all(range.ge > 0)) {
@@ -630,7 +634,7 @@ plotModule <- function(
         tail(palette, length(palette)/2), range.ge, range.ge, TRUE, 
         xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
         ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3), 
-        tick.size=legend.tick.size, 
+        tick.size=legend.tick.size, border.width=border.width,
         main="Gene expression", axis.line=laxt.line
       )
     } else {
@@ -639,7 +643,7 @@ plotModule <- function(
         palette, plim, range.ge, TRUE, main="Gene expression",
         xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
         ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3),  
-        tick.size=legend.tick.size, 
+        tick.size=legend.tick.size, border.width=border.width,
         axis.line=laxt.line
       )
     }
@@ -651,7 +655,7 @@ plotModule <- function(
     par(mar=c(1, 1, 1, 1))
     plotMultiBar(
       SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
-      cols=cols, drawBorders=drawBorders,
+      cols=cols, drawBorders=drawBorders, border.width=border.width,
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
       yaxt.line=saxt.line, maxt.line=0, xlab=xlab, 
       cex.modules=par("cex.lab")*0.7

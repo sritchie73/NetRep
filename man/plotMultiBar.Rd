@@ -5,7 +5,8 @@
 \usage{
 plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorders = FALSE,
   main = "", na.col = "#bdbdbd", yaxt = TRUE, plotModuleNames = TRUE,
-  yaxt.line = 0, maxt.line = 2.5, xlab = "", cex.modules = 0.7)
+  yaxt.line = 0, maxt.line = 2.5, xlab = "", cex.modules = 0.7,
+  border.width = 2)
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for
@@ -39,6 +40,8 @@ labels will be drawn.}
 \item{xlab}{x axis label}
 
 \item{cex.modules}{relative size of module names.}
+
+\item{border.width}{line width for borders.}
 }
 \description{
 Plot multiple horizontal bar plots

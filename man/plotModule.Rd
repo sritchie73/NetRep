@@ -7,9 +7,9 @@ plotModule(geneExpression, coexpression, adjacency, moduleAssignments, modules,
   discovery = 1, test = 1, orderSamplesBy = "test",
   orderGenesBy = "discovery", orderModules, plotGeneNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "Module Topology",
-  drawBorders = FALSE, gaxt.line = -0.5, saxt.line = -0.5, maxt.line,
-  legend.tick.size = 0.04, laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2)
+  drawBorders = FALSE, border.width = 2, gaxt.line = -0.5,
+  saxt.line = -0.5, maxt.line, legend.tick.size = 0.04, laxt.line = 2.5,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 }
 \arguments{
 \item{geneExpression}{optional; a list of
@@ -59,6 +59,8 @@ module names are rendered only if multiple \code{modules} are specified.}
 
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the
 connectivity, module membership, and summary expression bar plots.}
+
+\item{border.width}{line width for borders.}
 
 \item{gaxt.line}{the number of lines into the bottom margin at which the gene
 names will be drawn.}

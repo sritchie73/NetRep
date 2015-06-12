@@ -5,7 +5,7 @@
 \usage{
 plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorders = FALSE,
   na.col = "#bdbdbd", xaxt = TRUE, plotModuleNames = TRUE, main = "",
-  xaxt.line = -0.5, maxt.line = 3, ylab = "")
+  xaxt.line = -0.5, maxt.line = 3, ylab = "", border.width = 2)
 }
 \arguments{
 \item{heights}{heights of the bars.}
@@ -38,6 +38,8 @@ labels will be drawn.}
 names will be drawn.}
 
 \item{ylab}{label for the yaxis}
+
+\item{border.width}{line width for borders.}
 }
 \description{
 Plot bars around 0

@@ -24,12 +24,13 @@
 #'  labels, as multiple of \code{legend.tick.size}.
 #' @param legend.line the distance from the left of the plot to render the 
 #'  legend as a proportion of the horizontal size of the plot window.
+#' @param border.width line width for borders.
 #' 
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
   plotModuleNames=TRUE, main="", plotLegend=TRUE, legend.main="", legend.lim, 
   xaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1
+  legend.line=0.1, border.width=2
 ) {
   nGenes <- ncol(values) + length(na.indices)
   emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
@@ -77,7 +78,7 @@ plotTriangleHeatmap <- function(
       height <- breaks[mi + 1] - mids[mi]
       polygon(
         x=c(breaks[mi], breaks[mi+1], mids[mi], breaks[mi]),
-        y=c(0, 0, height, 0), lwd=2
+        y=c(0, 0, height, 0), lwd=border.width
       )
     }
   }
@@ -93,7 +94,7 @@ plotTriangleHeatmap <- function(
   # render border of plot
   polygon(
     x=c(0.5, nGenes+0.5, nGenes/2+0.5, 0.5), y=c(0, 0, nGenes/2, 0),
-    lwd=2, xpd=NA
+    lwd=border.width, xpd=NA
   )
   
   # Render axes
@@ -115,7 +116,7 @@ plotTriangleHeatmap <- function(
       palette, vlim, legend.lim, TRUE, legend.main,
       xlim=c(0.5 - pw*legend.line, pw*0.27), 
       ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.27), tick.size=legend.tick.size,
-      axis.line=laxt.line
+      axis.line=laxt.line, border.width=border.width
     )
   }
 }
@@ -151,13 +152,14 @@ plotTriangleHeatmap <- function(
 #'  labels, as multiple of \code{legend.tick.size}.
 #' @param legend.line the distance from the plot to render the legend as a 
 #'  proportion of the horizontal size of the plot window.
+#' @param border.width line width for borders.
 #' 
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
   main="", plotLegend=TRUE, legend.main="", legend.lim, xaxt.line=-0.5, 
   yaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1
+  legend.line=0.1, border.width=2
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
@@ -198,7 +200,7 @@ plotSquareHeatmap <- function(
           xright = breaks[mi],
           ybottom = 0.5,
           ytop = nY + 0.5,
-          border="black", lwd=2
+          border="black", lwd=border.width
         )
       } else {
         rect(
@@ -206,7 +208,7 @@ plotSquareHeatmap <- function(
           xright = breaks[mi],
           ybottom = (nX + 0.5) - (breaks[mi] - 0.5),
           ytop = (nX + 0.5) - (breaks[mi - 1] - 0.5),
-          border="black", lwd=2
+          border="black", lwd=border.width
         )
       }
     }
@@ -238,7 +240,7 @@ plotSquareHeatmap <- function(
     ytop=par("usr")[4],
     border="black",
     xpd=NA,
-    lwd=2
+    lwd=border.width
   )
   
   # Render axes
@@ -266,7 +268,7 @@ plotSquareHeatmap <- function(
       palette, vlim, legend.lim, FALSE, legend.main,
       xlim=c(pw - 0.5 + pw*legend.line, pw - 0.5 + pw*(legend.line+0.05)), 
       ylim=c(ph/3, ph - 0.5 - ph*0.1), tick.size=legend.tick.size,
-      axis.line=laxt.line
+      axis.line=laxt.line, border.width=border.width
     )
   }
 }
@@ -288,10 +290,11 @@ plotSquareHeatmap <- function(
 #'  plot window.
 #' @param axis.line distance from the axis to render the axis labels as a 
 #'  multiple of \code{tick.size}.
+#' @param border.width line width for borders.
 #' 
 addGradientLegend <- function(
   palette, palette.vlim, legend.vlim, horizontal, main, xlim, ylim, 
-  tick.size=0.04, axis.line=3
+  tick.size=0.04, axis.line=3, border.width=2
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -344,7 +347,7 @@ addGradientLegend <- function(
   # Render bounding box
   rect(
     xleft=xlim[1], xright=xlim[2], ybottom=ylim[1], ytop=ylim[2],
-    border="black", lwd=2, xpd=NA
+    border="black", lwd=border.width, xpd=NA
   )
   
   # Render axis, but make sure it's balanced around 0
@@ -370,7 +373,7 @@ addGradientLegend <- function(
     
     # Now plot the lines and text
     sapply(at, function(aa) {
-      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=2, xpd=NA)
+      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=border.width, xpd=NA)
     })
     text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA)
   } else {
@@ -388,7 +391,7 @@ addGradientLegend <- function(
     
     # draw axis ticks
     sapply(at, function(aa) {
-      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=2, xpd=NA)
+      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=border.width, xpd=NA)
     })
     text(labels, x=xlim[1]-tck*axis.line, y=at, cex=par("cex.axis"), xpd=NA)
   }
@@ -423,11 +426,12 @@ addGradientLegend <- function(
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
 #' @param ylab label for the yaxis
+#' @param border.width line width for borders.
 #' 
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
-  maxt.line=3, ylab=""
+  maxt.line=3, ylab="", border.width=2
 ) {
   if (length(cols) == 1)
     cols <- rep(cols, length(heights))
@@ -463,17 +467,17 @@ plotBar <- function(
       ytop=heights[ii],
       col=cols[ii],
       border=ifelse(drawBorders, "black", NA),
-      lwd=2
+      lwd=border.width
     ) 
   }
-  abline(h=0, col="black", lwd=2)
-  axis(side=2, las=2, lwd=2)
+  abline(h=0, col="black", lwd=border.width)
+  axis(side=2, las=2, lwd=border.width)
   
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
     for (bi in head(breaks[-1], -1)) {
-      lines(x=rep(bi, 2), y=heights.lim, lwd=2)
+      lines(x=rep(bi, 2), y=heights.lim, lwd=border.width)
     }
   }
   
@@ -517,11 +521,12 @@ plotBar <- function(
 #'  labels will be drawn.
 #' @param xlab x axis label
 #' @param cex.modules relative size of module names.
+#' @param border.width line width for borders.
 #'
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="",
   na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5,
-  xlab="", cex.modules=0.7
+  xlab="", cex.modules=0.7, border.width=2
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -581,16 +586,16 @@ plotMultiBar <- function(
         ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
         col=cols[jj, ii],
         border=ifelse(drawBorders, "black", NA),
-        lwd=2
+        lwd=border.width
       ) 
     }
     
     # draw 0 axis
-    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=2)
+    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=border.width)
     
     # draw axis
     axis(
-      side=1, labels=FALSE, tck=-0.025, lwd=2,
+      side=1, labels=FALSE, tck=-0.025, lwd=border.width,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
     )
     axis(

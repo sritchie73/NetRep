@@ -8,7 +8,7 @@ plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
   plotModuleNames = TRUE, main = "", plotLegend = TRUE,
   legend.main = "", legend.lim, xaxt.line = -0.5, yaxt.line = -0.5,
   maxt.line = 3, legend.tick.size = 0.04, laxt.line = 2.5,
-  legend.line = 0.1)
+  legend.line = 0.1, border.width = 2)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -59,6 +59,8 @@ labels, as multiple of \code{legend.tick.size}.}
 
 \item{legend.line}{the distance from the plot to render the legend as a
 proportion of the horizontal size of the plot window.}
+
+\item{border.width}{line width for borders.}
 }
 \description{
 Plot a square heatmap
