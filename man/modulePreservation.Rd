@@ -247,16 +247,17 @@ recommended. Matrix data is ideally stored in the
  that for two-sided tests. This can be calculated with
  \code{\link{requiredPerms}}. When \code{nPerm} is not specified, the number
  of permutations is automatically calculated as the number required for a
- Bonferroni corrected significance threshold adjusting for the number of
- modules in each \emph{discovery} dataset multiplied by the number of
- \emph{test} datasets. Although assessing the replication of a small number
- of modules calls for very few permutations, we recommend using no fewer than
- 200 as fewer permutations are unlikely to generate representative null
- distributions. \strong{Note:} the assumptions used by
- \code{\link{requiredPerms}} break down when assessing the preservation of
- very small modules in a very small dataset (e.g. gene sets in a dataset with
- less than 100 genes total). However, the reported p-values will still be
- accurate (see \code{\link{perm.test}}) \emph{(2)}.
+ Bonferroni corrected significance threshold adjusting for the total number
+ of tests for each statistic, i.e. the total number of modules to be analysed
+ multiplied by the number of \emph{test} datasets each module is tested in.
+ Although assessing the replication of a small numberof modules calls for
+ very few permutations, we recommend using no fewer than 1,000 as fewer
+ permutations are unlikely to generate representative null distributions.
+ \strong{Note:} the assumption used by \code{\link{requiredPerms}} to
+ determine the correct number of permtutations breaks down when assessing the
+ preservation of modules in a very small dataset (e.g. gene sets in a dataset
+ with less than 100 genes total). However, the reported p-values will still
+ be accurate (see \code{\link{perm.test}}) \emph{(2)}.
 }
 }
 \examples{
