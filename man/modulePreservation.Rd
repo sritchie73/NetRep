@@ -4,10 +4,9 @@
 \title{Replication and preservation of network modules across datasets}
 \usage{
 modulePreservation(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, discovery = 1, test = 2, nCores = 1,
-  lowmem = FALSE, nPerm, excludeModules, includeModules, null = "overlap",
-  alternative = "greater", simplify = TRUE, verbose = TRUE,
-  keepNulls = FALSE)
+  moduleAssignments, discovery = 1, test = 2, nCores = 1, nPerm,
+  excludeModules, includeModules, null = "overlap", alternative = "greater",
+  simplify = TRUE, verbose = TRUE, keepNulls = FALSE)
 }
 \arguments{
 \item{geneExpression}{A list of gene expression matrices, one for each
@@ -26,8 +25,6 @@ containing the module assignments for each gene in the respective dataset.}
 \emph{discovery} dataset.}
 
 \item{nCores}{number of cores to parallelise the permutation procedure over.}
-
-\item{lowmem}{logical; should memory usage be minimised (see details)?}
 
 \item{nPerm}{number of permutations to use. Can be specified as a vector if
 a different number of permutations is desired for each discovery dataset.
@@ -161,12 +158,20 @@ recommended. Matrix data is ideally stored in the
   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 }
 \subsection{Memory usage:}{
-  If the \code{lowmem} argument is set to \code{TRUE}, all matrix data will
-  be unloaded back to disk and RAM will be cleared after each permutation.
-  This may be desirable if the procedure is consuming all available RAM on
-  the machine and the user wishes to continue performing other tasks while
-  running the permutation tests in the background. However, the procedure
-  will take 2-3 times longer to complete.
+  A trade off has been made between memory usage and computation time.
+  'modulePreservation' has a large memory overhead as it requires
+  pre-computed coexpression and adjacency matrices for each dataset. However,
+  these are stored in shared memory, which means that each parallel process
+  can independently access this memory. There is very little memory overhead
+  for each additional core.
+
+  Although this also means that the matrices can be larger than the available
+  RAM, in practice we find that this slows down the procedure by several
+  orders of magnitude. For optimal performance, there should be sufficient
+  memory to load in each gene expression, coexpression, and adjacency matrix
+  for each dataset. Note: most of this memory is cached; matrices are only
+  loaded into RAM when needed (i.e. for the dataset pair for a comparison),
+  so the physical amount of RAM used will be much lower.
 }
 \subsection{Module Preservation Statistics:}{
  Module preservation is assessed through seven statistics \emph{(1)}:
