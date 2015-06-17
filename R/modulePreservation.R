@@ -758,79 +758,80 @@ modulePreservation <- function(
               monitorProgress(nCores - 1, 2, run.dir)
               NULL
             } else {
-              if (verbose) {
-                conns <- setupParProgressLogs(chunk, nCores - 1, 2, run.dir)
-                progressBar <- conns[[1]]
-                on.exit(lapply(conns, close))
-              } 
-              
-              # Attach matrices.
-              if (!is.null(geneExpression))
-                sge <- lapply(sge, attach.bigMatrix)
-              coexpression <- lapply(coexpression, attach.bigMatrix)
-              adjacency <- lapply(adjacency, attach.bigMatrix)
-              on.exit({
+              tryCatch({
+                if (verbose) {
+                  conns <- setupParProgressLogs(chunk, nCores - 1, 2, run.dir)
+                  progressBar <- conns[[1]]
+                } 
+                
+                # Attach matrices.
+                if (!is.null(geneExpression))
+                  sge <- lapply(sge, attach.bigMatrix)
+                coexpression <- lapply(coexpression, attach.bigMatrix)
+                adjacency <- lapply(adjacency, attach.bigMatrix)
+                
+                #-----------------------------------------------------------------
+                # Calculate the module preservation statistics for each module on
+                #  a random subset of genes of the same size in the test dataset
+                #-----------------------------------------------------------------
+                chunkStats <- array(
+                  NA, dim=c(nModules, nStatistics, length(chunk))
+                )
+                dimnames(chunkStats)[1:2] <- dimnames(observed)
+                dimnames(chunkStats)[[3]] <- paste0("permutation.", chunk)
+                for (pi in seq_along(chunk)) {
+                  for (mi in overlapModules) {
+                    modGenes <- names(overlapAssignments %sub_in% mi)
+                    discInds <- match(modGenes, colnames(coexpression[[di]]))
+                    
+                    # Select a random subset of nodes of the same size as the subset 
+                    # ss, depending on our null model.
+                    modSize <- length(modGenes)
+                    if (model == "overlap") {
+                      permGenes <- sample(names(overlapGenes), modSize)
+                    } else {
+                      permGenes <- sample(colnames(coexpression[[ti]]), modSize)
+                    }
+                    permInds <- match(permGenes, colnames(coexpression[[ti]]))
+                    # Ensure crashes aren't fatal
+                    tryCatch({
+                      permProps <- moduleProps(adjacency[[ti]], permInds, sge[[ti]])
+                      chunkStats[mi,,pi] <- calcStats(
+                        discProps[[mi]], permProps, 
+                        coexpression[[di]], discInds,
+                        coexpression[[ti]], permInds
+                      )
+                      rm(permProps)
+                      gc()
+                    }, error = function(e) {
+                      warning(
+                        "Calculation for module ", mi, " failed on ",
+                        "permutation ", chunk[pi], " with error message:\n",
+                        e$message
+                      )
+                    })
+                  }
+                  # Update the progress at the end of the loop.
+                  if (verbose) {
+                    updateParProgress(progressBar, chunk[pi])
+                    if (nCores == 1) {
+                      reportProgress(2, run.dir)
+                      if (chunk[pi] == nPerm[di]) {
+                        cat("\n")
+                      }
+                    }
+                  }
+                }
+                chunkNum <- ceiling(chunk[1]/length(chunk))
+                permFile <- paste0("chunk", chunkNum, "permutations.rds")
+                saveRDS(chunkStats, file.path(tmp.dir, permFile))
+              }, finally = {
+                lapply(conns, close)
                 if (!is.null(geneExpression))
                   sge <- lapply(sge, detach.bigMatrix)
                 coexpression <- lapply(coexpression, detach.bigMatrix)
                 adjacency <- lapply(adjacency, detach.bigMatrix)
-              }, add=TRUE)
-                
-              #-----------------------------------------------------------------
-              # Calculate the module preservation statistics for each module on
-              #  a random subset of genes of the same size in the test dataset
-              #-----------------------------------------------------------------
-              chunkStats <- array(
-                NA, dim=c(nModules, nStatistics, length(chunk))
-              )
-              dimnames(chunkStats)[1:2] <- dimnames(observed)
-              dimnames(chunkStats)[[3]] <- paste0("permutation.", chunk)
-              for (pi in seq_along(chunk)) {
-                for (mi in overlapModules) {
-                  modGenes <- names(overlapAssignments %sub_in% mi)
-                  discInds <- match(modGenes, colnames(coexpression[[di]]))
-                  
-                  # Select a random subset of nodes of the same size as the subset 
-                  # ss, depending on our null model.
-                  modSize <- length(modGenes)
-                  if (model == "overlap") {
-                    permGenes <- sample(names(overlapGenes), modSize)
-                  } else {
-                    permGenes <- sample(colnames(coexpression[[ti]]), modSize)
-                  }
-                  permInds <- match(permGenes, colnames(coexpression[[ti]]))
-                  # Ensure crashes aren't fatal
-                  tryCatch({
-                    permProps <- moduleProps(adjacency[[ti]], permInds, sge[[ti]])
-                    chunkStats[mi,,pi] <- calcStats(
-                      discProps[[mi]], permProps, 
-                      coexpression[[di]], discInds,
-                      coexpression[[ti]], permInds
-                    )
-                    rm(permProps)
-                    gc()
-                  }, error = function(e) {
-                    warning(
-                      "Calculation for module ", mi, " failed on ",
-                      "permutation ", chunk[pi], " with error message:\n",
-                      e$message
-                    )
-                  })
-                }
-                # Update the progress at the end of the loop.
-                if (verbose) {
-                  updateParProgress(progressBar, chunk[pi])
-                  if (nCores == 1) {
-                    reportProgress(2, run.dir)
-                    if (chunk[pi] == nPerm[di]) {
-                      cat("\n")
-                    }
-                  }
-                }
-              }
-              chunkNum <- ceiling(chunk[1]/length(chunk))
-              permFile <- paste0("chunk", chunkNum, "permutations.rds")
-              saveRDS(chunkStats, file.path(tmp.dir, permFile))
+              })
             }
           }
           #---------------------------------------------------------------------
