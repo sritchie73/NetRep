@@ -196,7 +196,7 @@ networkProperties <- function(
   discovery=1, test=1, simplify=TRUE
 ) {
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)

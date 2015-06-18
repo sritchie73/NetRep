@@ -386,7 +386,7 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   # Temporary directory to store new bigMatrix objects in
   vCat(verbose, 0, "creating directory for temporary objects...")
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     vCat(verbose, 0, "removing temporary object directory...")
@@ -744,7 +744,7 @@ modulePreservation <- function(
           if(verbose) {
             # To log progress, we will write our progress to a file for each chunk
             while (TRUE) {
-              run.dir <- paste0(".run-progress", getUUID())
+              run.dir <- file.path(tempdir(), paste0(".run-progress", getUUID()))
               # Handle the infintesimally small chance of a UUID collision
               tryCatch({
                 dir.create(run.dir)

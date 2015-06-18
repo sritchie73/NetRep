@@ -409,7 +409,7 @@ plotExpression <- function(
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
@@ -637,7 +637,7 @@ plotCoexpression <- function(
   orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
 
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
@@ -775,7 +775,7 @@ plotAdjacency <- function(
   orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
@@ -916,7 +916,7 @@ plotModuleMembership <- function(
   orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
@@ -1058,7 +1058,7 @@ plotConnectivity <- function(
   orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
@@ -1203,7 +1203,7 @@ plotSummaryExpression <- function(
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
@@ -1401,7 +1401,7 @@ plotExpressionLegend <- function(
     stop("Cannot plot expression legend without gene expression data")
   
   # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- paste0(".temp-objects", getUUID())
+  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   on.exit({
     unlink(tmp.dir, recursive=TRUE)
