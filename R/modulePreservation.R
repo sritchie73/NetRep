@@ -574,6 +574,12 @@ modulePreservation <- function(
   } else {
     vCat(verbose, 0, "Running on 1 cores.")
   }
+  # Suppress annoying foreach warning if running in serial
+  if (getDoParWorkers() == 1) {
+    suppressWarnings({
+      foreach(ii = 1:2) %dopar% { ii }
+    })
+  }
   
   # Since we expect the user to explicitly handle the number of parallel threads,
   # we will disable the potential implicit parallelism on systems where R has
@@ -753,7 +759,7 @@ modulePreservation <- function(
               unlink(run.dir, recursive=TRUE)
             }, add=TRUE)
           }
-          foreach(chunk=ichunkTasks(verbose, nPerm[di], nCores)) %maybe_do_par% {
+          foreach(chunk=ichunkTasks(verbose, nPerm[di], nCores)) %dopar% {
             if (verbose && length(chunk) == 1 && chunk == -1) {
               monitorProgress(nCores - 1, 2, run.dir)
               NULL
@@ -826,7 +832,9 @@ modulePreservation <- function(
                 permFile <- paste0("chunk", chunkNum, "permutations.rds")
                 saveRDS(chunkStats, file.path(tmp.dir, permFile))
               }, finally = {
-                lapply(conns, close)
+                if (verbose) {
+                  lapply(conns, close)
+                }
                 if (!is.null(geneExpression))
                   sge <- lapply(sge, detach.bigMatrix)
                 coexpression <- lapply(coexpression, detach.bigMatrix)

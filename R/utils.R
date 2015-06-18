@@ -181,25 +181,6 @@ ichunkTasks <- function(verbose, n, cores) {
   }
 }
 
-#' Maybe do parallel 
-#' 
-#' Suppresses warnings from \code{\link[foreach]{\%dopar\%}} when no parallel
-#' backend is registered, using \code{\link[foreach]{\%do\%}} instead.
-#' 
-#' @seealso \code{\link{foreach}}
-#' @param obj \code{foreach} object used to control the evaluation of \code{ex}.
-#' @param ex the R expression to evaluate.
-#' @import foreach
-#' @name foreach
-`%maybe_do_par%` <- function(obj, ex) {
-  if (getDoParWorkers() == 1) {
-    e <- foreach:::getDoSeq()
-  } else {
-    e <- foreach:::getDoPar()
-  }
-  e$fun(obj, substitute(ex), parent.frame(), e$data)
-}
-
 #' Poke attached big matrix objects to initialise them
 #' 
 #' This is a magical speed hack. See details
