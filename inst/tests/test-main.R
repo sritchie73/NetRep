@@ -3,13 +3,25 @@ gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
 
 coexpSets <- list(
-  a=as.bigMatrix(matrix(rnorm(100*100), 100, dimnames=list(gn1, gn1)), "tmp1"),
-  b=as.bigMatrix(matrix(rnorm(100*100), 100, dimnames=list(gn2, gn2)), "tmp2")
+  a=as.bigMatrix(
+    matrix(rnorm(100*100), 100, dimnames=list(gn1, gn1)), 
+    file.path(tempdir(), "tmp1")
+  ),
+  b=as.bigMatrix(
+    matrix(rnorm(100*100), 100, dimnames=list(gn2, gn2)), 
+    file.path(tempdir(), "tmp2")
+  )
 )
 adjSets <- coexpSets
 exprSets <- list(
-  a=as.bigMatrix(matrix(rnorm(50*100), 50, dimnames=list(NULL, gn1)), "tmp3"),
-  b=as.bigMatrix(matrix(rnorm(75*100), 75, dimnames=list(NULL, gn2)), "tmp4")
+  a=as.bigMatrix(
+    matrix(rnorm(50*100), 50, dimnames=list(NULL, gn1)),
+    file.path(tempdir(), "tmp3")
+  ),
+  b=as.bigMatrix(
+    matrix(rnorm(75*100), 75, dimnames=list(NULL, gn2)),
+    file.path(tempdir(), "tmp4")
+  )
 )
 moduleAssignments <- list(a=sample(1:7, 100, replace=TRUE), b=NULL)
 names(moduleAssignments[[1]]) <- gn1
@@ -20,7 +32,7 @@ test_that("Network properties function runs without error", {
       exprSets, coexpSets, adjSets, moduleAssignments, modules="1"
     ), "list"
   )
-  sink("tmp.log") # ignore warnings
+  sink(file.path(tempdir(), "tmp.log")) # ignore warnings
   props <- networkProperties(
     exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10]
   )
@@ -55,4 +67,4 @@ test_that("Main routine runs and produces sane output", {
     includeModules=c(1,2,3), keepNulls=TRUE, verbose=FALSE
   )
 })
-unlink('tmp*')
+unlink(file.path(tempdir(), 'tmp*'))

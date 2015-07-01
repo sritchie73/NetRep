@@ -1,7 +1,7 @@
 Package: fastModPres
 Type: Package
 Title: Fast permutation procedure for testing network module replication
-Version: 0.24.0
+Version: 0.25.0
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for assessing the replication/preservation of network

@@ -6,9 +6,7 @@
 #' @param x a regular matrix to convert 
 #' @param file the name of the file which the (non-bigMatrix) data are to be
 #'  read from (see \code{\link[bigmemory]{read.big.matrix}}).
-#' @param backingpath directory the bigMatrix is, or will be, stored in.
-#' @param backingname basename (filename without an extension) the
-#'  bigMatrix object is, or will be, stored in.
+#' @param backingfile location on disk the bigMatrix is, or will be, stored at.
 #' @param type the type of the atomic element 
 #'  (\code{options()$bigmemory.default.type} by default - "\code{double}" - 
 #'  but can be changed by the user to "\code{integer}", "\code{short}", or 
@@ -56,15 +54,19 @@
 #' @export
 #' @import bigmemory
 save.as.bigMatrix <- function(
-  x, backingname, backingpath=".", type=options("bigmemory.default.type")[[1]]
+  x, backingfile, type=options("bigmemory.default.type")[[1]]
 ) {
   if (!(class(x) == "matrix"))
     stop("'x' must be a 'matrix'")
   
+  # Get components for interfacing with bigmemory and resolve paths as absolute
+  backingname <- basename(backingfile)
+  backingpath <- gsub(paste0(backingname, "$"), "", backingfile)
   backingpath <- normalizePath(backingpath)
+  backingfile <- file.path(backingpath, backingname)
   
   # Dimension names are saved separately from the big.matrix object.
-  cnFile <- file.path(backingpath, paste0(backingname, "_colnames.txt"))
+  cnFile <- paste0(backingfile, "_colnames.txt")
   if (!is.null(colnames(x))) {
     write.table(
       colnames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
@@ -74,7 +76,7 @@ save.as.bigMatrix <- function(
     if (file.exists(cnFile))
       unlink(cnFile)
   }
-  rnFile <- file.path(backingpath, paste0(backingname, "_rownames.txt"))
+  rnFile <- paste0(backingfile,  "_rownames.txt")
   if (!is.null(rownames(x))) {
     write.table(
       rownames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
@@ -100,23 +102,27 @@ save.as.bigMatrix <- function(
 #' @rdname bigMatrix-get
 #' @export
 load.bigMatrix <- function(
-  backingname, backingpath="."
+  backingfile
 ) {
+  # Get components for interfacing with bigmemory and resolve paths as absolute
+  backingname <- basename(backingfile)
+  backingpath <- gsub(paste0(backingname, "$"), "", backingfile)
   backingpath <- normalizePath(backingpath)
+  backingfile <- file.path(backingpath, backingname)
   
   # Check for row and column names
   rn <- NULL
-  rnFile <- file.path(backingpath, paste0(backingname, "_rownames.txt"))
+  rnFile <- paste0(backingfile, "_rownames.txt")
   if (file.exists(rnFile))
     rn <- as.character(read.table(rnFile, stringsAsFactors=FALSE)[,1])
   
   cn <- NULL
-  cnFile <- file.path(backingpath, paste0(backingname, "_colnames.txt"))
+  cnFile <- paste0(backingfile, "_colnames.txt")
   if (file.exists(cnFile))
     cn <- as.character(read.table(cnFile, stringsAsFactors=FALSE)[,1])
 
   # Check if the file is already a 'big.matrix', and handle appropriately
-  descFile <- file.path(backingpath, paste0(backingname, ".desc"))
+  descFile <- paste0(backingfile, ".desc")
   if (file.exists(descFile)) {
     d1 <- dget(descFile)
     if (!is.null(d1@description$colNames) || 
@@ -157,7 +163,7 @@ load.bigMatrix <- function(
 #' 
 #' @export
 as.bigMatrix <- function(
-  x, backingname, backingpath=".", type=options("bigmemory.default.type")[[1]]
+  x, backingfile, type=options("bigmemory.default.type")[[1]]
 ) {
   if (class(x) == "big.matrix") 
     stop(
@@ -166,18 +172,22 @@ as.bigMatrix <- function(
   if (class(x) != "matrix")
     stop("Cannot convert from ", class(x), " to 'bigMatrix'")
   
-  save.as.bigMatrix(x, backingname, backingpath, type)
-  load.bigMatrix(backingname, backingpath)
+  save.as.bigMatrix(x, backingfile, type)
+  load.bigMatrix(backingfile)
 }
 
 #' @rdname bigMatrix-get
 #' @export
 read.bigMatrix <- function(
-  file, backingname, backingpath=".", 
+  file, backingfile, 
   type=options("bigmemory.default.type")[[1]],
   row.names=TRUE, header=TRUE, ...
 ) {
+  # Get components for interfacing with bigmemory and resolve paths as absolute
+  backingname <- basename(backingfile)
+  backingpath <- gsub(paste0(backingname, "$"), "", backingfile)
   backingpath <- normalizePath(backingpath)
+  backingfile <- file.path(backingpath, backingname)
   
   bm <- read.big.matrix(
     filename=file, 
@@ -190,7 +200,7 @@ read.bigMatrix <- function(
   # For some reason, read.big.matrix doesn't add the row names to the descriptor
   # file when both rownames and colnames are present (in some cases). So we 
   # manually override that.
-  dFile <- file.path(backingpath, paste0(backingname, ".desc"))
+  dFile <- paste0(backingfile, ".desc")
   desc <- dget(dFile)
   if (!is.null(rownames(bm))) {
     desc@description$rowNames <- rownames(bm)
@@ -205,7 +215,7 @@ read.bigMatrix <- function(
   dput(desc, dFile)
   rm(bm)
   gc()
-  load.bigMatrix(backingname, backingpath)
+  load.bigMatrix(backingfile)
 }
 
 

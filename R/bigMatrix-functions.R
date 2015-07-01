@@ -38,7 +38,9 @@ scaleBigMatrix <- function(x, tmp.dir) {
   if (is.attached)
     x <- detach.bigMatrix(x)
 
-  suppressWarnings(load.bigMatrix(gsub(".desc", "", descriptorfile), tmp.dir))  
+  suppressWarnings(
+    load.bigMatrix(file.path(tmp.dir, gsub(".desc", "", descriptorfile)))
+  )  
 }
 
 #' Get the range of a bigMatrix or its subset

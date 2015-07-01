@@ -7,25 +7,21 @@
 \alias{save.as.bigMatrix}
 \title{Loading in data as a 'bigMatrix'}
 \usage{
-save.as.bigMatrix(x, backingname, backingpath = ".",
+save.as.bigMatrix(x, backingfile,
   type = options("bigmemory.default.type")[[1]])
 
-load.bigMatrix(backingname, backingpath = ".")
+load.bigMatrix(backingfile)
 
-as.bigMatrix(x, backingname, backingpath = ".",
-  type = options("bigmemory.default.type")[[1]])
+as.bigMatrix(x, backingfile, type = options("bigmemory.default.type")[[1]])
 
-read.bigMatrix(file, backingname, backingpath = ".",
+read.bigMatrix(file, backingfile,
   type = options("bigmemory.default.type")[[1]], row.names = TRUE,
   header = TRUE, ...)
 }
 \arguments{
 \item{x}{a regular matrix to convert}
 
-\item{backingname}{basename (filename without an extension) the
-bigMatrix object is, or will be, stored in.}
-
-\item{backingpath}{directory the bigMatrix is, or will be, stored in.}
+\item{backingfile}{location on disk the bigMatrix is, or will be, stored at.}
 
 \item{type}{the type of the atomic element
 (\code{options()$bigmemory.default.type} by default - "\code{double}" -
