@@ -424,9 +424,9 @@ modulePreservation <- function(
   )
   
   # Try to intelligently handle different types of user input
-  geneExpression <- dynamicMatLoad(geneExpression, backingpath=tmp.dir)
-  coexpression <- dynamicMatLoad(coexpression, backingpath=tmp.dir)
-  adjacency <- dynamicMatLoad(adjacency, backingpath=tmp.dir)
+  geneExpression <- dynamicMatLoad(geneExpression)
+  coexpression <- dynamicMatLoad(coexpression)
+  adjacency <- dynamicMatLoad(adjacency)
   
   # Sanity check input for consistency.
   checkSets(

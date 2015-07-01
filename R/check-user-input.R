@@ -353,8 +353,7 @@ formatGeneExpression <- function(geneExpression, nDatasets, datasetNames) {
 #' Dynamically detect and load a bigMatrix object depending on input type
 #' 
 #' @param object user input object
-#' @param ... additional arguments to pass to read.bigMatrix or as.bigMatrix,
-#'   usually a temporary directory for the backingpath
+#' @param ... additional arguments to pass to read.bigMatrix
 #'   
 #' @return
 #'  A 'bigMatrix' object or error.
@@ -374,17 +373,15 @@ dynamicMatLoad <- function(object, ...) {
     
     # Is this file a big.matrix descriptor?
     if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
-      backingname <- basename(object)
-      backingpath <- gsub(backingname, "", object)
-      backingname <- gsub(".desc", "", backingpath)
-      return(load.bigMatrix(backingname, backingpath))
+      return(load.bigMatrix(object))
     } else {
       vCat(
         TRUE, 0,
         "Creating new 'bigMatrix' in a temporary directory for file ", object,
         ". This could take a while."
       )
-      return(read.bigMatrix(file=object, backingname=basename, ...))
+      backingfile <- file.path(tempdir(), basename)
+      return(read.bigMatrix(file=object, backingfile=backingfile, ...))
     }
     
   } else if (class(object) == "matrix") {
@@ -393,7 +390,8 @@ dynamicMatLoad <- function(object, ...) {
       "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
       " This could take a while."
     )
-    return(as.bigMatrix(object, backingname=basename, ...))
+    backingfile <- file.path(tempdir(), basename)
+    return(as.bigMatrix(object, backingfile=backingfile, ...))
   } 
   stop("unable to load object of type ", class(object), " as a bigMatrix!")
 }

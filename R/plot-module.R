@@ -307,9 +307,9 @@ plotModule <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(

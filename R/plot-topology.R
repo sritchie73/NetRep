@@ -416,9 +416,9 @@ plotExpression <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
@@ -644,9 +644,9 @@ plotCoexpression <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
@@ -782,9 +782,9 @@ plotAdjacency <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
@@ -923,9 +923,9 @@ plotModuleMembership <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
@@ -1065,9 +1065,9 @@ plotConnectivity <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
@@ -1210,9 +1210,9 @@ plotSummaryExpression <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # Format optional input data so it doesn't cause cascading error crashes 
   geneExpression <- formatGeneExpression(
@@ -1408,9 +1408,9 @@ plotExpressionLegend <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression, backingpath=tmp.dir))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression, backingpath=tmp.dir))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency, backingpath=tmp.dir))
+  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
+  coexpression <- unifyDS(dynamicMatLoad(coexpression))
+  adjacency <- unifyDS(dynamicMatLoad(adjacency))
   
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structuren

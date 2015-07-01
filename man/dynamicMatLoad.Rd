@@ -8,8 +8,7 @@ dynamicMatLoad(object, ...)
 \arguments{
 \item{object}{user input object}
 
-\item{...}{additional arguments to pass to read.bigMatrix or as.bigMatrix,
-  usually a temporary directory for the backingpath}
+\item{...}{additional arguments to pass to read.bigMatrix}
 }
 \value{
 A 'bigMatrix' object or error.
