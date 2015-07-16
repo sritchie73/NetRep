@@ -14,19 +14,19 @@ gene coexpression network module.
 ## Installation
 
 The latest stable version of this package as well as its package dependencies are maintained 
-in a lightweight CRAN-like repository at https://sritchie73.github.io/miniCRAN and can
+in a lightweight CRAN-like repository at http://InouyeLab.github.io/miniCRAN and can
 be installed using `install.packages`:
 
 ```{r}
-install.packages("fastModPres", repos="http://sritchie73.github.io/miniCRAN")
+install.packages("fastModPres", repos="http://InouyeLab.github.io/miniCRAN")
 ```
 
-The most up-to-date version of this package can be installed directly from github using
+The latest developmental version of this package can be installed directly from github using
 the devtools package:
 
 ```{r}
 library(devtools)
-install_github("sritchie73/fastModPres")
+install_github("InouyeLab/fastModPres")
 ```
 
 ## Software dependencies: Installation troubleshooting
