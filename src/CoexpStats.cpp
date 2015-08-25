@@ -42,21 +42,11 @@ List CoexpStats(
     }   
   }
 
-  mat corCor = cor(corD, corT);
   mat meanCor = mean(sign(corD) % corT, 1); 
 
-
-  if (corCor(0,0) < -1 || corCor(0,0) > 1) {
-    Function warning("warning");
-    warning("'cor.coexp' returned a correlation outside of [-1,1]"
-            "returning NA instead.");
-    return List::create(
-      Named("cor.coexp") = NA_REAL,
-      Named("mean.coexp") = meanCor                                                                                                                                                                                                             
-    );  
-  }
   return List::create(
-    Named("cor.coexp") = corCor,
+    Named("cor.discovery") = corD,
+    Named("cor.test") = corT,
     Named("mean.coexp") = meanCor
   );  
 }

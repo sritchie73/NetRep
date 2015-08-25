@@ -31,6 +31,11 @@
 #' @param null the type of null model, either "overlap" or "all" (see details).
 #' @param alternative The type of module preservation test to perform. Must be 
 #'   one of "greater" (default), "less" or "two.sided" (see details).
+#' @param corMethod character vector indicating method to use when calculating 
+#'   the correlation based statistics (see details). Must be one of "pearson", 
+#'   "spearman", "kendall" or "bicor". If "pearson", the fast correlation
+#'   function provided by the WGCNA package will be used. If "bicor", then the
+#'   \code{\link[WGCNA]{bicor}} function will be used.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' @param simplify logical; if \code{TRUE}, simplify the structure of the output
 #'  list if possible (see Return Value).
@@ -378,7 +383,7 @@
 modulePreservation <- function(
   geneExpression=NULL, coexpression, adjacency, moduleAssignments,
   discovery=1, test=2, nCores=1, nPerm, excludeModules,
-  includeModules, null="overlap", alternative="greater",
+  includeModules, null="overlap", alternative="greater", corMethod="pearson",
   simplify=TRUE, verbose=TRUE, keepNulls=FALSE
 ) {
   #-----------------------------------------------------------------------------
@@ -577,6 +582,7 @@ modulePreservation <- function(
   # Suppress annoying foreach warning if running in serial
   if (getDoParWorkers() == 1) {
     suppressWarnings({
+      ii <- 0 # suppress R CMD check note
       foreach(ii = 1:2) %dopar% { ii }
     })
   }
@@ -724,7 +730,8 @@ modulePreservation <- function(
             stats <- calcStats(
               discProps[[mi]], testProps, 
               coexpression[[di]], discInds,
-              coexpression[[ti]], testInds
+              coexpression[[ti]], testInds,
+              corMethod
             )
             observed[mi,] <- stats
           }
@@ -805,7 +812,8 @@ modulePreservation <- function(
                       chunkStats[mi,,pi] <- calcStats(
                         discProps[[mi]], permProps, 
                         coexpression[[di]], discInds,
-                        coexpression[[ti]], permInds
+                        coexpression[[ti]], permInds,
+                        corMethod
                       )
                       rm(permProps)
                       gc()

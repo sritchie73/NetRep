@@ -6,7 +6,8 @@
 modulePreservation(geneExpression = NULL, coexpression, adjacency,
   moduleAssignments, discovery = 1, test = 2, nCores = 1, nPerm,
   excludeModules, includeModules, null = "overlap", alternative = "greater",
-  simplify = TRUE, verbose = TRUE, keepNulls = FALSE)
+  corMethod = "pearson", simplify = TRUE, verbose = TRUE,
+  keepNulls = FALSE)
 }
 \arguments{
 \item{geneExpression}{A list of gene expression matrices, one for each
@@ -43,6 +44,12 @@ preservation of all modules will be tested.}
 
 \item{alternative}{The type of module preservation test to perform. Must be
 one of "greater" (default), "less" or "two.sided" (see details).}
+
+\item{corMethod}{character vector indicating method to use when calculating
+the correlation based statistics (see details). Must be one of "pearson",
+"spearman", "kendall" or "bicor". If "pearson", the fast correlation
+function provided by the WGCNA package will be used. If "bicor", then the
+\code{\link[WGCNA]{bicor}} function will be used.}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}

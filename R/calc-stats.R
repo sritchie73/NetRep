@@ -7,10 +7,15 @@
 #'  discovery dataset using \code{\link{adjProps}} and \code{\link{dataProps}}.
 #' @param testProps network properties calculated for the module from the
 #'  test dataset using \code{\link{adjProps}} and \code{\link{dataProps}}.
-#' @param discCoexp 'bigMatrix' containing the coexpression network for the discovery dataset.
+#' @param discCoexp 'bigMatrix' containing the coexpression network for the 
+#'  discovery dataset.
 #' @param discIndices module indices in the discovery dataset.
-#' @param testCoexp 'bigMatrix' containing the coexpression network for the test dataset.
+#' @param testCoexp 'bigMatrix' containing the coexpression network for the 
+#'  test dataset.
 #' @param testIndices module indices in the test dataset.
+#' @param corMethod method to use when calculating the correlation between 
+#'  network properties. I.e. one of "pearson", "spearman", "kendall", or 
+#'  "bicor".
 #'  
 #' @section Design decision:
 #'  Most of the module presevation statistics are calculated as the correlation 
@@ -39,19 +44,43 @@
 #' statistics: \emph{mean.adj}, \emph{cor.kIM}, \emph{pve}, \emph{mean.MM},
 #' \emph{cor.MM}, \emph{cor.coexp}, and \emph{mean.coexp}.
 calcStats <- function(
-  discProps, testProps, discCoexp, discIndices, testCoexp, testIndices
+  discProps, testProps, discCoexp, discIndices, testCoexp, testIndices,
+  corMethod = "pearson"
 ) {
+  cList <- coexpStats(discCoexp, discIndices, testCoexp, testIndices)
   stats <- c(
     mean.adj = testProps[["mean.adj"]],
-    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]]),
-    unlist(coexpStats(discCoexp, discIndices, testCoexp, testIndices))
+    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]], corMethod),
+    cor.coexp = cor(cList[["cor.discovery"]], cList[["cor.test"]], corMethod),
+    mean.coexp = cList[["mean.coexp"]]
   )
   if ("pve" %in% names(testProps)) { # Detect if data has been provided
     stats <- c(
       stats, pve = testProps[["pve"]],
       mean.MM = mean(sign(discProps[["MM"]]) * testProps[["MM"]]),
-      cor.MM = cor(discProps[["MM"]], testProps[["MM"]])
+      cor.MM = cor(discProps[["MM"]], testProps[["MM"]], corMethod)
     )
   }
   stats
+}
+
+#' Dispatch function for correlation methods
+#' @param x a numeric vector or a matrix. If \code{y} is null, \code{x} must be 
+#'  a matrix.
+#' @param y a numeric vector or a matrix. If not given, correlations of columns 
+#'  of \code{x} will be calculated.
+#' @param method character string specifying the method to be used. If "pearson", the
+#'  fast correlation function provided by the WGCNA package will be used. If 
+#'  "bicor", then the \code{\link[WGCNA]{bicor}} function will be used. 
+#'  Otherwise the standard \code{\link[stats]{cor}} will be used.
+#' 
+#' @import WGCNA 
+cor <- function(x, y, method="pearson") {
+  if (method == "bicor") { 
+    WGCNA::bicor(x, y)[,] # [,] drops matrix structure 
+  } else if (method == "pearson") {
+    WGCNA::cor(x, y)[,]
+  } else {
+    stats::cor(x, y, method=method)
+  }
 }
