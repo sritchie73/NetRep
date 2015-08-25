@@ -23,10 +23,10 @@ List RangeSubset(const Mat<T>& dat, IntegerVector subsetIndices) {
   );
 }
 
-template <typename T>
-List BigRange(const Mat<T>& dat) {
-  Mat<T> datMax = max(max(dat, 0), 1);
-  Mat<T> datMin = min(min(dat, 0), 1);
+template <typename S>
+List BigRange(const Mat<S>& dat) {
+  Mat<S> datMax = max(max(dat, 0), 1);
+  Mat<S> datMin = min(min(dat, 0), 1);
   
   return List::create(
     Named("min") = datMin,
@@ -113,7 +113,7 @@ List BigRange(SEXP pDat) {
     );
   } else if (type == 6) {
     return BigRange(
-      arma::Mat<int>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false)
+      arma::Mat<float>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false)
     );
   } else if (type == 8) {
     return BigRange(

@@ -21,57 +21,54 @@ using namespace arma;
  */
 template <typename T>
 List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
-
-    // Cast the BigMatrix to an arma::Mat<double>
-    Mat<T> U, V;
-    Col<T> S;
-    uvec subsetCols = sort(as<uvec>(subsetIndices) - 1);
-    
-    // Get the summary profile for the network subset from the SVD.
-    bool success = svd_econ(U, S, V, aDat.cols(subsetCols), "left", "dc");
-    if (!success) {
-      Function warning("warning");
-      warning("SVD failed to converge, does your data contain missing or"
-              " infinite values?");
-      return List::create(
-          Named("SEP") = NA_REAL,
-          Named("MM") = NA_REAL,
-          Named("pve") = NA_REAL
-        );
-    }
-    Mat<T> summary(U.col(0));
-
-    // Flip the sign of the summary profile so that the eigenvector is 
-    // positively correlated with the average scaled value of the underlying
-    // data for the network subset.
-    Mat<T> ap = cor(mean(aDat.cols(subsetCols), 1), summary);
-    if (ap(0,0) < 0) {
-      summary *= -1; 
-    }
-    
-    // We want the correlation between each variable (node) in the underlying
-    // data and the summary profile for that network subset.
-    Mat<T> p = cor(summary, aDat.cols(subsetCols));
-    Mat<T> MM(p);
-    
-    // To make sure the resulting MAR and KIM vectors are in the correct order,
-    // order the results to match the original ordering of subsetIndices.
-    Function rank("rank"); // Rank only works on R objects like IntegerVector.
-    uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
-
-    Col<T> oMM = MM(idxRank);
-
-    // The proportion of variance explained is the sum of the squared 
-    // correlation between the network subset summary profile, and each of the 
-    // variables in the data that correspond to nodes in the network subset.
-    Mat<T> pve(mean(square(p), 1));
-    
+  Mat<T> U, V;
+  Col<T> S;
+  uvec subsetCols = sort(as<uvec>(subsetIndices) - 1);
+  
+  // Get the summary profile for the network subset from the SVD.
+  bool success = svd_econ(U, S, V, dat.cols(subsetCols), "left", "dc");
+  if (!success) {
+    Function warning("warning");
+    warning("SVD failed to converge, does your data contain missing or"
+            " infinite values?");
     return List::create(
-      Named("SEP") = summary,
-      Named("MM") = oMM,
-      Named("pve") = pve
-    );
+        Named("SEP") = NA_REAL,
+        Named("MM") = NA_REAL,
+        Named("pve") = NA_REAL
+      );
   }
+  Mat<T> summary(U.col(0));
+
+  // Flip the sign of the summary profile so that the eigenvector is 
+  // positively correlated with the average scaled value of the underlying
+  // data for the network subset.
+  Mat<T> ap = cor(mean(dat.cols(subsetCols), 1), summary);
+  if (ap(0,0) < 0) {
+    summary *= -1; 
+  }
+  
+  // We want the correlation between each variable (node) in the underlying
+  // data and the summary profile for that network subset.
+  Mat<T> p = cor(summary, dat.cols(subsetCols));
+  Mat<T> MM(p);
+  
+  // To make sure the resulting MAR and KIM vectors are in the correct order,
+  // order the results to match the original ordering of subsetIndices.
+  Function rank("rank"); // Rank only works on R objects like IntegerVector.
+  uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
+
+  Col<T> oMM = MM(idxRank);
+
+  // The proportion of variance explained is the sum of the squared 
+  // correlation between the network subset summary profile, and each of the 
+  // variables in the data that correspond to nodes in the network subset.
+  Mat<T> pve(mean(square(p), 1));
+  
+  return List::create(
+    Named("SEP") = summary,
+    Named("MM") = oMM,
+    Named("pve") = pve
+  );
 }
 
 //' Network subset eigenvector and proportion of variance explained in C++
@@ -134,7 +131,7 @@ List DataProps(SEXP pDat, IntegerVector subsetIndices) {
   }
   
   // Dispatch function for all types of big.matrix.
-  unsigned short type = xpAdj->matrix_type();
+  unsigned short type = xpDat->matrix_type();
   if (type == 6) {
     return DataProps(
       arma::Mat<float>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
