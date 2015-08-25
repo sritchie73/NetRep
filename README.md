@@ -14,20 +14,37 @@ gene coexpression network module.
 ## Installation
 
 The latest stable version of this package as well as its package dependencies are maintained 
-in a lightweight CRAN-like repository at https://sritchie73.github.io/miniCRAN and can
+in a lightweight CRAN-like repository at http://InouyeLab.github.io/miniCRAN and can
 be installed using `install.packages`:
 
 ```{r}
-install.packages("fastModPres", repos="http://sritchie73.github.io/miniCRAN")
+install.packages("fastModPres", repos="http://InouyeLab.github.io/miniCRAN")
 ```
 
-The most up-to-date version of this package can be installed directly from github using
+The latest developmental version of this package can be installed directly from github using
 the devtools package:
 
 ```{r}
 library(devtools)
-install_github("sritchie73/fastModPres")
+install_github("InouyeLab/fastModPres")
 ```
+
+## Software dependencies: Installation troubleshooting
+
+`fastModPres` and its dependencies require several third party libraries to be
+installed. If not found, installation of the package will fail.
+
+The `g++` compiler is required for the `bigmemory` package to install, 
+`gfortran` is required for the `statmod` package to install, and a `BLAS` 
+library is required for `RcppArmadillo` to install.
+
+BLAS libraries must be installed prior to the installation of R, otherwise R 
+won't link to them correctly and `RcppArmadillo` will fail to install. You've 
+encountered this error if `RcppArmadillo` partially compiles, but then throws 
+an error about failing to link to `-llapack`. LAPACK libraries come bundled with
+most BLAS libraries.
+
+Operating specific instructions to follow. 
 
 ## Testing
 To ensure the package has installed correctly and will run on your system, run the following:
