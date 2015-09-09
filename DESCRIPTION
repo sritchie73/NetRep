@@ -1,6 +1,6 @@
-Package: fastModPres
+Package: netrep
 Type: Package
-Title: Fast permutation procedure for testing network module replication
+Title: Testing network module replication and preservation through permutation testing
 Version: 0.25.0
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'

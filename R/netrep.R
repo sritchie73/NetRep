@@ -10,8 +10,8 @@
 #' plotting functions for visualising a module. 
 #'
 #' @docType package
-#' @name fastModPres
-#' @useDynLib fastModPres
+#' @name netrep
+#' @useDynLib netrep
 #' @importFrom Rcpp evalCpp
 #' @import BH
 #' @import bigmemory

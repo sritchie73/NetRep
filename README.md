@@ -1,4 +1,4 @@
-# fastModPres
+# netrep
 ##### Fast permutation procedure for testing network module replication
 
 An R package containing functions for assessing the replication/preservation of 
@@ -18,7 +18,7 @@ in a lightweight CRAN-like repository at http://InouyeLab.github.io/miniCRAN and
 be installed using `install.packages`:
 
 ```{r}
-install.packages("fastModPres", repos="http://InouyeLab.github.io/miniCRAN")
+install.packages("netrep", repos="http://InouyeLab.github.io/miniCRAN")
 ```
 
 The latest developmental version of this package can be installed directly from github using
@@ -26,12 +26,12 @@ the devtools package:
 
 ```{r}
 library(devtools)
-install_github("InouyeLab/fastModPres")
+install_github("InouyeLab/netrep")
 ```
 
 ## Software dependencies: Installation troubleshooting
 
-`fastModPres` and its dependencies require several third party libraries to be
+`netrep` and its dependencies require several third party libraries to be
 installed. If not found, installation of the package will fail.
 
 The `g++` compiler is required for the `bigmemory` package to install, 
@@ -51,6 +51,6 @@ To ensure the package has installed correctly and will run on your system, run t
 
 ```{r}
 library(testthat)
-test_package("fastModPres")
+test_package("netrep")
 ```
 
