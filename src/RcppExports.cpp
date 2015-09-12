@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // AdjProps
 List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices);
-RcppExport SEXP fastModPres_AdjProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
+RcppExport SEXP NetRep_AdjProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // CheckFinite
 void CheckFinite(SEXP pDat);
-RcppExport SEXP fastModPres_CheckFinite(SEXP pDatSEXP) {
+RcppExport SEXP NetRep_CheckFinite(SEXP pDatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
@@ -30,7 +30,7 @@ END_RCPP
 }
 // CoexpStats
 List CoexpStats(SEXP pCoexpD, IntegerVector discIndices, SEXP pCoexpT, IntegerVector testIndices);
-RcppExport SEXP fastModPres_CoexpStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
+RcppExport SEXP NetRep_CoexpStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -44,7 +44,7 @@ END_RCPP
 }
 // DataProps
 List DataProps(SEXP pDat, IntegerVector subsetIndices);
-RcppExport SEXP fastModPres_DataProps(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
+RcppExport SEXP NetRep_DataProps(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -56,7 +56,7 @@ END_RCPP
 }
 // RangeSubset
 List RangeSubset(SEXP pDat, IntegerVector subsetIndices);
-RcppExport SEXP fastModPres_RangeSubset(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
+RcppExport SEXP NetRep_RangeSubset(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -68,7 +68,7 @@ END_RCPP
 }
 // BigRange
 List BigRange(SEXP pDat);
-RcppExport SEXP fastModPres_BigRange(SEXP pDatSEXP) {
+RcppExport SEXP NetRep_BigRange(SEXP pDatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -79,7 +79,7 @@ END_RCPP
 }
 // Scale
 void Scale(SEXP pDat, SEXP spDat);
-RcppExport SEXP fastModPres_Scale(SEXP pDatSEXP, SEXP spDatSEXP) {
+RcppExport SEXP NetRep_Scale(SEXP pDatSEXP, SEXP spDatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);

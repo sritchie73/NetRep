@@ -14,7 +14,7 @@
 #'   }
 #' @rdname AdjProps-cpp
 AdjProps <- function(pAdjacency, subsetIndices) {
-    .Call('fastModPres_AdjProps', PACKAGE = 'fastModPres', pAdjacency, subsetIndices)
+    .Call('NetRep_AdjProps', PACKAGE = 'NetRep', pAdjacency, subsetIndices)
 }
 
 #' Check the elements of a `big.matrix`
@@ -26,7 +26,7 @@ AdjProps <- function(pAdjacency, subsetIndices) {
 #'
 #' @rdname chekcFinite-cpp
 CheckFinite <- function(pDat) {
-    invisible(.Call('fastModPres_CheckFinite', PACKAGE = 'fastModPres', pDat))
+    invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', pDat))
 }
 
 #' Calculate the Correlation of Coexpression and Mean Sign-Aware Coexpression
@@ -63,7 +63,7 @@ CheckFinite <- function(pDat) {
 #'  }
 #' @rdname CoexpStats-cpp
 CoexpStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
-    .Call('fastModPres_CoexpStats', PACKAGE = 'fastModPres', pCoexpD, discIndices, pCoexpT, testIndices)
+    .Call('NetRep_CoexpStats', PACKAGE = 'NetRep', pCoexpD, discIndices, pCoexpT, testIndices)
 }
 
 #' Network subset eigenvector and proportion of variance explained in C++
@@ -116,7 +116,7 @@ CoexpStats <- function(pCoexpD, discIndices, pCoexpT, testIndices) {
 #' @rdname dataProps-cpp
 #'  
 DataProps <- function(pDat, subsetIndices) {
-    .Call('fastModPres_DataProps', PACKAGE = 'fastModPres', pDat, subsetIndices)
+    .Call('NetRep_DataProps', PACKAGE = 'NetRep', pDat, subsetIndices)
 }
 
 #' Get the range of a big.matrix
@@ -131,7 +131,7 @@ DataProps <- function(pDat, subsetIndices) {
 #'   
 #' @rdname range-cpp
 RangeSubset <- function(pDat, subsetIndices) {
-    .Call('fastModPres_RangeSubset', PACKAGE = 'fastModPres', pDat, subsetIndices)
+    .Call('NetRep_RangeSubset', PACKAGE = 'NetRep', pDat, subsetIndices)
 }
 
 #' @name range-cpp
@@ -139,7 +139,7 @@ RangeSubset <- function(pDat, subsetIndices) {
 #'   \code{BigRange}: get the range of values in a big.matrix
 #' 
 BigRange <- function(pDat) {
-    .Call('fastModPres_BigRange', PACKAGE = 'fastModPres', pDat)
+    .Call('NetRep_BigRange', PACKAGE = 'NetRep', pDat)
 }
 
 #' Scale a matrix by its rows
@@ -150,6 +150,6 @@ BigRange <- function(pDat) {
 #'   will be stored in.
 #' @rdname scale-cpp
 Scale <- function(pDat, spDat) {
-    invisible(.Call('fastModPres_Scale', PACKAGE = 'fastModPres', pDat, spDat))
+    invisible(.Call('NetRep_Scale', PACKAGE = 'NetRep', pDat, spDat))
 }
 

@@ -1,5 +1,5 @@
 # Allows the matrix slot of the big.matrix class to be empty, which
-# is desirable if we're forcing netrep to consume minimal memory.
+# is desirable if we're forcing modulePreservation to consume minimal memory.
 setClassUnion("maybe.big.matrix", c("big.matrix", "NULL"))
 
 # Allows the rownames and colnames slots of the big.matrix class to be empty.
