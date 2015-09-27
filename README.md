@@ -13,12 +13,12 @@ gene coexpression network module.
 
 ## Installation
 
-The latest stable version of this package as well as its package dependencies are maintained 
-in a lightweight CRAN-like repository at http://InouyeLab.github.io/miniCRAN and can
-be installed using `install.packages`:
+The latest stable version of this package can be installed directly from this
+Github repository:
 
 ```{r}
-install.packages("NetRep", repos="http://InouyeLab.github.io/miniCRAN")
+library(devtools)
+install_github("InouyeLab/NetRep")
 ```
 
 The latest developmental version of this package can be installed directly from github using
@@ -26,7 +26,7 @@ the devtools package:
 
 ```{r}
 library(devtools)
-install_github("InouyeLab/NetRep")
+install_github("InouyeLab/NetRep", branch="dev")
 ```
 
 ## Software dependencies: Installation troubleshooting
