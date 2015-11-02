@@ -24,9 +24,6 @@ test_that("Testing with no column and rownames", {
   # Test loading from a "big.matrix"
   d3 <- load.bigMatrix(file.path(tempdir(), "tmp1"))
   expect_identical(d3, d1)
-  # Make sure the row and column names are put in the right files
-  d4 <- load.bigMatrix(file.path(tempdir(), "tmp1"))
-  expect_identical(d1, d4)
   
   # Check reading and writing
   write.bigMatrix(
