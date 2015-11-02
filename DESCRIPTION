@@ -31,3 +31,4 @@ Suggests:
     doMC,
     doParallel
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
+RoxygenNote: 5.0.0
