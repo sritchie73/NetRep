@@ -23,14 +23,6 @@ library(devtools)
 install_github("InouyeLab/NetRep")
 ```
 
-The latest developmental version of this package can be installed directly from github using
-the devtools package:
-
-```{r}
-library(devtools)
-install_github("InouyeLab/NetRep", branch="dev")
-```
-
 ## Software dependencies: Installation troubleshooting
 
 `NetRep` and its dependencies require several third party libraries to be
