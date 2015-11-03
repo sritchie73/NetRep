@@ -10,8 +10,8 @@ using namespace arma;
 
 /* Implementation of AdjProps
  *
- * @param adj the armadillo compatible adjacency matrix
- * @param subsetIndices indices of the network subset of interest.
+ * @param adj the armadillo compatible network adjacency matrix
+ * @param subsetIndices indices of the network module of interest.
  * @return
  *    A List containing:
  *     - The weighted within-subset degree for each node (kIM).

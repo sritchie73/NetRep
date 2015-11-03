@@ -382,9 +382,9 @@
 #' @import RhpcBLASctl
 #' @export
 modulePreservation <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments,
-  discovery=1, test=2, nCores=1, nPerm, excludeModules,
-  includeModules, null="overlap", alternative="greater", corMethod="pearson",
+  data=NULL, correlation, network, moduleAssignments,
+  discovery=1, test=2, nCores=1, nPerm, exclude,
+  include, null="overlap", alternative="greater", statCorMethod="pearson",
   simplify=TRUE, verbose=TRUE, keepNulls=FALSE
 ) {
   #-----------------------------------------------------------------------------
@@ -416,17 +416,17 @@ modulePreservation <- function(
   
   if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)
     stop("'nCores' must be a single number greater than 0")
-  if (!is.null(geneExpression) && !is.list(geneExpression))
-    stop("Expecting a list of gene expression matrices, one for each dataset")
-  if (!is.list(coexpression))
-    stop("Expecting a list of coexpression matrices, one for each dataset")
-  if (!is.list(adjacency))
-    stop("Expecting a list of adjacency matrices, one for each dataset")
+  if (!is.null(data) && !is.list(data))
+    stop("Expecting a list of matrices for argument 'data'")
+  if (!is.list(correlation))
+    stop("Expecting a list of matrices for argument 'correlation'")
+  if (!is.list(network))
+    stop("Expecting a list of matrices for argument 'network'")
   
   # Check for valid corMethod options
-  validCorMethods <- c("pearson", "spearman", "kendall", "bicor")
-  if (corMethod %nin% validCorMethods)
-    stop("'corMethod' must be one of ", paste(validCorMethods, collpase=" "))
+  validMethods <- c("pearson", "spearman", "kendall", "bicor")
+  if (statCorMethod %nin% validMethods)
+    stop("'corMethod' must be one of ", paste(validMethods, collpase=" "))
   
   # Check for WGCNA. We need to open a temporary sink to suppress all of WGCNA's
   # startup messages.
@@ -435,57 +435,57 @@ modulePreservation <- function(
   if (suppressMessages(suppressWarnings(require("WGCNA"))))
     hasWGCNA <- TRUE
   sink()
-  if (corMethod == "bicor" & !hasWGCNA)
-    stop("corMethod='bicor' requires the WGCNA package (install from BioConductor).")
+  if (statCorMethod == "bicor" & !hasWGCNA)
+    stop("statCorMethod='bicor' requires the WGCNA package.")
   
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structure.
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression)
+    moduleAssignments, discovery, length(correlation), names(correlation)
   )
   
   # Try to intelligently handle different types of user input
-  geneExpression <- dynamicMatLoad(geneExpression)
-  coexpression <- dynamicMatLoad(coexpression)
-  adjacency <- dynamicMatLoad(adjacency)
+  data <- dynamicMatLoad(data)
+  correlation <- dynamicMatLoad(correlation)
+  network <- dynamicMatLoad(network)
   
   # Sanity check input for consistency.
   checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+    data, correlation, network, moduleAssignments, discovery, test
   )
   
   # Are the datasets named, or will we iterate by index?
-  if (!is.null(names(coexpression))) {
-    datasets <- names(coexpression)
+  if (!is.null(names(correlation))) {
+    datasets <- names(correlation)
     if (class(discovery) != "character")
       discovery <- datasets[discovery]
     if (class(test) != "character")
       test <- datasets[test]
   } else {
-    datasets <- seq_along(coexpression)
+    datasets <- seq_along(correlation)
   }
   nDatasets <- length(datasets)
   
   # same for the include and exclude modules arguments
-  includeModules <- formatInclude(
-    includeModules, discovery, length(coexpression), datasets
+  include <- formatInclude(
+    include, discovery, length(correlation), datasets
   )
-  excludeModules <- formatExclude(
-    excludeModules, discovery, length(coexpression), datasets
+  exclude <- formatExclude(
+    exclude, discovery, length(correlation), datasets
   )
   
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang.
   vCat(verbose, 0, "checking matrices for non-finite values...")
-  lapply(geneExpression, checkFinite)
-  lapply(coexpression, checkFinite)
-  lapply(adjacency, checkFinite)
+  lapply(data, checkFinite)
+  lapply(correlation, checkFinite)
+  lapply(network, checkFinite)
   
   # Temporarily create scaled gene expression set for the calculation of the
   # summary expression profile
   sge <- NULL
-  if (!is.null(geneExpression))
-    sge <- lapply(geneExpression, scaleBigMatrix, tmp.dir)
+  if (!is.null(data))
+    sge <- lapply(data, scaleBigMatrix, tmp.dir)
   
   # Set up return list 
   res <- rep(list(NULL), nDatasets)
@@ -507,11 +507,11 @@ modulePreservation <- function(
     # of datasets each module is tested in.
     multiplier <- sum(sapply(discovery, function(di) {
       modules <- names(table(moduleAssignments[[di]]))
-      if (!is.null(excludeModules[[di]])) {
-        modules <- modules %sub_nin% excludeModules[[di]]
+      if (!is.null(exclude[[di]])) {
+        modules <- modules %sub_nin% exclude[[di]]
       }
-      if (!is.null(includeModules[[di]])) {
-        modules <- modules %sub_in% includeModules[[di]]
+      if (!is.null(include[[di]])) {
+        modules <- modules %sub_in% include[[di]]
       }
       nTest <- length(test %sub_nin% di)
       length(modules)*nTest
@@ -612,12 +612,12 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   # Set up correlation function
   #-----------------------------------------------------------------------------
-  if (corMethod == "bicor") {
+  if (statCorMethod == "bicor") {
     cor <- function(...) bicor(..., quick=1, nThreads=1)[,]
-  } else if (corMethod == "pearson" & hasWGCNA) {
+  } else if (statCorMethod == "pearson" & hasWGCNA) {
     cor <- function(...) corFast(..., quick=1, nThreads=1)[,]
   } else {
-    cor <- function(...) stats::cor(..., method=corMethod)[,]
+    cor <- function(...) stats::cor(..., method=statCorMethod)[,]
   }
   
   #-----------------------------------------------------------------------------
@@ -643,7 +643,7 @@ modulePreservation <- function(
           vCat(
             verbose, 0, sep="", 
             "Calculating preservation of network subsets from dataset ",
-            di, ", in dataset ", ti, "."
+            di, " in dataset ", ti, "."
           )
           #---------------------------------------------------------------------
           # Set up variables for this comparison
@@ -652,23 +652,23 @@ modulePreservation <- function(
           # Force modules to be character vectors to avoid improper indexing
           if (is.numeric(moduleAssignments[[di]])) { 
             moduleAssignments[[di]] <- as.character(moduleAssignments[[di]])
-            names(moduleAssignments[[di]]) <- colnames(coexpression[[di]])
+            names(moduleAssignments[[di]]) <- colnames(correlation[[di]])
           }
           
           # To simplify later function calls, we need to get a vector of module
           # assignments only for (a) modules of interest and (b) the genes 
           # present in both datasets for those modules.
           overlapGenes <- intersect(
-            colnames(coexpression[[di]]), 
-            colnames(coexpression[[ti]])
+            colnames(correlation[[di]]), 
+            colnames(correlation[[ti]])
           )
           overlapAssignments <- moduleAssignments[[di]][overlapGenes]
           # Restrict to modules of interest
           modules <- unique(moduleAssignments[[di]])
-          if (!is.null(excludeModules[[di]]))
-            modules <- modules %sub_nin% excludeModules[[di]]
-          if (!is.null(includeModules[[di]]))
-            modules <- modules %sub_in% includeModules[[di]]
+          if (!is.null(exclude[[di]]))
+            modules <- modules %sub_nin% exclude[[di]]
+          if (!is.null(include[[di]]))
+            modules <- modules %sub_in% include[[di]]
           overlapAssignments <- overlapAssignments %sub_in% modules 
           overlapModules <- unique(overlapAssignments)
           overlapModules <- overlapModules[orderAsNumeric(overlapModules)]
@@ -740,8 +740,8 @@ modulePreservation <- function(
           names(discProps) <- overlapModules
           for (mi in overlapModules) {
             modGenes <- names(overlapAssignments %sub_in% mi)
-            modInds <- match(modGenes, colnames(coexpression[[di]]))
-            discProps[[mi]] <- moduleProps(adjacency[[di]], modInds, sge[[di]])
+            modInds <- match(modGenes, colnames(correlation[[di]]))
+            discProps[[mi]] <- moduleProps(network[[di]], modInds, sge[[di]])
           }
           
           #---------------------------------------------------------------------
@@ -751,13 +751,13 @@ modulePreservation <- function(
           rownames(observed) <- overlapModules
           for (mi in overlapModules) {
             modGenes <- names(overlapAssignments %sub_in% mi)
-            discInds <- match(modGenes, colnames(coexpression[[di]]))
-            testInds <- match(modGenes, colnames(coexpression[[ti]]))
-            testProps <-  moduleProps(adjacency[[ti]], testInds, sge[[ti]])
+            discInds <- match(modGenes, colnames(correlation[[di]]))
+            testInds <- match(modGenes, colnames(correlation[[ti]]))
+            testProps <-  moduleProps(network[[ti]], testInds, sge[[ti]])
             stats <- calcStats(
               discProps[[mi]], testProps, 
-              coexpression[[di]], discInds,
-              coexpression[[ti]], testInds
+              correlation[[di]], discInds,
+              correlation[[ti]], testInds
             )
             observed[mi,] <- stats
           }
@@ -804,10 +804,10 @@ modulePreservation <- function(
                 } 
                 
                 # Attach matrices.
-                if (!is.null(geneExpression))
+                if (!is.null(data))
                   sge <- lapply(sge, attach.bigMatrix)
-                coexpression <- lapply(coexpression, attach.bigMatrix)
-                adjacency <- lapply(adjacency, attach.bigMatrix)
+                correlation <- lapply(correlation, attach.bigMatrix)
+                network <- lapply(network, attach.bigMatrix)
                 
                 #-----------------------------------------------------------------
                 # Calculate the module preservation statistics for each module on
@@ -821,7 +821,7 @@ modulePreservation <- function(
                 for (pi in seq_along(chunk)) {
                   for (mi in overlapModules) {
                     modGenes <- names(overlapAssignments %sub_in% mi)
-                    discInds <- match(modGenes, colnames(coexpression[[di]]))
+                    discInds <- match(modGenes, colnames(correlation[[di]]))
                     
                     # Select a random subset of nodes of the same size as the subset 
                     # ss, depending on our null model.
@@ -829,16 +829,16 @@ modulePreservation <- function(
                     if (model == "overlap") {
                       permGenes <- sample(names(overlapGenes), modSize)
                     } else {
-                      permGenes <- sample(colnames(coexpression[[ti]]), modSize)
+                      permGenes <- sample(colnames(correlation[[ti]]), modSize)
                     }
-                    permInds <- match(permGenes, colnames(coexpression[[ti]]))
+                    permInds <- match(permGenes, colnames(correlation[[ti]]))
                     # Ensure crashes aren't fatal
                     tryCatch({
-                      permProps <- moduleProps(adjacency[[ti]], permInds, sge[[ti]])
+                      permProps <- moduleProps(network[[ti]], permInds, sge[[ti]])
                       chunkStats[mi,,pi] <- calcStats(
                         discProps[[mi]], permProps, 
-                        coexpression[[di]], discInds,
-                        coexpression[[ti]], permInds
+                        correlation[[di]], discInds,
+                        correlation[[ti]], permInds
                       )
                       rm(permProps)
                       gc()
@@ -868,10 +868,10 @@ modulePreservation <- function(
                 if (verbose) {
                   lapply(conns, close)
                 }
-                if (!is.null(geneExpression))
+                if (!is.null(data))
                   sge <- lapply(sge, detach.bigMatrix)
-                coexpression <- lapply(coexpression, detach.bigMatrix)
-                adjacency <- lapply(adjacency, detach.bigMatrix)
+                correlation <- lapply(correlation, detach.bigMatrix)
+                network <- lapply(network, detach.bigMatrix)
               })
             }
           }
