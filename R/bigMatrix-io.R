@@ -224,7 +224,11 @@ read.bigMatrix <- function(
   dput(desc, dFile)
   rm(bm)
   gc()
-  load.bigMatrix(backingfile)
+  # load.bigMatrix will throw a warning when converting from a big.matrix 
+  # object to a bigMatrix object. Since we're just using this function to avoid
+  # code duplication, we can suppress this warning. Any other warnings will be
+  # thrown above when using bigmemory::read.big.matrix
+  suppressWarnings(load.bigMatrix(backingfile)) 
 }
 
 
