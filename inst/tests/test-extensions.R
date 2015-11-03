@@ -16,8 +16,8 @@ test_that("checkFinite is correct", {
   m4 <- matrix(sample(c(1:2), 9, TRUE), 3)
   types <- c("char", "short", "integer", "double")
   for (i in 1:4) {
-    bm1 <- as.bigMatrix(m1, file.path(tempdir(), "tmp1"), type=types[i])
-    bm4 <- as.bigMatrix(m4, file.path(tempdir(), "tmp4"), type=types[i])
+    bm1 <- as.bigMatrix(m1, file.path(tempdir(), paste0("tmp1-", i)), type=types[i])
+    bm4 <- as.bigMatrix(m4, file.path(tempdir(), paste0("tmp4-", i)), type=types[i])
     expect_error(checkFinite(bm1))
     expect_null(checkFinite(bm4))
   }

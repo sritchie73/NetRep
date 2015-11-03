@@ -12,7 +12,7 @@ test_that("Testing with no column and rownames", {
       for (kk in c("", ",drop=FALSE", ",drop=NA", ',drop="a"', ",drop=NULL")) {
         expect_identical(
           eval(parse(text=paste0("m1[", ii, ",", jj, kk, "]"))),
-          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]"))),
+          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]")))
         )
       }
     }
@@ -32,11 +32,11 @@ test_that("Testing with no column and rownames", {
   )
   d5 <- read.bigMatrix(
     file.path(tempdir(), "tmp1.txt"), 
-    file.path(tempdir(), "tmp1"), 
+    file.path(tempdir(), "tmp1-1"), 
     type="integer", sep="\t", 
     header=FALSE, row.names=FALSE
   )
-  expect_identical(d1, d5)
+  expect_identical(d1[,], d5[,])
 })
 
 test_that("Testing with rownames only", {
@@ -50,7 +50,7 @@ test_that("Testing with rownames only", {
       for (kk in c("", ",drop=FALSE", ",drop=NA", ',drop="a"', ",drop=NULL")) {
         expect_identical(
           eval(parse(text=paste0("m1[", ii, ",", jj, kk, "]"))),
-          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]"))),
+          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]")))
         )
       }
     }
@@ -71,10 +71,10 @@ test_that("Testing with rownames only", {
     sep="\t", quote=FALSE, row.names=TRUE, col.names=FALSE
   )
   d5 <- read.bigMatrix(
-    file.path(tempdir(), "tmp2.txt"), file.path(tempdir(), "tmp2"), 
+    file=file.path(tempdir(), "tmp2.txt"), file.path(tempdir(), "tmp2-1"),
     type="integer", sep="\t", header=FALSE, row.names=TRUE
   )
-  expect_identical(d1, d5)
+  expect_identical(d1[,], d5[,])
 })
 
 test_that("Testing with colnames only", {
@@ -88,7 +88,7 @@ test_that("Testing with colnames only", {
       for (kk in c("", ",drop=FALSE", ",drop=NA", ',drop="a"', ",drop=NULL")) {
         expect_identical(
           eval(parse(text=paste0("m1[", ii, ",", jj, kk, "]"))),
-          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]"))),
+          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]")))
         )
       }
     }
@@ -109,10 +109,10 @@ test_that("Testing with colnames only", {
     sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE
   )
   d5 <- read.bigMatrix(
-    file.path(tempdir(), "tmp3.txt"), file.path(tempdir(), "tmp3"), 
+    file.path(tempdir(), "tmp3.txt"), file.path(tempdir(), "tmp3-1"), 
     type="integer", sep="\t", header=TRUE, row.names=FALSE
   )
-  expect_identical(d1, d5)
+  expect_identical(d1[,], d5[,])
 })
 
 test_that("Testing with both row and column names", {
@@ -127,7 +127,7 @@ test_that("Testing with both row and column names", {
       for (kk in c("", ",drop=FALSE", ",drop=NA", ',drop="a"', ",drop=NULL")) {
         expect_identical(
           eval(parse(text=paste0("m1[", ii, ",", jj, kk, "]"))),
-          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]"))),
+          eval(parse(text=paste0("d1[", ii, ",", jj, kk, "]")))
         )
       }
     }
@@ -147,10 +147,10 @@ test_that("Testing with both row and column names", {
     sep="\t", quote=FALSE, row.names=TRUE, col.names=TRUE
   )
   d5 <- read.bigMatrix(
-    file.path(tempdir(), "tmp4.txt"), file.path(tempdir(), "tmp4"), 
+    file.path(tempdir(), "tmp4.txt"), file.path(tempdir(), "tmp4-1"), 
     type="integer", sep="\t", header=TRUE, row.names=TRUE
   )
-  expect_identical(d1, d5)
+  expect_identical(d1[,], d5[,])
 })
 
 unlink(file.path(tempdir(), "tmp*"))
