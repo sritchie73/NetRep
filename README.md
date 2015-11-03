@@ -5,6 +5,8 @@ An R package containing functions for assessing the replication/preservation of
 network topology for weighted gene coexpression network modules in one or more
 independent datasets through permutation testing.
 
+A preprint is available on BioRxiv: [A scalable permutation approach reveals replication and preservation patterns of gene coexpression modules](http://biorxiv.org/content/early/2015/10/21/029553)
+
 The main function for this package is `modulePreservation`. Other
 useful functions include `networkProperties` for calculating the
 topological properties of a module, and `plotModule` and other
