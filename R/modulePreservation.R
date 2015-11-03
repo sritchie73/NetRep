@@ -33,9 +33,10 @@
 #'   one of "greater" (default), "less" or "two.sided" (see details).
 #' @param corMethod character vector indicating method to use when calculating 
 #'   the correlation based statistics (see details). Must be one of "pearson", 
-#'   "spearman", "kendall" or "bicor". If "pearson", the fast correlation
-#'   function provided by the WGCNA package will be used. If "bicor", then the
-#'   \code{\link[WGCNA]{bicor}} function will be used.
+#'   "spearman", or "kendall". If the WGCNA package is installed then "bicor" 
+#'   may also be specified as an option (see \code{\link[WGCNA]{bicor}). 
+#'   The fast correlation function provided by WGCNA will also be used for 
+#'   "pearson".
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' @param simplify logical; if \code{TRUE}, simplify the structure of the output
 #'  list if possible (see Return Value).
@@ -407,7 +408,7 @@ modulePreservation <- function(
   }
   model <- pmatch(null, nullModels)
   
-  # Identiyf the alternate hypothesis to use
+  # Identify the alternate hypothesis to use
   validAlts <- c("two.sided", "less", "greater")
   altMatch <- pmatch(alternative, validAlts)
   if (is.na(altMatch))
@@ -421,6 +422,21 @@ modulePreservation <- function(
     stop("Expecting a list of coexpression matrices, one for each dataset")
   if (!is.list(adjacency))
     stop("Expecting a list of adjacency matrices, one for each dataset")
+  
+  # Check for valid corMethod options
+  validCorMethods <- c("pearson", "spearman", "kendall", "bicor")
+  if (corMethod %nin% validCorMethods)
+    stop("'corMethod' must be one of ", paste(validCorMethods, collpase=" "))
+  
+  # Check for WGCNA. We need to open a temporary sink to suppress all of WGCNA's
+  # startup messages.
+  hasWGCNA <- FALSE
+  sink(file.path(tempdir(), "suppressedWGCNAstartupMessage.txt"))
+  if (suppressMessages(suppressWarnings(require("WGCNA"))))
+    hasWGCNA <- TRUE
+  sink()
+  if (corMethod == "bicor" & !hasWGCNA)
+    stop("corMethod='bicor' requires the WGCNA package (install from BioConductor).")
   
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structure.
@@ -547,7 +563,7 @@ modulePreservation <- function(
       # once the analysis has finished.
       vCat(
         TRUE, 0, file=stderr(),
-        "Warning: unable to find 'doParallel' package, running on 1 core.", 
+        "Warning: unable to find 'doParallel' package, running on 1 core." 
       )
       warning("U")
     }
@@ -592,6 +608,17 @@ modulePreservation <- function(
   # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
   omp_set_num_threads(1)
   blas_set_num_threads(1)
+  
+  #-----------------------------------------------------------------------------
+  # Set up correlation function
+  #-----------------------------------------------------------------------------
+  if (corMethod == "bicor") {
+    cor <- function(...) bicor(..., quick=1, nThreads=1)[,]
+  } else if (corMethod == "pearson" & hasWGCNA) {
+    cor <- function(...) corFast(..., quick=1, nThreads=1)[,]
+  } else {
+    cor <- function(...) stats::cor(..., method=corMethod)[,]
+  }
   
   #-----------------------------------------------------------------------------
   # Set up variables for running module preservation analysis
@@ -730,8 +757,7 @@ modulePreservation <- function(
             stats <- calcStats(
               discProps[[mi]], testProps, 
               coexpression[[di]], discInds,
-              coexpression[[ti]], testInds,
-              corMethod
+              coexpression[[ti]], testInds
             )
             observed[mi,] <- stats
           }
@@ -812,8 +838,7 @@ modulePreservation <- function(
                       chunkStats[mi,,pi] <- calcStats(
                         discProps[[mi]], permProps, 
                         coexpression[[di]], discInds,
-                        coexpression[[ti]], permInds,
-                        corMethod
+                        coexpression[[ti]], permInds
                       )
                       rm(permProps)
                       gc()

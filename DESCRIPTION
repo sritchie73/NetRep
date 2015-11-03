@@ -24,11 +24,11 @@ Imports:
     BH,
     RhpcBLASctl,
     abind,
-    RColorBrewer,
-    WGCNA
+    RColorBrewer
 Suggests:
     testthat,
     doMC,
-    doParallel
+    doParallel,
+    WGCNA
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
 RoxygenNote: 5.0.0

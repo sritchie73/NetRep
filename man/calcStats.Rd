@@ -4,8 +4,7 @@
 \alias{calcStats}
 \title{Calculate module preservation statistics}
 \usage{
-calcStats(discProps, testProps, discCoexp, discIndices, testCoexp, testIndices,
-  corMethod = "pearson")
+calcStats(discProps, testProps, discCoexp, discIndices, testCoexp, testIndices)
 }
 \arguments{
 \item{discProps}{network properties calculated for the module from the
@@ -23,10 +22,6 @@ discovery dataset.}
 test dataset.}
 
 \item{testIndices}{module indices in the test dataset.}
-
-\item{corMethod}{method to use when calculating the correlation between 
-network properties. I.e. one of "pearson", "spearman", "kendall", or 
-"bicor".}
 }
 \value{
 a vector containing the values for all the module preservation
