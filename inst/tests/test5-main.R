@@ -1,4 +1,4 @@
-context("Testing Main Routine...")
+context("Testing modulePreservation function")
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
 

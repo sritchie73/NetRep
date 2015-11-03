@@ -1,4 +1,4 @@
-context("Permutation Testing")
+context("Testing mathematical correctness of the permutation test function")
 
 n <- 100000
 normData <- rnorm(n=n)
