@@ -23,7 +23,14 @@ library(devtools)
 install_github("InouyeLab/NetRep")
 ```
 
-## Software dependencies: Installation troubleshooting
+To ensure the package has installed correctly and will run on your system, run the following:
+
+```{r}
+library(testthat)
+test_package("NetRep")
+```
+
+## Installation troubleshooting
 
 `NetRep` and its dependencies require several third party libraries to be
 installed. If not found, installation of the package will fail.
@@ -39,12 +46,4 @@ an error about failing to link to `-llapack`. LAPACK libraries come bundled with
 most BLAS libraries.
 
 Operating specific instructions to follow. 
-
-## Testing
-To ensure the package has installed correctly and will run on your system, run the following:
-
-```{r}
-library(testthat)
-test_package("NetRep")
-```
 
