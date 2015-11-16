@@ -2,49 +2,49 @@
 % Please edit documentation in R/calc-stats.R
 \name{calcStats}
 \alias{calcStats}
-\title{Calculate module preservation statistics}
+\title{Calculate module preservation statistics.}
 \usage{
-calcStats(discProps, testProps, discCoexp, discIndices, testCoexp, testIndices)
+calcStats(discProps, testProps, discCor, discIndices, testCor, testIndices)
 }
 \arguments{
-\item{discProps}{network properties calculated for the module from the
-discovery dataset using \code{\link{adjProps}} and \code{\link{dataProps}}.}
+\item{discProps}{module properties in the \emph{discovery} dataset calculated 
+using \code{\link{netProps}} and \code{\link{dataProps}}.}
 
-\item{testProps}{network properties calculated for the module from the
-test dataset using \code{\link{adjProps}} and \code{\link{dataProps}}.}
+\item{testProps}{module properties in the \emph{test} dataset calculated 
+using \code{\link{netProps}} and \code{\link{dataProps}}.}
 
-\item{discCoexp}{'bigMatrix' containing the coexpression network for the 
-discovery dataset.}
+\item{discCor}{'bigMatrix' containing the correlation structure matrix 
+for the \emph{discovery} dataset.}
 
 \item{discIndices}{module indices in the discovery dataset.}
 
-\item{testCoexp}{'bigMatrix' containing the coexpression network for the 
-test dataset.}
+\item{testCor}{'bigMatrix' containing the correlation structure matrix 
+for the \emph{test} dataset.}
 
 \item{testIndices}{module indices in the test dataset.}
 }
 \value{
 a vector containing the values for all the module preservation
-statistics: \emph{mean.adj}, \emph{cor.kIM}, \emph{pve}, \emph{mean.MM},
-\emph{cor.MM}, \emph{cor.coexp}, and \emph{mean.coexp}.
+statistics: \emph{density}, \emph{cor.kIM}, \emph{pve}, \emph{mean.MM},
+\emph{cor.MM}, \emph{cor.cor}, and \emph{mean.cor}.
 }
 \description{
-Calculates the modules preservation statistics using the sets of 
-pre-calculated properties, along with the coexpression networks.
+Calculates the modules preservation statistics using the pre-calculated 
+module properties along with the correlation structure matrices.
 }
 \section{Design decision}{
 
  Most of the module presevation statistics are calculated as the correlation 
- of some network properties across the \emph{discovery} and \emph{test} 
+ of some network property between the \emph{discovery} and \emph{test} 
  datasets. The permutation procedure randomly samples from the \emph{test} 
  dataset, so it therefore makes sense to calculate the network properties in 
  the \emph{discovery} dataset once only. The code is thus split into 
- calculations of the network properties, and then calculating the statistics 
- from these. The exceptions to this design are the coexpression based
- statistics. The \emph{cor.coexp} and \emph{mean.coexp} require all entries
- of the pairwise coexpression matrix for the module. As modules can be quite
- large (e.g., 10,000 probes), this would be prohibitive to pass around in
- memory.
+ calculations of the network properties, and then subsequent calculation of 
+ the statistics. The exception to this design are the correlation structure 
+ based statistics as they require all entries of the correlation structure 
+ matrices for that module. As modules can be quite large (e.g., 10,000 
+ variables), this would be dramatically increase memory overhead to apply 
+ this strategy.
 }
 \references{
 \enumerate{

@@ -100,6 +100,6 @@ List NetProps(SEXP pAdjacency, IntegerVector subsetIndices) {
   } else {
     /* We should never get here, unless the underlying implementation of
     bigmemory changes */
-    throw Rcpp::exception("Undefined type for provided big.matrix");
+    throw Rcpp::exception("Undefined type for provided bigMatrix");
   }
 }

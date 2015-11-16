@@ -6,18 +6,6 @@
 
 using namespace Rcpp;
 
-// AdjProps
-List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices);
-RcppExport SEXP NetRep_AdjProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
-    __result = Rcpp::wrap(AdjProps(pAdjacency, subsetIndices));
-    return __result;
-END_RCPP
-}
 // CheckFinite
 void CheckFinite(SEXP pDat);
 RcppExport SEXP NetRep_CheckFinite(SEXP pDatSEXP) {
@@ -28,17 +16,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// CoexpStats
-List CoexpStats(SEXP pCoexpD, IntegerVector discIndices, SEXP pCoexpT, IntegerVector testIndices);
-RcppExport SEXP NetRep_CoexpStats(SEXP pCoexpDSEXP, SEXP discIndicesSEXP, SEXP pCoexpTSEXP, SEXP testIndicesSEXP) {
+// CorStats
+List CorStats(SEXP pCorD, IntegerVector discIndices, SEXP pCorT, IntegerVector testIndices);
+RcppExport SEXP NetRep_CorStats(SEXP pCorDSEXP, SEXP discIndicesSEXP, SEXP pCorTSEXP, SEXP testIndicesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pCoexpD(pCoexpDSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pCorD(pCorDSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type pCoexpT(pCoexpTSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pCorT(pCorTSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP);
-    __result = Rcpp::wrap(CoexpStats(pCoexpD, discIndices, pCoexpT, testIndices));
+    __result = Rcpp::wrap(CorStats(pCorD, discIndices, pCorT, testIndices));
     return __result;
 END_RCPP
 }
@@ -51,6 +39,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
     __result = Rcpp::wrap(DataProps(pDat, subsetIndices));
+    return __result;
+END_RCPP
+}
+// NetProps
+List NetProps(SEXP pAdjacency, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_NetProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(NetProps(pAdjacency, subsetIndices));
     return __result;
 END_RCPP
 }

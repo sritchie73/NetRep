@@ -14,10 +14,10 @@ using namespace arma;
  * @param subsetIndices indices of the network subset of interest.
  * @return
  *    A List containing:
- *     - The Summary Expression Profile of each node (SEP).
- *     - The Module Membership of each node (MM).
- *     - The proportion of the variance explained by the subset's summary 
- *       expression profile (pve).
+ *     - A vector summarising the module (moduleSummary).
+ *     - The Module Membership of each variable (MM).
+ *     - The proportion of module variance explained by the module summary vector 
+ *       (pve).
  */
 template <typename T>
 List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
@@ -32,7 +32,7 @@ List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
     warning("SVD failed to converge, does your data contain missing or"
             " infinite values?");
     return List::create(
-        Named("SEP") = NA_REAL,
+        Named("SP") = NA_REAL,
         Named("MM") = NA_REAL,
         Named("pve") = NA_REAL
       );
@@ -41,7 +41,7 @@ List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
 
   // Flip the sign of the summary profile so that the eigenvector is 
   // positively correlated with the average scaled value of the underlying
-  // data for the network subset.
+  // data for the network module.
   Mat<T> ap = cor(mean(dat.cols(subsetCols), 1), summary);
   if (ap(0,0) < 0) {
     summary *= -1; 
@@ -52,7 +52,7 @@ List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
   Mat<T> p = cor(summary, dat.cols(subsetCols));
   Mat<T> MM(p);
   
-  // To make sure the resulting MAR and KIM vectors are in the correct order,
+  // To make sure the resulting KIM vector is in the correct order,
   // order the results to match the original ordering of subsetIndices.
   Function rank("rank"); // Rank only works on R objects like IntegerVector.
   uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
@@ -60,18 +60,18 @@ List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
   Col<T> oMM = MM(idxRank);
 
   // The proportion of variance explained is the sum of the squared 
-  // correlation between the network subset summary profile, and each of the 
+  // correlation between the network module summary profile, and each of the 
   // variables in the data that correspond to nodes in the network subset.
   Mat<T> pve(mean(square(p), 1));
   
   return List::create(
-    Named("SEP") = summary,
+    Named("moduleSummary") = summary,
     Named("MM") = oMM,
     Named("pve") = pve
   );
 }
 
-//' Network subset eigenvector and proportion of variance explained in C++
+//' Get the module summary vector and the proportion of variance it explains
 //' 
 //' @param pDat SEXP container for the pointer to a scaled version of the 
 //'   data matrix used to construct the network.
@@ -81,15 +81,15 @@ List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
 //' @return
 //'  A list containing:
 //'  \enumerate{
-//'   \item{\emph{"SEP"}:}{
-//'     The Summary Expression Profile of each node (see details).
+//'   \item{\emph{"moduleSummary"}:}{
+//'     The module summary profile (see details).
 //'   }
 //'   \item{\emph{"MM"}:}{
 //'     The Module Membership of each node (see details).
 //'   }
 //'   \item{\emph{"pve"}:}{
-//'     The proportion of the variance explained by the subset's summary 
-//'     expression profile (see details).
+//'     The proportion of the variance explained by the module's summary 
+//'      profile (see details).
 //'   }
 //'  }
 //'  
@@ -103,19 +103,17 @@ List DataProps(const Mat<T>& dat, IntegerVector subsetIndices) {
 //'  }
 //'  
 //' @details
-//'  First, a summar expression profile (SEP) is calculated for the 
-//'  module from the underlying gene expression data. This corresponds to the 
-//'  first eigenvector of a principal component analysis \emph{(1)}. 
+//'  First, the module summary profile (SP) is calculated as the first 
+//'  eigenvector of a principal component analysis of the variables composing 
+//'  the module of interest. The orientation of the eigenvector is modified so 
+//'  that its sign is in the same direction as the module on average. I.e. for 
+//'  gene expression data this is the "module eigengene" \emph{(1)}.
 //'  
-//'  The orientation of the eigenvector is modified so that its sign is in the
-//'  same direction as the gene expression (on average).
+//'  The Module Membership (MM) is the correlation between each variable 
+//'  composing the module and the module's summary profile.
 //'  
-//'  The Module Membership (MM) is thus quantified as the correlation between each
-//'  gene in the module and the summary expression profile.
-//'  
-//'  The proportion of variance in the module's gene expression data explained 
-//'  by the summary expression profile (pve) is quantified as the average square
-//' of the Module Membership \emph{(1)}.
+//'  The proportion of module variance explained by the summary profile (pve) 
+//'  is quantified as the average square of the Module Membership \emph{(1)}.
 //' 
 //' @import RcppArmadillo
 //' @rdname dataProps-cpp
@@ -144,7 +142,7 @@ List DataProps(SEXP pDat, IntegerVector subsetIndices) {
     );
   } else {
     throw Rcpp::exception(
-      "SVD can only be calculated on a big.matrix whose underlying type is"
+      "SVD can only be calculated on a 'bigMatrix' whose underlying type is"
       "'double' or 'float'."
     );
   }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{DataProps}
 \alias{DataProps}
-\title{Network subset eigenvector and proportion of variance explained in C++}
+\title{Get the module summary vector and the proportion of variance it explains}
 \usage{
 DataProps(pDat, subsetIndices)
 }
@@ -16,35 +16,33 @@ data matrix used to construct the network.}
 \value{
 A list containing:
  \enumerate{
-  \item{\emph{"SEP"}:}{
-    The Summary Expression Profile of each node (see details).
+  \item{\emph{"moduleSummary"}:}{
+    The module summary profile (see details).
   }
   \item{\emph{"MM"}:}{
     The Module Membership of each node (see details).
   }
   \item{\emph{"pve"}:}{
-    The proportion of the variance explained by the subset's summary 
-    expression profile (see details).
+    The proportion of the variance explained by the module's summary 
+     profile (see details).
   }
  }
 }
 \description{
-Network subset eigenvector and proportion of variance explained in C++
+Get the module summary vector and the proportion of variance it explains
 }
 \details{
-First, a summar expression profile (SEP) is calculated for the 
- module from the underlying gene expression data. This corresponds to the 
- first eigenvector of a principal component analysis \emph{(1)}. 
+First, the module summary profile (SP) is calculated as the first 
+ eigenvector of a principal component analysis of the variables composing 
+ the module of interest. The orientation of the eigenvector is modified so 
+ that its sign is in the same direction as the module on average. I.e. for 
+ gene expression data this is the "module eigengene" \emph{(1)}.
  
- The orientation of the eigenvector is modified so that its sign is in the
- same direction as the gene expression (on average).
+ The Module Membership (MM) is the correlation between each variable 
+ composing the module and the module's summary profile.
  
- The Module Membership (MM) is thus quantified as the correlation between each
- gene in the module and the summary expression profile.
- 
- The proportion of variance in the module's gene expression data explained 
- by the summary expression profile (pve) is quantified as the average square
-of the Module Membership \emph{(1)}.
+ The proportion of module variance explained by the summary profile (pve) 
+ is quantified as the average square of the Module Membership \emph{(1)}.
 }
 \references{
 \enumerate{

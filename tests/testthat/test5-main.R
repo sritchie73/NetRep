@@ -48,8 +48,8 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(dim(res1$nulls), c(7, 7, 10))
   expect_equal(dim(res1$observed), c(7, 7))
   expect_equal(dim(res1$p.values), c(7, 7))
-  expect_equal(length(res1$propGenesPresent), 7)
-  expect_equal(length(res1$nGenesPresent), 7)
+  expect_equal(length(res1$propVarsPresent), 7)
+  expect_equal(length(res1$nVarsPresent), 7)
   res2 <- modulePreservation(
     NULL, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10,
     keepNulls=TRUE, verbose=FALSE
@@ -57,14 +57,14 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(dim(res2$nulls), c(7, 4, 10))
   expect_equal(dim(res2$observed), c(7, 4))
   expect_equal(dim(res2$p.values), c(7, 4))
-  expect_equal(length(res2$propGenesPresent), 7)
-  expect_equal(length(res2$nGenesPresent), 7)
+  expect_equal(length(res2$propVarsPresent), 7)
+  expect_equal(length(res2$nVarsPresent), 7)
   
   moduleAssignments[[2]]<- sample(1:9, 100, replace=TRUE)
   names(moduleAssignments[[2]]) <- gn2
   res1 <- modulePreservation(
     exprSets, coexpSets, rev(adjSets), moduleAssignments, "a", "b", nPerm=10,
-    includeModules=c(1,2,3), keepNulls=TRUE, verbose=FALSE
+    include=c(1,2,3), keepNulls=TRUE, verbose=FALSE
   )
 })
 unlink(file.path(tempdir(), 'tmp*'))

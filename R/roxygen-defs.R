@@ -3,17 +3,16 @@
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
 #'
-#' @param discCoexp a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
-#'   pairwise coexpression for the \emph{discovery} dataset.
-#' @param testCoexp a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
-#'   pairwise coexpression for the \emph{test} dataset.
-#' @param discIndices indices corresponding to the network module in the matrix 
-#'   of pairwise-coexpression in the \emph{discovery} dataset.
-#' @param testIndices indices corresponding to the network module, or a random 
-#'   sample of the same size, in the matrix of pairwise-coexpression in the 
-#'   \emph{test} dataset.
+#' @param discCor a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+#'   correlation structure among variables in the \emph{discovery} dataset.
+#' @param testCor a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+#'   correlation structure among variables in the \emph{test} dataset.
+#' @param discIndices indices corresponding to the network module in 
+#'  \code{discCor}.
+#' @param testIndices indices corresponding to the network module in
+#'  \code{testCor}.
 #'
-#' @name coexp_params
+#' @name cor_params
 NULL
 
 #' Template parameters
@@ -21,10 +20,11 @@ NULL
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
 #'
-#' @param adj a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
-#'   pairwise gene adjacencies.
+#' @param adj a \code{\link[=bigMatrix-class]{bigMatrix}} containing an
+#' adjacency matrix representation of the network (i.e. an \eqn{n * n} matrix 
+#' containing the edge weights between each pair of variables).  
 #' 
-#' @name adj_param
+#' @name net_param
 NULL
 
 #' Template parameters
@@ -32,12 +32,11 @@ NULL
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
 #'
-#' @param sge a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled gene
-#'   expression data. Assumes columns are genes/probes, rows are samples, and
-#'   that probes have been scaled (This can be done using
-#'   \code{\link{scaleBigMatrix}}).
+#' @param sge a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+#'  numeric data. Assumes columns correspond to variables (e.g. genes, 
+#'  microbial operational taxonomic unit) and rows correspond to samples.
 #'
-#' @name ge_param
+#' @name dat_param
 NULL
 
 #' Template parameters
