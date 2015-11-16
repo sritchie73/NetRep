@@ -4,23 +4,26 @@
 \alias{networkProperties}
 \title{Calculate the topological properties for a network module}
 \usage{
-networkProperties(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, modules, discovery = 1, test = 1, simplify = TRUE)
+networkProperties(data = NULL, correlation, network, moduleAssignments,
+  modules, discovery = 1, test = 1, simplify = TRUE)
 }
 \arguments{
-\item{geneExpression}{optional; \code{NULL} or a list of 
-\code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
-expression data for a datset of interest (see details). Columns are
-expected to be genes, rows samples.}
+\item{data}{a list of numeric matrices. Each entry of the list corresponds to
+a dataset and contains the data used to infer the interaction network
+between variables (e.g. genes). Expects matrix columns to correspond to
+variables and matrix rows to correspond to samples.}
 
-\item{coexpression}{a list of 'bigMatrix' objects, each containing the gene
-coexpression for a dataset of interest (see details).}
+\item{correlation}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the correlation between 
+each pair of variables in the dataset.}
 
-\item{adjacency}{a list of 'bigMatrix' objects, each containing the gene
-adjacencies for a dataset of interest (see details).}
+\item{network}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the network edge weights 
+between each pair of variables in the dataset.}
 
-\item{moduleAssignments}{a list of named vectors assigning genes to modules 
-for each datast of interest (see details).}
+\item{moduleAssignments}{a vector containing the module each variable belongs
+to in the discovery dataset. If there are multiple discovery datasets 
+then this argument should be a list of such vectors.}
 
 \item{modules}{a vector of modules to apply the function to (see details).}
 
@@ -34,28 +37,33 @@ was discovered in (see details).}
 simplified if only one module is specified.}
 }
 \value{
-A list of network properties for each module of interests containing:
+A list of network properties for each module of interest:
  \itemize{
    \item{connectivity:}{
-     The intramodular connectivity for each gene in the module 
+     The sum of the within-module weighted node degree for each variable 
+     composing the module. This is equivalent to the intramodular 
+     connectivity for weighted gene coexpression networks \emph{(1)}.  
    }
    \item{density:}{
-     The mean adjacency for genes in the module.
+     The average edge weight within the module.
    }
  }
- If gene expression data is provided for the \code{test} dataset then the 
- following are also returned:
+ If the underlying data is provided for the \code{test} dataset's network 
+ then the following are also returned:
  \itemize{
-   \item{summaryExpression:}{
-     The summary expression profile (first eigenvector of the gene 
-     expression from a principal component analysis) for the module.
+   \item{moduleSummary:}{
+     A vector summarising the module across each sample. This is calculated 
+     as the first eigenvector of the module from a principal component 
+     analysis. This is equivalent to the module eigengene for weighted gene
+     coexpression networks, see \emph{(1)}.
    }
    \item{moduleMembership:}{
-     The correlation between each gene and the summary expression profile.
+     The correlation between each variable composing the module and the 
+     \code{moduleSummary}.
    }
    \item{propVarExpl:}{
-     The proportion of variance explained in the module's gene expression by
-     its summary expression profile.
+     The proportion of module variance explained by the \code{moduleSummary}
+     vector.
    }
  }
 }
@@ -66,27 +74,18 @@ or more modules in a user specified dataset.
 \details{
 \subsection{Input data structure:}{
   This function allows for input data formatted in a number of ways. Where 
-  there are multiple datasets of interest (e.g. multiple tissues, or a 
-  discovery dataset and an independent test dataset) the arguments 
-  \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+  there are multiple datasets of interest (e.g. multiple tissues, locations, 
+  or a discovery dataset and an independent test dataset) the arguments 
+  \code{data}, \code{correlation}, and \code{network} should be
   \code{\link[=list]{lists}} where each element contains the matrix data for 
-  each respective dataset. This matrix data should be stored as a 'bigMatrix'
-  object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
-  data}). Alternatively, if only one dataset is of interest, the
-  \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
-  will also each accept a single 'bigMatrix' object.
+  each respective dataset. Alternatively, if only one dataset is of interest, 
+  the \code{data}, \code{correlation}, and \code{network} arguments
+  will also each accept a 'matrix' object.
   
   Similarly, the \code{moduleAssignments} argument expects a list of named
-  vectors, which contain the the module assignments for each gene in the
-  respective dataset. List elements corresponding to datasets where module
-  discovery has not been performed should contain \code{NULL}, unless the
-  datasets are named throughout the function arguments. I.e. where the
-  \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-  \code{adjacency} correspond to the names of each dataset of interest, the
-  names of the \code{discovery} dataset can be used to look up the respective
-  module assignments in the \code{moduleAssignments} list. If module
-  discovery has only been performed in one dataset, then the
-  \code{moduleAssignments} will also accept a named vector.
+  vectors, which denote the module each variable belongs to in the discovery
+  dataset. If module discovery has only been performed in one dataset, then 
+  the \code{moduleAssignments} argument will also accept a named vector.
   
   The \code{discovery} arguments specifies which dataset the \code{modules} 
   of interest were discovered in, and the \code{test} argument specifies 
@@ -94,16 +93,16 @@ or more modules in a user specified dataset.
   ignored if data is provided for only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
-  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
-  data, regular 'matrix' objects are also accepted. In this case, the
+  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+  data, regular 'matrix' objects are also accepted. In this case, the 
   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-  conversion process involves writing out each matrix as a binary file on
-  disk, which can take a long time for large datasets. It is strongly
+  conversion process involves writing out each matrix as a binary file on 
+  disk, which can take a long time for large datasets. It is strongly 
   recommended for the user to store their data as 'bigMatrix' objects, as the
   \link{modulePreservation} function, \link[=plotModule]{plotting} 
-  \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and 
-  \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
-  Further, 'bigMatrix' objects have a number of benefits, including 
+  \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
+  \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
+  objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
   \link[=bigMatrix-get]{converting to, loading in}, and 

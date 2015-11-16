@@ -2,12 +2,12 @@
 % Please edit documentation in R/check-user-input.R
 \name{formatExclude}
 \alias{formatExclude}
-\title{Format excludeModules list}
+\title{Format exclude list}
 \usage{
-formatExclude(excludeModules, discovery, nDatasets, datasetNames)
+formatExclude(exclude, discovery, nDatasets, datasetNames)
 }
 \arguments{
-\item{excludeModules}{input provided by the user}
+\item{exclude}{input provided by the user}
 
 \item{discovery}{vector of discovery networks provided by the user}
 
@@ -19,6 +19,6 @@ formatExclude(excludeModules, discovery, nDatasets, datasetNames)
 List structure to match the rest of the input data
 }
 \description{
-Format excludeModules list
+Format exclude list
 }
 

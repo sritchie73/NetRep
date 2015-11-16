@@ -8,17 +8,17 @@ using namespace arma;
 // [[Rcpp::depends(BH, bigmemory, RcppArmadillo)]]
 #include <bigmemory/BigMatrix.h>
 
-/* Implementation of AdjProps
+/* Implementation of NetProps
  *
- * @param adj the armadillo compatible adjacency matrix
- * @param subsetIndices indices of the network subset of interest.
+ * @param adj the armadillo compatible network adjacency matrix.
+ * @param subsetIndices indices of the network module of interest.
  * @return
  *    A List containing:
  *     - The weighted within-subset degree for each node (kIM).
- *     - The mean absolute edge weight of the network subset (mean.adj).
+ *     - The mean edge weight of the network module (density).
  */
 template <typename T>
-List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
+List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   // Convert indices to C++ indexing and a class Armadillo can work with.
   // Indices are sorted, because sequential memory access is faster!.
   uvec nodeIdx = sort(as<uvec>(subsetIndices) - 1);
@@ -40,7 +40,7 @@ List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 
   return List::create(
     Named("kIM") = oKIM,
-    Named("mean.adj") = sum(colSums, 1) / (n*n - n)
+    Named("density") = sum(colSums, 1) / (n*n - n)
   );
 }                                                                                                                                                                                                                                          
 
@@ -55,9 +55,9 @@ List AdjProps(const Mat<T>& adj, IntegerVector subsetIndices) {
 //'     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
 //'     \item{\emph{mean.adj}:}{The mean absolute edge weight of the network subset.}
 //'   }
-//' @rdname AdjProps-cpp
+//' @rdname NetProps-cpp
 // [[Rcpp::export]]
-List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices) {
+List NetProps(SEXP pAdjacency, IntegerVector subsetIndices) {
   XPtr<BigMatrix> xpAdj(pAdjacency);
 
   if (xpAdj->ncol() != xpAdj->nrow()) {
@@ -73,33 +73,33 @@ List AdjProps(SEXP pAdjacency, IntegerVector subsetIndices) {
   //  Dispatch function for all types of big.matrix.
   unsigned short type = xpAdj->matrix_type();
   if (type == 1) {
-    return AdjProps(
+    return NetProps(
       arma::Mat<char>((char *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 2) {
-    return AdjProps(
+    return NetProps(
       arma::Mat<short>((short *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 4) {
-    return AdjProps(
+    return NetProps(
       arma::Mat<int>((int *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 6) {
-    return AdjProps(
+    return NetProps(
       arma::Mat<float>((float *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else if (type == 8) {
-    return AdjProps(
+    return NetProps(
       arma::Mat<double>((double *)xpAdj->matrix(), xpAdj->nrow(), xpAdj->ncol(), false),
       subsetIndices
     );
   } else {
     /* We should never get here, unless the underlying implementation of
     bigmemory changes */
-    throw Rcpp::exception("Undefined type for provided big.matrix");
+    throw Rcpp::exception("Undefined type for provided bigMatrix");
   }
 }

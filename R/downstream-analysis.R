@@ -3,48 +3,27 @@
 #' Calculates the network properties used to assess module preservation for one
 #' or more modules in a user specified dataset.
 #' 
-#' @param geneExpression optional; \code{NULL} or a list of 
-#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
-#'   expression data for a datset of interest (see details). Columns are
-#'   expected to be genes, rows samples.
-#' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
-#'   coexpression for a dataset of interest (see details).
-#' @param adjacency a list of 'bigMatrix' objects, each containing the gene
-#'   adjacencies for a dataset of interest (see details).
-#' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   for each datast of interest (see details).
-#' @param modules a vector of modules to apply the function to (see details).
-#' @param discovery name or index denoting which dataset the module of interest
-#'   was discovered in (see details).
-#' @param test name or index denoting which dataset to apply the function to 
-#'   (see details).
+#' @inheritParams common_params
+#' @inheritParams common_params2
+#' 
 #' @param simplify logical; if \code{TRUE} the output data structure is 
 #'   simplified if only one module is specified.
 #'  
 #' @details
 #'  \subsection{Input data structure:}{
 #'   This function allows for input data formatted in a number of ways. Where 
-#'   there are multiple datasets of interest (e.g. multiple tissues, or a 
-#'   discovery dataset and an independent test dataset) the arguments 
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+#'   there are multiple datasets of interest (e.g. multiple tissues, locations, 
+#'   or a discovery dataset and an independent test dataset) the arguments 
+#'   \code{data}, \code{correlation}, and \code{network} should be
 #'   \code{\link[=list]{lists}} where each element contains the matrix data for 
-#'   each respective dataset. This matrix data should be stored as a 'bigMatrix'
-#'   object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
-#'   data}). Alternatively, if only one dataset is of interest, the
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
-#'   will also each accept a single 'bigMatrix' object.
+#'   each respective dataset. Alternatively, if only one dataset is of interest, 
+#'   the \code{data}, \code{correlation}, and \code{network} arguments
+#'   will also each accept a 'matrix' object.
 #'   
 #'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors, which contain the the module assignments for each gene in the
-#'   respective dataset. List elements corresponding to datasets where module
-#'   discovery has not been performed should contain \code{NULL}, unless the
-#'   datasets are named throughout the function arguments. I.e. where the
-#'   \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-#'   \code{adjacency} correspond to the names of each dataset of interest, the
-#'   names of the \code{discovery} dataset can be used to look up the respective
-#'   module assignments in the \code{moduleAssignments} list. If module
-#'   discovery has only been performed in one dataset, then the
-#'   \code{moduleAssignments} will also accept a named vector.
+#'   vectors, which denote the module each variable belongs to in the discovery
+#'   dataset. If module discovery has only been performed in one dataset, then 
+#'   the \code{moduleAssignments} argument will also accept a named vector.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
@@ -52,16 +31,16 @@
 #'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
-#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+#'   data, regular 'matrix' objects are also accepted. In this case, the 
 #'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-#'   conversion process involves writing out each matrix as a binary file on
-#'   disk, which can take a long time for large datasets. It is strongly
+#'   conversion process involves writing out each matrix as a binary file on 
+#'   disk, which can take a long time for large datasets. It is strongly 
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
-#'   \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and 
-#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
-#'   Further, 'bigMatrix' objects have a number of benefits, including 
+#'   \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
+#'   \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
+#'   objects. Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 
 #'   \link[=bigMatrix-get]{converting to, loading in}, and 
@@ -69,28 +48,33 @@
 #' }
 #' 
 #' @return 
-#'  A list of network properties for each module of interests containing:
+#'  A list of network properties for each module of interest:
 #'  \itemize{
 #'    \item{connectivity:}{
-#'      The intramodular connectivity for each gene in the module 
+#'      The sum of the within-module weighted node degree for each variable 
+#'      composing the module. This is equivalent to the intramodular 
+#'      connectivity for weighted gene coexpression networks \emph{(1)}.  
 #'    }
 #'    \item{density:}{
-#'      The mean adjacency for genes in the module.
+#'      The average edge weight within the module.
 #'    }
 #'  }
-#'  If gene expression data is provided for the \code{test} dataset then the 
-#'  following are also returned:
+#'  If the underlying data is provided for the \code{test} dataset's network 
+#'  then the following are also returned:
 #'  \itemize{
-#'    \item{summaryExpression:}{
-#'      The summary expression profile (first eigenvector of the gene 
-#'      expression from a principal component analysis) for the module.
+#'    \item{moduleSummary:}{
+#'      A vector summarising the module across each sample. This is calculated 
+#'      as the first eigenvector of the module from a principal component 
+#'      analysis. This is equivalent to the module eigengene for weighted gene
+#'      coexpression networks, see \emph{(1)}.
 #'    }
 #'    \item{moduleMembership:}{
-#'      The correlation between each gene and the summary expression profile.
+#'      The correlation between each variable composing the module and the 
+#'      \code{moduleSummary}.
 #'    }
 #'    \item{propVarExpl:}{
-#'      The proportion of variance explained in the module's gene expression by
-#'      its summary expression profile.
+#'      The proportion of module variance explained by the \code{moduleSummary}
+#'      vector.
 #'    }
 #'  }
 #'
@@ -192,7 +176,7 @@
 #' @rdname networkProperties
 #' @export
 networkProperties <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
+  data=NULL, correlation, network, moduleAssignments, modules,
   discovery=1, test=1, simplify=TRUE
 ) {
   # Temporary directory to store new bigMatrix objects in
@@ -203,9 +187,9 @@ networkProperties <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structuren
@@ -218,18 +202,16 @@ networkProperties <- function(
   }
   
   # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
-  )
+  data <- formatDataList(data, length(correlation), names(correlation))
   
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # Sanity check input for consistency.
   checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+    data, correlation, network, moduleAssignments, discovery, test
   )
   
   if (any(modules %nin% moduleAssignments[[discovery]])) {
@@ -240,57 +222,58 @@ networkProperties <- function(
     )
   }
   
-  # Temporarily create scaled gene expression set for the calculation of the
-  # summary expression profile
-  sge <- NULL
-  if (!is.null(geneExpression[[test]])) {
+  # Temporarily create scaled dataset for the calculation of the
+  # module summary vector
+  sdat <- NULL
+  if (!is.null(data[[test]])) {
     tryCatch({
-      checkFinite(geneExpression[[test]]) 
+      checkFinite(data[[test]]) 
     }, error = function(e) {
-      stop("Non-finite values encountered for the test dataset gene expression")
+      stop("Non-finite values encountered for the test dataset")
     })
-    sge <- scaleBigMatrix(geneExpression[[test]], tmp.dir)
+    sdat <- scaleBigMatrix(data[[test]], tmp.dir)
   }
   
   # Get the properties for each module of interest 
   res <- lapply(modules, function(mod) {
     # Get the row/column indices of the module in the dataset of interest 
     sub <- moduleAssignments[[discovery]][moduleAssignments[[discovery]] == mod]
-    modInds <- match(names(sub), rownames(coexpression[[test]]))
+    modInds <- match(names(sub), rownames(correlation[[test]]))
     na.inds <- which(is.na(modInds))
     modInds <- na.omit(modInds)
     
     if (length(modInds) == 0) {
       stop(
-        "none of the genes for module ", mod, 
+        "none of the variables composing module ", mod, 
         " are present in the test dataset"
       )
     }
     
     tryCatch({
-      checkFinite(adjacency[[test]]) 
+      checkFinite(network[[test]]) 
     }, error = function(e) {
-      stop("Non-finite values encountered for the test dataset adjacency")
+      stop("Non-finite values encountered for the test network")
     })
     
-    # Get the properties calculated from the gene expression
-    geProps <- NULL
-    if (!is.null(sge)) {
-      geProps <- dataProps(sge, modInds)
+    # Get the properties calculated from the underlying data used to infer the
+    # network
+    datProps <- NULL
+    if (!is.null(sdat)) {
+      datProps <- dataProps(sdat, modInds)
       # rename for clarity
-      names(geProps) <- c("summaryExpression", "moduleMembership", "propVarExpl")
-      geProps[[2]] <- insert.nas(geProps[[2]], na.inds)
-      names(geProps[[1]]) <- rownames(sge)
-      names(geProps[[2]]) <- names(sub)
+      names(datProps) <- c("moduleSummary", "moduleMembership", "propVarExpl")
+      datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
+      names(datProps[[1]]) <- rownames(sdat)
+      names(datProps[[2]]) <- names(sub)
     }
     
-    # Get the properties calculated from the adjacency.
-    adjProps <- adjProps(adjacency[[test]], modInds)
-    names(adjProps) <- c("connectivity", "density")
-    adjProps[[1]] <- insert.nas(adjProps[[1]], na.inds)
-    names(adjProps[[1]]) <- names(sub)
+    # Get the properties calculated from the network.
+    netProps <- netProps(network[[test]], modInds)
+    names(netProps) <- c("connectivity", "density")
+    netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
+    names(netProps[[1]]) <- names(sub)
     
-    c(geProps, adjProps)
+    c(datProps, netProps)
   })
   if (simplify && length(res) == 1) {
     res <- res[[1]]
@@ -300,69 +283,44 @@ networkProperties <- function(
   res
 }
 
-#' Order genes and modules within a network.
+#' Order nodes and modules within a network.
 #' 
-#' Order genes in descending order of intramodular connectivity within each 
-#' module, and order modules by the similarity of their summary expression
-#' profiles. Intramodular connectivity is strongly correlated with biological
-#' importance within a given module \emph{(1)}.
+#' Order nodes in descending order of intra-module connectivity and order 
+#' modules by the similarity of their summary vectors.
 #' 
-#' @param geneExpression optional; \code{NULL} or a list of 
-#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
-#'   expression data for a datset of interest (see details). Columns are
-#'   expected to be genes, rows samples.
-#' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
-#'   coexpression for a dataset of interest (see details).
-#' @param adjacency a list of 'bigMatrix' objects, each containing the gene
-#'   adjacencies for a dataset of interest (see details).
-#' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   for each datast of interest (see details).
-#' @param modules a vector of modules to apply the function to (see details).
-#' @param discovery name or index denoting which dataset the module of interest
-#'   was discovered in (see details).
-#' @param test name or index denoting which dataset to apply the function to 
-#'   (see details).
+#' @inheritParams common_params
+#' @inheritParams common_params2
+#' 
 #' @param na.rm logical; If \code{TRUE}, genes present in the \code{discovery} 
 #'   dataset but missing from the test dataset are excluded. If \code{FALSE}, 
 #'   missing genes are put last in the ordering.
-#' @param orderModules logical; if \code{TRUE} modules ordered by the clustering
-#'   of their summary expression profile. If \code{FALSE} modules are returned 
+#' @param orderModules logical; if \code{TRUE} modules ordered by clustering
+#'   their summary vectors. If \code{FALSE} modules are returned 
 #'   in the order provided.
 #' @param simplify logical; if \code{FALSE} the returned data structure will be 
-#'   a list of vectors of ordered genes, one list element for each module. If
-#'   \code{TRUE}, the returned data structure will be a single vector of 
-#'   ordered genes.
+#'   a list of vectors, one list element for each module. If \code{TRUE}, the
+#'   returned data structure will be a single vector of ordered genes.
 #'   
 #' @details
 #'  \subsection{Input data structure:}{
 #'   This function allows for input data formatted in a number of ways. Where 
-#'   there are multiple datasets of interest (e.g. multiple tissues, or a 
-#'   discovery dataset and an independent test dataset) the arguments 
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+#'   there are multiple datasets of interest (e.g. multiple tissues, locations, 
+#'   or a discovery dataset and an independent test dataset) the arguments 
+#'   \code{data}, \code{correlation}, and \code{network} should be
 #'   \code{\link[=list]{lists}} where each element contains the matrix data for 
-#'   each respective dataset. This matrix data should be stored as a 'bigMatrix'
-#'   object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
-#'   data}). Alternatively, if only one dataset is of interest, the
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
-#'   will also each accept a single 'bigMatrix' object.
+#'   each respective dataset. Alternatively, if only one dataset is of interest, 
+#'   the \code{data}, \code{correlation}, and \code{network} arguments
+#'   will also each accept a 'matrix' object.
 #'   
 #'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors, which contain the the module assignments for each gene in the
-#'   respective dataset. List elements corresponding to datasets where module
-#'   discovery has not been performed should contain \code{NULL}, unless the
-#'   datasets are named throughout the function arguments. I.e. where the
-#'   \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-#'   \code{adjacency} correspond to the names of each dataset of interest, the
-#'   names of the \code{discovery} dataset can be used to look up the respective
-#'   module assignments in the \code{moduleAssignments} list. If module
-#'   discovery has only been performed in one dataset, then the
-#'   \code{moduleAssignments} will also accept a named vector.
+#'   vectors, which denote the module each variable belongs to in the discovery
+#'   dataset. If module discovery has only been performed in one dataset, then 
+#'   the \code{moduleAssignments} argument will also accept a named vector.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the intramodular connectivity in to determine 
-#'   the ordering of genes. These arguments are ignored if data is provided for 
-#'   only one dataset.
+#'   which dataset to calculate the network properties in. These arguments are
+#'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
@@ -371,9 +329,9 @@ networkProperties <- function(
 #'   conversion process involves writing out each matrix as a binary file on
 #'   disk, which can take a long time for large datasets. It is strongly
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
-#'   \link{modulePreservation} function, \link{networkProperties} function, 
-#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 
-#'   \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
+#'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
+#'   \link[=plotTopology]{functions}, \link[=sampleOrder]{sample} ordering, and
+#'   \link{networkProperties} functions also expect 'bigMatrix' objects. 
 #'   Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 
@@ -391,8 +349,8 @@ networkProperties <- function(
 #' }
 #' 
 #' @return
-#'  A vector of gene names in descending order of intramodular connectivity for
-#'  each module. 
+#'  A vector of variable names in descending order of intramodular connectivity 
+#'  for each module. 
 #'  
 #' @examples
 #' \dontrun{
@@ -411,13 +369,13 @@ networkProperties <- function(
 #' adjA <- as.bigMatrix(adjA, "adjA_bm")
 #' 
 #' ## Example 1: get the ordering of samples for a single module
-#' geneOrder(
+#' nodeOrder(
 #'   geA, coexpA, adjA, moduleAssignments, modules="2"
 #' )
 #' 
 #' ## Example 2: get the order of genes of an arbitrary subset
 #' ## (the first 10 genes)
-#' geneOrder(
+#' nodeOrder(
 #'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10]
 #' )
 #' 
@@ -471,7 +429,7 @@ networkProperties <- function(
 #' 
 #' # Get the order of genes in the liver tissue for modules 
 #' # 3 and 7, which were discovered in the adipose tissue. 
-#' geneOrder(
+#' nodeOrder(
 #'   geneExpression, coexpression, adjacency, moduleAssignments,
 #'   modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
@@ -480,33 +438,34 @@ networkProperties <- function(
 #' unlink("*_bm*")
 #' }
 #' 
-#' @name geneOrder
+#' @name nodeOrder
 #' @export
-geneOrder <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
+nodeOrder <- function(
+  data=NULL, correlation, network, moduleAssignments, modules,
   discovery=1, test=1, na.rm=FALSE, orderModules=TRUE, simplify=TRUE
 ) {
   props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules,
+    data, correlation, network, moduleAssignments, modules,
     discovery, test, simplify=FALSE
   )
   
   # order modules
   moduleOrder <- 1
   if (length(props) > 1 && orderModules) {
-    if (!is.null(geneExpression[[test]])) {
-      # Create a matrix of summary expression profiles to measure the similarity
+    if (!is.null(data[[test]])) {
+      # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
-        0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
+        0, ncol=length(props), nrow=length(props[[1]]$moduleSummary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$summaryExpression
+        seps[,mi] <- props[[mi]]$moduleSummary
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
       warning(
-        "No gene expression provided, modules will be ordered as provided"
+        "Data used to infer networks not provided, modules will be ordered as", 
+        "provided."
       )
       moduleOrder <- seq_along(props)
     }
@@ -530,66 +489,39 @@ geneOrder <- function(
   res
 }
 
-#' Order genes and modules within a network.
+#' Order samples within a network.
 #' 
-#' Order genes in descending order of intramodular connectivity within each 
-#' module, and order modules by the similarity of their summary expression
-#' profiles. Intramodular connectivity is strongly correlated with biological
-#' importance within a given module \emph{(1)}.
+#' Get the order of samples within a module based on the module summary vector.
 #' 
-#' @param geneExpression optional; \code{NULL} or a list of 
-#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
-#'   expression data for a datset of interest (see details). Columns are
-#'   expected to be genes, rows samples.
-#' @param coexpression  a list of 'bigMatrix' objects, each containing the gene
-#'   coexpression for a dataset of interest (see details).
-#' @param adjacency a list of 'bigMatrix' objects, each containing the gene
-#'   adjacencies for a dataset of interest (see details).
-#' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   for each datast of interest (see details).
-#' @param modules a vector of modules to apply the function to (see details).
-#' @param discovery name or index denoting which dataset the module of interest
-#'   was discovered in (see details).
-#' @param test name or index denoting which dataset to apply the function to 
-#'   (see details).
-#' @param na.rm logical; If \code{TRUE}, genes present in the \code{discovery} 
-#'   dataset but missing from the test dataset are excluded. If \code{FALSE}, 
-#'   missing genes are put last in the ordering.
-#' @param simplify logical; if \code{FALSE} the returned data structure will be 
-#'   a list of vectors of ordered genes, one list element for each module. If
-#'   \code{TRUE}, the returned data structure will be a single vector of 
-#'   ordered genes.
+#' @inheritParams common_params
+#' @inheritParams common_params2
+#'
+#' @param na.rm logical; If \code{TRUE} variables present in the 
+#'   \code{discovery} dataset but missing from the \code{test} dataset are 
+#'   excluded. If \code{FALSE} missing variables are put last in the ordering.
+#' @param simplify logical; If \code{TRUE} a vector is returned instead of a 
+#'  list when applying the function to one module.
 #'   
 #' @details
 #'  \subsection{Input data structure:}{
 #'   This function allows for input data formatted in a number of ways. Where 
-#'   there are multiple datasets of interest (e.g. multiple tissues, or a 
-#'   discovery dataset and an independent test dataset) the arguments 
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+#'   there are multiple datasets of interest (e.g. multiple tissues, locations, 
+#'   or a discovery dataset and an independent test dataset) the arguments 
+#'   \code{data}, \code{correlation}, and \code{network} should be
 #'   \code{\link[=list]{lists}} where each element contains the matrix data for 
-#'   each respective dataset. This matrix data should be stored as a 'bigMatrix'
-#'   object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
-#'   data}). Alternatively, if only one dataset is of interest, the
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
-#'   will also each accept a single 'bigMatrix' object.
+#'   each respective dataset. Alternatively, if only one dataset is of interest, 
+#'   the \code{data}, \code{correlation}, and \code{network} arguments
+#'   will also each accept a 'matrix' object.
 #'   
 #'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors, which contain the the module assignments for each gene in the
-#'   respective dataset. List elements corresponding to datasets where module
-#'   discovery has not been performed should contain \code{NULL}, unless the
-#'   datasets are named throughout the function arguments. I.e. where the
-#'   \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-#'   \code{adjacency} correspond to the names of each dataset of interest, the
-#'   names of the \code{discovery} dataset can be used to look up the respective
-#'   module assignments in the \code{moduleAssignments} list. If module
-#'   discovery has only been performed in one dataset, then the
-#'   \code{moduleAssignments} will also accept a named vector.
+#'   vectors, which denote the module each variable belongs to in the discovery
+#'   dataset. If module discovery has only been performed in one dataset, then 
+#'   the \code{moduleAssignments} argument will also accept a named vector.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the summary expression in for determining the
-#'   order of the samples. These arguments are ignored if data is provided for 
-#'   only one dataset.
+#'   which dataset to calculate the network properties in. These arguments are
+#'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
@@ -598,9 +530,9 @@ geneOrder <- function(
 #'   conversion process involves writing out each matrix as a binary file on 
 #'   disk, which can take a long time for large datasets. It is strongly 
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
-#'   \link{modulePreservation} function, \link{networkProperties} function, 
-#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 
-#'   \link[=geneOrder]{gene} ordering also expect 'bigMatrix' objects. 
+#'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
+#'   \link[=plotTopology]{functions}, \link[=nodeOrder]{nodeOrder} and 
+#'   \link{networkProperties} functions also expect 'bigMatrix' objects.
 #'   Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 
@@ -619,7 +551,7 @@ geneOrder <- function(
 #' 
 #' @return
 #'  A list of vectors, one per module of interest, each containing the sample 
-#'  names sorted in descending order of the module's summary expression profile. 
+#'  names sorted in descending order of the module's summary vector. 
 #'  
 #' @examples
 #' \dontrun{
@@ -710,21 +642,29 @@ geneOrder <- function(
 #' @name sampleOrder
 #' @export
 sampleOrder <- function(
-  geneExpression, coexpression, adjacency, moduleAssignments, modules,
+  data, correlation, network, moduleAssignments, modules,
   discovery=1, test=1, na.rm=FALSE, simplify=TRUE
 ) {
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot order samples without gene expression data")
+  if (is.null(data[[test]]))
+    stop("Cannot order samples without 'data'")
   props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules,
+    data, correlation, network, moduleAssignments, modules,
     discovery, test, simplify=FALSE
   )
 
   res <- lapply(props, function(mip) {
-    names(sort(
-      mip$summaryExpression, decreasing=TRUE, 
-      na.last=ifelse(na.rm, NA, TRUE)
-    ))
+    # Need to handle cases where no rownames are provided
+    if (!is.null(names(mip$moduleSummary))) {
+      names(sort(
+        mip$moduleSummary, decreasing=TRUE, 
+        na.last=ifelse(na.rm, NA, TRUE)
+      ))
+    } else {
+      order(
+        mip$moduleSummary, decreasing=TRUE, 
+        na.last=ifelse(na.rm, NA, TRUE)
+      )
+    }
   })
   if (simplify && length(res) == 1) {
     res <- res[[1]]

@@ -1,7 +1,7 @@
 #' Scale and Center the rows of a 'big.matrix'
 #' 
-#' Create a new \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled gene
-#' expression. Genes are expected to be columns.
+#' Create a new \code{\link[=bigMatrix-class]{bigMatrix}} containing column-wise
+#' scaled data.
 #' 
 #' @param x the bigMatrix to scale.
 #' @param tmp.dir temporary directory to store the backingfiles for the 
@@ -46,7 +46,7 @@ scaleBigMatrix <- function(x, tmp.dir) {
 #' Get the range of a bigMatrix or its subset
 #' 
 #' Note subsetting only applies to columns: this is only meant for use with the 
-#' gene expression matrix.
+#' 'data' matrices.
 #' 
 #' @param x a bigMatrix
 #' @param subsetIndices an optional vector to subset the matrix by
