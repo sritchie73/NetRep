@@ -615,8 +615,6 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   if (statCorMethod == "bicor") {
     cor <- function(...) bicor(..., quick=1, nThreads=1)[,]
-  } else if (statCorMethod == "pearson" & hasWGCNA) {
-    cor <- function(...) corFast(..., quick=1, nThreads=1)[,]
   } else {
     cor <- function(...) stats::cor(..., method=statCorMethod)[,]
   }
