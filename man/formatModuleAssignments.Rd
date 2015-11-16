@@ -5,7 +5,7 @@
 \title{Format moduleAssignments list}
 \usage{
 formatModuleAssignments(moduleAssignments, discovery, nDatasets, datasetNames,
-  nDiscGenes, discGeneNames)
+  nDiscVars, discVarNames)
 }
 \arguments{
 \item{moduleAssignments}{input provided by the user}
@@ -16,11 +16,11 @@ formatModuleAssignments(moduleAssignments, discovery, nDatasets, datasetNames,
 
 \item{datasetNames}{names of the datasets}
 
-\item{nDiscGenes}{number of genes in the discovery dataset. Only required if
-moduleAssignments is missing.}
+\item{nDiscVars}{number of variables in the discovery dataset. 
+Only required if \code{moduleAssignments} is missing.}
 
-\item{discGeneNames}{names of the genes in the discovery dataset. Only 
-required if moduleAssignments is missing.}
+\item{discVarNames}{varaibles in the discovery dataset. Only 
+required if \code{moduleAssignments} is missing.}
 }
 \value{
 List structure for moduleAssignments for internal calculations.

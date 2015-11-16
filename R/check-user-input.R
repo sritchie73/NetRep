@@ -3,18 +3,10 @@
 #' Make sure all objects are the right class, have the same dimensions, and
 #' are ordered the same way across datasets.
 #' 
-#' @param geneExpression a list of \code{bigMatrix} objects
-#' @param coexpression a list of \code{bigMatrix} objects
-#' @param adjacency a list of \code{bigMatrix} objects
-#' @param moduleAssignments a list of either NULL, or vectors assigning genes to
-#'  modules in the \code{discovery} datasets.
-#' @param discovery name or index denoting which dataset the module of
-#'  interest was discovered in. See details.
-#' @param test name or index denoting which dataset to apply the function to.
-#'  See details.
+#' @inheritParams common_params
 #'  
 checkSets <- function(
-  geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+  data, correlation, network, moduleAssignments, discovery, test
 ) {
   if (class(discovery) %nin% c("character", "numeric", "integer"))
     stop("'discovery' must be a vector of dataset names or indices")
@@ -22,42 +14,42 @@ checkSets <- function(
     stop("'test' must be a vector of dataset names or indices")
   
   classes <- c(
-    class(coexpression),
-    class(adjacency),
+    class(correlation),
+    class(network),
     class(moduleAssignments)
   )
-  if (!is.null(geneExpression)) {
-    classes <- c(class(geneExpression), classes)
+  if (!is.null(data)) {
+    classes <- c(class(data), classes)
   }
   
   # Make sure the objects are lists, lists of bigMatrix objects, and have the
   # same length.
   if (!all(classes == "list")) {
-    stop("Expecting lists of 'bigMatrix' objects")
+    stop("Expecting lists of 'bigMatrix' objects.")
   }
   classes2 <- c(
-    sapply(coexpression, class),
-    sapply(adjacency, class)
+    sapply(correlation, class),
+    sapply(network, class)
   )
-  if (!is.null(geneExpression)) {
-    geClasses <- sapply(geneExpression, class)
+  if (!is.null(data)) {
+    geClasses <- sapply(data, class)
     geClasses <- geClasses[geClasses != "NULL"]
     classes2 <- c(geClasses, classes2)      
   }
   if(!all(classes2 == "bigMatrix")) {
     stop(
       "expecting 'bigMatrix' objects, or a list of 'bigMatrix' objects for ",
-      "the 'geneExpression', coexpression', and 'adjacency' arguments"
+      "the 'data', correlation', and 'network' arguments."
     )
   }
-  nDatasets <- c(length(coexpression), length(adjacency))
-  if (!is.null(geneExpression)) {
-    nDatasets <- c(length(geneExpression), nDatasets)
+  nDatasets <- c(length(correlation), length(network))
+  if (!is.null(data)) {
+    nDatasets <- c(length(data), nDatasets)
   }
   if (length(unique(nDatasets)) > 1) {
     stop(
       "different number of datasets encountered across the",
-      " 'geneExpression', coexpression', and 'adjacency' arguments"
+      " 'data', correlation', and 'network' arguments."
     )
   }
   
@@ -65,33 +57,35 @@ checkSets <- function(
   # matches.
   if (class(discovery) != "character" || class(test) != "character") {
     if (
-      any(names(coexpression) != names(adjacency)) &&
-      any(names(coexpression) != names(moduleAssignments)) &&
-      (!is.null(geneExpression) && any(names(geneExpression) != names(coexpression)))
+      any(names(correlation) != names(network)) &&
+      any(names(correlation) != names(moduleAssignments)) &&
+      (!is.null(data) && any(names(data) != names(correlation)))
     ) {
       stop(
         "'discovery' or 'test' provided as a vector of indices, but ",
         "ordering of dataset is not the same between the ", 
-        ifelse(is.null(geneExpression), "", "'geneExpression'"),
-        " 'coexpression', 'adjacency', and 'moduleAssignments'"
+        ifelse(is.null(data), "", "'data'"),
+        " 'correlation', 'network', and 'moduleAssignments' lists."
       )
     }
   }
   
-  if (!is.null(names(coexpression))) {
-    datasets <- names(coexpression)
+  if (!is.null(names(correlation))) {
+    datasets <- names(correlation)
   } else {
-    datasets <- seq_along(coexpression)
+    datasets <- seq_along(correlation)
   }
+  
+  # Check dimensions of data is ok
   for (dd in datasets) {
-    if (nrow(coexpression[[dd]]) != ncol(coexpression[[dd]]))
-      stop("'coexpression' of dataset ", dd, " is not square")
-    if (nrow(adjacency[[dd]]) != ncol(adjacency[[dd]]))
-      stop("'adjacency' of dataset ", dd, " is not square")
+    if (nrow(correlation[[dd]]) != ncol(correlation[[dd]]))
+      stop("'correlation' matrix for dataset ", dd, " is not square.")
+    if (nrow(network[[dd]]) != ncol(network[[dd]]))
+      stop("'network' matrix for dataset ", dd, " is not square.")
     
-    ncols <- c(ncol(coexpression[[dd]]), ncol(adjacency[[dd]]))
-    if (!is.null(geneExpression)) {
-      ncols <- c(ncol(geneExpression[[dd]]), ncols)
+    ncols <- c(ncol(correlation[[dd]]), ncol(network[[dd]]))
+    if (!is.null(data)) {
+      ncols <- c(ncol(data[[dd]]), ncols)
     }
     if (!is.null(moduleAssignments[[dd]])) {
       ncols <- c(ncols, length(moduleAssignments[[dd]]))
@@ -99,41 +93,50 @@ checkSets <- function(
 
     if (length(unique(ncols)) > 1) {
       stop(
-        "Different number of genes encountered across arguments for dataset ",
-        dd
+        "Input matrices for dataset ", dd, " do not contain the same number of",
+        " variables (columns)."
       )
     }
     
-    if (any(rownames(coexpression[[dd]]) != colnames(coexpression[[dd]]))) {
+    # Check variable name order is the same within and across input matrices
+    if (any(rownames(correlation[[dd]]) != colnames(correlation[[dd]]))) {
       stop(
-        "'coexpression' of dataset ", dd, " has differing row and column",
-        " ordering"
+        "'correlation' matrix for dataset ", dd, " does not have consistent", 
+        "row and column name ordering."
       )
     }
-    if (any(rownames(adjacency[[dd]]) != colnames(adjacency[[dd]]))) {
+    if (any(rownames(network[[dd]]) != colnames(network[[dd]]))) {
       stop(
-        "'adjacency' of dataset ", dd, " has differing row and column",
-        " ordering"
+        "'network' matrix for dataset ", dd, " does not have consistent", 
+        "row and column name ordering."
       )
     }
-    if (any(rownames(adjacency[[dd]]) != rownames(coexpression[[dd]]))) {
+    if (any(rownames(network[[dd]]) != rownames(correlation[[dd]]))) {
       stop(
-        "'adjacency' and 'coexpression' of dataset ", dd, " have differing",
-        " gene ordering"
+        "'network' and 'correlation' matrices for dataset ", dd, " do not have",
+        " consistent ordering of variables (column names)."
       )
+    }
+    if (!is.null(data) & !is.null(data[[dd]])) {
+      if (any(colnames(data[[dd]]) != colnames(correlation[dd]))) {
+        stop(
+          "'data' and 'correlation' matrices for dataset ", dd, " do not have",
+          " consistent ordering of variables (column names)."
+        )
+      }
     }
     if (!is.null(moduleAssignments[[dd]])) {
-      if (any(rownames(adjacency[[dd]]) != names(moduleAssignments[[dd]]))) {
+      if (any(rownames(network[[dd]]) != names(moduleAssignments[[dd]]))) {
         stop(
-          "'moduleAssignments' has differing gene ordering to the ",
-          "'coexpression' and 'adjacency' for dataset ", dd
+          "'moduleAssignments' has differing variable ordering to the ",
+          "'correlation' and 'network' matrices for dataset ", dd, "."
         )
       }
     }
     for (di in discovery) {
       if (is.null(moduleAssignments[[di]])) {
         stop(
-          "No 'moduleAssignments' present for discovery dataset ", di  
+          "No 'moduleAssignments' present for discovery dataset ", di, "." 
         )
       }
     }
@@ -150,17 +153,17 @@ checkSets <- function(
 #' @param discovery vector of discovery networks provided by the user
 #' @param nDatasets number of datasets
 #' @param datasetNames names of the datasets
-#' @param nDiscGenes number of genes in the discovery dataset. Only required if
-#'  moduleAssignments is missing.
-#' @param discGeneNames names of the genes in the discovery dataset. Only 
-#'  required if moduleAssignments is missing.
+#' @param nDiscVars number of variables in the discovery dataset. 
+#'  Only required if \code{moduleAssignments} is missing.
+#' @param discVarNames varaibles in the discovery dataset. Only 
+#'  required if \code{moduleAssignments} is missing.
 #' 
 #' @return
 #'  List structure for moduleAssignments for internal calculations.
 #'
 formatModuleAssignments <- function(
   moduleAssignments, discovery, nDatasets, datasetNames, 
-  nDiscGenes, discGeneNames
+  nDiscVars, discVarNames
 ) {
   if (class(discovery) %nin% c("character", "numeric", "integer"))
     stop("'discovery' must be a vector of dataset names or indices")
@@ -169,8 +172,8 @@ formatModuleAssignments <- function(
   if (missing(moduleAssignments)) {
     moduleAssignments <- rep(list(NULL), nDatasets)
     names(moduleAssignments) <- datasetNames
-    moduleAssignments[[discovery]] <- rep("1", nDiscGenes)
-    names(moduleAssignments[[discovery]]) <- discGeneNames
+    moduleAssignments[[discovery]] <- rep("1", nDiscVars)
+    names(moduleAssignments[[discovery]]) <- discVarNames
   }
   
   # If we're subsetting by dataset index, make sure the ordering of datasets

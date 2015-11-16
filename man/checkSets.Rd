@@ -4,24 +4,29 @@
 \alias{checkSets}
 \title{Check input data for consistency}
 \usage{
-checkSets(geneExpression, coexpression, adjacency, moduleAssignments, discovery,
-  test)
+checkSets(data, correlation, network, moduleAssignments, discovery, test)
 }
 \arguments{
-\item{geneExpression}{a list of \code{bigMatrix} objects}
+\item{data}{a list of numeric matrices. Each entry of the list corresponds to
+a dataset and contains the data used to infer the interaction network
+between variables (e.g. genes). Expects matrix columns to correspond to
+variables and matrix rows to correspond to samples.}
 
-\item{coexpression}{a list of \code{bigMatrix} objects}
+\item{correlation}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the correlation between 
+each pair of variables in the dataset.}
 
-\item{adjacency}{a list of \code{bigMatrix} objects}
+\item{network}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the network edge weights 
+between each pair of variables in the dataset.}
 
-\item{moduleAssignments}{a list of either NULL, or vectors assigning genes to
-modules in the \code{discovery} datasets.}
+\item{moduleAssignments}{a vector containing the module each variable belongs
+to in the discovery dataset. If there are multiple discovery datasets 
+then this argument should be a list of such vectors.}
 
-\item{discovery}{name or index denoting which dataset the module of
-interest was discovered in. See details.}
+\item{discovery}{name or index denoting which the discovery dataset.}
 
-\item{test}{name or index denoting which dataset to apply the function to.
-See details.}
+\item{test}{name or index denoting the dataset to analyse the module in.}
 }
 \description{
 Make sure all objects are the right class, have the same dimensions, and
