@@ -103,29 +103,29 @@ addAlpha <- function(col, alpha) {
   paste0(col, as.hexmode(floor(255*alpha)))
 }
 
-#' Color palette for coexpression heatmaps
+#' Color palette for correlation heatmaps
 #'
 #' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
 #' This gives a nicer contrast than the "RdBu" palette
-coexpression.palette <- function() {
+correlation.palette <- function() {
   cols <- rev(brewer.pal(11, "RdYlBu"))
   cols[6] <- "#FFFFFF"
   cols
 }
 
-#' Color palette for adjacency heatmaps
+#' Color palette for network heatmaps
 #'
 #' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
-adjacency.palette <- function() {
-  coexpression.palette()[6:11]
+network.palette <- function() {
+  correlation.palette()[6:11]
 }
 
-#' Color palette for expression and summary expression plots
+#' Color palette for data heatmaps and module summary vector plots
 #'
 #' RColorBrewer palette "PRGn" with a white middle color.
 #'
 #' @import RColorBrewer
-expression.palette <- function() {
+data.palette <- function() {
   cols <- brewer.pal(9, "PRGn")
   cols[5] <- "#FFFFFF"
   cols

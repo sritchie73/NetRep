@@ -24,9 +24,10 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{discovery}{name or index denoting which the discovery dataset.}
+\item{discovery}{name or index denoting which dataset the module of interest
+was discovered in.}
 
-\item{test}{name or index denoting the dataset to analyse the module in.}
+\item{test}{name or index denoting which dataset to apply the function to.}
 }
 \description{
 Make sure all objects are the right class, have the same dimensions, and

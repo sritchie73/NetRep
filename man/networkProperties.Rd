@@ -27,9 +27,11 @@ then this argument should be a list of such vectors.}
 
 \item{modules}{a vector of modules to apply the function to (see details).}
 
-\item{discovery}{name or index denoting which the discovery dataset.}
+\item{discovery}{name or index denoting which dataset the module of interest
+was discovered in (see details).}
 
-\item{test}{name or index denoting the dataset to analyse the module in.}
+\item{test}{name or index denoting which dataset to apply the function to 
+(see details).}
 
 \item{simplify}{logical; if \code{TRUE} the output data structure is 
 simplified if only one module is specified.}

@@ -2,54 +2,35 @@
 #' 
 #' Functions for plotting the topology of a network module.
 #' 
-#' @param geneExpression optional; a list of 
-#'   \code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
-#'   expression data for a datset of interest (see details). Columns are
-#'   expected to be genes, rows samples. If not provided, the expression,
-#'   module membership, and summary expression will not be plotted.
-#' @param coexpression a list of 'bigMatrix' objects, each containing the gene
-#'   coexpression for a dataset of interest (see details).
-#' @param adjacency a list of 'bigMatrix' objects, each containing the gene
-#'   adjacencies for a dataset of interest (see details).
-#' @param moduleAssignments a list of named vectors assigning genes to modules 
-#'   in each dataset of interest (see details).
-#' @param modules a vector of modules to apply the function to (see details).
-#' @param discovery name or index denoting which dataset the module of interest
-#'   was discovered in (see details).
-#' @param test name or index denoting which dataset to apply the function to 
-#'   (see details).
-#' @param symmetric logical; controls whether the coexpression and adjacency 
+#' @inheritParams common_params
+#' @inheritParams common_params2
+#'
+#' @param symmetric logical; controls whether the correlation and network 
 #'  heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
-#'  heatmaps. If symmetric, then the gene and module names will also be rendered
+#'  heatmaps. If symmetric, then the node and module names will also be rendered
 #'  on the left axis.
-#' @param orderGenesBy one of "discovery", "test", or "none" indicating which
-#'  dataset the function should use to order the genes (see details).
-#' @param orderSamplesBy one of "discovery", "test", or "none" indicating which
-#'  dataset the function should use to order the samples (see details).
-#' @param orderModules logical; if \code{TRUE} modules will be ordered by the 
-#'  similarity of their summary expression profiles (see details). The default
-#'  is \code{TRUE} if gene expression for the \code{test} dataset is provided.
-#' @param plotGeneNames logical; controls whether the gene names are 
-#'  rendered on the bottom axis when using \code{plotExpression},
-#'  \code{plotCoxpression}, \code{plotAdjacency}, \code{plotConnectivity},
-#'  or \code{plotModuleMembership}.
+#' @param orderNodesBy one of "discovery", "test" or "none". Controls how nodes
+#' are ordered on the plot (see details).
+#' @param orderSamplesBy one of "discovery", "test" or "none". Controls how 
+#' samples are ordered on the plot (see details).
+#' @param orderModules logical; if \code{TRUE} modules will be ordered by 
+#'  similarity (see details). The default is \code{TRUE} if the data for the 
+#'  \code{test} network is provided.
+#' @param plotNodeNames logical; controls whether the node names are 
+#'  rendered on the bottom axis.
 #' @param plotSampleNames logical; controls whether the sample names are 
-#'  rendered on the left axis when using \code{plotSummaryExpression} or 
-#'  \code{plotExpression}.
-#' @param plotModuleNames logical; controls whether module names are rendered 
-#'  above the bar charts when using \code{plotSummaryExpression}, or on the 
-#'  bottom axis when using \code{plotExpression}, \code{plotCoexpression},
-#'  \code{plotAdjacency}, \code{plotConnectivity}, or 
-#'  \code{plotModuleMembership}. By default, module names are only rendered 
-#'  when multiple \code{modules} are specified.
+#'  rendered on the left axis.
+#' @param plotModuleNames logical; controls whether module names are rendered.
+#'  The default is for module names to be rendered when multiple \code{modules} 
+#'  are drawn.
 #' @param palette a vector of colors to use for each plot (see details).
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
 #'  in \code{plotModuleMembership}, \code{plotConnectivity}, and
-#'  \code{plotSummaryExpression}.
+#'  \code{plotModuleSummary}.
 #' @param border.width line width for borders.
 #' @param plotLegend logical; controls whether a legend is drawn when using
-#'  \code{plotCoexpression}, \code{plotAdjacency}, or \code{plotExpression}.
-#' @param gaxt.line the number of lines into the bottom margin at which the gene
+#'  \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.
+#' @param gaxt.line the number of lines into the bottom margin at which the node
 #'  names will be drawn.
 #' @param saxt.line the number of lines into the left margin at which the sample
 #'  names will be drawn.
@@ -62,170 +43,144 @@
 #' @param legend.tick.size size of the ticks on the axis legend.
 #' @param laxt.line the distance from the legend to render the legend axis 
 #'  labels, as multiple of \code{legend.tick.size}.
-#' @param cex.axis relative size of the gene and sample names.
+#' @param cex.axis relative size of the node and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.
 #' @param horizontal logical; controls whether the legend is rendered 
-#'  horizontally or vertically when using \code{plotExpressionLegend},
-#'  \code{plotCoexpressionLegend} or \code{plotAdjacencyLegend}.
+#'  horizontally or vertically when using \code{plotDataLegend},
+#'  \code{plotCorrelationLegend} or \code{plotNetworkLegend}.
 #'
 #' @details
 #'  \subsection{Input data structure:}{
 #'   This function allows for input data formatted in a number of ways. Where 
-#'   there are multiple datasets of interest (e.g. multiple tissues, or a 
-#'   discovery dataset and an independent test dataset) the arguments 
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+#'   there are multiple datasets of interest (e.g. multiple tissues, locations, 
+#'   or a discovery dataset and an independent test dataset) the arguments 
+#'   \code{data}, \code{correlation}, and \code{network} should be
 #'   \code{\link[=list]{lists}} where each element contains the matrix data for 
-#'   each respective dataset. This matrix data should be stored as a 'bigMatrix'
-#'   object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
-#'   data}). Alternatively, if only one dataset is of interest, the
-#'   \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
-#'   will also each accept a single 'bigMatrix' object.
+#'   each respective dataset. Alternatively, if only one dataset is of interest, 
+#'   the \code{data}, \code{correlation}, and \code{network} arguments
+#'   will also each accept a 'matrix' object.
 #'   
 #'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors, which contain the the module assignments for each gene in the
-#'   respective dataset. List elements corresponding to datasets where module
-#'   discovery has not been performed should contain \code{NULL}, unless the
-#'   datasets are named throughout the function arguments. I.e. where the
-#'   \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-#'   \code{adjacency} correspond to the names of each dataset of interest, the
-#'   names of the \code{discovery} dataset can be used to look up the respective
-#'   module assignments in the \code{moduleAssignments} list. If module
-#'   discovery has only been performed in one dataset, then the
-#'   \code{moduleAssignments} will also accept a named vector.
+#'   vectors, which denote the module each variable belongs to in the discovery
+#'   dataset. If module discovery has only been performed in one dataset, then 
+#'   the \code{moduleAssignments} argument will also accept a named vector.
 #'   
 #'   The \code{discovery} arguments specifies which dataset the \code{modules} 
 #'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to plot those module(s) in. The \code{orderGenesBy} and
-#'   \code{orderSamplesBy} arguments control how genes and samples are ordered
-#'   on the plot. These arguments are ignored if data is provided for only one 
-#'   dataset.
+#'   which dataset to calculate the network properties in. These arguments are
+#'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
-#'   data, regular 'matrix' objects are also accepted. In this case, the
+#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+#'   data, regular 'matrix' objects are also accepted. In this case, the 
 #'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-#'   conversion process involves writing out each matrix as a binary file on
-#'   disk, which can take a long time for large datasets. It is strongly
+#'   conversion process involves writing out each matrix as a binary file on 
+#'   disk, which can take a long time for large datasets. It is strongly 
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
-#'   \link{modulePreservation} function, \link{networkProperties} function,
-#'   \link[=plotModule]{plotting} \link[=plotTopology]{functions},
-#'   \link[=geneOrder]{gene} and \link[=sampleOrder]{sample} ordering also
-#'   expect 'bigMatrix' objects. Further, 'bigMatrix' objects have a number of
-#'   benefits, including instantaneous load time from any future R session, and
-#'   parallel access from mutliple independent R sessions. Methods are provided
-#'   for \link[=bigMatrix-get]{converting to, loading in}, and 
+#'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
+#'   \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
+#'   \link[=sampleOrder]{sample} ordering functions  also expect 'bigMatrix'
+#'   objects. Further, 'bigMatrix' objects have a number of benefits, including 
+#'   instantaneous load time from any future R session, and parallel access from
+#'   mutliple independent R sessions. Methods are provided for 
+#'   \link[=bigMatrix-get]{converting to, loading in}, and 
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }
-#' \subsection{Gene and sample ordering:}{
-#'   By default, genes are ordered in decreasing order of intramodular 
-#'   connectivity in the \code{discovery} dataset (see \code{\link{geneOrder}}). 
+#' \subsection{Node, sample, and module ordering:}{
+#'   By default, nodes are ordered in decreasing order of within-module
+#'   connectivity in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
 #'   This facilitates the visual comparison of modules across datasets, as the 
-#'   gene ordering will be preserved. Missing genes are colored in grey. This 
-#'   behaviour can be change by setting \code{orderGenesBy} to "test", in which
-#'   cases genes will be ordered in decreasing order of intramodular 
-#'   connectivity in the discovery dataset. Alternatively \code{orderGenesBy}
-#'   can be set to "none", in which case genes are rendered in the order they
-#'   appear in the discovery dataset.
+#'   node ordering will be preserved. Missing nodes are colored in grey. If
+#'   \code{orderNodesBy} is "test" nodes will instead be ordered by 
+#'   within-module connectivity in the \code{test} dataset. If "none" nodes are 
+#'   drawn in the order they are provided in the drawn dataset.
 #'   
 #'   When multiple modules are specified, modules are ordered by the similarity
-#'   of their summary expression profiles in the \code{orderGenesBy} dataset. 
-#'   To disable this behaviour, set \code{orderModules} to \code{FALSE}.
+#'   of their summary vectors in the drawn dataset. To disable this behaviour, 
+#'   set \code{orderModules} to \code{FALSE}.
 #'   
-#'   Sample ordering only applies to \code{plotExpression} and 
-#'   \code{plotSummaryExpression}. By default, samples are ordered in descending
-#'   order of the summary expression profile for the left-most module appearing
-#'   on the plot (see \code{\link{sampleOrder}}. By default, the summary
-#'   expression profile is calculated in the \code{test} dataset. This behaviour
-#'   can be changed through the \code{orderSamplesBy} argument, however setting 
-#'   \code{orderSamplesBy} to "discovery" will only work if samples are present 
-#'   in both datasets.
+#'   Sample ordering only applies to \code{plotData} and 
+#'   \code{plotModuleSummary}. By default, samples are ordered in descending
+#'   order of the module summary vector in the drawn dataset for the left-most 
+#'   module appearing on the plot (see \code{\link{sampleOrder}}.
 #' }
-#' \subsection{Normalised intramodular connectivity:}{
-#'   The gene connectivity is normalised by the maximum connectivity in any 
-#'   given module when rendered on the bar plot. This facilitates visual 
-#'   comparison on genes within a module when multiple modules of differing 
-#'   sizes or densities are rendered. Further, although the relative
-#'   intramodular connectivity provides information about a genes biological
-#'   importance to a module \emph{(1)}, the numeric value is meaningless.
-#'   Normalising the connectivity is therefore useful for visual inspection.
+#' \subsection{Normalised connectivity:}{
+#'   The within-module connectivity is normalised by the maximum connectivity in
+#'   any given module when rendered on the bar plot. This facilitates visual 
+#'   comparison of multiple modules with differing sizes or densities.
 #' }
 #' \subsection{Customising plot layout:}{
 #'   Although reasonable default values for most parameters have been provided,
 #'   the rendering of axes and titles may need adjusting depending on the size
 #'   of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
 #'   \code{maxt.line}, and \code{laxt.line} control the distance from each plot
-#'   window that the gene labels, sample labels, module labels, and legend 
+#'   window that the node labels, sample labels, module labels, and legend 
 #'   labels are rendered. 
 #'   
 #'   \code{legend.tick.size} controls the length of the 
-#'   axis ticks on each of the legends relative to the coexpression, adjacency,
-#'   and gene expression plot windows. 
+#'   axis ticks on each of the legends relative to the correlation, network,
+#'   and data plot windows. 
 #'   
 #'   \code{legend.position} controls the horizontal offset of the legend 
 #'   relative to the plot. For the triangle heatmaps, (\code{symmetric=FALSE} in
-#'   \code{plotCoexpression} and \code{plotAdjacency}) this controls how far 
+#'   \code{plotCorrelation} and \code{plotNetwork}) this controls how far 
 #'   left of the plot the legend starts as a proportion of the plot width. For
-#'   the square heatmaps (\code{plotExpression}, and \code{symmetric=TRUE} in
-#'   \code{plotCoexpression} and \code{plotAdjacency}) this controls how far 
+#'   the square heatmaps (\code{plotData}, and \code{symmetric=TRUE} in
+#'   \code{plotCorrelation} and \code{plotNetwork}) this controls how far 
 #'   right of the plot the legend starts as a proportion of the plot width.
 #'   
 #'   \code{cex.main} controls the relative text size of the plot title
 #'   (specified by the \code{main} argument). \code{cex.axis} controls the
-#'   relative text size of the gene and sample labels. \code{cex.lab} controls
+#'   relative text size of the node and sample labels. \code{cex.lab} controls
 #'   the relative text size of the bar plot axis labels, module labels, and the
 #'   legend titles.
 #'   
-#'   The rendering of gene, sample, and module names can be disabled by setting
-#'   \code{plotGeneNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
+#'   The rendering of node, sample, and module names can be disabled by setting
+#'   \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
 #'   \code{FALSE}, and the rendering of the legend can be disabled by setting
 #'   \code{plotLegend} to \code{FALSE}
 #'   
 #'   The \code{drawBorders} argument controls whether borders are drawn around
 #'   the bars in \code{plotConnectivity}, \code{plotModuleMembership}, and 
-#'   \code{plotSummaryExpression}.
+#'   \code{plotModuleSummary}.
 #' }
 #' \subsection{Customising the color palette:}{
-#'   \code{plotCoexpression} and \code{plotCoexpressionLegend} expect the
+#'   \code{plotCorrelation} and \code{plotCorrelationLegend} expect the
 #'   \code{palette} argument to be a vector of colors to interpolate over when
-#'   plotting the coexpression. They expect the first element of the 
-#'   \code{palette} vector to be the color used for coexpression values of -1,
+#'   plotting the correlation. They expect the first element of the 
+#'   \code{palette} vector to be the color used for correlation values of -1,
 #'   and the last element of the \code{palette} vector to be the color used for 
-#'   coexpression values of 1.
+#'   correlation values of 1.
 #'   
-#'   \code{plotAdjacency} and \code{plotAdjacencyLegend} expect the
+#'   \code{plotNetwork} and \code{plotNetworkLegend} expect the
 #'   \code{palette} argument to be a vector of colors to interpolate over when
-#'   plotting the adjacencies. They expect the first element of the 
-#'   \code{palette} vector to be the color used for gene adjacency values of 0,
+#'   plotting the edge weights. They expect the first element of the 
+#'   \code{palette} vector to be the color used for edge weights of 0,
 #'   and the last element of the \code{palette} vector to be the color used for 
-#'   coexpression values of 1.
+#'   correlation values of 1.
 #'   
 #'   \code{plotConnectivity} expects \code{palette} to be a single color, a 
-#'   vector of colors, one for each gene, or a vector of colors to be repeated.
+#'   vector of colors, one for each node, or a vector of colors to be repeated.
 #'   
 #'   \code{plotModuleMembership} expects \code{palette} to be a vector 
-#'   containing two colors, the first to be used for genes with negative module
-#'   membership values, and the second to be used for genes with positive module
+#'   containing two colors, the first to be used for nodes with negative module
+#'   membership values, and the second to be used for nodes with positive module
 #'   membership values. 
 #'   
-#'   \code{plotExpression} and \code{plotExpressionLegend} expect the 
-#'   \code{palette} argument to be a vector of colors to interpolate over when 
-#'   plotting the gene expression. In order to accomodate gene expression values
-#'   with dramatically different ranges, these functions expect the palette to 
-#'   be a diverging set of colors with a centre value corresponding the a gene 
-#'   expression value of 0 (e.g. white). The colors used will be balanced around
-#'   0: i.e. positive and negative values of gene expression will have the same 
-#'   color intensity on a diverging color palette regardless of the actual 
-#'   range. For gene expression data not centred around 0 the tail of the vector
-#'   will be used: the minimum gene expression value will receive the centre 
-#'   palette color, and the last element of the \code{palette} vector will be
-#'   used for maximum gene expression value.
+#'   \code{plotData} and \code{plotDataLegend} expect the \code{palette}
+#'   argument to be a vector of colors to interpolate over when plotting the
+#'   'data.' In order to accomodate data matrices with different ranges,
+#'   these functions expect the palette to be a diverging set of colors with a
+#'   centre value of 0 (e.g. white). The colors drawn are balanced around 0: 
+#'   i.e. positive and negative values of data will have the same intensity on a 
+#'   diverging color palette regardless of the actual range of the data.
 #'   
-#'   \code{plotSummaryExpression} expects \code{palette} to be a vector 
-#'   containing two colors, the first to be used for genes with a negative 
-#'   summary expression profile, and the second to be used for genes with a 
-#'   positive summary expression profile, regardless of whether the gene 
-#'   expression is centred around 0.
+#'   \code{plotModuleSummary} expects \code{palette} to be a vector 
+#'   containing two colors, the first to be used for nodes with a negative 
+#'   module summary measurement, and the second to be used for genes with a 
+#'   positive module summary measurment, regardless of whether the data matrix
+#'   is centred around 0.
 #' }
 #' 
 #' @references
@@ -247,8 +202,8 @@
 #' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
 #' colnames(geA) <- paste0("Gene_", 1:100)
 #' rownames(geA) <- paste0("CohortA_", 1:50)
-#' coexpA <- cor(geA) # coexpression
-#' adjA <- abs(coexpA)^5 # adjacency
+#' coexpA <- cor(geA) # correlation
+#' adjA <- abs(coexpA)^5 # network
 #' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
 #' names(moduleAssignments) <- paste0("Gene_", 1:100)
 #' 
@@ -258,28 +213,28 @@
 #' adjA <- as.bigMatrix(adjA, "adjA_bm")
 #' 
 #' ## Example 1: Plot Module 2 in cohort A.
-#' plotExpression(geA, coexpA, adjA, moduleAssignments, modules="2")
-#' plotCoexpression(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotData(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotCorrelation(geA, coexpA, adjA, moduleAssignments, modules="2")
 #' # alternatively as a square heatmap
-#' plotCoexpression(
+#' plotCorrelation(
 #'  geA, coexpA, adjA, moduleAssignments, modules="2", symmetric=TRUE
 #' )
-#' plotAdjacency(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotNetwork(geA, coexpA, adjA, moduleAssignments, modules="2")
 #' plotConnectivity(geA, coexpA, adjA, moduleAssignments, modules="2")
 #' plotModuleMembership(geA, coexpA, adjA, moduleAssignments, modules="2")
-#' plotSummaryExpression(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotModuleSummary(geA, coexpA, adjA, moduleAssignments, modules="2")
 #' 
 #' ## Example 2: Plot an arbitrary set of genes in cohort A
-#' plotExpression(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
-#' plotCoexpression(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotData(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotCorrelation(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
 #' # alternatively as a square heatmap
-#' plotCoexpression(
+#' plotCorrelation(
 #'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], symmetric=TRUE
 #' )
-#' plotAdjacency(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotNetwork(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
 #' plotConnectivity(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
 #' plotModuleMembership(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
-#' plotSummaryExpression(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotModuleSummary(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
 #' 
 #' ## Example 3: Plot the topology of two adipose tissue modules in the liver
 #' ## tissue data 
@@ -287,24 +242,24 @@
 #' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
 #' colnames(geAdipose) <- paste0("Gene_", 1:100)
 #' rownames(geAdipose) <- paste0("Sample_", 1:50)
-#' coexpAdipose <- cor(geAdipose) # coexpression
-#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
+#' coexpAdipose <- cor(geAdipose) # correlation
+#' adjAdipose <- abs(coexpAdipose)^5 # network
 #' adiposeModules <- sample(0:7, size=100, replace=TRUE)
 #' names(adiposeModules) <- paste0("Gene_", 1:100)
 #' 
 #' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
 #' colnames(geLiver) <- paste0("Gene_", 1:100)
 #' rownames(geLiver) <- paste0("Sample_", 1:50)
-#' coexpLiver <- cor(geLiver) # coexpression
-#' adjLiver <- abs(coexpLiver)^6 # adjacency
+#' coexpLiver <- cor(geLiver) # correlation
+#' adjLiver <- abs(coexpLiver)^6 # network
 #' liverModules <- sample(0:12, size=100, replace=TRUE)
 #' names(liverModules) <- paste0("Gene_", 1:100)
 #'
 #' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
 #' colnames(geHeart) <- paste0("Gene_", 1:100)
 #' rownames(geHeart) <- paste0("Sample_", 1:50)
-#' coexpHeart <- cor(geHeart) # coexpression
-#' adjHeart <- abs(coexpHeart)^4 # adjacency
+#' coexpHeart <- cor(geHeart) # correlation
+#' adjHeart <- abs(coexpHeart)^4 # network
 #' heartModules <- sample(0:5, size=100, replace=TRUE)
 #' names(heartModules) <- paste0("Gene_", 1:100)
 #' 
@@ -315,12 +270,12 @@
 #'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
 #'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
 #' )
-#' coexpression <- list(
+#' correlation <- list(
 #'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
 #'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
 #'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
 #' )
-#' adjacency <- list(
+#' network <- list(
 #'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
 #'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
 #'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
@@ -330,33 +285,33 @@
 #' )
 #' 
 #' # Show the plot
-#' plotExpression(
-#'  geneExpression, coexpression, adjacency, moduleAssignments,
+#' plotData(
+#'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
-#' plotCoexpression(
-#'  geneExpression, coexpression, adjacency, moduleAssignments,
+#' plotCorrelation(
+#'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
 #' # alternatively as a square heatmap
-#' plotCoexpression(
-#'  geneExpression, coexpression, adjacency, moduleAssignments, 
+#' plotCorrelation(
+#'  geneExpression, correlation, network, moduleAssignments, 
 #'  modules=c("3", "7"), discovery="adipose", test="liver", symmetric=TRUE
 #' )
-#' plotAdjacency(
-#'  geneExpression, coexpression, adjacency, moduleAssignments,
+#' plotNetwork(
+#'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
 #' plotConnectivity(
-#'  geneExpression, coexpression, adjacency, moduleAssignments, 
+#'  geneExpression, correlation, network, moduleAssignments, 
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
 #' plotModuleMembership(
-#'  geneExpression, coexpression, adjacency, moduleAssignments,
+#'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
-#' plotSummaryExpression(
-#'  geneExpression, coexpression, adjacency, moduleAssignments,
+#' plotModuleSummary(
+#'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
 #' 
@@ -367,17 +322,17 @@
 #' @name plotTopology
 NULL
 
-#' \code{plotExpression:} Plot a heatmap of the gene expression for one or more
-#' network modules in their discovery dataset, or an independent test dataset.
+#' \code{plotData}: Plot a heatmap of the data matrix for one or more
+#' network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotExpression <- function(
-  geneExpression, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
-  orderModules, plotGeneNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
-  main="", palette=expression.palette(), border.width=2, plotLegend=TRUE, 
-  legend.main="Expression", gaxt.line=-0.5, saxt.line=-0.5, maxt.line=3, 
+plotData <- function(
+  data, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, orderSamplesBy="test", orderNodesBy="discovery",
+  orderModules, plotNodeNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
+  main="", palette=data.palette(), border.width=2, plotLegend=TRUE, 
+  legend.main="data", gaxt.line=-0.5, saxt.line=-0.5, maxt.line=3, 
   legend.position=0.15, legend.tick.size=0.03, laxt.line=3, cex.axis=0.8, 
   cex.lab=1, cex.main=1.2
 ) {
@@ -398,14 +353,14 @@ plotExpression <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  if (is.null(geneExpression))
-    stop("Cannot plot gene expression without gene expression data")
+  if (is.null(data))
+    stop("Cannot plot data matrix without 'data'")
   
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
+  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
@@ -416,18 +371,18 @@ plotExpression <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
+  data <- formatDataList(
+    data, length(correlation), names(correlation)
   )
   
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # If module discovery has not been performed for all datasets, it may be
@@ -442,75 +397,75 @@ plotExpression <- function(
   
   # Sanity check input for consistency.
   checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+    data, correlation, network, moduleAssignments, discovery, test
   )
   
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot plot gene expression without gene expression data")
+  if (is.null(data[[test]]))
+    stop("Cannot plot data matrix without 'data'")
   
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
   #-----------------------------------------------------------------------------
-  # Get ordering of genes and samples in the 'test' dataset by the dataset 
-  # specified in 'orderGenesBy' and 'orderSamplesBy'.
+  # Get ordering of nodes and samples in the 'test' dataset by the dataset 
+  # specified in 'orderNodesBy' and 'orderSamplesBy'.
   #-----------------------------------------------------------------------------
   props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules, 
+    data, correlation, network, moduleAssignments, modules, 
     discovery, test, FALSE
   )
   
-  # Determine gene ordering, then sample ordering.
-  if (orderGenesBy == "discovery" && discovery != test) {
+  # Determine node ordering, then sample ordering.
+  if (orderNodesBy == "discovery" && discovery != test) {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
+      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
     
     propsDisc <- networkProperties(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      data, correlation, network, moduleAssignments, modules,
       discovery, discovery, FALSE
     ) 
     
     moduleOrder <- names(propsDisc)
     if (length(propsDisc) > 1 && orderModules) {
-      # Create a matrix of summary expression profiles to measure the similarity
+      # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
         0, ncol=length(propsDisc), 
-        nrow=length(propsDisc[[1]]$summaryExpression)
+        nrow=length(propsDisc[[1]]$moduleSummary)
       )
       colnames(seps) <- names(propsDisc)
       for (mi in seq_along(propsDisc)) {
-        seps[,mi] <- propsDisc[[mi]]$summaryExpression
+        seps[,mi] <- propsDisc[[mi]]$moduleSummary
       }
       moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
     }
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
         propsDisc[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
       ))
     }
-  } else if (orderGenesBy == "none") {
+  } else if (orderNodesBy == "none") {
     moduleOrder <- names(props)
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(props[[mi]]$connectivity)
     }
   } else {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
+      orderModules <- ifelse(is.null(data[[test]]), FALSE, TRUE)
     
     # Order modules and samples by the test network
     moduleOrder <- names(props)
     if (length(props) > 1 && orderModules) {
       seps <- matrix(
         0, ncol=length(props), 
-        nrow=length(props[[1]]$summaryExpression)
+        nrow=length(props[[1]]$moduleSummary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$summaryExpression
+        seps[,mi] <- props[[mi]]$moduleSummary
       }
       moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
     }
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
         props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
       ))
@@ -518,63 +473,63 @@ plotExpression <- function(
   }
   
   # If test == discovery, we order samples and modules by discovery, and plot
-  # the discovery. So we need to make sure the gene expression exists in the
+  # the discovery. So we need to make sure the data matrix exists in the
   # discovery
   if (orderSamplesBy == "discovery" && discovery != test) {
-    if (is.null(geneExpression[[discovery]])) {
+    if (is.null(data[[discovery]])) {
       stop(
-        "Expecting gene expression data for the discovery dataset in order",
+        "Expecting data matrix for the discovery dataset in order",
         " to sort samples"
       )
     }
     if (!exists("propsDisc")) {
       propsDisc <- networkProperties(
-        geneExpression, coexpression, adjacency, moduleAssignments, modules,
+        data, correlation, network, moduleAssignments, modules,
         discovery, discovery, FALSE
       )
     }
     sampleOrder <- names(sort(
-      propsDisc[[1]]$summaryExpression, decreasing=TRUE
+      propsDisc[[1]]$moduleSummary, decreasing=TRUE
     ))
   } else if (orderSamplesBy == "none") {
-    sampleOrder <- rownames(geneExpression[[test]])
+    sampleOrder <- rownames(data[[test]])
   } else {
     sampleOrder <- names(sort(
-      props[moduleOrder][[1]]$summaryExpression, decreasing=TRUE
+      props[moduleOrder][[1]]$moduleSummary, decreasing=TRUE
     ))
   }
   
   #-----------------------------------------------------------------------------
-  # Identify genes and samples from the 'discovery' dataset not present in the 
+  # Identify nodes and samples from the 'discovery' dataset not present in the 
   # 'test' dataset.
   #-----------------------------------------------------------------------------
-  if (all(sampleOrder %nin% rownames(geneExpression[[test]]))) {
+  if (all(sampleOrder %nin% rownames(data[[test]]))) {
     stop(
       "No samples from the 'orderSamplesBy' dataset are present in the",
       " 'test' dataset"
     )
   }
-  na.pos.y <- which(sampleOrder %nin% rownames(geneExpression[[test]]))
+  na.pos.y <- which(sampleOrder %nin% rownames(data[[test]]))
   if (length(na.pos.y) > 0) {
     presentSamples <- sampleOrder[-na.pos.y]
   } else {
     presentSamples <- sampleOrder
   }
   
-  # Handle genes not present in the test dataset
-  na.pos.x <- which(geneOrder %nin% colnames(coexpression[[test]]))
+  # Handle nodes not present in the test dataset
+  na.pos.x <- which(nodeOrder %nin% colnames(correlation[[test]]))
   if (length(na.pos.x) > 0) {
-    presentGenes <- geneOrder[-na.pos.x]
+    presentVars <- nodeOrder[-na.pos.x]
   } else {
-    presentGenes <- geneOrder
+    presentVars <- nodeOrder
   }
   
   #-----------------------------------------------------------------------------
-  # Plot the gene expression 
+  # Plot the data matrix
   #-----------------------------------------------------------------------------
-  # First we need to set up the color palette for the gene expression, which 
+  # First we need to set up the color palette for the data, which 
   # includes the fact that the range may be unbalanced around 0.
-  ge <- geneExpression[[test]][presentSamples, presentGenes]
+  ge <- data[[test]][presentSamples, presentVars]
   range.ge <- range(ge)
   if (all(range.ge > 0)) {
     palette <- tail(palette, length(palette)/2)
@@ -584,14 +539,14 @@ plotExpression <- function(
     range.pal <- c(-max(abs(range.ge)), max(abs(range.ge)))
   }
   xaxt <- NULL
-  if (plotGeneNames)
-    xaxt <- geneOrder
+  if (plotNodeNames)
+    xaxt <- nodeOrder
   yaxt <- NULL
   if (plotSampleNames)
     yaxt <- sampleOrder
   plotSquareHeatmap(
     ge, palette, vlim=range.pal, legend.lim=range.ge,
-    moduleAssignments[[discovery]][geneOrder], na.pos.x, na.pos.y, 
+    moduleAssignments[[discovery]][nodeOrder], na.pos.x, na.pos.y, 
     xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, yaxt.line=saxt.line, legend.tick.size=legend.tick.size,
@@ -600,16 +555,16 @@ plotExpression <- function(
   )
 }
 
-#' \code{plotCoexpression:} Plot a heatmap of the gene coexpression for one or more
-#' network modules in their discovery dataset, or an independent test dataset.
+#' \code{plotCorrelation}: Plot a heatmap of the correlation structure for one 
+#' or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotCoexpression <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="", palette=coexpression.palette(), 
-  border.width=2, plotLegend=TRUE, legend.main="Coexpression",
+plotCorrelation <- function(
+  data=NULL, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, symmetric=FALSE, orderNodesBy="discovery", orderModules,
+  plotNodeNames=TRUE, plotModuleNames, main="", palette=correlation.palette(), 
+  border.width=2, plotLegend=TRUE, legend.main="correlation",
   gaxt.line=-0.5, maxt.line=3, legend.position, legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -634,7 +589,7 @@ plotCoexpression <- function(
     stop("'main' must be a characer vector")
 
   orderByArgs <- c("discovery", "test", "none")
-  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
+  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
 
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
@@ -644,18 +599,18 @@ plotCoexpression <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
+  data <- formatDataList(
+    data, length(correlation), names(correlation)
   )
   
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # If module discovery has not been performed for all datasets, it may be
@@ -670,23 +625,23 @@ plotCoexpression <- function(
   
   
   #-----------------------------------------------------------------------------
-  # Get ordering of genes in the 'test' dataset by the dataset specified in 
-  # 'orderGenesBy'.
+  # Get ordering of nodes in the 'test' dataset by the dataset specified in 
+  # 'orderNodesBy'.
   #-----------------------------------------------------------------------------
-  if (orderGenesBy == "none") {
-    geneOrder <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
-  } else if (orderGenesBy == "discovery") {
+  if (orderNodesBy == "none") {
+    nodeOrder <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
+  } else if (orderNodesBy == "discovery") {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
-    geneOrder <- geneOrder(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
+    nodeOrder <- nodeOrder(
+      data, correlation, network, moduleAssignments, modules,
       discovery, discovery, FALSE, orderModules
     )
   } else {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
-    geneOrder <- geneOrder(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      orderModules <- ifelse(is.null(data[[test]]), FALSE, TRUE)
+    nodeOrder <- nodeOrder(
+      data, correlation, network, moduleAssignments, modules,
       discovery, test, FALSE, orderModules
     )
   }
@@ -695,28 +650,28 @@ plotCoexpression <- function(
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
   #-----------------------------------------------------------------------------
-  # Identify genes from the 'discovery' dataset not present in the 'test' 
+  # Identify nodes from the 'discovery' dataset not present in the 'test' 
   # dataset.
   #-----------------------------------------------------------------------------
-  na.pos <- which(geneOrder %nin% colnames(coexpression[[test]]))
+  na.pos <- which(nodeOrder %nin% colnames(correlation[[test]]))
   if (length(na.pos) > 0) {
-    presentGenes <- geneOrder[-na.pos]
+    presentVars <- nodeOrder[-na.pos]
   } else {
-    presentGenes <- geneOrder
+    presentVars <- nodeOrder
   }
   
   #-----------------------------------------------------------------------------
-  # Plot the gene coexpression 
+  # Plot the correlation structure
   #-----------------------------------------------------------------------------
   gaxt <- NULL
-  if (plotGeneNames)
-    gaxt <- geneOrder
+  if (plotNodeNames)
+    gaxt <- nodeOrder
   if (symmetric) {
     if (missing(legend.position))
       legend.position <- 0.2
     plotSquareHeatmap(
-      coexpression[[test]][presentGenes, presentGenes], palette, c(-1, 1), 
-      moduleAssignments[[discovery]][geneOrder], na.pos, na.pos, 
+      correlation[[test]][presentVars, presentVars], palette, c(-1, 1), 
+      moduleAssignments[[discovery]][nodeOrder], na.pos, na.pos, 
       xaxt=gaxt, yaxt=gaxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=gaxt.line, yaxt.line=gaxt.line, border.width=border.width,
@@ -727,8 +682,8 @@ plotCoexpression <- function(
     if (missing(legend.position))
       legend.position <- 0.1
     plotTriangleHeatmap(
-      coexpression[[test]][presentGenes , presentGenes], palette, c(-1, 1),
-      moduleAssignments[[discovery]][geneOrder], na.pos, xaxt=gaxt, 
+      correlation[[test]][presentVars , presentVars], palette, c(-1, 1),
+      moduleAssignments[[discovery]][nodeOrder], na.pos, xaxt=gaxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
@@ -738,16 +693,16 @@ plotCoexpression <- function(
   }
 }
 
-#' \code{plotAdjacency:} Plot a heatmap of the gene adjacencies for one or more
-#' network modules in their discovery dataset, or an independent test dataset.
+#' \code{plotNetwork}: Plot a heatmap of the edge weights for one or more
+#' network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotAdjacency <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, symmetric=FALSE, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="", palette=adjacency.palette(), 
-  border.width=2, plotLegend=TRUE, legend.main="Adjacency",
+plotNetwork <- function(
+  data=NULL, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, symmetric=FALSE, orderNodesBy="discovery", orderModules,
+  plotNodeNames=TRUE, plotModuleNames, main="", palette=network.palette(), 
+  border.width=2, plotLegend=TRUE, legend.main="network",
   gaxt.line=-0.5, maxt.line=3, legend.position, legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -772,7 +727,7 @@ plotAdjacency <- function(
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
+  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
@@ -782,18 +737,18 @@ plotAdjacency <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
+  data <- formatDataList(
+    data, length(correlation), names(correlation)
   )
   
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # If module discovery has not been performed for all datasets, it may be
@@ -807,23 +762,23 @@ plotAdjacency <- function(
   }
   
   #-----------------------------------------------------------------------------
-  # Get ordering of genes in the 'test' dataset by the dataset specified in 
-  # 'orderGenesBy'.
+  # Get ordering of nodes in the 'test' dataset by the dataset specified in 
+  # 'orderNodesBy'.
   #-----------------------------------------------------------------------------
-  if (orderGenesBy == "none") {
-    geneOrder <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
-  } else if (orderGenesBy == "discovery") {
+  if (orderNodesBy == "none") {
+    nodeOrder <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
+  } else if (orderNodesBy == "discovery") {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
-    geneOrder <- geneOrder(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
+    nodeOrder <- nodeOrder(
+      data, correlation, network, moduleAssignments, modules,
       discovery, discovery, FALSE, orderModules
     )
   } else {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
-    geneOrder <- geneOrder(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      orderModules <- ifelse(is.null(data[[test]]), FALSE, TRUE)
+    nodeOrder <- nodeOrder(
+      data, correlation, network, moduleAssignments, modules,
       discovery, test, FALSE, orderModules
     )
   }
@@ -832,28 +787,28 @@ plotAdjacency <- function(
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
   #-----------------------------------------------------------------------------
-  # Identify genes from the 'discovery' dataset not present in the 'test' 
+  # Identify nodes from the 'discovery' dataset not present in the 'test' 
   # dataset.
   #-----------------------------------------------------------------------------
-  na.pos <- which(geneOrder %nin% colnames(coexpression[[test]]))
+  na.pos <- which(nodeOrder %nin% colnames(correlation[[test]]))
   if (length(na.pos) > 0) {
-    presentGenes <- geneOrder[-na.pos]
+    presentVars <- nodeOrder[-na.pos]
   } else {
-    presentGenes <- geneOrder
+    presentVars <- nodeOrder
   }
   
   #-----------------------------------------------------------------------------
-  # Plot the gene adjacency
+  # Plot the network edge weights
   #-----------------------------------------------------------------------------
   gaxt <- NULL
-  if (plotGeneNames)
-    gaxt <- geneOrder
+  if (plotNodeNames)
+    gaxt <- nodeOrder
   if (symmetric) {
     if (missing(legend.position))
       legend.position <- 0.2
     plotSquareHeatmap(
-      adjacency[[test]][presentGenes, presentGenes], palette, c(0, 1), 
-      moduleAssignments[[discovery]][geneOrder], na.pos, na.pos, 
+      network[[test]][presentVars, presentVars], palette, c(0, 1), 
+      moduleAssignments[[discovery]][nodeOrder], na.pos, na.pos, 
       xaxt=gaxt, yaxt=gaxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=gaxt.line, yaxt.line=gaxt.line, 
@@ -865,8 +820,8 @@ plotAdjacency <- function(
     if (missing(legend.position))
       legend.position <- 0.1
     plotTriangleHeatmap(
-      adjacency[[test]][presentGenes , presentGenes], palette, c(0, 1),
-      moduleAssignments[[discovery]][geneOrder], na.pos, xaxt=gaxt, 
+      network[[test]][presentVars , presentVars], palette, c(0, 1),
+      moduleAssignments[[discovery]][nodeOrder], na.pos, xaxt=gaxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
@@ -876,16 +831,15 @@ plotAdjacency <- function(
   }
 }
 
-#' \code{plotModuleMembership:} Plot a bar chart of the module membership for
-#' one or more network modules in their discovery dataset, or an independent
-#' test dataset.
+#' \code{plotModuleMembership}: Plot a bar chart of the module membership for
+#' one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
 plotModuleMembership <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, orderGenesBy="discovery", orderModules,
-  plotGeneNames=TRUE, plotModuleNames, main="", border.width=2, 
+  data=NULL, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, orderNodesBy="discovery", orderModules,
+  plotNodeNames=TRUE, plotModuleNames, main="", border.width=2, 
   palette=c("#313695", "#a50026"), drawBorders=FALSE, gaxt.line=-0.5, 
   maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -906,14 +860,14 @@ plotModuleMembership <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  if (is.null(geneExpression))
-    stop("Cannot plot module membership without gene expression data")
+  if (is.null(data))
+    stop("Cannot plot module membership without the corresponding 'data'")
   
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
+  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
@@ -923,14 +877,14 @@ plotModuleMembership <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # If module discovery has not been performed for all datasets, it may be
@@ -943,36 +897,36 @@ plotModuleMembership <- function(
     stop("'modules' provided but not 'moduleAssignments'")
   }
   
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot plot module membership without gene expression data")
+  if (is.null(data[[test]]))
+    stop("Cannot plot module membership without the corresponding 'data'")
   
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
   #-----------------------------------------------------------------------------
-  # Get ordering of genes in the 'test' dataset by the dataset specified in 
-  # 'orderGenesBy'.
+  # Get ordering of nodes in the 'test' dataset by the dataset specified in 
+  # 'orderNodesBy'.
   #-----------------------------------------------------------------------------
   # Get the module membership for each module in the test network.
   props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules, 
+    data, correlation, network, moduleAssignments, modules, 
     discovery, test, FALSE
   )
 
-  # Now we will order the genes ourselves to prevent duplicate calls to 
+  # Now we will order the nodes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderGenesBy == "discovery" && discovery != test)  {
+  if (orderNodesBy == "discovery" && discovery != test)  {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
-    # Ordering genes by the discovery network however means we have to calculate
+      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
+    # Ordering nodes by the discovery network however means we have to calculate
     # The network properties in the discovery network
-    geneOrder <- geneOrder(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+    nodeOrder <- nodeOrder(
+      data, correlation, network, moduleAssignments, modules,
       discovery, discovery, FALSE, orderModules
     ) 
-  } else if (orderGenesBy == "none") {
+  } else if (orderNodesBy == "none") {
     moduleOrder <- seq_along(props)
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(props[[mi]]$connectivity)
     }
   } else {
@@ -981,21 +935,21 @@ plotModuleMembership <- function(
     # order modules
     moduleOrder <- 1
     if (length(props) > 1 && orderModules) {
-      # Create a matrix of summary expression profiles to measure the similarity
+      # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
-        0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
+        0, ncol=length(props), nrow=length(props[[1]]$moduleSummary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$summaryExpression
+        seps[,mi] <- props[[mi]]$moduleSummary
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
       moduleOrder <- seq_along(props)
     }
     
-    # order genes
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    # order nodes
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
         props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
       ))
@@ -1009,28 +963,27 @@ plotModuleMembership <- function(
   MM <- foreach(mi = seq_along(props), .combine=c) %do% {
     props[[mi]]$moduleMembership
   }
-  MM <- MM[geneOrder]
+  MM <- MM[nodeOrder]
   
   # Plot bar chart
   plotBar(
-    MM, c(-1,1), moduleAssignments[[discovery]][geneOrder],
+    MM, c(-1,1), moduleAssignments[[discovery]][nodeOrder],
     ifelse(MM > 0, palette[2], palette[1]), drawBorders=drawBorders,
-    xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
+    xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
     ylab="Module membership", border.width=border.width
   )
 }
 
 #' \code{plotConnectivity:} Plot a bar chart of the normalised intramodular 
-#' connectivity (see details) for one or more network modules in their discovery
-#' dataset, or an independent test dataset.
+#' connectivity (see details) for one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
 plotConnectivity <- function(
-  geneExpression=NULL, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, orderGenesBy="discovery", orderModules=TRUE,
-  plotGeneNames=TRUE, plotModuleNames, main="", palette="#feb24c", 
+  data=NULL, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, orderNodesBy="discovery", orderModules=TRUE,
+  plotNodeNames=TRUE, plotModuleNames, main="", palette="#feb24c", 
   border.width=2,  drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -1055,7 +1008,7 @@ plotConnectivity <- function(
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
+  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
@@ -1065,14 +1018,14 @@ plotConnectivity <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # If module discovery has not been performed for all datasets, it may be
@@ -1089,29 +1042,29 @@ plotConnectivity <- function(
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
   #-----------------------------------------------------------------------------
-  # Get ordering of genes in the 'test' dataset by the dataset specified in 
-  # 'orderGenesBy'.
+  # Get ordering of nodes in the 'test' dataset by the dataset specified in 
+  # 'orderNodesBy'.
   #-----------------------------------------------------------------------------
   # Get the module membership for each module in the test network.
   props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules, 
+    data, correlation, network, moduleAssignments, modules, 
     discovery, test, FALSE
   )
   
-  # Now we will order the genes ourselves to prevent duplicate calls to 
+  # Now we will order the nodes ourselves to prevent duplicate calls to 
   # networkProperties, which can be quite slow.
-  if (orderGenesBy == "discovery" && discovery != test)  {
+  if (orderNodesBy == "discovery" && discovery != test)  {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
-    # Ordering genes by the discovery network however means we have to calculate
+      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
+    # Ordering nodes by the discovery network however means we have to calculate
     # The network properties in the discovery network
-    geneOrder <- geneOrder(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+    nodeOrder <- nodeOrder(
+      data, correlation, network, moduleAssignments, modules,
       discovery, discovery, FALSE, orderModules
     ) 
-  } else if (orderGenesBy == "none") {
+  } else if (orderNodesBy == "none") {
     moduleOrder <- seq_along(props)
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(props[[mi]]$connectivity)
     }
   } else {
@@ -1119,22 +1072,22 @@ plotConnectivity <- function(
       orderModules <- TRUE
     # order modules
     moduleOrder <- 1
-    if (length(props) > 1 && orderModules && !is.null(geneExpression[[test]])) {
-      # Create a matrix of summary expression profiles to measure the similarity
+    if (length(props) > 1 && orderModules && !is.null(data[[test]])) {
+      # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
-        0, ncol=length(props), nrow=length(props[[1]]$summaryExpression)
+        0, ncol=length(props), nrow=length(props[[1]]$moduleSummary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$summaryExpression
+        seps[,mi] <- props[[mi]]$moduleSummary
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
       moduleOrder <- seq_along(props)
     }
     
-    # order genes
-    geneOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+    # order nodes
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
         props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
       ))
@@ -1150,27 +1103,26 @@ plotConnectivity <- function(
     # just the relative sizes and ranks
     props[[mi]]$connectivity/max(na.omit(props[[mi]]$connectivity))
   }
-  kIM <- kIM[geneOrder]
+  kIM <- kIM[nodeOrder]
   
   # Plot bar chart
   plotBar(
-    kIM, c(0,1), moduleAssignments[[discovery]][geneOrder],
+    kIM, c(0,1), moduleAssignments[[discovery]][nodeOrder],
     palette, drawBorders=drawBorders,
-    xaxt=plotGeneNames, plotModuleNames=plotModuleNames, 
+    xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
     ylab="Normalised connectivity", border.width=border.width
   )
 }
 
-#' \code{plotSummaryExpression:} Plot bar charts of the summary expression
-#' profiles of one or more network modules in their discovery dataset, or an
-#' independent test dataset.
+#' \code{plotModuleSummary}: Plot bar charts of the module summary vectors of 
+#' one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotSummaryExpression <- function(
-  geneExpression, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, orderSamplesBy="test", orderGenesBy="discovery",
+plotModuleSummary <- function(
+  data, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, orderSamplesBy="test", orderNodesBy="discovery",
   orderModules, plotSampleNames=TRUE, plotModuleNames, main="", 
   palette=c("#762a83", "#1b7837"), border.width=2, drawBorders=FALSE, 
   saxt.line=-0.5, maxt.line=0, cex.axis=0.8, cex.lab=1, cex.main=1.2
@@ -1192,14 +1144,14 @@ plotSummaryExpression <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  if (is.null(geneExpression))
-    stop("Cannot plot gene expression without gene expression data")
+  if (is.null(data))
+    stop("Cannot plot data matrix without 'data'")
   
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
   orderByArgs <- c("discovery", "test", "none")
-  orderGenesBy <- orderByArgs[pmatch(orderGenesBy, orderByArgs, nomatch=3)]
+  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
   # Temporary directory to store new bigMatrix objects in
@@ -1210,18 +1162,18 @@ plotSummaryExpression <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # Format optional input data so it doesn't cause cascading error crashes 
-  geneExpression <- formatGeneExpression(
-    geneExpression, length(coexpression), names(coexpression)
+  data <- formatDataList(
+    data, length(correlation), names(correlation)
   )
   
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
   # If module discovery has not been performed for all datasets, it may be
@@ -1236,106 +1188,106 @@ plotSummaryExpression <- function(
   
   # Sanity check input for consistency.
   checkSets(
-    geneExpression, coexpression, adjacency, moduleAssignments, discovery, test
+    data, correlation, network, moduleAssignments, discovery, test
   )
   
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot plot gene expression without gene expression data")
+  if (is.null(data[[test]]))
+    stop("Cannot plot data matrix without 'data'")
   
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
   
   #-----------------------------------------------------------------------------
-  # Get ordering of genes and samples in the 'test' dataset by the dataset 
-  # specified in 'orderGenesBy' and 'orderSamplesBy'.
+  # Get ordering of nodes and samples in the 'test' dataset by the dataset 
+  # specified in 'orderNodesBy' and 'orderSamplesBy'.
   #-----------------------------------------------------------------------------
   props <- networkProperties(
-    geneExpression, coexpression, adjacency, moduleAssignments, modules, 
+    data, correlation, network, moduleAssignments, modules, 
     discovery, test, FALSE
   )
   
-  # Determine gene ordering, then sample ordering.
-  if (orderGenesBy == "discovery" && discovery != test) {
+  # Determine node ordering, then sample ordering.
+  if (orderNodesBy == "discovery" && discovery != test) {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
+      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
     
     propsDisc <- networkProperties(
-      geneExpression, coexpression, adjacency, moduleAssignments, modules,
+      data, correlation, network, moduleAssignments, modules,
       discovery, discovery, FALSE
     ) 
     
     moduleOrder <- names(propsDisc)
     if (length(propsDisc) > 1 && orderModules) {
-      # Create a matrix of summary expression profiles to measure the similarity
+      # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
         0, ncol=length(propsDisc), 
-        nrow=length(propsDisc[[1]]$summaryExpression)
+        nrow=length(propsDisc[[1]]$moduleSummary)
       )
       colnames(seps) <- names(propsDisc)
       for (mi in seq_along(propsDisc)) {
-        seps[,mi] <- propsDisc[[mi]]$summaryExpression
+        seps[,mi] <- propsDisc[[mi]]$moduleSummary
       }
       moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
     }
-  } else if (orderGenesBy == "none") {
+  } else if (orderNodesBy == "none") {
     moduleOrder <- names(props)
   } else {
     if (missing(orderModules))
-      orderModules <- ifelse(is.null(geneExpression[[test]]), FALSE, TRUE)
+      orderModules <- ifelse(is.null(data[[test]]), FALSE, TRUE)
     
     # Order modules and samples by the test network
     moduleOrder <- names(props)
     if (length(props) > 1 && orderModules) {
       seps <- matrix(
         0, ncol=length(props), 
-        nrow=length(props[[1]]$summaryExpression)
+        nrow=length(props[[1]]$moduleSummary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$summaryExpression
+        seps[,mi] <- props[[mi]]$moduleSummary
       }
       moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
     }
   }
   
   # If test == discovery, we order samples and modules by discovery, and plot
-  # the discovery. So we need to make sure the gene expression exists in the
+  # the discovery. So we need to make sure the data exists in the
   # discovery
   if (orderSamplesBy == "discovery" && discovery != test) {
-    if (is.null(geneExpression[[discovery]])) {
+    if (is.null(data[[discovery]])) {
       stop(
-        "Expecting gene expression data for the discovery dataset in order",
+        "Expecting data for the discovery dataset in order",
         " to sort samples"
       )
     }
     if (!exists("propsDisc")) {
       propsDisc <- networkProperties(
-        geneExpression, coexpression, adjacency, moduleAssignments, modules,
+        data, correlation, network, moduleAssignments, modules,
         discovery, discovery, FALSE
       )
     }
     sampleOrder <- names(sort(
-      propsDisc[[1]]$summaryExpression, decreasing=TRUE
+      propsDisc[[1]]$moduleSummary, decreasing=TRUE
     ))
   } else if (orderSamplesBy == "none") {
-    sampleOrder <- rownames(geneExpression[[test]])
+    sampleOrder <- rownames(data[[test]])
   } else {
     sampleOrder <- names(sort(
-      props[moduleOrder][[1]]$summaryExpression, decreasing=TRUE
+      props[moduleOrder][[1]]$moduleSummary, decreasing=TRUE
     ))
   }
   
   #-----------------------------------------------------------------------------
-  # Identify genes and samples from the 'discovery' dataset not present in the 
+  # Identify nodes and samples from the 'discovery' dataset not present in the 
   # 'test' dataset.
   #-----------------------------------------------------------------------------
-  if (all(sampleOrder %nin% rownames(geneExpression[[test]]))) {
+  if (all(sampleOrder %nin% rownames(data[[test]]))) {
     stop(
       "No samples from the 'orderSamplesBy' dataset are present in the",
       " 'test' dataset"
     )
   }
-  na.pos <- which(sampleOrder %nin% rownames(geneExpression[[test]]))
+  na.pos <- which(sampleOrder %nin% rownames(data[[test]]))
   if (length(na.pos) > 0) {
     presentSamples <- sampleOrder[-na.pos]
   } else {
@@ -1344,11 +1296,11 @@ plotSummaryExpression <- function(
   
   
   #-----------------------------------------------------------------------------
-  # Plot the summary expression profiles 
+  # Plot the module summary vectors 
   #-----------------------------------------------------------------------------
   SEP <- foreach(mi = moduleOrder, .combine=cbind) %do% {
     matrix(
-      insert.nas(props[[mi]]$summaryExpression[presentSamples], na.pos),
+      insert.nas(props[[mi]]$moduleSummary[presentSamples], na.pos),
       ncol=1
     )
   }
@@ -1364,20 +1316,19 @@ plotSummaryExpression <- function(
     SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
     cols=cols, drawBorders=drawBorders, main=main, yaxt=plotSampleNames,
     plotModuleNames=plotModuleNames, yaxt.line=saxt.line, maxt.line=maxt.line,
-    xlab="Summary Expression", border.width=border.width
+    xlab="Module summary", border.width=border.width
   )
 }
 
-#' \code{plotExpressionLegend:} Plot a legend for the gene expression heatmap
-#' for one or more network modules in their discovery dataset, or an independent
-#' test dataset.
+#' \code{plotDataLegend}: Plot a legend for the data matrix heatmap
+#' for one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotExpressionLegend <- function(
-  geneExpression, coexpression, adjacency, moduleAssignments, modules,
-  discovery=1, test=1, palette=expression.palette(), border.width=2, 
-  horizontal=TRUE, legend.main="Expression", legend.tick.size=0.03, 
+plotDataLegend <- function(
+  data, correlation, network, moduleAssignments, modules,
+  discovery=1, test=1, palette=data.palette(), border.width=2, 
+  horizontal=TRUE, legend.main="data", legend.tick.size=0.03, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1397,8 +1348,8 @@ plotExpressionLegend <- function(
   #-----------------------------------------------------------------------------
   # Validate user input
   #-----------------------------------------------------------------------------
-  if (is.null(geneExpression))
-    stop("Cannot plot expression legend without gene expression data")
+  if (is.null(data))
+    stop("Cannot plot legend without corresponding 'data'")
   
   # Temporary directory to store new bigMatrix objects in
   tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
@@ -1408,9 +1359,9 @@ plotExpressionLegend <- function(
   }, add=TRUE)
   
   # Unify data structures and load in matrices
-  geneExpression <- unifyDS(dynamicMatLoad(geneExpression))
-  coexpression <- unifyDS(dynamicMatLoad(coexpression))
-  adjacency <- unifyDS(dynamicMatLoad(adjacency))
+  data <- unifyDS(dynamicMatLoad(data))
+  correlation <- unifyDS(dynamicMatLoad(correlation))
+  network <- unifyDS(dynamicMatLoad(network))
   
   # If module discovery has not been performed for all datasets, it may be
   # easier for the user to provide a simplified list structuren
@@ -1424,21 +1375,21 @@ plotExpressionLegend <- function(
   
   # Format optional input data so it doesn't cause cascading error crashes
   moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(coexpression), names(coexpression),
-    ncol(coexpression[[discovery]]), colnames(coexpression[[discovery]])
+    moduleAssignments, discovery, length(correlation), names(correlation),
+    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
   )
   
-  if (is.null(geneExpression[[test]]))
-    stop("Cannot plot summary expression without gene expression data")
+  if (is.null(data[[test]]))
+    stop("Cannot plot module summary vector without the corresponding 'data'")
   
   #-----------------------------------------------------------------------------
-  # Get the range of gene expression for the modules in the test dataset 
+  # Get the range of data matrix for the modules in the test dataset 
   #-----------------------------------------------------------------------------
-  modGenes <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
-  modGenes <- modGenes %sub_in% colnames(geneExpression[[test]])
-  if (length(modGenes) == 0)
-    stop("None of the module genes are present in the test dataset")
-  rg <- range(geneExpression[[test]][,modGenes])
+  modNodes <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
+  modNodes <- modNodes %sub_in% colnames(data[[test]])
+  if (length(modNodes) == 0)
+    stop("None of the variables composing the module are present in the test dataset")
+  rg <- range(data[[test]][,modNodes])
   
   #-----------------------------------------------------------------------------
   # Plot the legend
@@ -1465,13 +1416,14 @@ plotExpressionLegend <- function(
   }
 }
 
-#' \code{plotCoexpressionLegend:} Plot a legend for the gene coexpression.
+#' \code{plotCorrelationLegend}: Plot a legend for the correlation structure 
+#' heatmap.
 #' 
 #' @rdname plotTopology
 #' @export
-plotCoexpressionLegend <- function(
-  palette=coexpression.palette(), border.width=2, horizontal=TRUE, 
-  legend.main="Coexpression", legend.tick.size=0.03, laxt.line=2.5, 
+plotCorrelationLegend <- function(
+  palette=correlation.palette(), border.width=2, horizontal=TRUE, 
+  legend.main="correlation", legend.tick.size=0.03, laxt.line=2.5, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1499,13 +1451,13 @@ plotCoexpressionLegend <- function(
   )
 }
 
-#' \code{plotAdjacencyLegend:} Plot a legend for the gene adjacencies.
+#' \code{plotNetworkLegend}: Plot a legend for the network edge weights heatmap.
 #' 
 #' @rdname plotTopology
 #' @export
-plotAdjacencyLegend <- function(
-  palette=adjacency.palette(), border.width=2, horizontal=TRUE, 
-  legend.main="Adjacency", legend.tick.size=0.03, laxt.line=2.5, 
+plotNetworkLegend <- function(
+  palette=network.palette(), border.width=2, horizontal=TRUE, 
+  legend.main="network", legend.tick.size=0.03, laxt.line=2.5, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------

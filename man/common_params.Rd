@@ -20,10 +20,6 @@ between each pair of variables in the dataset.}
 \item{moduleAssignments}{a vector containing the module each variable belongs
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
-
-\item{discovery}{name or index denoting which the discovery dataset.}
-
-\item{test}{name or index denoting the dataset to analyse the module in.}
 }
 \description{
 Template parameters to be imported into other function documentation. This 

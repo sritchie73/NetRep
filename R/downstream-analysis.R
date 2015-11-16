@@ -4,7 +4,8 @@
 #' or more modules in a user specified dataset.
 #' 
 #' @inheritParams common_params
-#' @param modules a vector of modules to apply the function to (see details).
+#' @inheritParams common_params2
+#' 
 #' @param simplify logical; if \code{TRUE} the output data structure is 
 #'   simplified if only one module is specified.
 #'  
@@ -288,7 +289,8 @@ networkProperties <- function(
 #' modules by the similarity of their summary vectors.
 #' 
 #' @inheritParams common_params
-#' @param modules a vector of modules to apply the function to (see details).
+#' @inheritParams common_params2
+#' 
 #' @param na.rm logical; If \code{TRUE}, genes present in the \code{discovery} 
 #'   dataset but missing from the test dataset are excluded. If \code{FALSE}, 
 #'   missing genes are put last in the ordering.
@@ -492,7 +494,8 @@ nodeOrder <- function(
 #' Get the order of samples within a module based on the module summary vector.
 #' 
 #' @inheritParams common_params
-#' @param modules a vector of modules to apply the function to (see details).
+#' @inheritParams common_params2
+#'
 #' @param na.rm logical; If \code{TRUE} variables present in the 
 #'   \code{discovery} dataset but missing from the \code{test} dataset are 
 #'   excluded. If \code{FALSE} missing variables are put last in the ordering.

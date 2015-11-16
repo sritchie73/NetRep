@@ -4,6 +4,9 @@
 #' are ordered the same way across datasets.
 #' 
 #' @inheritParams common_params
+#' @param discovery name or index denoting which dataset the module of interest
+#'   was discovered in.
+#' @param test name or index denoting which dataset to apply the function to.
 #'  
 checkSets <- function(
   data, correlation, network, moduleAssignments, discovery, test

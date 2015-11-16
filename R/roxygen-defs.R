@@ -68,9 +68,20 @@ NULL
 #' @param moduleAssignments a vector containing the module each variable belongs
 #' to in the discovery dataset. If there are multiple discovery datasets 
 #' then this argument should be a list of such vectors.
-#' @param discovery name or index denoting which the discovery dataset.
-#' @param test name or index denoting the dataset to analyse the module in.
 #'
 #' @name common_params
 NULL
 
+#' Template parameters
+#' 
+#' Template parameters to be imported into other function documentation. This 
+#' is not intended to be a stand-alone help file.
+#' 
+#' @param modules a vector of modules to apply the function to (see details).
+#' @param discovery name or index denoting which dataset the module of interest
+#'   was discovered in (see details).
+#' @param test name or index denoting which dataset to apply the function to 
+#'   (see details).
+#'   
+#' @name common_params2
+NULL
