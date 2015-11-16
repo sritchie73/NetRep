@@ -27,9 +27,10 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{discovery}{name or index denoting which the discovery dataset.}
+\item{discovery}{name or index denoting the discovery dataset(s).}
 
-\item{test}{name or index denoting the dataset to analyse the module in.}
+\item{test}{name or index denoting the dataset(s) to test module preservation 
+in.}
 
 \item{nCores}{number of cores to parallelise the permutation procedure over.}
 
@@ -85,14 +86,14 @@ The returned data structure is organised as a nested list of lists, which
      corresponding values in \code{nulls}.
    }
    \item{\code{nVarsPresent}:}{
-     A vector containing the number of genes that are present in the test
+     A vector containing the number of variables that are present in the test
      dataset for each module.
    }
    \item{\code{propVarsPresent}:}{
-     A vector containing the proportion of genes present in the test dataset
+     A vector containing the proportion of variables present in the test dataset
      for each module. Modules where this is less than 1 should be 
      investigated further before making judgements about preservation to 
-     ensure that the missing genes are not the most connected ones.
+     ensure that the missing variables are not the most connected ones.
    }
    \item{\code{contingency}:}{ 
      If \code{moduleAssignments} are present for both the \emph{discovery}
@@ -105,51 +106,36 @@ The returned data structure is organised as a nested list of lists, which
 }
 \details{
 \subsection{Input data structure:}{
-  The topological properties used to assess module preservation are designed 
-  for networks constructed using Weighted Gene Coexpression Network Analysis 
-  (\pkg{\link[WGCNA]{WGCNA}}, \emph{(3)}). These are calculated from the gene expression
-  for each dataset, the pairwise correlation between genes (coexpression) for
-  each dataset, and the pairwise gene adjacencies (network) for each
-  dataset. The network is typically the absolute value of the correlation
-  raised to a power to penalise weak correlations \emph{(3)}. Module
-  preservation can also be assessed on networks without the gene expression
-  data, but only a limited subset of the statistics will be calculated.
-  Network modules are usually clusters of tightly coexpressed genes
-  \emph{(3)}, but the procedure is also useful for assessing known gene sets,
-  i.e. pathways across conditions or tissues \emph{(1)}.
+  This function allows for input data formatted in a number of ways. Where 
+  there are multiple datasets of interest (e.g. multiple tissues, locations, 
+  or a discovery dataset and an independent test dataset) the arguments 
+  \code{data}, \code{correlation}, and \code{network} should be
+  \code{\link[=list]{lists}} where each element contains the matrix data for 
+  each respective dataset. Alternatively, if only one dataset is of interest, 
+  the \code{data}, \code{correlation}, and \code{network} arguments
+  will also each accept a 'matrix' object.
   
-  The arguments \code{data}, \code{correlation}, and 
-  \code{network} each expect a \code{\link{list}} where each element 
-  contains the matrix data for each respective dataset. This matrix data 
-  should be stored as a 'bigMatrix' object (see 
-  \link[=bigMatrix-get]{converting matrix data to 'bigMatrix' data}).
   Similarly, the \code{moduleAssignments} argument expects a list of named
-  vectors, which contain the the module assignments for each gene in the
-  respective dataset. List elements corresponding to datasets where module
-  discovery has not been performed should contain \code{NULL}, unless the
-  datasets are named throughout the function arguments. I.e. where the
-  \code{\link{names}} of \code{data}, \code{correlation}, and
-  \code{network} correspond to the names of each dataset of interest, the
-  names of the \code{discovery} dataset can be used to look up the respective
-  module assignments in the \code{moduleAssignments} list. If module
-  discovery has only been performed in one dataset, then the
-  \code{moduleAssignments} will also accept a named vector.
+  vectors, which denote the module each variable belongs to in the discovery
+  dataset. If module discovery has only been performed in one dataset, then 
+  the \code{moduleAssignments} argument will also accept a named vector.
   
   The \code{discovery} arguments specifies which dataset the \code{modules} 
   of interest were discovered in, and the \code{test} argument specifies 
-  which dataset to test the replication/preservation of each module.
+  which dataset to calculate the network properties in. These arguments are
+  ignored if data is provided for only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
-  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
-  data, regular 'matrix' objects are also accepted. In this case, the
+  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+  data, regular 'matrix' objects are also accepted. In this case, the 
   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-  conversion process involves writing out each matrix as a binary file on
-  disk, which can take a long time for large datasets. It is strongly
+  conversion process involves writing out each matrix as a binary file on 
+  disk, which can take a long time for large datasets. It is strongly 
   recommended for the user to store their data as 'bigMatrix' objects, as the
-  \link{networkProperties} function, \link[=plotModule]{plotting} 
-  \link[=plotTopology]{functions}, \link[=geneOrder]{gene} and 
-  \link[=sampleOrder]{sample} ordering also expect 'bigMatrix' objects. 
-  Further, 'bigMatrix' objects have a number of benefits, including 
+  \link{modulePreservation} function, \link[=plotModule]{plotting} 
+  \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
+  \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
+  objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
   \link[=bigMatrix-get]{converting to, loading in}, and 
@@ -174,54 +160,51 @@ The returned data structure is organised as a nested list of lists, which
 \subsection{Module Preservation Statistics:}{
  Module preservation is assessed through seven statistics \emph{(1)}:
  \enumerate{
-   \item{\code{mean.adj}:}{
-     The mean adjacency, or module density, measures how densely connected a 
-     module is in the \emph{test} dataset.
+   \item{\code{density}:}{
+     The mean network edge weight of the module in the test dataset. Is the
+     module more (or less) densely connected than expected by chance? 
    }
-   \item{\code{pve}:}{
-     Short for "the proportion of variance explained in the underlying gene
-     expression data for the module by its summary expression profile in the
-     \emph{test} dataset". The summary expression profile is calculated as
+   \item{\code{propVarExpl}:}{
+     The proportion of module varaince explained by the module summary 
+     vector in the test dataset. The module summary vector is calculated as
      the first eigenvector from a principal component analysis on the
-     module's (scaled) gene expression data. The summary expression profile
-     is commonly referred to as the "module eigengene (ME)", and abbreviated
-     as \code{propVarExpl} in \emph{(1)}.
+     module's data. For weighted gene coexpression networks this corresponds 
+     to the "module eigengene (ME)" \emph{(1)}. Is the module more (or less)
+     coherent than expected by chance?
    }
-   \item{\code{cor.coexp}:}{
-     The correlation of correlation patterns for a module across the
-     \emph{discovery} and \emph{test} datasets. It is also referred to as
-     the "correlation of correlation" and abbreviated as \code{cor.cor} in 
-     \emph{(1)}.
+   \item{\code{cor.cor}:}{
+     The correlation of the module's correlation structure across datasets. 
+     Is the correlation structure more (or less) similar than expected by 
+     chance?
    }
    \item{\code{cor.kIM}:}{
-     The correlation of intramodular connectivity across the \emph{discovery}
-     and \emph{test} datasets. Intramodular connectivity is quantified as the
-     sum of adjacency for a gene to all other genes in the module.
+     The correlation of within-module connectivity (sum of edge weights to 
+     all other nodes, i.e. a "weighted" node degree) across datasets. Are the
+     relative node connectivities more similar than expected by chance?
    }
    \item{\code{cor.MM}:}{
-     The correlation of intramodular module membership across the
-     \emph{discovery} and \emph{test} datasets. Module membership denotes the
-     correlation between each gene and the summary expression profile for
-     that module in the given dataset. The statistic is abbreviated as
-     \code{cor.kME} in \emph{(1)}.
+     The correlation of module membership across datasets. Module membership 
+     quantifies how strongly each variable composing a module contributes to 
+     the module's summary vector. It is calculated as the correlation between
+     the variable and the module summary vector. The statistic is abbreviated 
+     as \code{cor.kME} in \emph{(1)}. Are the node contributions to the 
+     module summary vector more similar than expected by chance?
    }
-   \item{\code{mean.coexp}:}{
-     The mean sign-aware correlation measures the average correlation for a
-     module in the \emph{test} dataset, multiplied by the sign of the 
-     correlation in the \emph{discovery} dataset. It assesses how strongly 
-     correlated the genes are in the test dataset (in either direction), 
-     penalising the module if any gene pairs whose correlation flips between
+   \item{\code{mean.cor}:}{
+     The mean correlation in the test dataset. It quantifies how strongly 
+     correlated variables composing a module are in the test dataset, 
+     penalising any variables where the sign of the correlation flips across
      datasets. It is also referred to as the "mean sign-aware correlation"
-     and abbreviated as \code{mean.cor} in \emph{(1)}.
+     (see \emph{(1)}). Is the correlation structure stronger than expected
+     by chance?
    }
    \item{\code{mean.MM}:}{
-     The mean sign-aware module membership measures the average module 
-     membership in the \emph{test} dataset, multiplied by the sign of the 
-     module membership in the \emph{discovery} dataset. It measures how 
-     coherent the gene expression is in the \emph{test} dataset, penalising 
-     the module if any genes are differentially expressed compared to the 
-     module in one, but not both \emph{discovery} and \emph{test} datasets. 
-     It is also abbreivated as \code{mean.kME} in \emph{(1)}.
+     The mean module membership in the test dataset. It quantifies how 
+     coherent the module is, penalising any variables where the sign of the 
+     contribution flips across datasets (e.g. differential expression in one
+     dataset but not the other). It is also abbreivated as \code{mean.kME} 
+     in \emph{(1)}. Is the mean contribution of variables composing a module
+     to the module stronger than expected by chance?
    }
  }
 }
@@ -235,15 +218,14 @@ The returned data structure is organised as a nested list of lists, which
  
  To determine whether a module preservation statistic deviates from chance, a
  permutation procedure is employed. Each statistic is calculated between the
- module in the \emph{discovery} dataset and \code{nPerm} random gene sets of
+ module in the \emph{discovery} dataset and \code{nPerm} random subsets of
  the same size in the \emph{test} dataset in order to assess the distribution
  of each statistic under the null hypothesis. Two models for the null 
  hypothesis are available. Under "overlap", the default, random sampling is
- performed only for the set of genes present in both the \emph{discovery} and
- \emph{test} datasets. Alternative, the argument \code{null} can be set to
- "all", in which case random sampling is performed on all genes present in
- the \emph{test} dataset. The latter may be suitable when assessing module
- replication across species.
+ performed only for the set of variables present in both the \emph{discovery} and
+ \emph{test} datasets. Alternatively, the argument \code{null} can be set to
+ "all", in which case random sampling is performed on all variables present in
+ the \emph{test} dataset.
   
  The number of permutations required for any given significance threshold is 
  approximately 1 / the desired significance for one sided tests, and double 
