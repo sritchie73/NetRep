@@ -35,6 +35,10 @@ containing the edge weights between each pair of variables).}
 
 \item{moduleIndices}{indices for the network module of interest in the
 supplied data matrix.}
+
+\item{sdat}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+numeric data. Assumes columns correspond to variables (e.g. genes, 
+microbial operational taxonomic unit) and rows correspond to samples.}
 }
 \value{
 \code{corStats:} a list containing:

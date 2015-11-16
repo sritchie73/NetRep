@@ -32,7 +32,7 @@ NULL
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
 #'
-#' @param sge a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+#' @param sdat a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
 #'  numeric data. Assumes columns correspond to variables (e.g. genes, 
 #'  microbial operational taxonomic unit) and rows correspond to samples.
 #'

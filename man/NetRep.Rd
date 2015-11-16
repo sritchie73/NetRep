@@ -6,7 +6,7 @@
 \alias{NetRep-package}
 \title{Fast permutation procedure for testing network module replication}
 \description{
-Functions for assessing the replication/preservation of network modules'
+Functions for assessing the replication/preservation of a network module's
 topology across datasets through permutation testing. This method is suitable
 for interaction networks that are not sparse. These include gene coexpression
 networks, protein-protein interaction networks, and microbial interaction 

@@ -4,7 +4,7 @@
 \alias{dat_param}
 \title{Template parameters}
 \arguments{
-\item{sge}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+\item{sdat}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
 numeric data. Assumes columns correspond to variables (e.g. genes, 
 microbial operational taxonomic unit) and rows correspond to samples.}
 }

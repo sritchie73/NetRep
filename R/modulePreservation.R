@@ -406,7 +406,7 @@ modulePreservation <- function(
   # startup messages.
   hasWGCNA <- FALSE
   sink(file.path(tempdir(), "suppressedWGCNAstartupMessage.txt"))
-  if (suppressMessages(suppressWarnings(require("WGCNA"))))
+  if (suppressMessages(suppressWarnings(requireNamespace("WGCNA"))))
     hasWGCNA <- TRUE
   sink()
   if (statCorMethod == "bicor" & !hasWGCNA)
@@ -514,21 +514,21 @@ modulePreservation <- function(
   if (.Platform$OS.type == "windows" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
-    if(suppressWarnings(suppressMessages(require(doParallel)))) {
+    if(suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
       # we need an additional thread to monitor and report progress
       if (verbose)  
         nCores <- nCores + 1
-      cl <- makeCluster(nCores)
-      registerDoParallel(cl)
+      cl <- doParallel::makeCluster(nCores)
+      doParallel::registerDoParallel(cl)
       on.exit({
-        stopCluster(cl)
+        doParallel::stopCluster(cl)
       }, add=TRUE)
       vCat(verbose, 0, "Running on", nCores - 1, "cores.")
-      if ((nCores - 1) > detectCores()) {
+      if ((nCores - 1) > parallel::detectCores()) {
         stop(
           "Requested number of threads (", nCores - 1, ") is higher than the ",
-          "number of available cores (", detectCores(), "). Using too many ",
-          "threads may cause the machine to thrash/freeze."
+          "number of available cores (", parallel::detectCores(), 
+          "). Using too many threads may cause the machine to thrash/freeze."
         )
       }
     } else {
@@ -544,17 +544,17 @@ modulePreservation <- function(
   } else if (.Platform$OS.type == "unix" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
-    if(suppressWarnings(suppressMessages(require(doMC)))) {
+    if(suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
       # we need an additional thread to monitor and report progress
       if (verbose) 
         nCores <- nCores + 1
-      registerDoMC(nCores)
+      doMC::registerDoMC(nCores)
       vCat(verbose, 0, "Running on", nCores - 1, "cores.")
-      if ((nCores - 1) > detectCores()) {
+      if ((nCores - 1) > parallel::detectCores()) {
         stop(
           "Requested number of threads (", nCores - 1, ") is higher than the ",
-          "number of available cores (", detectCores(), "). Using too many ",
-          "threads may cause the machine to thrash/freeze."
+          "number of available cores (", parallel::detectCores(), 
+          "). Using too many threads may cause the machine to thrash/freeze."
         )
       }
     } else {
@@ -570,7 +570,7 @@ modulePreservation <- function(
     vCat(verbose, 0, "Running on 1 cores.")
   }
   # Suppress annoying foreach warning if running in serial
-  if (getDoParWorkers() == 1) {
+  if (nCores == 1) {
     suppressWarnings({
       ii <- 0 # suppress R CMD check note
       foreach(ii = 1:2) %dopar% { ii }
@@ -587,7 +587,7 @@ modulePreservation <- function(
   # Set up correlation function
   #-----------------------------------------------------------------------------
   if (statCorMethod == "bicor") {
-    cor <- function(...) bicor(..., quick=1, nThreads=1)[,]
+    cor <- function(...) WGCNA::bicor(..., quick=1, nThreads=1)[,]
   } else {
     cor <- function(...) stats::cor(..., method=statCorMethod)[,]
   }
