@@ -2,12 +2,11 @@ Package: NetRep
 Type: Package
 Title: Testing network module replication and preservation through permutation
     testing
-Version: 0.26.0
+Version: 0.30.0
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
-Description: Functions for assessing the replication/preservation of network
-    topology for weighted gene coexpression network modules in one or more
-    independent datasets through permutation testing.
+Description: Functions for assessing the replication/preservation of a network 
+  module's topology across datasets through permutation testing.
 License: GPL-2
 Depends:
     R (>= 3.0.0),

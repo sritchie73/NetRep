@@ -518,10 +518,10 @@ modulePreservation <- function(
       # we need an additional thread to monitor and report progress
       if (verbose)  
         nCores <- nCores + 1
-      cl <- doParallel::makeCluster(nCores)
+      cl <- parallel::makeCluster(nCores)
       doParallel::registerDoParallel(cl)
       on.exit({
-        doParallel::stopCluster(cl)
+        parallel::stopCluster(cl)
       }, add=TRUE)
       vCat(verbose, 0, "Running on", nCores - 1, "cores.")
       if ((nCores - 1) > parallel::detectCores()) {
