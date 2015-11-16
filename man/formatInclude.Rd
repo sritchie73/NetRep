@@ -2,12 +2,12 @@
 % Please edit documentation in R/check-user-input.R
 \name{formatInclude}
 \alias{formatInclude}
-\title{Format includeModules list}
+\title{Format the list of modules to include.}
 \usage{
-formatInclude(includeModules, discovery, nDatasets, datasetNames)
+formatInclude(include, discovery, nDatasets, datasetNames)
 }
 \arguments{
-\item{includeModules}{input provided by the user}
+\item{include}{input provided by the user}
 
 \item{discovery}{vector of discovery networks provided by the user}
 
@@ -19,6 +19,6 @@ formatInclude(includeModules, discovery, nDatasets, datasetNames)
 List structure to match the rest of the input data
 }
 \description{
-Format includeModules list
+Format the list of modules to include.
 }
 

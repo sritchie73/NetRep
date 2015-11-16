@@ -203,9 +203,9 @@ formatModuleAssignments <- function(
   moduleAssignments
 }
 
-#' Format includeModules list
+#' Format the list of modules to include.
 #' 
-#' @param includeModules input provided by the user
+#' @param include input provided by the user
 #' @param discovery vector of discovery networks provided by the user
 #' @param nDatasets number of datasets
 #' @param datasetNames names of the datasets
@@ -214,61 +214,61 @@ formatModuleAssignments <- function(
 #'  List structure to match the rest of the input data
 #'
 formatInclude <- function(
-  includeModules, discovery, nDatasets, datasetNames
+  include, discovery, nDatasets, datasetNames
 ) {
-  if (missing(includeModules)) {
-    includeModules <- rep(list(NULL), length(discovery))
-    names(includeModules) <- discovery
+  if (missing(include)) {
+    include <- rep(list(NULL), length(discovery))
+    names(include) <- discovery
   }
   
   if (class(discovery) %nin% c("character", "numeric", "integer"))
     stop("'discovery' must be a vector of dataset names or indices")
   
   msg <- paste0(
-    "mismatch between number of 'discovery' specified and ",
-    "'includeModules' provided"
+    "mismatch between number of 'discovery' datasets specified and ",
+    "number of 'include' vectors provided"
   )
-  if (!is.list(includeModules)) {
+  if (!is.list(include)) {
+    # If not a list and there's only one discovery dataset, we can wrap in a 
+    # list with the appropriate name
     if (length(discovery) > 1) {
       stop(msg)
     } else {
       tmp <- rep(list(NULL), nDatasets)
       names(tmp) <- datasetNames
-      tmp[[discovery]] <- includeModules
-      includeModules <- tmp
+      tmp[[discovery]] <- include
+      include <- tmp
     }
   } else {
-    if (
-      !is.null(names(includeModules)) && 
-        !all(names(includeModules) %in% datasetNames)
-    ) {
-      stop("unable to match all names of 'includeModules' to dataset names")
+    if (!is.null(names(include)) && !all(names(include) %in% datasetNames)) {
+      stop(
+        "Unable to match list element names of 'include' to dataset names")
     }
-    if (length(includeModules) < nDatasets) {
+    if (length(include) < nDatasets) {
       tmp <- rep(list(NULL), nDatasets)
       names(tmp) <- datasetNames
-      if (length(includeModules) == length(discovery)) {
-        if (is.null(names(includeModules))) {
-          tmp[discovery] <- includeModules
+      if (length(include) == length(discovery)) {
+        if (is.null(names(include))) {
+          tmp[discovery] <- include
         } else {
-          tmp[names(includeModules)] <- includeModules
+          tmp[names(include)] <- include
         }
       } else {
-        if (is.null(names(includeModules))) {
+        if (is.null(names(include))) {
           stop(msg)
         } else {
-          tmp[names(includeModules)] <- includeModules
+          tmp[names(include)] <- include
         }
       }
-      includeModules <- tmp
+      include <- tmp
     }
   }
-  includeModules
+  include
 }
 
-#' Format excludeModules list
+#' Format exclude list
 #' 
-#' @param excludeModules input provided by the user
+#' @param exclude input provided by the user
 #' @param discovery vector of discovery networks provided by the user
 #' @param nDatasets number of datasets
 #' @param datasetNames names of the datasets
@@ -277,11 +277,11 @@ formatInclude <- function(
 #'  List structure to match the rest of the input data
 #'
 formatExclude <- function(
-  excludeModules, discovery, nDatasets, datasetNames
+  exclude, discovery, nDatasets, datasetNames
 ) {
-  if (missing(excludeModules)) {
-    excludeModules <- rep(list(NULL), length(discovery))
-    names(excludeModules) <- discovery
+  if (missing(exclude)) {
+    exclude <- rep(list(NULL), length(discovery))
+    names(exclude) <- discovery
   }
   
   if (class(discovery) %nin% c("character", "numeric", "integer"))
@@ -289,44 +289,44 @@ formatExclude <- function(
   
   msg <- paste0(
     "mismatch between number of 'discovery' specified and ",
-    "'excludeModules' provided"
+    "'exclude' provided"
   )
-  if (!is.list(excludeModules)) {
+  if (!is.list(exclude)) {
     if (length(discovery) > 1) {
       stop(msg)
     } else {
       tmp <- rep(list(NULL), nDatasets)
       names(tmp) <- datasetNames
-      tmp[[discovery]] <- excludeModules
-      excludeModules <- tmp
+      tmp[[discovery]] <- exclude
+      exclude <- tmp
     }
   } else {
     if (
-      !is.null(names(excludeModules)) && 
-      !all(names(excludeModules) %in% datasetNames)
+      !is.null(names(exclude)) && 
+      !all(names(exclude) %in% datasetNames)
     ) {
-      stop("unable to match all names of 'excludeModules' to dataset names")
+      stop("unable to match all names of 'exclude' to dataset names")
     }
-    if (length(excludeModules) < nDatasets) {
+    if (length(exclude) < nDatasets) {
       tmp <- rep(list(NULL), nDatasets)
       names(tmp) <- datasetNames
-      if (length(excludeModules) == length(discovery)) {
-        if (is.null(names(excludeModules))) {
-          tmp[discovery] <- excludeModules
+      if (length(exclude) == length(discovery)) {
+        if (is.null(names(exclude))) {
+          tmp[discovery] <- exclude
         } else {
-          tmp[names(excludeModules)] <- excludeModules
+          tmp[names(exclude)] <- exclude
         }
       } else {
-        if (is.null(names(excludeModules))) {
+        if (is.null(names(exclude))) {
           stop(msg)
         } else {
-          tmp[names(excludeModules)] <- excludeModules
+          tmp[names(exclude)] <- exclude
         }
       }
-      excludeModules <- tmp
+      exclude <- tmp
     }
   }
-  excludeModules
+  exclude
 }
 
 #' Format the gene expression lists
