@@ -4,27 +4,32 @@
 \alias{modulePreservation}
 \title{Replication and preservation of network modules across datasets}
 \usage{
-modulePreservation(geneExpression = NULL, coexpression, adjacency,
-  moduleAssignments, discovery = 1, test = 2, nCores = 1, nPerm,
-  excludeModules, includeModules, null = "overlap", alternative = "greater",
-  corMethod = "pearson", simplify = TRUE, verbose = TRUE,
-  keepNulls = FALSE)
+modulePreservation(data = NULL, correlation, network, moduleAssignments,
+  discovery = 1, test = 2, nCores = 1, nPerm, exclude, include,
+  null = "overlap", alternative = "greater", statCorMethod = "pearson",
+  simplify = TRUE, verbose = TRUE, keepNulls = FALSE)
 }
 \arguments{
-\item{geneExpression}{A list of gene expression matrices, one for each 
-dataset. Expects columns to be genes, rows to be samples.}
+\item{data}{a list of numeric matrices. Each entry of the list corresponds to
+a dataset and contains the data used to infer the interaction network
+between variables (e.g. genes). Expects matrix columns to correspond to
+variables and matrix rows to correspond to samples.}
 
-\item{coexpression}{A list of coexpression matrices, one for each dataset.}
+\item{correlation}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the correlation between 
+each pair of variables in the dataset.}
 
-\item{adjacency}{A list of adjacency matrices, one for each dataset.}
+\item{network}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the network edge weights 
+between each pair of variables in the dataset.}
 
-\item{moduleAssignments}{A list of vectors for each \emph{discovery} dataset
-containing the module assignments for each gene in the respective dataset.}
+\item{moduleAssignments}{a vector containing the module each variable belongs
+to in the discovery dataset. If there are multiple discovery datasets 
+then this argument should be a list of such vectors.}
 
-\item{discovery}{datasets where module discovery has been performed.}
+\item{discovery}{name or index denoting which the discovery dataset.}
 
-\item{test}{datasets to test for preservation of modules from each 
-\emph{discovery} dataset.}
+\item{test}{name or index denoting the dataset to analyse the module in.}
 
 \item{nCores}{number of cores to parallelise the permutation procedure over.}
 
@@ -33,15 +38,15 @@ a different number of permutations is desired for each discovery dataset.
 If not specified, the number of permutations will be automatically 
 determined (see details).}
 
-\item{excludeModules}{optional list of vectors containing modules to exclude 
-from the analysis for each \code{discovery} dataset. If unspecified, the 
-preservation of all modules will be tested.}
+\item{exclude}{an optional vector of modules to exclude from the analysis. If
+there are multiple discovery datasets a list of vectors may be provided.}
 
-\item{includeModules}{optional list of vectors containing modules to include 
-in the analysis for each \code{discovery} dataset. If unspecified, the 
-preservation of all modules will be tested.}
+\item{include}{an optional vector of modules to include in the
+analysis. If there are multiple discovery datasets a list of vectors may be
+provided.}
 
-\item{null}{the type of null model, either "overlap" or "all" (see details).}
+\item{null}{variables to include when generating the null distributions. 
+Must be either "overlap" or "all" (see details).}
 
 \item{alternative}{The type of module preservation test to perform. Must be 
 one of "greater" (default), "less" or "two.sided" (see details).}
@@ -79,11 +84,11 @@ The returned data structure is organised as a nested list of lists, which
      statistics as evaluated through a permutation test using the 
      corresponding values in \code{nulls}.
    }
-   \item{\code{nGenesPresent}:}{
+   \item{\code{nVarsPresent}:}{
      A vector containing the number of genes that are present in the test
      dataset for each module.
    }
-   \item{\code{propGenesPresent}:}{
+   \item{\code{propVarsPresent}:}{
      A vector containing the proportion of genes present in the test dataset
      for each module. Modules where this is less than 1 should be 
      investigated further before making judgements about preservation to 
@@ -98,23 +103,14 @@ The returned data structure is organised as a nested list of lists, which
    }
  }
 }
-\description{
-Assess whether gene coexpression modules replicate or are preserved in an 
-independent dataset. Module preservation is assessed using a permutation 
-procedure performed on seven module preservation statistics (see details). 
-Each dataset requires a precalculated coexpression network and adjecency 
-network (see details). Providing the gene expression is optional, but 
-recommended. Matrix data is ideally stored in the
-\code{\link[=bigMatrix-class]{bigMatrix}} format (see details).
-}
 \details{
 \subsection{Input data structure:}{
   The topological properties used to assess module preservation are designed 
   for networks constructed using Weighted Gene Coexpression Network Analysis 
   (\pkg{\link[WGCNA]{WGCNA}}, \emph{(3)}). These are calculated from the gene expression
   for each dataset, the pairwise correlation between genes (coexpression) for
-  each dataset, and the pairwise gene adjacencies (adjacency) for each
-  dataset. The adjacency is typically the absolute value of the correlation
+  each dataset, and the pairwise gene adjacencies (network) for each
+  dataset. The network is typically the absolute value of the correlation
   raised to a power to penalise weak correlations \emph{(3)}. Module
   preservation can also be assessed on networks without the gene expression
   data, but only a limited subset of the statistics will be calculated.
@@ -122,8 +118,8 @@ recommended. Matrix data is ideally stored in the
   \emph{(3)}, but the procedure is also useful for assessing known gene sets,
   i.e. pathways across conditions or tissues \emph{(1)}.
   
-  The arguments \code{geneExpression}, \code{coexpression}, and 
-  \code{adjacency} each expect a \code{\link{list}} where each element 
+  The arguments \code{data}, \code{correlation}, and 
+  \code{network} each expect a \code{\link{list}} where each element 
   contains the matrix data for each respective dataset. This matrix data 
   should be stored as a 'bigMatrix' object (see 
   \link[=bigMatrix-get]{converting matrix data to 'bigMatrix' data}).
@@ -132,8 +128,8 @@ recommended. Matrix data is ideally stored in the
   respective dataset. List elements corresponding to datasets where module
   discovery has not been performed should contain \code{NULL}, unless the
   datasets are named throughout the function arguments. I.e. where the
-  \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-  \code{adjacency} correspond to the names of each dataset of interest, the
+  \code{\link{names}} of \code{data}, \code{correlation}, and
+  \code{network} correspond to the names of each dataset of interest, the
   names of the \code{discovery} dataset can be used to look up the respective
   module assignments in the \code{moduleAssignments} list. If module
   discovery has only been performed in one dataset, then the
@@ -162,7 +158,7 @@ recommended. Matrix data is ideally stored in the
 \subsection{Memory usage:}{
   A trade off has been made between memory usage and computation time. 
   'modulePreservation' has a large memory overhead as it requires 
-  pre-computed coexpression and adjacency matrices for each dataset. However,
+  pre-computed correlation and network matrices for each dataset. However,
   these are stored in shared memory, which means that each parallel process
   can independently access this memory. There is very little memory overhead
   for each additional core. 
@@ -170,7 +166,7 @@ recommended. Matrix data is ideally stored in the
   Although this also means that the matrices can be larger than the available
   RAM, in practice we find that this slows down the procedure by several 
   orders of magnitude. For optimal performance, there should be sufficient
-  memory to load in each gene expression, coexpression, and adjacency matrix
+  memory to load in each gene expression, correlation, and network matrix
   for each dataset. Note: most of this memory is cached; matrices are only 
   loaded into RAM when needed (i.e. for the dataset pair for a comparison),
   so the physical amount of RAM used will be much lower.
@@ -192,7 +188,7 @@ recommended. Matrix data is ideally stored in the
      as \code{propVarExpl} in \emph{(1)}.
    }
    \item{\code{cor.coexp}:}{
-     The correlation of coexpression patterns for a module across the
+     The correlation of correlation patterns for a module across the
      \emph{discovery} and \emph{test} datasets. It is also referred to as
      the "correlation of correlation" and abbreviated as \code{cor.cor} in 
      \emph{(1)}.
@@ -210,9 +206,9 @@ recommended. Matrix data is ideally stored in the
      \code{cor.kME} in \emph{(1)}.
    }
    \item{\code{mean.coexp}:}{
-     The mean sign-aware coexpression measures the average coexpression for a
+     The mean sign-aware correlation measures the average correlation for a
      module in the \emph{test} dataset, multiplied by the sign of the 
-     coexpression in the \emph{discovery} dataset. It assesses how strongly 
+     correlation in the \emph{discovery} dataset. It assesses how strongly 
      correlated the genes are in the test dataset (in either direction), 
      penalising the module if any gene pairs whose correlation flips between
      datasets. It is also referred to as the "mean sign-aware correlation"
@@ -278,7 +274,7 @@ set.seed(1)
 geA <- matrix(rnorm(50*100), ncol=100) # gene expression
 colnames(geA) <- paste0("Gene_", 1:100)
 rownames(geA) <- paste0("CohortA_", 1:50)
-coexpA <- cor(geA) # coexpression
+coexpA <- cor(geA) # correlation
 adjA <- abs(coexpA)^5 # adjacency
 moduleAssignments <- sample(1:7, size=100, replace=TRUE)
 names(moduleAssignments) <- paste0("Gene_", 1:100)
@@ -286,15 +282,15 @@ names(moduleAssignments) <- paste0("Gene_", 1:100)
 geB <- matrix(rnorm(70*100), ncol=100) # gene expression
 colnames(geB) <- paste0("Gene_", 1:100) 
 rownames(geB) <- paste0("CohortB_", 1:70)
-coexpB <- cor(geB) # coexpression
+coexpB <- cor(geB) # correlation
 adjB <- abs(coexpB)^6 # adjacency
 
 # Now format the data for input to modulePreservation
-geneExpression <- list(
+data <- list(
   cohortA=as.bigMatrix(geA, "geA_bm"),
   cohortB=as.bigMatrix(geA, "geA_bm")    
 )
-coexpression <- list(
+correlation <- list(
   cohortA=as.bigMatrix(coexpA, "coexpA_bm"),
   cohortB=as.bigMatrix(coexpB, "coexpB_bm")
 )
@@ -305,20 +301,20 @@ adjacency <- list(
 
 # Assess module preservation, using two cores
 replication <- modulePreservation(
-  geneExpression, coexpression, adjacency, moduleAssignments, 
+  data, correlation, adjacency, moduleAssignments, 
   nCores=2
 )
 
 ## Example 2: assess replication of two disease-associated modules
 replication <- modulePreservation(
-  geneExpression, coexpression, adjacency, moduleAssignments,
-  nCores=2, includeModules = c("4", "7")
+  data, correlation, adjacency, moduleAssignments,
+  nCores=2, include = c("4", "7")
 )
 
 ## Example 3: exclude a module from the analysis
 replication <- modulePreservation(
-  geneExpression, coexpression, adjacency, moduleAssignments,
-  nCores=2, excludeModules = "0"
+  data, correlation, adjacency, moduleAssignments,
+  nCores=2, exclude = "0"
 )
 
 ## Example 4: assess preservation of modules across multiple
@@ -326,7 +322,7 @@ replication <- modulePreservation(
 geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
 colnames(geAdipose) <- paste0("Gene_", 1:100)
 rownames(geAdipose) <- paste0("Sample_", 1:50)
-coexpAdipose <- cor(geAdipose) # coexpression
+coexpAdipose <- cor(geAdipose) # correlation
 adjAdipose <- abs(coexpAdipose)^5 # adjacency
 adiposeModules <- sample(0:7, size=100, replace=TRUE)
 names(adiposeModules) <- paste0("Gene_", 1:100)
@@ -334,7 +330,7 @@ names(adiposeModules) <- paste0("Gene_", 1:100)
 geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
 colnames(geLiver) <- paste0("Gene_", 1:100)
 rownames(geLiver) <- paste0("Sample_", 1:50)
-coexpLiver <- cor(geLiver) # coexpression
+coexpLiver <- cor(geLiver) # correlation
 adjLiver <- abs(coexpLiver)^6 # adjacency
 liverModules <- sample(0:12, size=100, replace=TRUE)
 names(liverModules) <- paste0("Gene_", 1:100)
@@ -342,18 +338,18 @@ names(liverModules) <- paste0("Gene_", 1:100)
 geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
 colnames(geHeart) <- paste0("Gene_", 1:100)
 rownames(geHeart) <- paste0("Sample_", 1:50)
-coexpHeart <- cor(geHeart) # coexpression
+coexpHeart <- cor(geHeart) # correlation
 adjHeart <- abs(coexpHeart)^4 # adjacency
 heartModules <- sample(0:5, size=100, replace=TRUE)
 names(heartModules) <- paste0("Gene_", 1:100)
 
 # Now format the data for input to modulePreservation
-geneExpression <- list(
+data <- list(
   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
   heart=as.bigMatrix(geHeart, "geHeart_bm") 
 )
-coexpression <- list(
+correlation <- list(
   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
@@ -370,7 +366,7 @@ moduleAssignments <- list(
 # Assess the preservation of each module in each non-discovery
 # tissue.
 preservation <- modulePreservation(
-  geneExpression, coexpression, adjacency, moduleAssignments,
+  data, correlation, adjacency, moduleAssignments,
   nCores=2, discovery=c("adipose", "liver", "heart"), 
   test=c("adipose", "liver", "heart")
 )

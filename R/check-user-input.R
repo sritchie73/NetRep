@@ -329,24 +329,24 @@ formatExclude <- function(
   exclude
 }
 
-#' Format the gene expression lists
+#' Format the optional 'data' argument list
 #' 
-#' Allows the user to set \code{geneExpression} to \code{NULL} without the data
+#' Allows the user to set \code{data} to \code{NULL} without the data
 #' causing cascading input-check errors.
 #' 
-#' @param geneExpression geneExpression data
+#' @param data user provided input to 'data' argument of package functions.
 #' @param nDatasets total number of datasets
 #' @param datasetNames names of the datasets
 #' 
 #' @return
 #'  A formatted list of gene expression data
-formatGeneExpression <- function(geneExpression, nDatasets, datasetNames) {
-  if (is.null(geneExpression) || identical(geneExpression, list(NULL))) {
+formatDataList <- function(data, nDatasets, datasetNames) {
+  if (is.null(data) || identical(data, list(NULL))) {
     res <- rep(list(NULL), nDatasets)
     names(res) <- datasetNames
     res
   } else {
-    geneExpression
+    data
   }
 }
 

@@ -2,83 +2,69 @@
 % Please edit documentation in R/downstream-analysis.R
 \name{sampleOrder}
 \alias{sampleOrder}
-\title{Order genes and modules within a network.}
+\title{Order samples within a network.}
 \usage{
-sampleOrder(geneExpression, coexpression, adjacency, moduleAssignments, modules,
+sampleOrder(data, correlation, network, moduleAssignments, modules,
   discovery = 1, test = 1, na.rm = FALSE, simplify = TRUE)
 }
 \arguments{
-\item{geneExpression}{optional; \code{NULL} or a list of 
-\code{\link[=bigMatrix-class]{bigMatrix}} objects, each containing the gene
-expression data for a datset of interest (see details). Columns are
-expected to be genes, rows samples.}
+\item{data}{a list of numeric matrices. Each entry of the list corresponds to
+a dataset and contains the data used to infer the interaction network
+between variables (e.g. genes). Expects matrix columns to correspond to
+variables and matrix rows to correspond to samples.}
 
-\item{coexpression}{a list of 'bigMatrix' objects, each containing the gene
-coexpression for a dataset of interest (see details).}
+\item{correlation}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the correlation between 
+each pair of variables in the dataset.}
 
-\item{adjacency}{a list of 'bigMatrix' objects, each containing the gene
-adjacencies for a dataset of interest (see details).}
+\item{network}{a list of matrices. Each entry of the list corresponds to a 
+dataset and contains an \eqn{n * n} matrix of the network edge weights 
+between each pair of variables in the dataset.}
 
-\item{moduleAssignments}{a list of named vectors assigning genes to modules 
-for each datast of interest (see details).}
+\item{moduleAssignments}{a vector containing the module each variable belongs
+to in the discovery dataset. If there are multiple discovery datasets 
+then this argument should be a list of such vectors.}
 
 \item{modules}{a vector of modules to apply the function to (see details).}
 
-\item{discovery}{name or index denoting which dataset the module of interest
-was discovered in (see details).}
+\item{discovery}{name or index denoting which the discovery dataset.}
 
-\item{test}{name or index denoting which dataset to apply the function to 
-(see details).}
+\item{test}{name or index denoting the dataset to analyse the module in.}
 
-\item{na.rm}{logical; If \code{TRUE}, genes present in the \code{discovery} 
-dataset but missing from the test dataset are excluded. If \code{FALSE}, 
-missing genes are put last in the ordering.}
+\item{na.rm}{logical; If \code{TRUE} variables present in the 
+\code{discovery} dataset but missing from the \code{test} dataset are 
+excluded. If \code{FALSE} missing variables are put last in the ordering.}
 
-\item{simplify}{logical; if \code{FALSE} the returned data structure will be 
-a list of vectors of ordered genes, one list element for each module. If
-\code{TRUE}, the returned data structure will be a single vector of 
-ordered genes.}
+\item{simplify}{logical; If \code{TRUE} a vector is returned instead of a 
+list when applying the function to one module.}
 }
 \value{
 A list of vectors, one per module of interest, each containing the sample 
- names sorted in descending order of the module's summary expression profile.
+ names sorted in descending order of the module's summary vector.
 }
 \description{
-Order genes in descending order of intramodular connectivity within each 
-module, and order modules by the similarity of their summary expression
-profiles. Intramodular connectivity is strongly correlated with biological
-importance within a given module \emph{(1)}.
+Get the order of samples within a module based on the module summary vector.
 }
 \details{
 \subsection{Input data structure:}{
   This function allows for input data formatted in a number of ways. Where 
-  there are multiple datasets of interest (e.g. multiple tissues, or a 
-  discovery dataset and an independent test dataset) the arguments 
-  \code{geneExpression}, \code{coexpression}, and \code{adjacency} should be
+  there are multiple datasets of interest (e.g. multiple tissues, locations, 
+  or a discovery dataset and an independent test dataset) the arguments 
+  \code{data}, \code{correlation}, and \code{network} should be
   \code{\link[=list]{lists}} where each element contains the matrix data for 
-  each respective dataset. This matrix data should be stored as a 'bigMatrix'
-  object (see \link[=bigMatrix-get]{converting matrix data to 'bigMatrix'
-  data}). Alternatively, if only one dataset is of interest, the
-  \code{geneExpression}, \code{coexpression}, and \code{adjacency} arguments
-  will also each accept a single 'bigMatrix' object.
+  each respective dataset. Alternatively, if only one dataset is of interest, 
+  the \code{data}, \code{correlation}, and \code{network} arguments
+  will also each accept a 'matrix' object.
   
   Similarly, the \code{moduleAssignments} argument expects a list of named
-  vectors, which contain the the module assignments for each gene in the
-  respective dataset. List elements corresponding to datasets where module
-  discovery has not been performed should contain \code{NULL}, unless the
-  datasets are named throughout the function arguments. I.e. where the
-  \code{\link{names}} of \code{geneExpression}, \code{coexpression}, and
-  \code{adjacency} correspond to the names of each dataset of interest, the
-  names of the \code{discovery} dataset can be used to look up the respective
-  module assignments in the \code{moduleAssignments} list. If module
-  discovery has only been performed in one dataset, then the
-  \code{moduleAssignments} will also accept a named vector.
+  vectors, which denote the module each variable belongs to in the discovery
+  dataset. If module discovery has only been performed in one dataset, then 
+  the \code{moduleAssignments} argument will also accept a named vector.
   
   The \code{discovery} arguments specifies which dataset the \code{modules} 
   of interest were discovered in, and the \code{test} argument specifies 
-  which dataset to calculate the summary expression in for determining the
-  order of the samples. These arguments are ignored if data is provided for 
-  only one dataset.
+  which dataset to calculate the network properties in. These arguments are
+  ignored if data is provided for only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
@@ -87,9 +73,9 @@ importance within a given module \emph{(1)}.
   conversion process involves writing out each matrix as a binary file on 
   disk, which can take a long time for large datasets. It is strongly 
   recommended for the user to store their data as 'bigMatrix' objects, as the
-  \link{modulePreservation} function, \link{networkProperties} function, 
-  \link[=plotModule]{plotting} \link[=plotTopology]{functions}, and 
-  \link[=geneOrder]{gene} ordering also expect 'bigMatrix' objects. 
+  \link{modulePreservation} function, \link[=plotModule]{plotting} 
+  \link[=plotTopology]{functions}, \link[=nodeOrder]{nodeOrder} and 
+  \link{networkProperties} functions also expect 'bigMatrix' objects.
   Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
