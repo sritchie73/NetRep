@@ -44,17 +44,23 @@ coexpStats <- function(
 
 #' @rdname wrappers
 #' @return 
-#'  \code{netProps:} a list of network properties calculated from an adjacency
-#'  matrix. These properties can either be scalers (summarising the whole
-#'  network subset), or vectors (characterising some property for each node in
-#'  the network subset).
-adjProps <- function(adj, moduleIndices) {
+#'  \code{netProps:} a list of containing:  
+#'  \enumerate{
+#'    \item{kIM:}{
+#'      The intramodular connectivity (the weighted within-subset 
+#'      degree for each network node)
+#'    }
+#'    \item{density:}{
+#'      The mean edge weight within the network module 
+#'    }
+#'  }
+netProps <- function(adj, moduleIndices) {
   # Attach the big.matrix object if not attached yet
   is.attached <- adj@attached
   if (!is.attached)
     adj <- attach.bigMatrix(adj)
   
-  res <- AdjProps(adj@matrix@address, moduleIndices)
+  res <- NetProps(adj@matrix@address, moduleIndices)
   
   # detach big.matrix objects if they were detached to begin with
   if (!is.attached)
