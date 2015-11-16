@@ -903,7 +903,7 @@ modulePreservation <- function(
           for (mi in overlapModules) {
             for (si in seq_len(nStatistics)) {
               # Does the order of nodes in each permutation affect the statistic?
-              if (colnames(observed)[si] %in% c("mean.adj", "propVarExpl")) {
+              if (colnames(observed)[si] %in% c("density", "propVarExpl")) {
                 order <- FALSE
               } else {
                 order <- TRUE
@@ -924,7 +924,7 @@ modulePreservation <- function(
               # Get the p-values
               p.values[mi, si] <- perm.test(
                 nulls[mi, si, ], observed[mi, si], 
-                genesPres[mi], length(overlapGenes),
+                varsPres[mi], length(overlapVars),
                 order=order, alternative=alternative
               )
               
@@ -934,11 +934,11 @@ modulePreservation <- function(
           # Order statistics: First density stats, then connectivity
           if (!is.null(sge[[di]])) {
             statOrder <- c(
-              "mean.adj", "pve", "cor.coexp", "cor.kIM", "cor.MM",
-              "mean.coexp", "mean.MM"
+              "density", "propVarExpl", "cor.cor", "cor.kIM", "cor.MM",
+              "mean.cor", "mean.MM"
             ) 
           } else {
-            statOrder <- c("mean.adj", "cor.kIM", "cor.coexp", "mean.coexp")
+            statOrder <- c("density", "cor.kIM", "cor.cor", "mean.cor")
           }
           
           
@@ -955,8 +955,8 @@ modulePreservation <- function(
             observed = observed[, statOrder],
             nulls = nulls,
             p.values = p.values[, statOrder],
-            nGenesPresent = genesPres,
-            propGenesPresent = propGenesPres,
+            nVarsPresent = varsPres,
+            propVarsPresent = propVarsPres,
             contingency = contingency
           )
           # remove NULL outputs

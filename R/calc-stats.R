@@ -52,7 +52,7 @@ calcStats <- function(
   )
   if ("pve" %in% names(testProps)) { # Detect if data has been provided
     stats <- c(
-      stats, pve = testProps[["pve"]],
+      stats, propVarExpl = testProps[["pve"]],
       mean.MM = mean(sign(discProps[["MM"]]) * testProps[["MM"]]),
       cor.MM = cor(discProps[["MM"]], testProps[["MM"]])
     )
