@@ -413,6 +413,7 @@ modulePreservation <- function(
   altMatch <- pmatch(alternative, validAlts)
   if (is.na(altMatch))
     stop("Alternative must be one of ", validAlts)
+  alternative <- validAlts[altMatch]
   
   if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)
     stop("'nCores' must be a single number greater than 0")
@@ -481,7 +482,7 @@ modulePreservation <- function(
   lapply(correlation, checkFinite)
   lapply(network, checkFinite)
   
-  # Temporarily create scaled gene expression set for the calculation of the
+  # Temporarily create scaled data set for the calculation of the
   # summary expression profile
   sge <- NULL
   if (!is.null(data))
@@ -656,13 +657,13 @@ modulePreservation <- function(
           }
           
           # To simplify later function calls, we need to get a vector of module
-          # assignments only for (a) modules of interest and (b) the genes 
+          # assignments only for (a) modules of interest and (b) the variables
           # present in both datasets for those modules.
-          overlapGenes <- intersect(
+          overlapVars <- intersect(
             colnames(correlation[[di]]), 
             colnames(correlation[[ti]])
           )
-          overlapAssignments <- moduleAssignments[[di]][overlapGenes]
+          overlapAssignments <- moduleAssignments[[di]][overlapVars]
           # Restrict to modules of interest
           modules <- unique(moduleAssignments[[di]])
           if (!is.null(exclude[[di]]))
@@ -675,25 +676,25 @@ modulePreservation <- function(
           
           if (length(overlapAssignments) == 0) {
             warning(
-              "No genes for the modules of interest are present in the test",
-              " dataset"
+              "No variables composing the modules of interest are present in", 
+              " the test dataset"
             )
             next
           }
           
-          # How many genes are present in the test dataset for the modules of 
-          # interest?
-          genesPres <- table(overlapAssignments)
+          # How many variables are present in the test dataset for the modules 
+          # of interest?
+          varsPres <- table(overlapAssignments)
           modulesWithNoOverlap <- modules %sub_nin% overlapAssignments
-          genesPres <- c(genesPres, rep(0, length(modulesWithNoOverlap)))
-          names(genesPres)[names(genesPres) == ""] <- modulesWithNoOverlap
-          genesPres <- genesPres[orderAsNumeric(names(genesPres))]
+          varsPres <- c(varsPres, rep(0, length(modulesWithNoOverlap)))
+          names(varsPres)[names(varsPres) == ""] <- modulesWithNoOverlap
+          varsPres <- varsPres[orderAsNumeric(names(varsPres))]
           
           # What proportion?
           moduleSizes <- table(moduleAssignments[[di]])
           moduleSizes <- moduleSizes[names(moduleSizes) %sub_in% modules]
-          propGenesPres <- genesPres / moduleSizes
-          propGenesPres <- propGenesPres[orderAsNumeric(names(propGenesPres))]
+          propVarsPres <- varsPres / moduleSizes
+          propVarsPres <- propVarsPres[orderAsNumeric(names(propVarsPres))]
           
           # Calculate some basic cross-tabulation statistics so we can assess 
           # which modules in both datasets map to each other, if module
@@ -702,8 +703,8 @@ modulePreservation <- function(
           if (!is.null(moduleAssignments[[ti]])) {
             # Get total number of nodes from each discovery subset in each test subset 
             contingency <- table(
-              moduleAssignments[[di]][overlapGenes], 
-              moduleAssignments[[ti]][overlapGenes]
+              moduleAssignments[[di]][overlapVars], 
+              moduleAssignments[[ti]][overlapVars]
             )
             # filter on subsets the user cares about
             contingency <- contingency[modules,,drop=FALSE]
@@ -717,7 +718,7 @@ modulePreservation <- function(
             
             # add in the module sizes from the respective datasets
             contingency <- cbind(rowSums(contingency), contingency)
-            testSizes <- table(moduleAssignments[[ti]][overlapGenes])
+            testSizes <- table(moduleAssignments[[ti]][overlapVars])
             testSizes <- testSizes[colnames(contingency)]
             
             contingency <- rbind(
@@ -739,8 +740,8 @@ modulePreservation <- function(
           discProps <- rep(list(NULL), nModules)
           names(discProps) <- overlapModules
           for (mi in overlapModules) {
-            modGenes <- names(overlapAssignments %sub_in% mi)
-            modInds <- match(modGenes, colnames(correlation[[di]]))
+            modVars <- names(overlapAssignments %sub_in% mi)
+            modInds <- match(modVars, colnames(correlation[[di]]))
             discProps[[mi]] <- moduleProps(network[[di]], modInds, sge[[di]])
           }
           
@@ -750,9 +751,9 @@ modulePreservation <- function(
           observed <- matrix(NA, nrow=nModules, ncol=nStatistics)
           rownames(observed) <- overlapModules
           for (mi in overlapModules) {
-            modGenes <- names(overlapAssignments %sub_in% mi)
-            discInds <- match(modGenes, colnames(correlation[[di]]))
-            testInds <- match(modGenes, colnames(correlation[[ti]]))
+            modVars <- names(overlapAssignments %sub_in% mi)
+            discInds <- match(modVars, colnames(correlation[[di]]))
+            testInds <- match(modVars, colnames(correlation[[ti]]))
             testProps <-  moduleProps(network[[ti]], testInds, sge[[ti]])
             stats <- calcStats(
               discProps[[mi]], testProps, 
@@ -809,10 +810,10 @@ modulePreservation <- function(
                 correlation <- lapply(correlation, attach.bigMatrix)
                 network <- lapply(network, attach.bigMatrix)
                 
-                #-----------------------------------------------------------------
-                # Calculate the module preservation statistics for each module on
-                #  a random subset of genes of the same size in the test dataset
-                #-----------------------------------------------------------------
+                #---------------------------------------------------------------
+                # Calculate the module preservation statistics for each module
+                # on a random subset of the same size in the test dataset
+                #---------------------------------------------------------------
                 chunkStats <- array(
                   NA, dim=c(nModules, nStatistics, length(chunk))
                 )
@@ -820,18 +821,18 @@ modulePreservation <- function(
                 dimnames(chunkStats)[[3]] <- paste0("permutation.", chunk)
                 for (pi in seq_along(chunk)) {
                   for (mi in overlapModules) {
-                    modGenes <- names(overlapAssignments %sub_in% mi)
-                    discInds <- match(modGenes, colnames(correlation[[di]]))
+                    modVars <- names(overlapAssignments %sub_in% mi)
+                    discInds <- match(modVars, colnames(correlation[[di]]))
                     
                     # Select a random subset of nodes of the same size as the subset 
                     # ss, depending on our null model.
-                    modSize <- length(modGenes)
+                    modSize <- length(modVars)
                     if (model == "overlap") {
-                      permGenes <- sample(names(overlapGenes), modSize)
+                      permVars <- sample(names(overlapVars), modSize)
                     } else {
-                      permGenes <- sample(colnames(correlation[[ti]]), modSize)
+                      permVars <- sample(colnames(correlation[[ti]]), modSize)
                     }
-                    permInds <- match(permGenes, colnames(correlation[[ti]]))
+                    permInds <- match(permVars, colnames(correlation[[ti]]))
                     # Ensure crashes aren't fatal
                     tryCatch({
                       permProps <- moduleProps(network[[ti]], permInds, sge[[ti]])
@@ -917,9 +918,6 @@ modulePreservation <- function(
                 } else {
                   alternative <- "two.sided"
                 }
-              } else {
-                alternative <- validAlts[altMatch]
-              }
               
               # Get the p-values
               p.values[mi, si] <- perm.test(
