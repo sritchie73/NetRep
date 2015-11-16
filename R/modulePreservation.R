@@ -910,15 +910,6 @@ modulePreservation <- function(
                 order <- TRUE
               }
               
-              # If the two-sided alternative has been specified, it only makes
-              # sense to use it on the correlation-based statistics.
-              if (altMatch == 1) {
-                if (colnames(observed)[si] %in% c("mean.adj", "propVarExpl")) {
-                  alternative <- "greater"
-                } else {
-                  alternative <- "two.sided"
-                }
-              
               # Get the p-values
               p.values[mi, si] <- perm.test(
                 nulls[mi, si, ], observed[mi, si], 
