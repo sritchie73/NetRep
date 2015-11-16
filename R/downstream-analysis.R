@@ -367,13 +367,13 @@ networkProperties <- function(
 #' adjA <- as.bigMatrix(adjA, "adjA_bm")
 #' 
 #' ## Example 1: get the ordering of samples for a single module
-#' geneOrder(
+#' nodeOrder(
 #'   geA, coexpA, adjA, moduleAssignments, modules="2"
 #' )
 #' 
 #' ## Example 2: get the order of genes of an arbitrary subset
 #' ## (the first 10 genes)
-#' geneOrder(
+#' nodeOrder(
 #'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10]
 #' )
 #' 
