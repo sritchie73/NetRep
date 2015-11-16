@@ -13,6 +13,6 @@ rangeBigMatrix(x, subsetIndices)
 }
 \description{
 Note subsetting only applies to columns: this is only meant for use with the 
-gene expression matrix.
+'data' matrices.
 }
 
