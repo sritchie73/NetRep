@@ -1,4 +1,4 @@
-context("Testing modulePreservation function")
+context("Testing `modulePreservation` function")
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
 
@@ -25,20 +25,6 @@ exprSets <- list(
 )
 moduleAssignments <- list(a=sample(1:7, 100, replace=TRUE), b=NULL)
 names(moduleAssignments[[1]]) <- gn1
-
-test_that("Network properties function runs without error", {
-  expect_is(
-    networkProperties(
-      exprSets, coexpSets, adjSets, moduleAssignments, modules="1"
-    ), "list"
-  )
-  sink(file.path(tempdir(), "tmp.log")) # ignore warnings
-  props <- networkProperties(
-    exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10]
-  )
-  sink()
-  expect_is(props, "list")
-})
 
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
