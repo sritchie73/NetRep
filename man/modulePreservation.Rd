@@ -52,6 +52,11 @@ Must be either "overlap" or "all" (see details).}
 \item{alternative}{The type of module preservation test to perform. Must be 
 one of "greater" (default), "less" or "two.sided" (see details).}
 
+\item{statCorMethod}{character vector indicating method to use when calculating 
+the correlation based statistics (see details). Must be one of "pearson", 
+"spearman", or "kendall". If the WGCNA package is installed then "bicor" 
+may also be specified as an option (see \code{\link[WGCNA]{bicor}}).}
+
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}
 
@@ -103,6 +108,13 @@ The returned data structure is organised as a nested list of lists, which
      dataset.
    }
  }
+}
+\description{
+Quantify the preservation of network modules (sub-graphs) in an independent
+dataset through permutation testing on module topology. Seven network
+statistics (see details) are calculated for each module and then tested by
+comparing to distributions generated from their calculation on random subsets
+in the test dataset.
 }
 \details{
 \subsection{Input data structure:}{

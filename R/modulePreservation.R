@@ -1,6 +1,5 @@
 #' Replication and preservation of network modules across datasets
 #' 
-#' \description{
 #' Quantify the preservation of network modules (sub-graphs) in an independent
 #' dataset through permutation testing on module topology. Seven network
 #' statistics (see details) are calculated for each module and then tested by
@@ -29,7 +28,7 @@
 #' @param statCorMethod character vector indicating method to use when calculating 
 #'   the correlation based statistics (see details). Must be one of "pearson", 
 #'   "spearman", or "kendall". If the WGCNA package is installed then "bicor" 
-#'   may also be specified as an option (see \code{\link[WGCNA]{bicor}). 
+#'   may also be specified as an option (see \code{\link[WGCNA]{bicor}}). 
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' @param simplify logical; if \code{TRUE}, simplify the structure of the output
 #'  list if possible (see Return Value).
