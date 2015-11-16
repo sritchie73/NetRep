@@ -298,24 +298,20 @@ orderAsNumeric <- function(vec) {
   })
 }
 
-#' Get unordered genes
+#' Get variables composing a module
 #' 
-#' Get the genes for the user specified modules in the order they appear in 
-#' the moduleAssignments vector for the discovery dataset.
+#' Get the variables composing the user specified modules in the order they 
+#' appear in the 'moduleAssignments' vector for the discovery dataset.
 #' 
-#' @param moduleAssignments a vector assigning genes to modules, or a list of 
-#'  such vectors.
+#' @param moduleAssignments a vector of the module assignment for each variable
+#'  in the discovery dataset. If there are multiple discovery datasets 
+#' then this argument should be a list of such vectors.  
 #' @param modules a vector of modules to apply the function to.
 #' @param discovery name or index denoting which dataset the module of
 #'  interest was discovered in.
 #'  
-#' @details
-#'  Genes are retrieved from the discovery dataset, rather than the test 
-#'  dataset, because some genes from the discovery dataset may not appear in
-#'  the test dataset. 
-#'  
-#' @rdname getUnsortedGenes
-getGenes <- function(
+#' @rdname getModuleVarsUnsorted
+getModuleVarsUnsorted <- function(
   moduleAssignments, modules, discovery=1
 ) {
   foreach(mi = modules, .combine=c) %do% {

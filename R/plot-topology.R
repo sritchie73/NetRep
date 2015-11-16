@@ -674,7 +674,7 @@ plotCoexpression <- function(
   # 'orderGenesBy'.
   #-----------------------------------------------------------------------------
   if (orderGenesBy == "none") {
-    geneOrder <- getGenes(moduleAssignments, modules, discovery)
+    geneOrder <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
   } else if (orderGenesBy == "discovery") {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
@@ -811,7 +811,7 @@ plotAdjacency <- function(
   # 'orderGenesBy'.
   #-----------------------------------------------------------------------------
   if (orderGenesBy == "none") {
-    geneOrder <- getGenes(moduleAssignments, modules, discovery)
+    geneOrder <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
   } else if (orderGenesBy == "discovery") {
     if (missing(orderModules))
       orderModules <- ifelse(is.null(geneExpression[[discovery]]), FALSE, TRUE)
@@ -1434,7 +1434,7 @@ plotExpressionLegend <- function(
   #-----------------------------------------------------------------------------
   # Get the range of gene expression for the modules in the test dataset 
   #-----------------------------------------------------------------------------
-  modGenes <- getGenes(moduleAssignments, modules, discovery)
+  modGenes <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
   modGenes <- modGenes %sub_in% colnames(geneExpression[[test]])
   if (length(modGenes) == 0)
     stop("None of the module genes are present in the test dataset")
