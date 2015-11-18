@@ -16,6 +16,7 @@
 #'  If not specified, the number of permutations will be automatically 
 #'  determined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
+#'  Ignored if the user has already registered a parallel backend.
 #' @param exclude an optional vector of modules to exclude from the analysis. If
 #'   there are multiple discovery datasets a list of vectors may be provided.
 #' @param include an optional vector of modules to include in the
@@ -264,7 +265,7 @@
 #' # Now format the data for input to modulePreservation
 #' data <- list(
 #'   cohortA=as.bigMatrix(geA, "geA_bm"),
-#'   cohortB=as.bigMatrix(geA, "geA_bm")    
+#'   cohortB=as.bigMatrix(geA, "geB_bm")    
 #' )
 #' correlation <- list(
 #'   cohortA=as.bigMatrix(coexpA, "coexpA_bm"),
@@ -511,7 +512,13 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   # Set up parallel backend
   #-----------------------------------------------------------------------------
-  if (.Platform$OS.type == "windows" & nCores > 1) {
+  if (getDoParWorkers() > 1) {
+    vCat(
+      verbose, 0, "Using user-registered parallel backend with 1 reporter core",
+      "and", getDoParWorkers() - 1, "worker cores."
+    )
+  }
+  else if (.Platform$OS.type == "windows" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
     if(suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {

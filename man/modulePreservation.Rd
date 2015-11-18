@@ -32,7 +32,8 @@ then this argument should be a list of such vectors.}
 \item{test}{name or index denoting the dataset(s) to test module preservation 
 in.}
 
-\item{nCores}{number of cores to parallelise the permutation procedure over.}
+\item{nCores}{number of cores to parallelise the permutation procedure over.
+Ignored if the user has already registered a parallel backend.}
 
 \item{nPerm}{number of permutations to use. Can be specified as a vector if
 a different number of permutations is desired for each discovery dataset.
@@ -282,7 +283,7 @@ adjB <- abs(coexpB)^6 # adjacency
 # Now format the data for input to modulePreservation
 data <- list(
   cohortA=as.bigMatrix(geA, "geA_bm"),
-  cohortB=as.bigMatrix(geA, "geA_bm")    
+  cohortB=as.bigMatrix(geA, "geB_bm")    
 )
 correlation <- list(
   cohortA=as.bigMatrix(coexpA, "coexpA_bm"),
