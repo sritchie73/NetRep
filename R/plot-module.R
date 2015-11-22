@@ -561,12 +561,14 @@ plotModule <- function(
     )
     
     # Plot the data matrix
-    ge <- data[[test]][presentSamples, presentVars]
-    range.dat <- range(ge)
+    dat <- data[[test]][presentSamples, presentVars]
+    range.dat <- range(dat)
     if (all(range.dat > 0)) {
       palette <- tail(data.palette(), length(data.palette())/2)
+      range.pal <- range.dat
     } else if (all(range.dat < 0)) {
       palette <- head(data.palette(), length(data.palette())/2)
+      range.pal <- range.dat
     } else {
       palette <- data.palette()
       range.pal <- c(-max(abs(range.dat)), max(abs(range.dat)))
@@ -580,7 +582,7 @@ plotModule <- function(
       yaxt <- sampleOrder
     par(mar=c(1, 1, 1, 1))
     plotSquareHeatmap(
-      ge, palette, vlim=range.pal, legend.lim=range.dat,
+      dat, palette, vlim=range.pal, legend.lim=range.dat,
       moduleAssignments[[discovery]][nodeOrder], na.pos.x, na.pos.y, 
       xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
@@ -591,16 +593,16 @@ plotModule <- function(
     if (all(range.dat < 0)) {
       addGradientLegend(
         head(palette, length(palette)/2), range.dat, range.dat, TRUE, 
-        xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
-        ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3), 
+        xlim=c(0.5+ncol(dat)*0.1,ncol(dat)+0.5-ncol(dat)*0.1), 
+        ylim=c(nrow(dat)+0.5+nrow(dat)*0.2,nrow(dat)+0.5+nrow(dat)*0.3), 
         tick.size=legend.tick.size, border.width=border.width,
         main="Module data", axis.line=laxt.line
       )
     } else if (all(range.dat > 0)) {
       addGradientLegend(
         tail(palette, length(palette)/2), range.dat, range.dat, TRUE, 
-        xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
-        ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3), 
+        xlim=c(0.5+ncol(dat)*0.1,ncol(dat)+0.5-ncol(dat)*0.1), 
+        ylim=c(nrow(dat)+0.5+nrow(dat)*0.2,nrow(dat)+0.5+nrow(dat)*0.3), 
         tick.size=legend.tick.size, border.width=border.width,
         main="Module data", axis.line=laxt.line
       )
@@ -608,8 +610,8 @@ plotModule <- function(
       plim <- c(-max(abs(range.dat)), max(abs(range.dat)))
       addGradientLegend(
         palette, plim, range.dat, TRUE, main="Module data",
-        xlim=c(0.5+ncol(ge)*0.1,ncol(ge)+0.5-ncol(ge)*0.1), 
-        ylim=c(nrow(ge)+0.5+nrow(ge)*0.2,nrow(ge)+0.5+nrow(ge)*0.3),  
+        xlim=c(0.5+ncol(dat)*0.1,ncol(dat)+0.5-ncol(dat)*0.1), 
+        ylim=c(nrow(dat)+0.5+nrow(dat)*0.2,nrow(dat)+0.5+nrow(dat)*0.3),  
         tick.size=legend.tick.size, border.width=border.width,
         axis.line=laxt.line
       )

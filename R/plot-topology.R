@@ -529,14 +529,16 @@ plotData <- function(
   #-----------------------------------------------------------------------------
   # First we need to set up the color palette for the data, which 
   # includes the fact that the range may be unbalanced around 0.
-  ge <- data[[test]][presentSamples, presentVars]
-  range.ge <- range(ge)
-  if (all(range.ge > 0)) {
+  dat <- data[[test]][presentSamples, presentVars]
+  range.dat <- range(dat)
+  if (all(range.dat > 0)) {
     palette <- tail(palette, length(palette)/2)
-  } else if (all(range.ge < 0)) {
+    range.pal <- range.dat
+  } else if (all(range.dat < 0)) {
     palette <- head(palette, length(palette)/2)
+    range.pal <- range.dat
   } else {
-    range.pal <- c(-max(abs(range.ge)), max(abs(range.ge)))
+    range.pal <- c(-max(abs(range.dat)), max(abs(range.dat)))
   }
   xaxt <- NULL
   if (plotNodeNames)
@@ -545,7 +547,7 @@ plotData <- function(
   if (plotSampleNames)
     yaxt <- sampleOrder
   plotSquareHeatmap(
-    ge, palette, vlim=range.pal, legend.lim=range.ge,
+    dat, palette, vlim=range.pal, legend.lim=range.dat,
     moduleAssignments[[discovery]][nodeOrder], na.pos.x, na.pos.y, 
     xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
