@@ -517,6 +517,7 @@ modulePreservation <- function(
       verbose, 0, "Using user-registered parallel backend with 1 reporter core",
       "and", getDoParWorkers() - 1, "worker cores."
     )
+    nCores <- getDoParWorkers()
   }
   else if (.Platform$OS.type == "windows" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
