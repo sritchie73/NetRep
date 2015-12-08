@@ -512,13 +512,17 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   # Set up parallel backend
   #-----------------------------------------------------------------------------
+  
+  # First, check whether the user has already set up a parallel backend. In this
+  # case, we can ignore the `nCores` argument.
   if (getDoParWorkers() > 1) {
     vCat(
       verbose, 0, "Using user-registered parallel backend with 1 reporter core",
       "and", getDoParWorkers() - 1, "worker cores."
     )
     nCores <- getDoParWorkers()
-  }
+  } 
+  # If the user is on a Windows machine, we have to use the `doParallel` package 
   else if (.Platform$OS.type == "windows" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
@@ -547,7 +551,6 @@ modulePreservation <- function(
         TRUE, 0, file=stderr(),
         "Warning: unable to find 'doParallel' package, running on 1 core." 
       )
-      warning("U")
     }
   } else if (.Platform$OS.type == "unix" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
@@ -577,7 +580,9 @@ modulePreservation <- function(
   } else {
     vCat(verbose, 0, "Running on 1 cores.")
   }
-  # Suppress annoying foreach warning if running in serial
+  
+  # Suppress annoying foreach warning generated when using %dopar% and running 
+  # in serial
   if (nCores == 1) {
     suppressWarnings({
       ii <- 0 # suppress R CMD check note
