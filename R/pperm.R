@@ -40,6 +40,9 @@ perm.test <- function(
   if (is.na(altMatch))
     stop("Alternative must be one of ", validAlts)
   
+  if (is.na(observed))
+    return(NA)
+  
   if (order) {
     total.nperm = prod(totalSize:(totalSize - subsetSize + 1))
   } else {
