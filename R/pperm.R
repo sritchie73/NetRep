@@ -48,8 +48,8 @@ perm.test <- function(
   permuted <- sort(permuted)
   nPerm <- length(permuted)
   
-  less.extreme <- length(permuted[permuted < observed])
-  more.extreme <- length(permuted[permuted > observed])
+  less.extreme <- length(permuted[permuted <= observed])
+  more.extreme <- length(permuted[permuted >= observed])
   lower.pval <- permp(less.extreme, nPerm, total.nperm=total.nperm)
   upper.pval <- permp(more.extreme, nPerm, total.nperm=total.nperm)
   
