@@ -51,7 +51,7 @@ calcStats <- function(
     cor.cor = cor(cList[["cor.discovery"]], cList[["cor.test"]]),
     avg.cor = cList[["corDensity"]]
   )
-  if ("pve" %in% names(testProps)) { # Detect if data has been provided
+  if ("moduleCoherence" %in% names(testProps)) { # Detect if data has been provided
     stats <- c(
       stats, coherence = testProps[["moduleCoherence"]],
       avg.contrib = mean(sign(discProps[["nodeContribution"]]) * testProps[["nodeContribution"]]),
