@@ -25,8 +25,9 @@ for the \emph{test} dataset.}
 }
 \value{
 a vector containing the values for all the module preservation
-statistics: \emph{density}, \emph{cor.kIM}, \emph{pve}, \emph{mean.MM},
-\emph{cor.MM}, \emph{cor.cor}, and \emph{mean.cor}.
+statistics: \emph{avg.weight}, \emph{cor.degree}, 
+\emph{coherence}, \emph{avg.contrib}, \emph{cor.contrib}, \emph{cor.cor}, and 
+\emph{avg.cor}.
 }
 \description{
 Calculates the modules preservation statistics using the pre-calculated 

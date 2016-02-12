@@ -38,23 +38,24 @@
 #'  
 #' @return 
 #' a vector containing the values for all the module preservation
-#' statistics: \emph{density}, \emph{cor.kIM}, \emph{pve}, \emph{mean.MM},
-#' \emph{cor.MM}, \emph{cor.cor}, and \emph{mean.cor}.
+#' statistics: \emph{avg.weight}, \emph{cor.degree}, 
+#' \emph{coherence}, \emph{avg.contrib}, \emph{cor.contrib}, \emph{cor.cor}, and 
+#' \emph{avg.cor}.
 calcStats <- function(
   discProps, testProps, discCor, discIndices, testCor, testIndices
 ) {
   cList <- corStats(discCor, discIndices, testCor, testIndices)
   stats <- c(
-    density = testProps[["density"]],
-    cor.kIM = cor(discProps[["kIM"]], testProps[["kIM"]]),
+    avg.weight = testProps[["averageEdgeWeight"]],
+    cor.degree = cor(discProps[["weightedDegree"]], testProps[["weightedDegree"]]),
     cor.cor = cor(cList[["cor.discovery"]], cList[["cor.test"]]),
-    mean.cor = cList[["mean.cor"]]
+    avg.cor = cList[["corDensity"]]
   )
   if ("pve" %in% names(testProps)) { # Detect if data has been provided
     stats <- c(
-      stats, propVarExpl = testProps[["pve"]],
-      mean.MM = mean(sign(discProps[["MM"]]) * testProps[["MM"]]),
-      cor.MM = cor(discProps[["MM"]], testProps[["MM"]])
+      stats, coherence = testProps[["moduleCoherence"]],
+      avg.contrib = mean(sign(discProps[["nodeContribution"]]) * testProps[["nodeContribution"]]),
+      cor.contrib = cor(discProps[["nodeContribution"]], testProps[["nodeContribution"]])
     )
   }
   stats
