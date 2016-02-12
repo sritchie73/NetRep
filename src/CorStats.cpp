@@ -22,7 +22,7 @@ using namespace arma;
 //     discovery dataset (cor.discovery).
 //    - a flattened vector of the module's correlation structure in the 
 //      test dataset (cor.test).
-//    - sign aware mean of the correlation (mean.cor)
+//    - density of the correlation structure (corDensity)
 template <typename S, typename T>
 List CorStats(
   XPtr<BigMatrix> xpCorD, MatrixAccessor<S> matCorD, IntegerVector dIdx,
@@ -50,20 +50,21 @@ List CorStats(
   return List::create(
     Named("cor.discovery") = corD,
     Named("cor.test") = corT,
-    Named("mean.cor") = meanCor
+    Named("corDensity") = meanCor
   );  
 }
 
-//' Calculate the correlation based statistics
+//' Calculate the correlation structure based statistics
 //'
-//' Both of the correlation statistics are calculated using all pairwise 
-//' correlation values in both the \emph{discovery} and \emph{test} datasets.
-//' For the other statistics, it makes sense to calculate the 
-//' properties for the discovery network in advance to reduce calculation time
-//' and memory. However, for the correaltion statistics this strategy doesn't 
-//' make sense since we'd have to store a huge component of the discovery 
-//' correlation structure.
-//'
+//' Both of the "concordance of correlation structure" and "density of 
+//' correlation structure" are calculated using all pairwise 
+//' correlation coefficients between nodesin both the \emph{discovery} and 
+//' \emph{test} datasets. For the other module preservation statistics we can
+//' store components of each statistic calculated in each dataset separately,
+//' and save time by only calculating them in the discovery dataset once. 
+//' This would have a substantial memory overhead for the correlation structure
+//' based statistics, so we don't use this strategy.
+//' 
 //' @param pCorD,pCorT SEXP containers for the pointers to the correlation 
 //'  structure matrices for the \emph{discovery} and \emph{test} networks.
 //' @param discIndices,testIndices indices of the network subset in
@@ -80,8 +81,8 @@ List CorStats(
 //'       A flattened vector of the module's correlation structure in the 
 //'       \emph{test} dataset.
 //'     }
-//'     \item{\emph{mean.cor}:}{
-//'       The mean sign-aware correlation density of the network module.
+//'     \item{\emph{corDensity}:}{
+//'       The mean sign-aware correlation structure density of the network module.
 //'     }
 //'   }
 //'   

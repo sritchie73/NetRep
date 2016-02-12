@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{CorStats}
 \alias{CorStats}
-\title{Calculate the correlation based statistics}
+\title{Calculate the correlation structure based statistics}
 \usage{
 CorStats(pCorD, discIndices, pCorT, testIndices)
 }
@@ -24,19 +24,20 @@ A vector containing:
       A flattened vector of the module's correlation structure in the 
       \emph{test} dataset.
     }
-    \item{\emph{mean.cor}:}{
-      The mean sign-aware correlation density of the network module.
+    \item{\emph{corDensity}:}{
+      The mean sign-aware correlation structure density of the network module.
     }
   }
 }
 \description{
-Both of the correlation statistics are calculated using all pairwise 
-correlation values in both the \emph{discovery} and \emph{test} datasets.
-For the other statistics, it makes sense to calculate the 
-properties for the discovery network in advance to reduce calculation time
-and memory. However, for the correaltion statistics this strategy doesn't 
-make sense since we'd have to store a huge component of the discovery 
-correlation structure.
+Both of the "concordance of correlation structure" and "density of 
+correlation structure" are calculated using all pairwise 
+correlation coefficients between nodesin both the \emph{discovery} and 
+\emph{test} datasets. For the other module preservation statistics we can
+store components of each statistic calculated in each dataset separately,
+and save time by only calculating them in the discovery dataset once. 
+This would have a substantial memory overhead for the correlation structure
+based statistics, so we don't use this strategy.
 }
 \references{
 \enumerate{

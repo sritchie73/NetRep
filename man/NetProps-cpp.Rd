@@ -2,23 +2,24 @@
 % Please edit documentation in R/RcppExports.R
 \name{NetProps}
 \alias{NetProps}
-\title{Calculate Mean Adjacency and Intramodular Connectivity}
+\title{Calculate the topological properties based on network edge weights}
 \usage{
 NetProps(pAdjacency, subsetIndices)
 }
 \arguments{
-\item{pAdjacency}{SEXP container for the pointer to the adjacency matrix.}
+\item{pAdjacency}{SEXP container for the pointer to the adjacency matrix of
+the interaction network.}
 
 \item{subsetIndices}{indices of the network subset of interest.}
 }
 \value{
 A List containing:
   \enumerate{
-    \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
-    \item{\emph{mean.adj}:}{The mean absolute edge weight of the network subset.}
+    \item{\emph{weightedDegree}:}{The weighted within-module degree for each node.}
+    \item{\emph{averageEdgeWeight}:}{The mean absolute edge weight of the network subset.}
   }
 }
 \description{
-Calculate Mean Adjacency and Intramodular Connectivity
+Calculate the topological properties based on network edge weights
 }
 

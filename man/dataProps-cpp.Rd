@@ -17,14 +17,15 @@ data matrix used to construct the network.}
 A list containing:
  \enumerate{
   \item{\emph{"moduleSummary"}:}{
-    The module summary profile (see details).
+    The module's summary profile (see details).
   }
-  \item{\emph{"MM"}:}{
-    The Module Membership of each node (see details).
+  \item{\emph{"nodeContribution"}:}{
+    The contribution of each node to the module's summary profile (see 
+    details).
   }
-  \item{\emph{"pve"}:}{
-    The proportion of the variance explained by the module's summary 
-     profile (see details).
+  \item{\emph{"moduleCoherence"}:}{
+    The proportion of the variance in the data explained by the module's 
+    summary profile (see details).
   }
  }
 }
@@ -32,17 +33,21 @@ A list containing:
 Get the module summary vector and the proportion of variance it explains
 }
 \details{
-First, the module summary profile (SP) is calculated as the first 
- eigenvector of a principal component analysis of the variables composing 
- the module of interest. The orientation of the eigenvector is modified so 
- that its sign is in the same direction as the module on average. I.e. for 
- gene expression data this is the "module eigengene" \emph{(1)}.
+First, the module summary profile ('moduleSummary') is calculated as the
+ first eigenvector of a principal component analysis of the variables
+ composing the module of interest. The orientation of the eigenvector is
+ modified so that its sign is in the same direction as the module on
+ average. I.e. for gene expression data this is the "module eigengene"
+ \emph{(1)}.
  
- The Module Membership (MM) is the correlation between each variable 
- composing the module and the module's summary profile.
+ Each node's contribution to the summary profile ('nodeContribution') is
+ quantified as the correlation between each variable composing the module
+ and the module's summary profile. For weighted gene coexpression networks,
+ this is typically referred to as the 'module membership' \emph{(1)}.
  
- The proportion of module variance explained by the summary profile (pve) 
- is quantified as the average square of the Module Membership \emph{(1)}.
+ The The proportion of module variance explained by the summary profile
+ ('moduleCoherence') is quantified as the average square of the
+ 'nodeContribution' \emph{(1)}.
 }
 \references{
 \enumerate{

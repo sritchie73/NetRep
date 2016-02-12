@@ -10,12 +10,13 @@ using namespace arma;
 
 /* Implementation of NetProps
  *
- * @param adj the armadillo compatible network adjacency matrix.
+ * @param adj the armadillo compatible network adjacency matrix of
+ *   the interaction network.
  * @param subsetIndices indices of the network module of interest.
  * @return
  *    A List containing:
- *     - The weighted within-subset degree for each node (kIM).
- *     - The mean edge weight of the network module (density).
+ *     - The weighted within-subset degree for each node ('weightedDegree').
+ *     - The mean edge weight of the network module ('averageEdgeWeight').
  */
 template <typename T>
 List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
@@ -31,29 +32,30 @@ List NetProps(const Mat<T>& adj, IntegerVector subsetIndices) {
   
   int n = subsetIndices.size();
   
-  // To make sure the resulting KIM vector is in the correct order,
+  // To make sure the resulting vector is in the correct order,
   // order the results to match the original ordering of subsetIndices.
   Function rank("rank"); // Rank only works on R objects like IntegerVector.
   uvec idxRank = as<uvec>(rank(subsetIndices)) - 1;
 
-  Col<T> oKIM = colSums(idxRank);
+  Col<T> wDegree = colSums(idxRank);
 
   return List::create(
-    Named("kIM") = oKIM,
-    Named("density") = sum(colSums, 1) / (n*n - n)
+    Named("weightedDegree") = wDegree,
+    Named("averageEdgeWeight") = sum(colSums, 1) / (n*n - n)
   );
 }                                                                                                                                                                                                                                          
 
-//' Calculate Mean Adjacency and Intramodular Connectivity
+//' Calculate the topological properties based on network edge weights
 //'
-//' @param pAdjacency SEXP container for the pointer to the adjacency matrix.
+//' @param pAdjacency SEXP container for the pointer to the adjacency matrix of
+//'   the interaction network.
 //' @param subsetIndices indices of the network subset of interest.
 //'   
 //' @return
 //'   A List containing:
 //'   \enumerate{
-//'     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
-//'     \item{\emph{mean.adj}:}{The mean absolute edge weight of the network subset.}
+//'     \item{\emph{weightedDegree}:}{The weighted within-module degree for each node.}
+//'     \item{\emph{averageEdgeWeight}:}{The mean absolute edge weight of the network subset.}
 //'   }
 //' @rdname NetProps-cpp
 // [[Rcpp::export]]
