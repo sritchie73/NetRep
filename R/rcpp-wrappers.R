@@ -32,8 +32,8 @@ NULL
 #'    } \item{\emph{cor.test}:}{
 #'       A flattened vector of the module's correlation structure in the 
 #'       \emph{test} dataset.
-#'    } \item{\emph{mean.cor}:}{
-#'      The mean sign-aware correlation density of the network subset.
+#'    } \item{\emph{corDensity}:}{
+#'      The mean sign-aware correlation structure density of the network module.
 #'    }
 #'  } 
 corStats <- function(
@@ -65,12 +65,11 @@ corStats <- function(
 #' @return 
 #'  \code{netProps:} a list of containing:  
 #'  \enumerate{
-#'    \item{\emph{kIM}:}{
-#'      The intramodular connectivity (the weighted within-subset 
-#'      degree for each network node)
+#'    \item{\emph{weightedDegree}:}{
+#'      The weighted degree (within the module) for each node.
 #'    }
-#'    \item{\emph{density}:}{
-#'      The mean edge weight within the network module 
+#'    \item{\emph{averageEdgeWeight}:}{
+#'      The mean absolute edge weight of the network subset.
 #'    }
 #'  }
 netProps <- function(adj, moduleIndices) {
@@ -93,11 +92,11 @@ netProps <- function(adj, moduleIndices) {
 #'   \code{dataProps:} a list containing:
 #'   \enumerate{
 #'    \item{\emph{moduleSummary}:}{The module summary vector.}
-#'    \item{\emph{MM}:}{
-#'      The module membership for each variable, i.e. the correlation between
-#'      each variable and the module summary vector.
+#'    \item{\emph{nodeContribution}:}{
+#'      The contribution of each node to the module's summary profile , i.e. 
+#'      the correlation between each variable and the module summary vector.
 #'    }
-#'    \item{\emph{pve}:}{
+#'    \item{\emph{moduleCoherence}:}{
 #'      The proportion of module variance explained by the module summary vector. 
 #'    }
 #'   }
