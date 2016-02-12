@@ -39,30 +39,28 @@ simplified if only one module is specified.}
 \value{
 A list of network properties for each module of interest:
  \itemize{
-   \item{connectivity:}{
-     The sum of the within-module weighted node degree for each variable 
-     composing the module. This is equivalent to the intramodular 
-     connectivity for weighted gene coexpression networks \emph{(1)}.  
+   \item{\code{'degree'}:}{
+     The weighted within-module degree: the sum of edge weights for each 
+     node in the module.
    }
-   \item{density:}{
+   \item{\code{'avgWeight'}:}{
      The average edge weight within the module.
    }
  }
- If the underlying data is provided for the \code{test} dataset's network 
+ If the data used to infer the \code{test} network is provided  
  then the following are also returned:
  \itemize{
-   \item{moduleSummary:}{
+   \item{\code{'summary'}:}{
      A vector summarising the module across each sample. This is calculated 
      as the first eigenvector of the module from a principal component 
-     analysis. This is equivalent to the module eigengene for weighted gene
-     coexpression networks, see \emph{(1)}.
+     analysis.
    }
-   \item{moduleMembership:}{
-     The correlation between each variable composing the module and the 
-     \code{moduleSummary}.
+   \item{\code{'contribution'}:}{
+     The \emph{node contribution}: the similarity between each node and the
+     \emph{module summary profile} (\code{'summary'}).
    }
-   \item{propVarExpl:}{
-     The proportion of module variance explained by the \code{moduleSummary}
+   \item{\code{'coherence'}:}{
+     The proportion of module variance explained by the \code{'summary'}
      vector.
    }
  }
@@ -195,14 +193,5 @@ networkProperties(
 unlink("*_bm*")
 }
 
-}
-\references{
-\enumerate{
-   \item{
-     Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-     selection better than standard meta-analysis?} PLoS One \strong{8}, 
-     e61505 (2013).
-   }
-}
 }
 

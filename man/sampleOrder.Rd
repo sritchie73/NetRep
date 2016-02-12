@@ -172,13 +172,4 @@ unlink("*_bm*")
 }
 
 }
-\references{
-\enumerate{
-   \item{
-     Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-     selection better than standard meta-analysis?} PLoS One \strong{8}, 
-     e61505 (2013).
-   }
-}
-}
 

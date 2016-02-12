@@ -94,8 +94,8 @@ more network modules.
 
 Individual components of the module plot can be plotted using 
 \code{\link{plotCorrelation}}, \code{\link{plotNetwork}}, 
-\code{\link{plotConnectivity}}, \code{\link{plotModuleMembership}}, 
-\code{\link{plotData}}, and \code{\link{plotModuleSummary}}.
+\code{\link{plotDegree}}, \code{\link{plotContribution}}, 
+\code{\link{plotData}}, and \code{\link{plotSummary}}.
 }
 \details{
 \subsection{Input data structure:}{
@@ -264,21 +264,12 @@ unlink("*_bm*")
 }
 
 }
-\references{
-\enumerate{
-   \item{
-     Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-     selection better than standard meta-analysis?} PLoS One \strong{8}, 
-     e61505 (2013).
-   }
-}
-}
 \seealso{
 \code{\link{plotCorrelation}}, 
 \code{\link{plotNetwork}},
-\code{\link{plotConnectivity}},
-\code{\link{plotModuleMembership}},
+\code{\link{plotDegree}},
+\code{\link{plotContribution}},
 \code{\link{plotData}}, and
-\code{\link{plotModuleSummary}}.
+\code{\link{plotSummary}}.
 }
 

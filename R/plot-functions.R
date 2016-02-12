@@ -114,8 +114,8 @@ plotTriangleHeatmap <- function(
     pw <- nGenes
     addGradientLegend(
       palette, vlim, legend.lim, TRUE, legend.main,
-      xlim=c(0.5 - pw*legend.line, pw*0.27), 
-      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.27), tick.size=legend.tick.size,
+      xlim=c(0.5 - pw*legend.line, pw*0.25), 
+      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tick.size=legend.tick.size,
       axis.line=laxt.line, border.width=border.width
     )
   }

@@ -47,11 +47,11 @@ a list of vectors, one list element for each module. If \code{TRUE}, the
 returned data structure will be a single vector of ordered genes.}
 }
 \value{
-A vector of variable names in descending order of intramodular connectivity 
+A vector of variable names in descending order of weighted degree
  for each module.
 }
 \description{
-Order nodes in descending order of intra-module connectivity and order 
+Order nodes in descending order of \emph{weighted degree} and order 
 modules by the similarity of their summary vectors.
 }
 \details{

@@ -218,7 +218,7 @@ in the test dataset.
  contribute strongly, then this statistic will not be meaningful as its value
  will be heavily influenced by tiny variations in node rank. This can be
  assessed through visualisation of the module topology (see 
- \code{\link{plotNodeContribution}}.) Similarly, a strong
+ \code{\link{plotContribution}}.) Similarly, a strong
  \code{'cor.contrib'} is unlikely to be meaningful if the
  \code{'avg.contrib'} is not significant.
  
@@ -267,7 +267,8 @@ in the test dataset.
  typically called the "intramodular connectivity" \emph{(2)}. This statistic 
  will not be meaningful where all nodes are connected to each other with 
  similar strength, as its value will be heavily influenced by tiny,
- non-meaningful, variations in weighted degree.
+ non-meaningful, variations in weighted degree. This can be assessed through
+ visualisation of the module topology (see \code{\link{plotDegree}}.)
  
  Both the \code{'avg.weight'} and \code{'cor.degree'} assume edges are 
  weighted, and that the network is densely connected. Note that for sparse 

@@ -50,42 +50,31 @@
 #' @return 
 #'  A list of network properties for each module of interest:
 #'  \itemize{
-#'    \item{connectivity:}{
-#'      The sum of the within-module weighted node degree for each variable 
-#'      composing the module. This is equivalent to the intramodular 
-#'      connectivity for weighted gene coexpression networks \emph{(1)}.  
+#'    \item{\code{'degree'}:}{
+#'      The weighted within-module degree: the sum of edge weights for each 
+#'      node in the module.
 #'    }
-#'    \item{density:}{
+#'    \item{\code{'avgWeight'}:}{
 #'      The average edge weight within the module.
 #'    }
 #'  }
-#'  If the underlying data is provided for the \code{test} dataset's network 
+#'  If the data used to infer the \code{test} network is provided  
 #'  then the following are also returned:
 #'  \itemize{
-#'    \item{moduleSummary:}{
+#'    \item{\code{'summary'}:}{
 #'      A vector summarising the module across each sample. This is calculated 
 #'      as the first eigenvector of the module from a principal component 
-#'      analysis. This is equivalent to the module eigengene for weighted gene
-#'      coexpression networks, see \emph{(1)}.
+#'      analysis.
 #'    }
-#'    \item{moduleMembership:}{
-#'      The correlation between each variable composing the module and the 
-#'      \code{moduleSummary}.
+#'    \item{\code{'contribution'}:}{
+#'      The \emph{node contribution}: the similarity between each node and the
+#'      \emph{module summary profile} (\code{'summary'}).
 #'    }
-#'    \item{propVarExpl:}{
-#'      The proportion of module variance explained by the \code{moduleSummary}
+#'    \item{\code{'coherence'}:}{
+#'      The proportion of module variance explained by the \code{'summary'}
 #'      vector.
 #'    }
 #'  }
-#'
-#' @references
-#' \enumerate{
-#'    \item{
-#'      Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-#'      selection better than standard meta-analysis?} PLoS One \strong{8}, 
-#'      e61505 (2013).
-#'    }
-#' }
 #' 
 #' @examples
 #' \dontrun{
@@ -261,7 +250,7 @@ networkProperties <- function(
     if (!is.null(sdat)) {
       datProps <- dataProps(sdat, modInds)
       # rename for clarity
-      names(datProps) <- c("moduleSummary", "moduleMembership", "propVarExpl")
+      names(datProps) <- c("summary", "contribution", "coherence")
       datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
       names(datProps[[1]]) <- rownames(sdat)
       names(datProps[[2]]) <- names(sub)
@@ -269,7 +258,7 @@ networkProperties <- function(
     
     # Get the properties calculated from the network.
     netProps <- netProps(network[[test]], modInds)
-    names(netProps) <- c("connectivity", "density")
+    names(netProps) <- c("degree", "avgWeight")
     netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
     names(netProps[[1]]) <- names(sub)
     
@@ -285,7 +274,7 @@ networkProperties <- function(
 
 #' Order nodes and modules within a network.
 #' 
-#' Order nodes in descending order of intra-module connectivity and order 
+#' Order nodes in descending order of \emph{weighted degree} and order 
 #' modules by the similarity of their summary vectors.
 #' 
 #' @inheritParams common_params
@@ -349,7 +338,7 @@ networkProperties <- function(
 #' }
 #' 
 #' @return
-#'  A vector of variable names in descending order of intramodular connectivity 
+#'  A vector of variable names in descending order of weighted degree
 #'  for each module. 
 #'  
 #' @examples
@@ -455,11 +444,11 @@ nodeOrder <- function(
     if (!is.null(data[[test]])) {
       # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
-        0, ncol=length(props), nrow=length(props[[1]]$moduleSummary)
+        0, ncol=length(props), nrow=length(props[[1]]$summary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$moduleSummary
+        seps[,mi] <- props[[mi]]$summary
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
@@ -476,7 +465,7 @@ nodeOrder <- function(
   # order genes
   res <- foreach(mi = moduleOrder, .combine=c) %do% {
     rr <- names(sort(
-      props[[mi]]$connectivity, decreasing=TRUE, 
+      props[[mi]]$degree, decreasing=TRUE, 
       na.last=ifelse(na.rm, NA, TRUE)
     ))
     if (!simplify)
@@ -538,15 +527,6 @@ nodeOrder <- function(
 #'   mutliple independent R sessions. Methods are provided for 
 #'   \link[=bigMatrix-get]{converting to, loading in}, and 
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
-#' }
-#'
-#' @references
-#' \enumerate{
-#'    \item{
-#'      Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-#'      selection better than standard meta-analysis?} PLoS One \strong{8}, 
-#'      e61505 (2013).
-#'    }
 #' }
 #' 
 #' @return
@@ -654,14 +634,14 @@ sampleOrder <- function(
 
   res <- lapply(props, function(mip) {
     # Need to handle cases where no rownames are provided
-    if (!is.null(names(mip$moduleSummary))) {
+    if (!is.null(names(mip$summary))) {
       names(sort(
-        mip$moduleSummary, decreasing=TRUE, 
+        mip$summary, decreasing=TRUE, 
         na.last=ifelse(na.rm, NA, TRUE)
       ))
     } else {
       order(
-        mip$moduleSummary, decreasing=TRUE, 
+        mip$summary, decreasing=TRUE, 
         na.last=ifelse(na.rm, NA, TRUE)
       )
     }

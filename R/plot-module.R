@@ -7,8 +7,8 @@
 #' 
 #' Individual components of the module plot can be plotted using 
 #' \code{\link{plotCorrelation}}, \code{\link{plotNetwork}}, 
-#' \code{\link{plotConnectivity}}, \code{\link{plotModuleMembership}}, 
-#' \code{\link{plotData}}, and \code{\link{plotModuleSummary}}.
+#' \code{\link{plotDegree}}, \code{\link{plotContribution}}, 
+#' \code{\link{plotData}}, and \code{\link{plotSummary}}.
 #' 
 #' @inheritParams common_params
 #' @inheritParams common_params2
@@ -135,19 +135,10 @@
 #' @seealso
 #' \code{\link{plotCorrelation}}, 
 #' \code{\link{plotNetwork}},
-#' \code{\link{plotConnectivity}},
-#' \code{\link{plotModuleMembership}},
+#' \code{\link{plotDegree}},
+#' \code{\link{plotContribution}},
 #' \code{\link{plotData}}, and
-#' \code{\link{plotModuleSummary}}.
-#'  
-#' @references
-#' \enumerate{
-#'    \item{
-#'      Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-#'      selection better than standard meta-analysis?} PLoS One \strong{8}, 
-#'      e61505 (2013).
-#'    }
-#' }
+#' \code{\link{plotSummary}}.
 #' 
 #' @examples
 #' \dontrun{
@@ -331,11 +322,11 @@ plotModule <- function(
         # Create a matrix of module summary vectors to measure the similarity
         seps <- matrix(
           0, ncol=length(propsDisc), 
-          nrow=length(propsDisc[[1]]$moduleSummary)
+          nrow=length(propsDisc[[1]]$summary)
         )
         colnames(seps) <- names(propsDisc)
         for (mi in seq_along(propsDisc)) {
-          seps[,mi] <- propsDisc[[mi]]$moduleSummary
+          seps[,mi] <- propsDisc[[mi]]$summary
         }
         moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
       } else {
@@ -347,13 +338,13 @@ plotModule <- function(
     }
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
-        propsDisc[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
+        propsDisc[[mi]]$degree, decreasing=TRUE, na.last=TRUE
       ))
     }
   } else if (orderNodesBy == "none") {
     moduleOrder <- names(props)
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(props[[mi]]$connectivity)
+      names(props[[mi]]$degree)
     }
   } else {
     if (missing(orderModules))
@@ -365,11 +356,11 @@ plotModule <- function(
       if (!is.null(data[[test]])) {
         seps <- matrix(
           0, ncol=length(props), 
-          nrow=length(props[[1]]$moduleSummary)
+          nrow=length(props[[1]]$summary)
         )
         colnames(seps) <- names(props)
         for (mi in seq_along(props)) {
-          seps[,mi] <- props[[mi]]$moduleSummary
+          seps[,mi] <- props[[mi]]$summary
         }
         moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
       } else {
@@ -381,7 +372,7 @@ plotModule <- function(
     }
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
-        props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
+        props[[mi]]$degree, decreasing=TRUE, na.last=TRUE
       ))
     }
   }
@@ -403,14 +394,14 @@ plotModule <- function(
       )
     }
     sampleOrder <- names(sort(
-      propsDisc[[1]]$moduleSummary, decreasing=TRUE
+      propsDisc[[1]]$summary, decreasing=TRUE
     ))
   } else if (!is.null(data[[test]])) {
     if (orderSamplesBy == "none") {
       sampleOrder <- rownames(data[[test]])
     } else {
       sampleOrder <- names(sort(
-        props[moduleOrder][[1]]$moduleSummary, decreasing=TRUE
+        props[moduleOrder][[1]]$summary, decreasing=TRUE
       ))
     }
   }
@@ -449,14 +440,14 @@ plotModule <- function(
   kIM <- foreach(mi = seq_along(props), .combine=c) %do% {
     # Normalise the connectivity by the maximum. The value has no meaning,
     # just the relative sizes and ranks
-    props[[mi]]$connectivity/max(na.omit(props[[mi]]$connectivity))
+    props[[mi]]$degree/max(na.omit(props[[mi]]$degree))
   }
   kIM <- kIM[nodeOrder]
   
   if (!is.null(data[[test]])) {
     # now build the Module Membership vector
     MM <- foreach(mi = seq_along(props), .combine=c) %do% {
-      props[[mi]]$moduleMembership
+      props[[mi]]$contribution
     }
     MM <- MM[nodeOrder]
     MM.cols <- rep(correlation.palette()[1], length(MM))
@@ -465,7 +456,7 @@ plotModule <- function(
     # Summary Expression profiles matrix
     SEP <- foreach(mi = moduleOrder, .combine=cbind) %do% {
       matrix(
-        insert.nas(props[[mi]]$moduleSummary[presentSamples], na.pos.y),
+        insert.nas(props[[mi]]$summary[presentSamples], na.pos.y),
         ncol=1
       )
     }

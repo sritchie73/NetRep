@@ -25,8 +25,8 @@
 #'  are drawn.
 #' @param palette a vector of colors to use for each plot (see details).
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
-#'  in \code{plotModuleMembership}, \code{plotConnectivity}, and
-#'  \code{plotModuleSummary}.
+#'  in \code{plotContribution}, \code{plotDegree}, and
+#'  \code{plotSummary}.
 #' @param border.width line width for borders.
 #' @param plotLegend logical; controls whether a legend is drawn when using
 #'  \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.
@@ -101,14 +101,14 @@
 #'   set \code{orderModules} to \code{FALSE}.
 #'   
 #'   Sample ordering only applies to \code{plotData} and 
-#'   \code{plotModuleSummary}. By default, samples are ordered in descending
+#'   \code{plotSummary}. By default, samples are ordered in descending
 #'   order of the module summary vector in the drawn dataset for the left-most 
 #'   module appearing on the plot (see \code{\link{sampleOrder}}.
 #' }
 #' \subsection{Normalised connectivity:}{
 #'   The within-module connectivity is normalised by the maximum connectivity in
 #'   any given module when rendered on the bar plot. This facilitates visual 
-#'   comparison of multiple modules with differing sizes or densities.
+#'   comparison of multiple modules with differing sizes or edge densities.
 #' }
 #' \subsection{Customising plot layout:}{
 #'   Although reasonable default values for most parameters have been provided,
@@ -142,8 +142,8 @@
 #'   \code{plotLegend} to \code{FALSE}
 #'   
 #'   The \code{drawBorders} argument controls whether borders are drawn around
-#'   the bars in \code{plotConnectivity}, \code{plotModuleMembership}, and 
-#'   \code{plotModuleSummary}.
+#'   the bars in \code{plotDegree}, \code{plotContribution}, and 
+#'   \code{plotSummary}.
 #' }
 #' \subsection{Customising the color palette:}{
 #'   \code{plotCorrelation} and \code{plotCorrelationLegend} expect the
@@ -160,10 +160,10 @@
 #'   and the last element of the \code{palette} vector to be the color used for 
 #'   correlation values of 1.
 #'   
-#'   \code{plotConnectivity} expects \code{palette} to be a single color, a 
+#'   \code{plotDegree} expects \code{palette} to be a single color, a 
 #'   vector of colors, one for each node, or a vector of colors to be repeated.
 #'   
-#'   \code{plotModuleMembership} expects \code{palette} to be a vector 
+#'   \code{plotContribution} expects \code{palette} to be a vector 
 #'   containing two colors, the first to be used for nodes with negative module
 #'   membership values, and the second to be used for nodes with positive module
 #'   membership values. 
@@ -176,20 +176,11 @@
 #'   i.e. positive and negative values of data will have the same intensity on a 
 #'   diverging color palette regardless of the actual range of the data.
 #'   
-#'   \code{plotModuleSummary} expects \code{palette} to be a vector 
+#'   \code{plotSummary} expects \code{palette} to be a vector 
 #'   containing two colors, the first to be used for nodes with a negative 
 #'   module summary measurement, and the second to be used for genes with a 
 #'   positive module summary measurment, regardless of whether the data matrix
 #'   is centred around 0.
-#' }
-#' 
-#' @references
-#' \enumerate{
-#'    \item{
-#'      Langfelder, P., Mischel, P. S. & Horvath, S. \emph{When is hub gene 
-#'      selection better than standard meta-analysis?} PLoS One \strong{8}, 
-#'      e61505 (2013).
-#'    }
 #' }
 #' 
 #' @seealso
@@ -220,9 +211,9 @@
 #'  geA, coexpA, adjA, moduleAssignments, modules="2", symmetric=TRUE
 #' )
 #' plotNetwork(geA, coexpA, adjA, moduleAssignments, modules="2")
-#' plotConnectivity(geA, coexpA, adjA, moduleAssignments, modules="2")
-#' plotModuleMembership(geA, coexpA, adjA, moduleAssignments, modules="2")
-#' plotModuleSummary(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotDegree(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotContribution(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' plotSummary(geA, coexpA, adjA, moduleAssignments, modules="2")
 #' 
 #' ## Example 2: Plot an arbitrary set of genes in cohort A
 #' plotData(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
@@ -232,9 +223,9 @@
 #'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10], symmetric=TRUE
 #' )
 #' plotNetwork(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
-#' plotConnectivity(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
-#' plotModuleMembership(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
-#' plotModuleSummary(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotDegree(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotContribution(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
+#' plotSummary(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
 #' 
 #' ## Example 3: Plot the topology of two adipose tissue modules in the liver
 #' ## tissue data 
@@ -302,15 +293,15 @@
 #'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
-#' plotConnectivity(
+#' plotDegree(
 #'  geneExpression, correlation, network, moduleAssignments, 
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
-#' plotModuleMembership(
+#' plotContribution(
 #'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
-#' plotModuleSummary(
+#' plotSummary(
 #'  geneExpression, correlation, network, moduleAssignments,
 #'  modules=c("3", "7"), discovery="adipose", test="liver"
 #' )
@@ -430,23 +421,23 @@ plotData <- function(
       # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
         0, ncol=length(propsDisc), 
-        nrow=length(propsDisc[[1]]$moduleSummary)
+        nrow=length(propsDisc[[1]]$summary)
       )
       colnames(seps) <- names(propsDisc)
       for (mi in seq_along(propsDisc)) {
-        seps[,mi] <- propsDisc[[mi]]$moduleSummary
+        seps[,mi] <- propsDisc[[mi]]$summary
       }
       moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
     }
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
-        propsDisc[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
+        propsDisc[[mi]]$degree, decreasing=TRUE, na.last=TRUE
       ))
     }
   } else if (orderNodesBy == "none") {
     moduleOrder <- names(props)
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(props[[mi]]$connectivity)
+      names(props[[mi]]$degree)
     }
   } else {
     if (missing(orderModules))
@@ -457,17 +448,17 @@ plotData <- function(
     if (length(props) > 1 && orderModules) {
       seps <- matrix(
         0, ncol=length(props), 
-        nrow=length(props[[1]]$moduleSummary)
+        nrow=length(props[[1]]$summary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$moduleSummary
+        seps[,mi] <- props[[mi]]$summary
       }
       moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
     }
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
-        props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
+        props[[mi]]$degree, decreasing=TRUE, na.last=TRUE
       ))
     }
   }
@@ -489,13 +480,13 @@ plotData <- function(
       )
     }
     sampleOrder <- names(sort(
-      propsDisc[[1]]$moduleSummary, decreasing=TRUE
+      propsDisc[[1]]$summary, decreasing=TRUE
     ))
   } else if (orderSamplesBy == "none") {
     sampleOrder <- rownames(data[[test]])
   } else {
     sampleOrder <- names(sort(
-      props[moduleOrder][[1]]$moduleSummary, decreasing=TRUE
+      props[moduleOrder][[1]]$summary, decreasing=TRUE
     ))
   }
   
@@ -833,12 +824,12 @@ plotNetwork <- function(
   }
 }
 
-#' \code{plotModuleMembership}: Plot a bar chart of the module membership for
+#' \code{plotContribution}: Plot a bar chart of the module membership for
 #' one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotModuleMembership <- function(
+plotContribution <- function(
   data=NULL, correlation, network, moduleAssignments, modules,
   discovery=1, test=1, orderNodesBy="discovery", orderModules,
   plotNodeNames=TRUE, plotModuleNames, main="", border.width=2, 
@@ -929,7 +920,7 @@ plotModuleMembership <- function(
   } else if (orderNodesBy == "none") {
     moduleOrder <- seq_along(props)
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(props[[mi]]$connectivity)
+      names(props[[mi]]$degree)
     }
   } else {
     if (missing(orderModules))
@@ -939,11 +930,11 @@ plotModuleMembership <- function(
     if (length(props) > 1 && orderModules) {
       # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
-        0, ncol=length(props), nrow=length(props[[1]]$moduleSummary)
+        0, ncol=length(props), nrow=length(props[[1]]$summary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$moduleSummary
+        seps[,mi] <- props[[mi]]$summary
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
@@ -953,7 +944,7 @@ plotModuleMembership <- function(
     # order nodes
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
-        props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
+        props[[mi]]$degree, decreasing=TRUE, na.last=TRUE
       ))
     }
   }
@@ -963,7 +954,7 @@ plotModuleMembership <- function(
   #-----------------------------------------------------------------------------
   # now build the Module Membership vector
   MM <- foreach(mi = seq_along(props), .combine=c) %do% {
-    props[[mi]]$moduleMembership
+    props[[mi]]$contribution
   }
   MM <- MM[nodeOrder]
   
@@ -977,12 +968,12 @@ plotModuleMembership <- function(
   )
 }
 
-#' \code{plotConnectivity:} Plot a bar chart of the normalised intramodular 
+#' \code{plotDegree:} Plot a bar chart of the normalised intramodular 
 #' connectivity (see details) for one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotConnectivity <- function(
+plotDegree <- function(
   data=NULL, correlation, network, moduleAssignments, modules,
   discovery=1, test=1, orderNodesBy="discovery", orderModules=TRUE,
   plotNodeNames=TRUE, plotModuleNames, main="", palette="#feb24c", 
@@ -1067,7 +1058,7 @@ plotConnectivity <- function(
   } else if (orderNodesBy == "none") {
     moduleOrder <- seq_along(props)
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(props[[mi]]$connectivity)
+      names(props[[mi]]$degree)
     }
   } else {
     if (missing(orderModules))
@@ -1077,11 +1068,11 @@ plotConnectivity <- function(
     if (length(props) > 1 && orderModules && !is.null(data[[test]])) {
       # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
-        0, ncol=length(props), nrow=length(props[[1]]$moduleSummary)
+        0, ncol=length(props), nrow=length(props[[1]]$summary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$moduleSummary
+        seps[,mi] <- props[[mi]]$summary
       }
       moduleOrder <- hclust(as.dist(1-cor(seps)))$order
     } else {
@@ -1091,7 +1082,7 @@ plotConnectivity <- function(
     # order nodes
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(sort(
-        props[[mi]]$connectivity, decreasing=TRUE, na.last=TRUE
+        props[[mi]]$degree, decreasing=TRUE, na.last=TRUE
       ))
     }
   }
@@ -1103,7 +1094,7 @@ plotConnectivity <- function(
   kIM <- foreach(mi = seq_along(props), .combine=c) %do% {
     # Normalise the connectivity by the maximum. The value has no meaning,
     # just the relative sizes and ranks
-    props[[mi]]$connectivity/max(na.omit(props[[mi]]$connectivity))
+    props[[mi]]$degree/max(na.omit(props[[mi]]$degree))
   }
   kIM <- kIM[nodeOrder]
   
@@ -1117,12 +1108,12 @@ plotConnectivity <- function(
   )
 }
 
-#' \code{plotModuleSummary}: Plot bar charts of the module summary vectors of 
+#' \code{plotSummary}: Plot bar charts of the module summary vectors of 
 #' one or more network modules.
 #' 
 #' @rdname plotTopology
 #' @export
-plotModuleSummary <- function(
+plotSummary <- function(
   data, correlation, network, moduleAssignments, modules,
   discovery=1, test=1, orderSamplesBy="test", orderNodesBy="discovery",
   orderModules, plotSampleNames=TRUE, plotModuleNames, main="", 
@@ -1223,11 +1214,11 @@ plotModuleSummary <- function(
       # Create a matrix of module summary vectors to measure the similarity
       seps <- matrix(
         0, ncol=length(propsDisc), 
-        nrow=length(propsDisc[[1]]$moduleSummary)
+        nrow=length(propsDisc[[1]]$summary)
       )
       colnames(seps) <- names(propsDisc)
       for (mi in seq_along(propsDisc)) {
-        seps[,mi] <- propsDisc[[mi]]$moduleSummary
+        seps[,mi] <- propsDisc[[mi]]$summary
       }
       moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
     }
@@ -1242,11 +1233,11 @@ plotModuleSummary <- function(
     if (length(props) > 1 && orderModules) {
       seps <- matrix(
         0, ncol=length(props), 
-        nrow=length(props[[1]]$moduleSummary)
+        nrow=length(props[[1]]$summary)
       )
       colnames(seps) <- names(props)
       for (mi in seq_along(props)) {
-        seps[,mi] <- props[[mi]]$moduleSummary
+        seps[,mi] <- props[[mi]]$summary
       }
       moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
     }
@@ -1269,13 +1260,13 @@ plotModuleSummary <- function(
       )
     }
     sampleOrder <- names(sort(
-      propsDisc[[1]]$moduleSummary, decreasing=TRUE
+      propsDisc[[1]]$summary, decreasing=TRUE
     ))
   } else if (orderSamplesBy == "none") {
     sampleOrder <- rownames(data[[test]])
   } else {
     sampleOrder <- names(sort(
-      props[moduleOrder][[1]]$moduleSummary, decreasing=TRUE
+      props[moduleOrder][[1]]$summary, decreasing=TRUE
     ))
   }
   
@@ -1302,7 +1293,7 @@ plotModuleSummary <- function(
   #-----------------------------------------------------------------------------
   SEP <- foreach(mi = moduleOrder, .combine=cbind) %do% {
     matrix(
-      insert.nas(props[[mi]]$moduleSummary[presentSamples], na.pos),
+      insert.nas(props[[mi]]$summary[presentSamples], na.pos),
       ncol=1
     )
   }

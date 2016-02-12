@@ -13,16 +13,17 @@ CheckFinite <- function(pDat) {
     invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', pDat))
 }
 
-#' Calculate the correlation based statistics
+#' Calculate the correlation structure based statistics
 #'
-#' Both of the correlation statistics are calculated using all pairwise 
-#' correlation values in both the \emph{discovery} and \emph{test} datasets.
-#' For the other statistics, it makes sense to calculate the 
-#' properties for the discovery network in advance to reduce calculation time
-#' and memory. However, for the correaltion statistics this strategy doesn't 
-#' make sense since we'd have to store a huge component of the discovery 
-#' correlation structure.
-#'
+#' Both of the "concordance of correlation structure" and "density of 
+#' correlation structure" are calculated using all pairwise 
+#' correlation coefficients between nodesin both the \emph{discovery} and 
+#' \emph{test} datasets. For the other module preservation statistics we can
+#' store components of each statistic calculated in each dataset separately,
+#' and save time by only calculating them in the discovery dataset once. 
+#' This would have a substantial memory overhead for the correlation structure
+#' based statistics, so we don't use this strategy.
+#' 
 #' @param pCorD,pCorT SEXP containers for the pointers to the correlation 
 #'  structure matrices for the \emph{discovery} and \emph{test} networks.
 #' @param discIndices,testIndices indices of the network subset in
@@ -39,8 +40,8 @@ CheckFinite <- function(pDat) {
 #'       A flattened vector of the module's correlation structure in the 
 #'       \emph{test} dataset.
 #'     }
-#'     \item{\emph{mean.cor}:}{
-#'       The mean sign-aware correlation density of the network module.
+#'     \item{\emph{corDensity}:}{
+#'       The mean sign-aware correlation structure density of the network module.
 #'     }
 #'   }
 #'   
@@ -68,14 +69,15 @@ CorStats <- function(pCorD, discIndices, pCorT, testIndices) {
 #'  A list containing:
 #'  \enumerate{
 #'   \item{\emph{"moduleSummary"}:}{
-#'     The module summary profile (see details).
+#'     The module's summary profile (see details).
 #'   }
-#'   \item{\emph{"MM"}:}{
-#'     The Module Membership of each node (see details).
+#'   \item{\emph{"nodeContribution"}:}{
+#'     The contribution of each node to the module's summary profile (see 
+#'     details).
 #'   }
-#'   \item{\emph{"pve"}:}{
-#'     The proportion of the variance explained by the module's summary 
-#'      profile (see details).
+#'   \item{\emph{"moduleCoherence"}:}{
+#'     The proportion of the variance in the data explained by the module's 
+#'     summary profile (see details).
 #'   }
 #'  }
 #'  
@@ -89,17 +91,21 @@ CorStats <- function(pCorD, discIndices, pCorT, testIndices) {
 #'  }
 #'  
 #' @details
-#'  First, the module summary profile (SP) is calculated as the first 
-#'  eigenvector of a principal component analysis of the variables composing 
-#'  the module of interest. The orientation of the eigenvector is modified so 
-#'  that its sign is in the same direction as the module on average. I.e. for 
-#'  gene expression data this is the "module eigengene" \emph{(1)}.
+#'  First, the module summary profile ('moduleSummary') is calculated as the
+#'  first eigenvector of a principal component analysis of the variables
+#'  composing the module of interest. The orientation of the eigenvector is
+#'  modified so that its sign is in the same direction as the module on
+#'  average. I.e. for gene expression data this is the "module eigengene"
+#'  \emph{(1)}.
 #'  
-#'  The Module Membership (MM) is the correlation between each variable 
-#'  composing the module and the module's summary profile.
+#'  Each node's contribution to the summary profile ('nodeContribution') is
+#'  quantified as the correlation between each variable composing the module
+#'  and the module's summary profile. For weighted gene coexpression networks,
+#'  this is typically referred to as the 'module membership' \emph{(1)}.
 #'  
-#'  The proportion of module variance explained by the summary profile (pve) 
-#'  is quantified as the average square of the Module Membership \emph{(1)}.
+#'  The The proportion of module variance explained by the summary profile
+#'  ('moduleCoherence') is quantified as the average square of the
+#'  'nodeContribution' \emph{(1)}.
 #' 
 #' @import RcppArmadillo
 #' @rdname dataProps-cpp
@@ -108,16 +114,17 @@ DataProps <- function(pDat, subsetIndices) {
     .Call('NetRep_DataProps', PACKAGE = 'NetRep', pDat, subsetIndices)
 }
 
-#' Calculate Mean Adjacency and Intramodular Connectivity
+#' Calculate the topological properties based on network edge weights
 #'
-#' @param pAdjacency SEXP container for the pointer to the adjacency matrix.
+#' @param pAdjacency SEXP container for the pointer to the adjacency matrix of
+#'   the interaction network.
 #' @param subsetIndices indices of the network subset of interest.
 #'   
 #' @return
 #'   A List containing:
 #'   \enumerate{
-#'     \item{\emph{kIM}:}{The weighted within-subset degree for each node.}
-#'     \item{\emph{mean.adj}:}{The mean absolute edge weight of the network subset.}
+#'     \item{\emph{weightedDegree}:}{The weighted within-module degree for each node.}
+#'     \item{\emph{averageEdgeWeight}:}{The mean absolute edge weight of the network subset.}
 #'   }
 #' @rdname NetProps-cpp
 NetProps <- function(pAdjacency, subsetIndices) {
