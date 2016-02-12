@@ -90,55 +90,145 @@
 #'   so the physical amount of RAM used will be much lower.
 #' }
 #' \subsection{Module Preservation Statistics:}{
-#'  Module preservation is assessed through seven statistics \emph{(1)}:
-#'  \enumerate{
-#'    \item{\code{density}:}{
-#'      The mean network edge weight of the module in the test dataset. Is the
-#'      module more (or less) densely connected than expected by chance? 
-#'    }
-#'    \item{\code{propVarExpl}:}{
-#'      The proportion of module varaince explained by the module summary 
-#'      vector in the test dataset. The module summary vector is calculated as
-#'      the first eigenvector from a principal component analysis on the
-#'      module's data. For weighted gene coexpression networks this corresponds 
-#'      to the "module eigengene (ME)" \emph{(1)}. Is the module more (or less)
-#'      coherent than expected by chance?
-#'    }
-#'    \item{\code{cor.cor}:}{
-#'      The correlation of the module's correlation structure across datasets. 
-#'      Is the correlation structure more (or less) similar than expected by 
-#'      chance?
-#'    }
-#'    \item{\code{cor.kIM}:}{
-#'      The correlation of within-module connectivity (sum of edge weights to 
-#'      all other nodes, i.e. a "weighted" node degree) across datasets. Are the
-#'      relative node connectivities more similar than expected by chance?
-#'    }
-#'    \item{\code{cor.MM}:}{
-#'      The correlation of module membership across datasets. Module membership 
-#'      quantifies how strongly each variable composing a module contributes to 
-#'      the module's summary vector. It is calculated as the correlation between
-#'      the variable and the module summary vector. The statistic is abbreviated 
-#'      as \code{cor.kME} in \emph{(1)}. Are the node contributions to the 
-#'      module summary vector more similar than expected by chance?
-#'    }
-#'    \item{\code{mean.cor}:}{
-#'      The mean correlation in the test dataset. It quantifies how strongly 
-#'      correlated variables composing a module are in the test dataset, 
-#'      penalising any variables where the sign of the correlation flips across
-#'      datasets. It is also referred to as the "mean sign-aware correlation"
-#'      (see \emph{(1)}). Is the correlation structure stronger than expected
-#'      by chance?
-#'    }
-#'    \item{\code{mean.MM}:}{
-#'      The mean module membership in the test dataset. It quantifies how 
-#'      coherent the module is, penalising any variables where the sign of the 
-#'      contribution flips across datasets (e.g. differential expression in one
-#'      dataset but not the other). It is also abbreivated as \code{mean.kME} 
-#'      in \emph{(1)}. Is the mean contribution of variables composing a module
-#'      to the module stronger than expected by chance?
-#'    }
-#'  }
+#'  Module preservation is assessed through seven module preservation statistics,
+#'  each of which captures a different aspect of a module's topology; \emph{i.e.}
+#'  the structure of the relationships between its nodes \emph{(1,2)}. Below is
+#'  a description of each statistic, what they seek to measure, and where their
+#'  interpretation may be inappropriate. 
+#'  
+#'  The \emph{module coherence} (\code{'coherence'}), \emph{average node 
+#'  contribution} (\code{'avg.contrib'}), and \emph{concordance of node 
+#'  contribution} (\code{'cor.contrib'}) are all calculated from the data used 
+#'  to infer the network (provided in the \code{'data'} argument). They are 
+#'  calculated from the module’s \emph{summary profile}. This is the eigenvector
+#'  of the 1st principal component across all observations for every node
+#'  composing the module. For gene coexpression modules this can be interpreted
+#'  as a "summary expression profile". It is typically referred to as the
+#'  "module eigengene" in the weighted gene coexpression network analysis
+#'  literature \emph{(4)}.
+#'  
+#'  The \emph{module coherence} (\code{'coherence'}) quantifies the proportion 
+#'  of module variance explained by the module's "summary profile". The higher
+#'  this value, the more "coherent" the data is, \emph{i.e.} the more similar
+#'  the observations are nodes for each sample. With the default alternate
+#'  hypothesis, a small permutation \emph{P}-value indicates that the module is
+#'  more coherent than expected by chance.
+#'  
+#'  The \emph{average node contribution} (\code{'avg.contrib'}) and 
+#'  \emph{concordance of node contribution} (\code{'cor.contrib'}) are calculated 
+#'  from the \emph{node contribution}, which quantifies how similar each node is 
+#'  to the modules's \emph{summary profile}. It is calculated as the Pearson
+#'  correlation coefficient between each node and the module summary profile. In
+#'  the weighted gene coexpression network literature it is typically called the
+#'  "module membership" \emph{(2)}.
+#'  
+#'  The \emph{average node contribution} (\code{'avg.contrib'}) quantifies how
+#'  similar nodes are to the module summary profile in the test dataset. Nodes
+#'  detract from this score where the sign of their node contribution flips 
+#'  between the discovery and test datasets, \emph{e.g.} in the case of 
+#'  differential gene expression across conditions. A high \emph{average node
+#'  contribution} with a small permutation \emph{P}-value indicates that the
+#'  module remains coherent in the test dataset, and that the nodes are acting
+#'  together in a similar way.  
+#'  
+#'  The \emph{concordance of node contribution} (\code{'cor.contrib'}) measures 
+#'  whether the relative rank of nodes (in terms of their node contribution) is 
+#'  preserved across datasets. If a module is coherent enough that all nodes 
+#'  contribute strongly, then this statistic will not be meaningful as its value
+#'  will be heavily influenced by tiny variations in node rank. This can be
+#'  assessed through visualisation of the module topology (see 
+#'  \code{\link{plotNodeContribution}}.) Similarly, a strong
+#'  \code{'cor.contrib'} is unlikely to be meaningful if the
+#'  \code{'avg.contrib'} is not significant.
+#'  
+#'  The \emph{concordance of correlation strucutre} (\code{'cor.cor'}) and 
+#'  \emph{density of correlation structure} (\code{'avg.cor'}) are calculated 
+#'  from the user-provided correlation structure between nodes (provided in the 
+#'  \code{'correlation'} argument). This is referred to as "coexpression" when
+#'  calculated on gene expression data.
+#'  
+#'  The \code{'avg.cor'} measures how strongly nodes within a module are 
+#'  correlation on average in the test dataset. This average depends on the 
+#'  correlation coefficients in the discovery dataset: the score is penalised 
+#'  where correlation coefficients change in sign between datasets. A high 
+#'  \code{'avg.cor'} with a small permutation \emph{P}-value indicates that the 
+#'  module is (a) more strongly correlated than expected by chance for a module 
+#'  of the same size, and (b) more consistently correlated with respect to the 
+#'  discovery dataset than expected by chance.
+#'  
+#'  The \code{'cor.cor'} measures how similar the correlation coefficients are 
+#'  across the two datasets. A high \code{'cor.cor'} with a small permutation 
+#'  \emph{P}-value indicates that the correlation structure within a module is 
+#'  more similar across datasets than expected by chance. If all nodes within a 
+#'  module are very similarly correlated then this statistic will not be 
+#'  meaningful, as its value will be heavily influenced by tiny, non-meaningful, 
+#'  variations in correlation strength. This can be assessed through
+#'  visualisation of the module topology (see \code{\link{plotCorrelation}}.)
+#'  Similarly, a strong \code{'cor.cor'} is unlikely to be meaningful if the
+#'  \code{'avg.cor'} is not significant.
+#'  
+#'  The \emph{average edge weight} (\code{'avg.weight'}) and \emph{concordance
+#'  of weighted degree} (\code{'cor.degree'}) are both calculated from the 
+#'  interaction network (provided as adjacency matrices to the \code{'network'}
+#'  argument). 
+#'  
+#'  The \code{'avg.weight'} measures the average connection strength between 
+#'  nodes in the test dataset. In the weighted gene coexpression network 
+#'  literature this is typically called the "module density" \emph{(2)}. A high
+#'  \code{'avg.weight'} with a small permutation \emph{P}-value indicates that
+#'  the module is more strongly connected in the test dataset than expected by
+#'  chance. 
+#'  
+#'  The \code{'cor.degree'} calculates whether the relative rank of each node's 
+#'  \emph{weighted degree} is similar across datasets. The \emph{weighted
+#'  degree} is calculated as the sum of a node's edge weights to all other nodes
+#'  in the module. In the weighted gene coexpression network literature this is 
+#'  typically called the "intramodular connectivity" \emph{(2)}. This statistic 
+#'  will not be meaningful where all nodes are connected to each other with 
+#'  similar strength, as its value will be heavily influenced by tiny,
+#'  non-meaningful, variations in weighted degree.
+#'  
+#'  Both the \code{'avg.weight'} and \code{'cor.degree'} assume edges are 
+#'  weighted, and that the network is densely connected. Note that for sparse 
+#'  networks, edges with zero weight are included when calculating both
+#'  statistics. Only the magnitude of the weights, not their sign, contribute to
+#'  the score. If the network is \emph{unweighted}, \emph{i.e.} edges indicate
+#'  presence or absence of a relationship, then the \code{'avg.weight'} will be
+#'  the proportion of the number of edges to the total number of possible edges
+#'  while the \emph{weighted degree} simply becomes the \emph{degree}. A high
+#'  \code{'avg.weight'} in this case measures how interconnected a module is in
+#'  the test dataset. A high \emph{degree} indicates that a node is connected to
+#'  many other nodes. The interpretation of the \code{'cor.degree'} remains
+#'  unchanged between weighted and unweighted networks. If the network is
+#'  directed the interpretation of the \code{'avg.weight'} remains unchanged,
+#'  while the \emph{cor.degree} will measure the concordance of the node
+#'  \emph{in-}degree in the test network. To measure the \emph{out-}degree
+#'  instead, the adjacency matrices provided to the \code{'network'} argument
+#'  should be transposed.
+#' }
+#' \subsection{Sparse data:}{
+#'  Caution should be used when running \code{NetRep}
+#'  on sparse data (\emph{i.e.} where there are many zero values in the data 
+#'  used to infer the network). For this data, the \emph{average node contribution} 
+#'  (\code{'avg.contrib'}), \emph{concordance of node contribution} 
+#'  (\code{'cor.contrib'}), and \emph{module coherence} (\code{'coherence'})
+#'  will all be systematically underestimated due to their reliance on the 
+#'  Pearson correlation coefficient to calculate the \emph{node contribution}.
+#'  
+#'  Care should also be taken to use appropriate methods for inferring the
+#'  correlation structure when the data is sparse for the same reason.
+#' }
+#' \subsection{Proportional data:}{
+#'  Caution should be used when running \code{NetRep} on proportional data (
+#'  \emph{i.e.} where observations across samples all sum to the same value, 
+#'  \emph{e.g.} 1). For this data, the \emph{average node contribution} 
+#'  (\code{'avg.contrib'}), \emph{concordance of node contribution} 
+#'  (\code{'cor.contrib'}), and \emph{module coherence} (\code{'coherence'})
+#'  will all be systematically overestimated due to their reliance on the 
+#'  Pearson correlation coefficient to calculate the \emph{node contribution}.
+#'  
+#'  Care should also be taken to use appropriate methods for inferring the
+#'  correlation structure from proportional data for the same reason.
 #' }
 #' \subsection{Hypothesis testing:}{
 #'  Three alternative hypotheses are available. "greater", the default, tests
@@ -174,11 +264,16 @@
 #'  determine the correct number of permtutations breaks down when assessing the
 #'  preservation of modules in a very small dataset (e.g. gene sets in a dataset
 #'  with less than 100 genes total). However, the reported p-values will still
-#'  be accurate (see \code{\link{perm.test}}) \emph{(2)}.
+#'  be accurate (see \code{\link{perm.test}}) \emph{(3)}.
 #' }
 #' 
 #' @references 
 #'   \enumerate{
+#'     \item{
+#'      Ritchie, S.C., et al., \emph{A scalable permutation approach reveals 
+#'      replication and preservation patterns of network modules.} Cell Systems.
+#'      \emph{in review} (2016).
+#'     }
 #'     \item{
 #'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
 #'       network module preserved and reproducible?} PLoS Comput. Biol. 
@@ -888,7 +983,7 @@ modulePreservation <- function(
           for (mi in overlapModules) {
             for (si in seq_len(nStatistics)) {
               # Does the order of nodes in each permutation affect the statistic?
-              if (colnames(observed)[si] %in% c("density", "propVarExpl")) {
+              if (colnames(observed)[si] %in% c("avg.weight", "coherence")) {
                 order <- FALSE
               } else {
                 order <- TRUE
@@ -904,14 +999,15 @@ modulePreservation <- function(
             }
           }
           
-          # Order statistics: First density stats, then connectivity
+          # Order statistics: First density stats, then connectivity, then hybrid
           if (!is.null(sge[[di]])) {
             statOrder <- c(
-              "density", "propVarExpl", "cor.cor", "cor.kIM", "cor.MM",
-              "mean.cor", "mean.MM"
+              "avg.weight", "coherence", 
+              "cor.cor", "cor.degree", "cor.contrib",
+              "avg.cor", "avg.contrib"
             ) 
           } else {
-            statOrder <- c("density", "cor.kIM", "cor.cor", "mean.cor")
+            statOrder <- c("avg.weight", "cor.degree", "cor.cor", "avg.cor")
           }
           
           
