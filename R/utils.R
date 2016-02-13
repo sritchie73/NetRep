@@ -318,3 +318,95 @@ getModuleVarsUnsorted <- function(
     names(moduleAssignments[[discovery]] %sub_in% modules)
   }
 }
+
+#' Set up a parallel backend
+#'
+#' Set up a backend with the requested number of cores, or use existing backend
+#' if the user has set one up already.
+#'
+#' @param nCores number of cores to use.
+setupParallel <- function(nCores=NULL) {
+  # First, check whether the user has already set up a parallel backend. In this
+  # case, we can ignore the `nCores` argument.
+  if (getDoParWorkers() > 1) {
+    vCat(
+      verbose, 0, "Using user-registered parallel backend with 1 reporter core",
+      "and", getDoParWorkers() - 1, "worker cores."
+    )
+    nCores <- getDoParWorkers()
+  } 
+  
+  # If the user is on a Windows machine, we have to use the `doParallel` package 
+  else if (.Platform$OS.type == "windows" & nCores > 1) {
+    # Quietly load parallel backend packages. Throw our own warning and 
+    # continue
+    if(suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
+      # we need an additional thread to monitor and report progress
+      if (verbose)  
+        nCores <- nCores + 1
+      cl <- parallel::makeCluster(nCores)
+      doParallel::registerDoParallel(cl)
+      on.exit({
+        parallel::stopCluster(cl)
+      }, add=TRUE)
+      vCat(verbose, 0, "Running on", nCores - 1, "cores.")
+      if ((nCores - 1) > parallel::detectCores()) {
+        stop(
+          "Requested number of threads (", nCores - 1, ") is higher than the ",
+          "number of available cores (", parallel::detectCores(), 
+          "). Using too many threads may cause the machine to thrash/freeze."
+        )
+      }
+    } else {
+      nCores <- 1
+      # We want to immediately print a warning for the user, not at the end 
+      # once the analysis has finished.
+      vCat(
+        TRUE, 0, file=stderr(),
+        "Warning: unable to find 'doParallel' package, running on 1 core." 
+      )
+    }
+  } else if (.Platform$OS.type == "unix" & nCores > 1) {
+    # Quietly load parallel backend packages. Throw our own warning and 
+    # continue
+    if(suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
+      # we need an additional thread to monitor and report progress
+      if (verbose) 
+        nCores <- nCores + 1
+      doMC::registerDoMC(nCores)
+      vCat(verbose, 0, "Running on", nCores - 1, "cores.")
+      if ((nCores - 1) > parallel::detectCores()) {
+        stop(
+          "Requested number of threads (", nCores - 1, ") is higher than the ",
+          "number of available cores (", parallel::detectCores(), 
+          "). Using too many threads may cause the machine to thrash/freeze."
+        )
+      }
+    } else {
+      nCores <- 1
+      # We want to immediately print a warning for the user, not at the end 
+      # once the analysis has finished.
+      vCat(
+        TRUE, 0, file=stderr(),
+        "Unable to find 'doMC' package, running on 1 core."
+      )
+    }
+  } else {
+    vCat(verbose, 0, "Running on 1 cores.")
+  }
+  
+  # Suppress annoying foreach warning generated when using %dopar% and running 
+  # in serial
+  if (nCores == 1) {
+    suppressWarnings({
+      ii <- 0 # suppress R CMD check note
+      foreach(ii = 1:2) %dopar% { ii }
+    })
+  }
+
+  # Since we expect the user to explicitly handle the number of parallel threads,
+  # we will disable the potential implicit parallelism on systems where R has
+  # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
+  omp_set_num_threads(1)
+  blas_set_num_threads(1)
+}
