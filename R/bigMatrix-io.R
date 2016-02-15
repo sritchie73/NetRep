@@ -68,35 +68,42 @@ save.as.bigMatrix <- function(
   backingpath <- normalizePath(backingpath)
   backingfile <- file.path(backingpath, backingname)
   
-  # Dimension names are saved separately from the big.matrix object.
+  binFile <- paste0(backingname, ".bin")
+  descFile <- paste0(backingname, ".desc")
+  
+  fullBinFile <- paste0(backingfile, ".bin")
+  fullDescFile <- paste0(backingfile, ".bin")
   cnFile <- paste0(backingfile, "_colnames.txt")
+  rnFile <- paste0(backingfile,  "_rownames.txt")
+  
+  # Allow overwriting
+  if (file.exists(fullBinFile)) {
+    unlink(fullBinFile)
+    unlink(fullDescFile)
+    unlink(cnFile)
+    unlink(rnFile)
+  }
+  
+  # Dimension names are saved separately from the big.matrix object.
   if (!is.null(colnames(x))) {
     write.table(
       colnames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
       file=cnFile
     )
-  } else {
-    if (file.exists(cnFile))
-      unlink(cnFile)
   }
-  rnFile <- paste0(backingfile,  "_rownames.txt")
   if (!is.null(rownames(x))) {
     write.table(
       rownames(x), quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE,
       file=rnFile
     ) 
-  } else {
-    if (file.exists(rnFile))
-      unlink(rnFile)
   }
-  
   dimnames(x) <- NULL
   
   # now save the big.matrix to disk
   bigmemory::as.big.matrix(
     x, backingpath=backingpath, type=type,
-    backingfile=paste0(backingname, ".bin"),
-    descriptorfile=paste0(backingname, ".desc")
+    backingfile=binFile,
+    descriptorfile=descFile
   )
   
   invisible(NULL)
