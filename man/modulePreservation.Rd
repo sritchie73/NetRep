@@ -5,9 +5,10 @@
 \title{Replication and preservation of network modules across datasets}
 \usage{
 modulePreservation(data = NULL, correlation, network, moduleAssignments,
-  discovery = 1, test = 2, nCores = 1, nPerm, exclude, include,
-  null = "overlap", alternative = "greater", statCorMethod = "pearson",
-  simplify = TRUE, verbose = TRUE, keepNulls = FALSE)
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 2,
+  selfPreservation = FALSE, nCores = 1, nPerm = NULL, null = "overlap",
+  alternative = "greater", statCorMethod = "pearson", simplify = TRUE,
+  verbose = TRUE, keepNulls = FALSE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -27,25 +28,29 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{discovery}{name or index denoting the discovery dataset(s).}
+\item{modules}{a list of vectors, one for each \code{discovery} dataset, 
+of modules to perform the analysis on. The default is to analyse all modules
+with the exception of those specified in \code{backgroundLabel}.}
 
-\item{test}{name or index denoting the dataset(s) to test module preservation 
-in.}
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
+
+\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
+
+\item{test}{a list of vectors of names or indices denoting the test datasets
+for each \code{discovery} dataset. Alternatively can be provided as vector
+if the test datasets are the same for all 'discovery' datasets (e.g. for 
+performing a pairwise comparison).}
+
+\item{selfPreservation}{logical; if \code{FALSE} (default) then module 
+preservation analysis will not be performed where the \code{discovery} and
+\code{test} datasets are the same.}
 
 \item{nCores}{number of cores to parallelise the permutation procedure over.
 Ignored if the user has already registered a parallel backend.}
 
-\item{nPerm}{number of permutations to use. Can be specified as a vector if
-a different number of permutations is desired for each discovery dataset.
-If not specified, the number of permutations will be automatically 
-determined (see details).}
-
-\item{exclude}{an optional vector of modules to exclude from the analysis. If
-there are multiple discovery datasets a list of vectors may be provided.}
-
-\item{include}{an optional vector of modules to include in the
-analysis. If there are multiple discovery datasets a list of vectors may be
-provided.}
+\item{nPerm}{number of permutations to use. If not specified, the number of 
+permutations will be automaticallydetermined (see details).}
 
 \item{null}{variables to include when generating the null distributions. 
 Must be either "overlap" or "all" (see details).}
@@ -103,7 +108,7 @@ The returned data structure is organised as a nested list of lists, which
    }
    \item{\code{contingency}:}{ 
      If \code{moduleAssignments} are present for both the \emph{discovery}
-     and \emph{test} datasets, then a contigency table showing the overlap
+     and \emph{test} datasets, then a contingency table showing the overlap
      between modules across datasets is returned. Rows correspond to modules
      in the \emph{discovery} dataset, columns to modules in the \emph{test}
      dataset.

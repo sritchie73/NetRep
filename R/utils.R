@@ -325,13 +325,14 @@ getModuleVarsUnsorted <- function(
 #' if the user has set one up already.
 #'
 #' @param nCores number of cores to use.
-setupParallel <- function(nCores=NULL) {
+setupParallel <- function(nCores=NULL, verbose) {
   # First, check whether the user has already set up a parallel backend. In this
   # case, we can ignore the `nCores` argument.
   if (getDoParWorkers() > 1) {
     vCat(
-      verbose, 0, "Using user-registered parallel backend with 1 reporter core",
-      "and", getDoParWorkers() - 1, "worker cores."
+      verbose, 0, "Ignoring 'nCores': parallel backend detected.", 
+      "Reserving 1 core for progress reporting.",
+      getDoParWorkers() - 1, "cores will be used for computation"
     )
     nCores <- getDoParWorkers()
   } 
@@ -409,4 +410,34 @@ setupParallel <- function(nCores=NULL) {
   # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
   omp_set_num_threads(1)
   blas_set_num_threads(1)
+}
+
+#' Remove unnecessary list structure at depth = 2
+#'
+#' Removes entries that are \code{NULL} are extracts element if the length is 1.
+#'
+#' @param l a nested list
+#' 
+#' @return a list
+simplifyList2 <- function(l) {
+  filterNulls <- function(l) {
+    l <- l[!sapply(l, is.null)]
+    if (length(l) == 0)
+      return(list(NULL))
+    return(l)
+  }
+  collapse <- function(l) {
+    if (length(l) == 1)
+      return(l[[1]])
+    return(l)
+  }
+  # At depth 2
+  for (i1 in rev(seq_along(l))) {
+    l[[i1]] <- filterNulls(l[[i1]])
+    l[[i1]] <- collapse(l[[i1]])
+  }
+  # At depth 1
+  l <- filterNulls(l)
+  l <- collapse(l)
+  return(l)
 }

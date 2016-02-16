@@ -28,7 +28,8 @@ names(moduleAssignments[[1]]) <- gn1
 
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
-    exprSets, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10, 
+    exprSets, coexpSets, adjSets, moduleAssignments, 
+    discovery=1, test=2, nPerm=10, 
     keepNulls=TRUE, verbose=FALSE
   )
   expect_equal(dim(res1$nulls), c(7, 7, 10))
@@ -37,7 +38,8 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(length(res1$propVarsPresent), 7)
   expect_equal(length(res1$nVarsPresent), 7)
   res2 <- modulePreservation(
-    NULL, coexpSets, adjSets, moduleAssignments, 1, 2, nPerm=10,
+    NULL, coexpSets, adjSets, moduleAssignments, 
+    discovery=1, test=2, nPerm=10,
     keepNulls=TRUE, verbose=FALSE
   )
   expect_equal(dim(res2$nulls), c(7, 4, 10))
@@ -49,7 +51,8 @@ test_that("Main routine runs and produces sane output", {
   moduleAssignments[[2]]<- sample(1:9, 100, replace=TRUE)
   names(moduleAssignments[[2]]) <- gn2
   res1 <- modulePreservation(
-    exprSets, coexpSets, rev(adjSets), moduleAssignments, "a", "b", nPerm=10,
+    exprSets, coexpSets, rev(adjSets), moduleAssignments, 
+    discovery="a", test="b", nPerm=10,
     include=c(1,2,3), keepNulls=TRUE, verbose=FALSE
   )
 })

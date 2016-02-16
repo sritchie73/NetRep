@@ -15,7 +15,7 @@ attach.bigMatrix <- function(x) {
   if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
   if (x@attached)
-    stop("bigMatrix already in attached state")
+    return(x)
   if (!file.exists(x@descriptor))
     stop("Could not find backing file. Have you changed working directory?")
   x@matrix <- bigmemory::attach.big.matrix(x@descriptor)
@@ -29,7 +29,7 @@ detach.bigMatrix <- function(x) {
   if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
   if (!x@attached)
-    stop("bigMatrix already in detached state")
+    return(x)
   x@matrix <- NULL
   x@attached <- FALSE
   gc()
