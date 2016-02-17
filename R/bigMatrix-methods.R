@@ -70,7 +70,7 @@ setMethod("show", signature(object = "bigMatrix"), function(object) {
 
 setMethod("print", signature(x = "bigMatrix"), function(x) {
   cat("Warning: This is not advised. Here is the head of the matrix:\n")
-  head(x)
+  print(head(x))
 })
 
 setMethod("dim", signature(x = "bigMatrix"), function(x) {
@@ -137,7 +137,7 @@ setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
   if (n < 1 | n > nrow(x)) 
     stop("n must be between 1 and nrow(x)")
-  x[1:n,,]
+  x[1:n,]
 })
 
 setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
