@@ -4,10 +4,12 @@
 \alias{dynamicMatLoad}
 \title{Dynamically detect and load a bigMatrix object depending on input type}
 \usage{
-dynamicMatLoad(object, ...)
+dynamicMatLoad(object, tempdir, ...)
 }
 \arguments{
 \item{object}{user input object}
+
+\item{tempdir}{temporary directory to save objects in}
 
 \item{...}{additional arguments to pass to read.bigMatrix}
 }

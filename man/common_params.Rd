@@ -20,6 +20,20 @@ between each pair of variables in the dataset.}
 \item{moduleAssignments}{a vector containing the module each variable belongs
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
+
+\item{modules}{a list of vectors, one for each \code{discovery} dataset, 
+of modules to perform the analysis on. The default is to analyse all modules
+with the exception of those specified in \code{backgroundLabel}.}
+
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
+
+\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
+
+\item{test}{a list of vectors of names or indices denoting the test datasets
+for each \code{discovery} dataset. Alternatively can be provided as vector
+if the test datasets are the same for all 'discovery' datasets (e.g. for 
+performing a pairwise comparison).}
 }
 \description{
 Template parameters to be imported into other function documentation. This 

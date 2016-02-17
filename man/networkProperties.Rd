@@ -5,7 +5,8 @@
 \title{Calculate the topological properties for a network module}
 \usage{
 networkProperties(data = NULL, correlation, network, moduleAssignments,
-  modules, discovery = 1, test = 1, simplify = TRUE)
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  simplify = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -25,13 +26,19 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{modules}{a vector of modules to apply the function to (see details).}
+\item{modules}{a list of vectors, one for each \code{discovery} dataset, 
+of modules to perform the analysis on. The default is to analyse all modules
+with the exception of those specified in \code{backgroundLabel}.}
 
-\item{discovery}{name or index denoting which dataset the module of interest
-was discovered in (see details).}
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
 
-\item{test}{name or index denoting which dataset to apply the function to 
-(see details).}
+\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
+
+\item{test}{a list of vectors of names or indices denoting the test datasets
+for each \code{discovery} dataset. Alternatively can be provided as vector
+if the test datasets are the same for all 'discovery' datasets (e.g. for 
+performing a pairwise comparison).}
 
 \item{simplify}{logical; if \code{TRUE} the output data structure is 
 simplified if only one module is specified.}

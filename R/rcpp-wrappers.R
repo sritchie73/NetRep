@@ -4,11 +4,18 @@
 #' \code{\link{CorStats}}, \code{\link{NetProps}}, and \code{\link{DataProps}}.
 #' They provide a nicer interface for input handling and format the output in
 #' an R-friendly way.
-#'  
-#' @inheritParams cor_params
-#' @inheritParams net_param
-#' @inheritParams dat_param
-#' @inheritParams ind_param
+#'
+#' @param discCor a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+#'   correlation structure among variables in the \emph{discovery} dataset.
+#' @param testCor a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+#'   correlation structure among variables in the \emph{test} dataset.
+#' @param discIndices indices corresponding to the network module in 
+#'  \code{discCor}.
+#' @param testIndices indices corresponding to the network module in
+#'  \code{testCor}.
+#' 
+#' @param moduleIndices indices for the network module of interest in the
+#'   supplied data matrix.
 #'
 #' @references
 #'  \enumerate{
@@ -62,6 +69,11 @@ corStats <- function(
 }
 
 #' @rdname wrappers
+#' 
+#' @param adj a \code{\link[=bigMatrix-class]{bigMatrix}} containing an
+#' adjacency matrix representation of the network (i.e. an \eqn{n * n} matrix 
+#' containing the edge weights between each pair of variables).  
+#' 
 #' @return 
 #'  \code{netProps:} a list of containing:  
 #'  \enumerate{
@@ -88,6 +100,11 @@ netProps <- function(adj, moduleIndices) {
 }
 
 #' @rdname wrappers
+#' 
+#' @param sdat a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+#'  numeric data. Assumes columns correspond to variables (e.g. genes, 
+#'  microbial operational taxonomic unit) and rows correspond to samples.
+#' 
 #' @return 
 #'   \code{dataProps:} a list containing:
 #'   \enumerate{

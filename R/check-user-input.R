@@ -10,6 +10,7 @@
 #' @param modules user input for the 'modules' argument.
 #' @param backgroundLabel user input for the 'backgroundLabel' argument.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
+#' @param tempdir temporary directory to save new objects in
 #' 
 #' @seealso
 #' \code{\link{modulePreservation}}
@@ -19,7 +20,7 @@
 #' @return a list of containing the formatted user input
 processInput <- function(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel, 
-                         verbose=TRUE) {
+                         verbose=TRUE, tempdir) {
   # Where do we want to get:
   #   Each "argument" has a list of lists: at the top level, each element 
   #   corresponds to a "discovery" dataset, containing a list, where each element
@@ -143,13 +144,13 @@ processInput <- function(discovery, test, network, correlation, data,
   # ----------------------------------------------------------------------------
   
   if (!is.list(correlation))
-    correlation <- as.list(correlation)
+    correlation <- list(correlation)
   if (!is.list(network))
-    network <- as.list(network)
+    network <- list(network)
   
   # Make sure they're 'bigMatrix' objects
-  correlation <- lapply(correlation, dynamicMatLoad)
-  network <- lapply(network, dynamicMatLoad)
+  correlation <- lapply(correlation, dynamicMatLoad, tempdir)
+  network <- lapply(network, dynamicMatLoad, tmepdir)
   
   # Add any datasets names that are not in dataNames
   dataNames <- c(dataNames, names(correlation))
@@ -178,10 +179,10 @@ processInput <- function(discovery, test, network, correlation, data,
 
   # Otherwise check as per 'network' and 'correlation'
   if (!is.list(data))
-    data <- as.list(data)
+    data <- list(data)
 
   # Make sure they're 'bigMatrix' objects
-  data <- lapply(data, dynamicMatLoad)
+  data <- lapply(data, dynamicMatLoad, tempdir)
 
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
   data <- verifyDatasetOrder(data, "data", dataNames, nDatasets)
@@ -191,7 +192,7 @@ processInput <- function(discovery, test, network, correlation, data,
     # If this fails, ignore for now and throw appropriate error when checking
     # data consistency.
     tryCatch({
-      names(modules) <- names(network)
+      names(data) <- names(network)
     }, error = function(e) {}, warning=function(w) {})
   }
   
@@ -201,7 +202,7 @@ processInput <- function(discovery, test, network, correlation, data,
   
   # Handle cases where moduleAssignments assumed to be for discovery dataset
   if (!is.list(moduleAssignments)) 
-    moduleAssignments <- as.list(moduleAssignments)
+    moduleAssignments <- list(moduleAssignments)
   
   if (length(moduleAssignments) < length(network)) {
     tmp <- rep(list(NULL), length(network))
@@ -300,7 +301,7 @@ processInput <- function(discovery, test, network, correlation, data,
   
   # Handle cases where modules assumed to be for discovery dataset
   if (!is.list(modules)) 
-    modules <- as.list(modules)
+    modules <- list(modules)
   
   if (length(modules) < length(network)) {
     tmp <- rep(list(NULL), length(network))
@@ -421,10 +422,10 @@ processInput <- function(discovery, test, network, correlation, data,
   scaledData <- data
   for (ii in seq_along(scaledData)) {
     if (!is.null(scaledData[[ii]])) {
-      scaledData[[ii]] <- scaleBigMatrix(scaledData[[ii]], tempdir())
+      scaledData[[ii]] <- scaleBigMatrix(scaledData[[ii]], tempdir)
     }
   }
-  
+
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
@@ -463,11 +464,12 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
 #' Dynamically detect and load a bigMatrix object depending on input type
 #' 
 #' @param object user input object
+#' @param tempdir temporary directory to save objects in
 #' @param ... additional arguments to pass to read.bigMatrix
 #'   
 #' @return
 #'  A 'bigMatrix' object or error.
-dynamicMatLoad <- function(object, ...) {
+dynamicMatLoad <- function(object, tempdir, ...) {
   basename <- paste0("tmp", getUUID())
   if (is.null(object)) {
     return(NULL)
@@ -486,7 +488,7 @@ dynamicMatLoad <- function(object, ...) {
         "Creating new 'bigMatrix' in a temporary directory for file ", object,
         ". This could take a while."
       )
-      backingfile <- file.path(tempdir(), basename)
+      backingfile <- file.path(tempdir, basename)
       return(read.bigMatrix(file=object, backingfile=backingfile, ...))
     }
     
@@ -496,7 +498,7 @@ dynamicMatLoad <- function(object, ...) {
       "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
       " This could take a while."
     )
-    backingfile <- file.path(tempdir(), basename)
+    backingfile <- file.path(tempdir, basename)
     return(as.bigMatrix(object, backingfile=backingfile, ...))
   } 
   stop("unable to load object of type ", class(object), " as a bigMatrix!")

@@ -5,7 +5,7 @@
 \title{Process, check, and format input}
 \usage{
 processInput(discovery, test, network, correlation, data, moduleAssignments,
-  modules, backgroundLabel, verbose = TRUE)
+  modules, backgroundLabel, verbose = TRUE, tempdir)
 }
 \arguments{
 \item{discovery}{user input for the 'discovery' argument.}
@@ -23,6 +23,8 @@ processInput(discovery, test, network, correlation, data, moduleAssignments,
 \item{backgroundLabel}{user input for the 'backgroundLabel' argument.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
+
+\item{tempdir}{temporary directory to save new objects in}
 }
 \value{
 a list of containing the formatted user input

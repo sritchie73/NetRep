@@ -4,7 +4,6 @@
 #' or more modules in a user specified dataset.
 #' 
 #' @inheritParams common_params
-#' @inheritParams common_params2
 #' 
 #' @param simplify logical; if \code{TRUE} the output data structure is 
 #'   simplified if only one module is specified.
@@ -165,110 +164,81 @@
 #' @rdname networkProperties
 #' @export
 networkProperties <- function(
-  data=NULL, correlation, network, moduleAssignments, modules,
-  discovery=1, test=1, simplify=TRUE
+  data=NULL, correlation, network, moduleAssignments, modules=NULL,
+  backgroundLabel="0", discovery=1, test=1, simplify=TRUE
 ) {
-  # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
+  #-----------------------------------------------------------------------------
+  # Input processing and sanity checking
+  #-----------------------------------------------------------------------------
+  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
-  on.exit({
-    unlink(tmp.dir, recursive=TRUE)
-  }, add=TRUE)
   
-  # Unify data structures and load in matrices
-  data <- unifyDS(dynamicMatLoad(data))
-  correlation <- unifyDS(dynamicMatLoad(correlation))
-  network <- unifyDS(dynamicMatLoad(network))
+  vCat(TRUE, 0, "Validating user input...")
   
-  # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structuren
-  if (!missing(moduleAssignments) && missing(modules)) {
-    modules <- unique(moduleAssignments[[discovery]])
-  } else if (missing(moduleAssignments) && missing(modules)) {
-    modules <- "1"
-  } else if (missing(moduleAssignments) && !missing(modules)) {
-    stop("'modules' provided but not 'moduleAssignments'")
-  }
+  # Now try to make sense of the rest of the input
+  finput <- processInput(discovery, test, network, correlation, data, 
+                         moduleAssignments, modules, backgroundLabel,
+                         verbose=TRUE, tmp.dir)
+  data <- finput$data
+  correlation <- finput$correlation
+  network <- finput$network
+  moduleAssignments <- finput$moduleAssignments
+  modules <- finput$modules
+  discovery <- finput$discovery
+  test <- finput$test
+  nDatasets <- finput$nDatasets
+  datasetNames <- finput$datasetNames
+  scaledData <- finput$scaledData
   
-  # Format optional input data so it doesn't cause cascading error crashes 
-  data <- formatDataList(data, length(correlation), names(correlation))
-  
-  moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(correlation), names(correlation),
-    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
-  )
-  
-  # Sanity check input for consistency.
-  checkSets(
-    data, correlation, network, moduleAssignments, discovery, test
-  )
-  
-  if (any(modules %nin% moduleAssignments[[discovery]])) {
-    stop(
-      "Could not find module(s) ", 
-      paste(modules %sub_nin% moduleAssignments[[discovery]], collapse=", "),
-      " in the discovery dataset 'moduleAssignments'"
-    )
-  }
-  
-  # Temporarily create scaled dataset for the calculation of the
-  # module summary vector
-  sdat <- NULL
-  if (!is.null(data[[test]])) {
-    tryCatch({
-      checkFinite(data[[test]]) 
-    }, error = function(e) {
-      stop("Non-finite values encountered for the test dataset")
+  res <- lapply(discovery, function(di) {
+    r2 <- lapply(test[[di]], function(ti) {
+      r1 <- lapply(modules[[di]], function(mod) {
+        
+        # Get the row/column indices of the module in the dataset of interest 
+        sub <- moduleAssignments[[di]][moduleAssignments[[di]] == mod]
+        modInds <- match(names(sub), rownames(network[[ti]]))
+        na.inds <- which(is.na(modInds))
+        modInds <- na.omit(modInds)
+        
+        if (length(modInds) == 0) {
+          warning(
+            'none of the variables composing module "', mod, 
+            '" from dataset, "', di, '" are present in dataset "', ti
+          )
+          return(NULL)
+        }
+        
+        # Get the properties calculated from the underlying data used to infer the
+        # network
+        datProps <- NULL
+        if (!is.null(scaledData[[ti]])) {
+          datProps <- dataProps(scaledData[[ti]], modInds)
+          # rename for clarity
+          names(datProps) <- c("summary", "contribution", "coherence")
+          datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
+          names(datProps[[1]]) <- rownames(scaledData)
+          names(datProps[[2]]) <- names(sub)
+        }
+        
+        # Get the properties calculated from the network.
+        netProps <- netProps(network[[ti]], modInds)
+        names(netProps) <- c("degree", "avgWeight")
+        netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
+        names(netProps[[1]]) <- names(sub)
+        
+        c(datProps, netProps)
+      })
+      names(r1) <- modules[[di]]
+      return(r1)
     })
-    sdat <- scaleBigMatrix(data[[test]], tmp.dir)
-  }
-  
-  # Get the properties for each module of interest 
-  res <- lapply(modules, function(mod) {
-    # Get the row/column indices of the module in the dataset of interest 
-    sub <- moduleAssignments[[discovery]][moduleAssignments[[discovery]] == mod]
-    modInds <- match(names(sub), rownames(correlation[[test]]))
-    na.inds <- which(is.na(modInds))
-    modInds <- na.omit(modInds)
-    
-    if (length(modInds) == 0) {
-      stop(
-        "none of the variables composing module ", mod, 
-        " are present in the test dataset"
-      )
-    }
-    
-    tryCatch({
-      checkFinite(network[[test]]) 
-    }, error = function(e) {
-      stop("Non-finite values encountered for the test network")
-    })
-    
-    # Get the properties calculated from the underlying data used to infer the
-    # network
-    datProps <- NULL
-    if (!is.null(sdat)) {
-      datProps <- dataProps(sdat, modInds)
-      # rename for clarity
-      names(datProps) <- c("summary", "contribution", "coherence")
-      datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
-      names(datProps[[1]]) <- rownames(sdat)
-      names(datProps[[2]]) <- names(sub)
-    }
-    
-    # Get the properties calculated from the network.
-    netProps <- netProps(network[[test]], modInds)
-    names(netProps) <- c("degree", "avgWeight")
-    netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
-    names(netProps[[1]]) <- names(sub)
-    
-    c(datProps, netProps)
+    names(r2) <- test[[di]]
+    return(r2)
   })
-  if (simplify && length(res) == 1) {
-    res <- res[[1]]
-  } else {
-    names(res) <- modules
-  } 
+  names(res) <- discovery
+  
+  if (simplify) {
+    res <- simplifyList2(res)
+  }
   res
 }
 
@@ -278,7 +248,6 @@ networkProperties <- function(
 #' modules by the similarity of their summary vectors.
 #' 
 #' @inheritParams common_params
-#' @inheritParams common_params2
 #' 
 #' @param na.rm logical; If \code{TRUE}, genes present in the \code{discovery} 
 #'   dataset but missing from the test dataset are excluded. If \code{FALSE}, 
@@ -483,7 +452,6 @@ nodeOrder <- function(
 #' Get the order of samples within a module based on the module summary vector.
 #' 
 #' @inheritParams common_params
-#' @inheritParams common_params2
 #'
 #' @param na.rm logical; If \code{TRUE} variables present in the 
 #'   \code{discovery} dataset but missing from the \code{test} dataset are 

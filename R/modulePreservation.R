@@ -8,11 +8,6 @@
 #'
 #' @inheritParams common_params
 #' 
-#' @param discovery a vector of names or indices denoting the discovery dataset(s).
-#' @param test a list of vectors of names or indices denoting the test datasets
-#'  for each \code{discovery} dataset. Alternatively can be provided as vector
-#'  if the test datasets are the same for all 'discovery' datasets (e.g. for 
-#'  performing a pairwise comparison).
 #' @param selfPreservation logical; if \code{FALSE} (default) then module 
 #'  preservation analysis will not be performed where the \code{discovery} and
 #'  \code{test} datasets are the same.
@@ -20,11 +15,6 @@
 #'  permutations will be automaticallydetermined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
 #'  Ignored if the user has already registered a parallel backend.
-#' @param modules a list of vectors, one for each \code{discovery} dataset, 
-#'  of modules to perform the analysis on. The default is to analyse all modules
-#'  with the exception of those specified in \code{backgroundLabel}.
-#' @param backgroundLabel a single label that nodes that do not belong to any
-#'  module are assigned. The default is "0".
 #' @param null variables to include when generating the null distributions. 
 #'  Must be either "overlap" or "all" (see details).
 #' @param alternative The type of module preservation test to perform. Must be 
@@ -463,14 +453,8 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
   #-----------------------------------------------------------------------------
-  # Temporary directory to store new bigMatrix objects in
-  vCat(verbose, 0, "creating directory for temporary objects...")
-  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
+  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
-  on.exit({
-    vCat(verbose, 0, "removing temporary object directory...")
-    unlink(tmp.dir, recursive=TRUE)
-  }, add=TRUE)
   
   vCat(verbose, 0, "Validating user input...")
   
@@ -499,7 +483,7 @@ modulePreservation <- function(
   # Check for WGCNA if method == "bicor"
   if (statCorMethod == "bicor") {
     tryCatch({
-      sink(file.path(tempdir(), "suppressedWGCNAstartupMessage.txt"))
+      sink(file.path(tmp.dir, "suppressedWGCNAstartupMessage.txt"))
       suppressMessages(suppressWarnings(require("WGCNA")))
       cor <- function(...) WGCNA::bicor(..., quick=1, nThreads=1)[,]
     }, error = function(e) {
@@ -515,7 +499,7 @@ modulePreservation <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose)
+                         verbose, tmp.dir)
   data <- finput$data
   correlation <- finput$correlation
   network <- finput$network
@@ -525,6 +509,7 @@ modulePreservation <- function(
   test <- finput$test
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
+  scaledData <- finput$scaledData
 
   # If NULL, automatically determine.
   if (is.null(nPerm)) {
@@ -535,15 +520,6 @@ modulePreservation <- function(
     nPerm <- max(1000, requiredPerms(0.05/multiplier))
   } else if (!is.numeric(nPerm) | length(nPerm) > 1 | nPerm < 1) {
     stop("'nPerm' must be a single number > 1")
-  }
-  
-  # Temporarily create scaled data set for the calculation of the
-  # summary expression profile
-  sge <- data
-  for (ii in seq_along(sge)) {
-    if (!is.null(sge[[ii]])) {
-      sge[[ii]] <- scaleBigMatrix(sge[[ii]], tmp.dir)
-    }
   }
 
   # Set up return list 
@@ -599,7 +575,7 @@ modulePreservation <- function(
         overlapModules <- ct$overlapModules
         overlapAssignments <- ct$overlapAssignments
         
-        nStatistics <- ifelse(!is.null(sge[[di]]), 7, 4)
+        nStatistics <- ifelse(!is.null(scaledData[[di]]), 7, 4)
         nModules <- length(overlapModules)
         
         #---------------------------------------------------------------------
@@ -612,7 +588,7 @@ modulePreservation <- function(
         for (mi in overlapModules) {
           modVars <- names(overlapAssignments %sub_in% mi)
           modInds <- match(modVars, colnames(correlation[[di]]))
-          discProps[[mi]] <- moduleProps(network[[di]], modInds, sge[[di]])
+          discProps[[mi]] <- moduleProps(network[[di]], modInds, scaledData[[di]])
         }
         
         #---------------------------------------------------------------------
@@ -624,7 +600,7 @@ modulePreservation <- function(
           modVars <- names(overlapAssignments %sub_in% mi)
           discInds <- match(modVars, colnames(correlation[[di]]))
           testInds <- match(modVars, colnames(correlation[[ti]]))
-          testProps <-  moduleProps(network[[ti]], testInds, sge[[ti]])
+          testProps <-  moduleProps(network[[ti]], testInds, scaledData[[ti]])
           stats <- calcStats(
             discProps[[mi]], testProps, 
             correlation[[di]], discInds,
@@ -648,7 +624,7 @@ modulePreservation <- function(
         if(verbose) {
           # To log progress, we will write our progress to a file for each chunk
           while (TRUE) {
-            run.dir <- file.path(tempdir(), paste0(".run-progress", getUUID()))
+            run.dir <- file.path(tmp.dir, paste0(".run-progress", getUUID()))
             # Handle the infintesimally small chance of a UUID collision
             tryCatch({
               dir.create(run.dir)
@@ -676,13 +652,13 @@ modulePreservation <- function(
               } 
               
               # Attach matrices.
-              if (!is.null(sge[[di]]))
-                sge[[di]] <- attach.bigMatrix(sge[[di]])
+              if (!is.null(scaledData[[di]]))
+                scaledData[[di]] <- attach.bigMatrix(scaledData[[di]])
               correlation[[di]] <- attach.bigMatrix(correlation[[di]])
               network[[di]] <- attach.bigMatrix(network[[di]])
               
-              if (!is.null(sge[[ti]]))
-                sge[[ti]] <- attach.bigMatrix(sge[[ti]])
+              if (!is.null(scaledData[[ti]]))
+                scaledData[[ti]] <- attach.bigMatrix(scaledData[[ti]])
               correlation[[ti]] <- attach.bigMatrix(correlation[[ti]])
               network[[ti]] <- attach.bigMatrix(network[[ti]])
               
@@ -711,7 +687,7 @@ modulePreservation <- function(
                   permInds <- match(permVars, colnames(correlation[[ti]]))
                   # Ensure crashes aren't fatal
                   tryCatch({
-                    permProps <- moduleProps(network[[ti]], permInds, sge[[ti]])
+                    permProps <- moduleProps(network[[ti]], permInds, scaledData[[ti]])
                     chunkStats[mi,,pi] <- calcStats(
                       discProps[[mi]], permProps, 
                       correlation[[di]], discInds,
@@ -746,13 +722,13 @@ modulePreservation <- function(
                 lapply(conns, close)
               }
               # detach once finished.
-              if (!is.null(sge[[di]]))
-                sge[[di]] <- detach.bigMatrix(sge[[di]])
+              if (!is.null(scaledData[[di]]))
+                scaledData[[di]] <- detach.bigMatrix(scaledData[[di]])
               correlation[[di]] <- detach.bigMatrix(correlation[[di]])
               network[[di]] <- detach.bigMatrix(network[[di]])
               
-              if (!is.null(sge[[ti]]))
-                sge[[ti]] <- detach.bigMatrix(sge[[ti]])
+              if (!is.null(scaledData[[ti]]))
+                scaledData[[ti]] <- detach.bigMatrix(scaledData[[ti]])
               correlation[[ti]] <- detach.bigMatrix(correlation[[ti]])
               network[[ti]] <- detach.bigMatrix(network[[ti]])
               gc()
@@ -804,7 +780,7 @@ modulePreservation <- function(
         }
         
         # Order statistics: First density stats, then connectivity, then hybrid
-        if (!is.null(sge[[di]])) {
+        if (!is.null(scaledData[[di]])) {
           statOrder <- c(
             "avg.weight", "coherence", 
             "cor.cor", "cor.degree", "cor.contrib",
@@ -850,5 +826,7 @@ modulePreservation <- function(
   if (simplify) {
     res <- simplifyList2(res)
   }
-  res
+  # Clean up temporary objects
+  unlink(tmp.dir, recursive = TRUE)
+  return(res)
 }
