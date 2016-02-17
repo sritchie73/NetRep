@@ -57,20 +57,14 @@ is.bigMatrix <- function(x) {
 #-------------------------------------------------------------------------------
 setMethod("show", signature(object = "bigMatrix"), function(object) {
   cat(
-    'An object of class "bigMatrix"\n',
-    'Backingfile:', gsub(".desc", ".bin", object@descriptor), "\n",
-    'Current state:', ifelse(object@attached, "attached", "detached"), "\n"
+    '"bigMatrix" of type "', typeof(object), '" with ', nrow(object), 
+    " rows and ", ncol(object), ' columns stored at "',  
+    gsub(".desc", ".bin", object@descriptor), '"\n', sep=""
   )
-  if(object@attached) {
-    cat(" Address:\n")
-    show(object@matrix@address)
-    cat("\n")
-  } 
 })
 
 setMethod("print", signature(x = "bigMatrix"), function(x) {
-  cat("Warning: This is not advised. Here is the head of the matrix:\n")
-  print(head(x))
+  show(x)
 })
 
 setMethod("dim", signature(x = "bigMatrix"), function(x) {
