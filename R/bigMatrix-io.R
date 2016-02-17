@@ -141,9 +141,6 @@ load.bigMatrix <- function(
     if (!is.null(d1@description$colNames) || 
         !is.null(d1@description$rowNames)) 
     {
-      warning(
-        "row and column names will be stripped from existing 'big.matrix'"
-      )
       rn <- d1@description$rowNames
       cn <- d1@description$colNames
       d1@description["rowNames"] <- list(NULL)
@@ -205,10 +202,26 @@ read.bigMatrix <- function(
   backingpath <- normalizePath(backingpath)
   backingfile <- file.path(backingpath, backingname)
   
+  binFile <- paste0(backingname, ".bin")
+  descFile <- paste0(backingname, ".desc")
+  
+  fullBinFile <- paste0(backingfile, ".bin")
+  fullDescFile <- paste0(backingfile, ".bin")
+  cnFile <- paste0(backingfile, "_colnames.txt")
+  rnFile <- paste0(backingfile,  "_rownames.txt")
+  
+  # Allow overwriting
+  if (file.exists(fullBinFile)) {
+    unlink(fullBinFile)
+    unlink(fullDescFile)
+    unlink(cnFile)
+    unlink(rnFile)
+  }
+  
   bm <- read.big.matrix(
     filename=file, 
-    backingfile=paste0(backingname, ".bin"),
-    descriptorfile=paste0(backingname, ".desc"),
+    backingfile=binFile,
+    descriptorfile=descFile,
     backingpath=backingpath, type=type,
     has.row.names=row.names, header=header,
     ...
@@ -258,7 +271,7 @@ read.bigMatrix <- function(
 #' @name bigMatrix-out
 #' @export
 write.bigMatrix <- function(x, file, ...) {
-  write.table(x=x[,], file, ...)
+  write.table(x=x[,,drop=FALSE], file, ...)
 }
 
 #' @rdname bigMatrix-out

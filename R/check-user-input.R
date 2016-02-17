@@ -416,10 +416,19 @@ processInput <- function(discovery, test, network, correlation, data,
   lapply(correlation, checkFinite)
   lapply(network, checkFinite)
   
+  # Temporarily create scaled data set for the calculation of the
+  # summary expression profile
+  scaledData <- data
+  for (ii in seq_along(scaledData)) {
+    if (!is.null(scaledData[[ii]])) {
+      scaledData[[ii]] <- scaleBigMatrix(scaledData[[ii]], tempdir())
+    }
+  }
+  
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
-    nDatasets=nDatasets, datasetNames=names(network)
+    nDatasets=nDatasets, datasetNames=names(network), scaledData=scaledData
   ))
 }
 
