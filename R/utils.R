@@ -442,15 +442,3 @@ simplifyList2 <- function(l) {
   return(l)
 }
 
-
-#' Remove temporarily created bigMatrix objects
-#' 
-#' Prevents the temporary directory from growing excessively large if using many
-#' package functions in the same R session
-#'  
-cleanTempDir <- function() {
-  for (pat in c("*.bin", "*.desc", "*_rownames.txt", "*_colnames.txt")) {
-    path <- file.path(tempdir(), list.files(tempdir(), pat))
-    unlink(path)
-  }
-}
