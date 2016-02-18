@@ -55,7 +55,7 @@
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
 #'   \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
-#'   \link[=sampleOrder]{sample} ordering functions  also expect 'bigMatrix'
+#'   \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
 #'   objects. Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 
@@ -63,12 +63,12 @@
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }
 #' \subsection{Node, sample, and module ordering:}{
-#'   By default, nodes are ordered in decreasing order of within-module
-#'   connectivity in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
+#'   By default, nodes are ordered in decreasing order of \emph{weighted degree}
+#'   in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
 #'   This facilitates the visual comparison of modules across datasets, as the 
 #'   node ordering will be preserved. Missing nodes are colored in grey. If
 #'   \code{orderNodesBy} is "test" nodes will instead be ordered by 
-#'   within-module connectivity in the \code{test} dataset. If "none" nodes are 
+#'   weighted degree in the \code{test} dataset. If "none" nodes are 
 #'   drawn in the order they are provided in the drawn dataset.
 #'   
 #'   When multiple modules are specified, modules are ordered by the similarity
@@ -76,14 +76,14 @@
 #'   set \code{orderModules} to \code{FALSE}.
 #'   
 #'   Sample ordering only applies to \code{plotData} and 
-#'   \code{plotSummary}. By default, samples are ordered in descending
+#'   \code{plotModuleSummary}. By default, samples are ordered in descending
 #'   order of the module summary vector in the drawn dataset for the left-most 
 #'   module appearing on the plot (see \code{\link{sampleOrder}}.
 #' }
-#' \subsection{Normalised connectivity:}{
-#'   The within-module connectivity is normalised by the maximum connectivity in
+#' \subsection{Normalised degree:}{
+#'   The weighted degree is normalised by the maximum connectivity in
 #'   any given module when rendered on the bar plot. This facilitates visual 
-#'   comparison of multiple modules with differing sizes or edge densities.
+#'   comparison of multiple modules with differing sizes or densities.
 #' }
 #' \subsection{Customising plot layout:}{
 #'   Although reasonable default values for most parameters have been provided,
@@ -139,9 +139,9 @@
 #'   vector of colors, one for each node, or a vector of colors to be repeated.
 #'   
 #'   \code{plotContribution} expects \code{palette} to be a vector 
-#'   containing two colors, the first to be used for nodes with negative module
-#'   membership values, and the second to be used for nodes with positive module
-#'   membership values. 
+#'   containing two colors, the first to be used for nodes with negative node
+#'   contribution values, and the second to be used for nodes with positive node
+#'   contribution values. 
 #'   
 #'   \code{plotData} and \code{plotDataLegend} expect the \code{palette}
 #'   argument to be a vector of colors to interpolate over when plotting the
