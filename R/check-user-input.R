@@ -532,8 +532,12 @@ processInput <- function(discovery, test, network, correlation, data,
     }
   }
   
-  datasetNames <- structure(names(network), names=names(network))
-  
+  if (!is.null(names(network))) {
+    datasetNames <- structure(names(network), names=names(network))
+  } else {
+    datasetNames <- NULL
+  }
+
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
