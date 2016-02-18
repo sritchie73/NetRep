@@ -332,13 +332,11 @@ netPropsInternal <- function(
 #' @inheritParams common_params
 #' @inheritParams simplify_param
 #' @inheritParams par_param
+#' @inheritParams orderModules_param
 #' 
 #' @param na.rm logical; If \code{TRUE}, nodes and moduels present in the 
 #'   \code{discovery} dataset but missing from the test dataset are excluded. If
 #'   \code{FALSE}, missing nodes and modules are put last in the ordering.
-#' @param orderModules logical; if \code{TRUE} modules ordered by clustering 
-#'   their summary vectors. If \code{FALSE} modules are returned in the order
-#'   provided.
 #'   
 #' @details
 #'  \subsection{Input data structure:}{

@@ -53,3 +53,15 @@ NULL
 #'
 #' @name par_param
 NULL
+
+#' Template parameters
+#' 
+#' Template parameters to be imported into other function documentation. This 
+#' is not intended to be a stand-alone help file.
+#'
+#' @param orderModules logical; if \code{TRUE} modules ordered by clustering 
+#'   their summary vectors. If \code{FALSE} modules are returned in the order
+#'   provided.
+#'
+#' @name orderModules_param
+NULL
