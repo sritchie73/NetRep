@@ -486,4 +486,3 @@ simplifyList <- function(l, depth) {
     return(l)
   }
 }
-
