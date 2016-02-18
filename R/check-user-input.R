@@ -20,7 +20,7 @@
 #' @return a list of containing the formatted user input
 processInput <- function(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel, 
-                         verbose=TRUE, tempdir) {
+                         verbose, tempdir) {
   # Where do we want to get:
   #   Each "argument" has a list of lists: at the top level, each element 
   #   corresponds to a "discovery" dataset, containing a list, where each element
@@ -408,7 +408,7 @@ processInput <- function(discovery, test, network, correlation, data,
   
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang.
-  vCat(verbose, 0, "checking matrices for non-finite values...")
+  vCat(verbose, 1, "checking matrices for non-finite values...")
   lapply(data, function(x) { 
     if (!is.null(x)) {
       checkFinite(x)
