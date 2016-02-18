@@ -233,13 +233,6 @@ plotModule <- function(
   
   vCat(verbose, 0, "Validating user input...")
   
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef)
-  }, add=TRUE)
-  
   # Check plot-specific arguments
   if (class(main) != "character")
     stop("'main' must be a characer vector")
@@ -252,14 +245,18 @@ plotModule <- function(
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
-  if (missing(plotModuleNames))
-    plotModuleNames <- !missing(modules) && length(modules) > 1
-  
   # At this time, we can only plot within one dataset.
   if (!is.vector(discovery) | !is.vector(test) | 
       length(discovery) > 1 | length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
+  
+  # Register parallel backend. 
+  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
+  nCores <- par$nCores
+  on.exit({
+    cleanupCluster(par$cluster, par$predef)
+  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
@@ -284,11 +281,14 @@ plotModule <- function(
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
   names(discAsTest) <- discovery
-  
+
   on.exit({
     vCat(verbose, 0, "Cleaning up temporary objects...")
     unlink(tmp.dir, recursive = TRUE)
   }, add = TRUE)
+  
+  if (missing(plotModuleNames))
+    plotModuleNames <- length(mods) > 1
   
   if ((orderSamplesBy == "discovery" & is.null(scaledData[[di]])) |
       (orderSamplesBy == "test" & is.null(scaledData[[ti]]))) {
