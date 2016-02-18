@@ -4,6 +4,7 @@
 #' 
 #' @param discovery user input for the 'discovery' argument.
 #' @param test user input for the 'test' argument.
+#' @param network user input for the 'network' argument.
 #' @param correlation user input for the 'correlation' argument.
 #' @param data user input for the 'data' argument.
 #' @param moduleAssignments user input for the 'moduleAssignments' argument.
@@ -566,7 +567,7 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
          "'", errname, "' matrices")
   }
   if (is.null(dataNames) & (length(tocheck) < nDatasets)) {
-    stop("expecting ", nDatasets, "'", errname, "' matrices ", length(correlation),
+    stop("expecting ", nDatasets, "'", errname, "' matrices ", length(tocheck),
          " provided")
   }
   

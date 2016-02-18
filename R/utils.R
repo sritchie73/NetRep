@@ -448,7 +448,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
 cleanupCluster <- function(cluster, predef) {
   if (!is.null(cluster)) {
     if (suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
-      doParallel::stopCluster(cluster)
+      parallel::stopCluster(cluster)
     }
   } else if (!predef) {
     if (suppressWarnings(suppressMessages(requireNamespace("doMC")))) {

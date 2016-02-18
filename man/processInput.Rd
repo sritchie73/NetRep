@@ -12,6 +12,8 @@ processInput(discovery, test, network, correlation, data, moduleAssignments,
 
 \item{test}{user input for the 'test' argument.}
 
+\item{network}{user input for the 'network' argument.}
+
 \item{correlation}{user input for the 'correlation' argument.}
 
 \item{data}{user input for the 'data' argument.}

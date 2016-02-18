@@ -190,7 +190,7 @@ in the test dataset.
  contribution} (\code{'avg.contrib'}), and \emph{concordance of node 
  contribution} (\code{'cor.contrib'}) are all calculated from the data used 
  to infer the network (provided in the \code{'data'} argument). They are 
- calculated from the module’s \emph{summary profile}. This is the eigenvector
+ calculated from the module's \emph{summary profile}. This is the eigenvector
  of the 1st principal component across all observations for every node
  composing the module. For gene coexpression modules this can be interpreted
  as a "summary expression profile". It is typically referred to as the

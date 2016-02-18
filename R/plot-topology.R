@@ -372,6 +372,7 @@ plotData <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
@@ -631,6 +632,7 @@ plotCorrelation <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
@@ -852,6 +854,7 @@ plotNetwork <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
@@ -1075,6 +1078,7 @@ plotContribution <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
@@ -1273,6 +1277,7 @@ plotDegree <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
@@ -1439,6 +1444,7 @@ plotSummary <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)
@@ -1652,7 +1658,7 @@ plotDataLegend <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
-  
+
   on.exit({
     vCat(verbose, 0, "Cleaning up temporary objects...")
     unlink(tmp.dir, recursive = TRUE)

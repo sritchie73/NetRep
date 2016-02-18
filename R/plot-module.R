@@ -277,6 +277,7 @@ plotModule <- function(
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
+  mi <- NULL # initialise to suppress CRAN NOTE
   
   # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
   discAsTest <- list(discovery)

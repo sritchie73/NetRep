@@ -91,7 +91,7 @@
 #'  contribution} (\code{'avg.contrib'}), and \emph{concordance of node 
 #'  contribution} (\code{'cor.contrib'}) are all calculated from the data used 
 #'  to infer the network (provided in the \code{'data'} argument). They are 
-#'  calculated from the module’s \emph{summary profile}. This is the eigenvector
+#'  calculated from the module's \emph{summary profile}. This is the eigenvector
 #'  of the 1st principal component across all observations for every node
 #'  composing the module. For gene coexpression modules this can be interpreted
 #'  as a "summary expression profile". It is typically referred to as the
@@ -483,7 +483,7 @@ modulePreservation <- function(
   if (statCorMethod == "bicor") {
     tryCatch({
       sink(file.path(tmp.dir, "suppressedWGCNAstartupMessage.txt"))
-      suppressMessages(suppressWarnings(require("WGCNA")))
+      suppressMessages(suppressWarnings(requireNamespace("WGCNA")))
       cor <- function(...) WGCNA::bicor(..., quick=1, nThreads=1)[,]
     }, error = function(e) {
       stop("'statCorMethod' = 'bicor' requires the 'WGCNA' package to be",
