@@ -232,7 +232,7 @@ processInput <- function(discovery, test, network, correlation, data,
     tmp <- rep(list(NULL), length(network))
     names(tmp) <- names(network)
     if (length(discovery) != length(moduleAssignments))
-      stop("must have a 'moduleAssignments' vector for each 'discovery dataset")
+      stop("must have a 'moduleAssignments' vector for each 'discovery' dataset")
     tmp[discovery] <- moduleAssignments
     moduleAssignments <- tmp
   }
@@ -268,12 +268,72 @@ processInput <- function(discovery, test, network, correlation, data,
   }
   
   # ----------------------------------------------------------------------------
-  # Next, process the 'modules' argument
+  # Next, process the 'backgroundLabel' argument
   # ----------------------------------------------------------------------------
   
-  if (!is.vector(backgroundLabel))
-    stop("expecting 'backgroundLabel' to be a vector of module labels to ignore")
+  # User had to explicitly turn off, they probably mean "don't ignore this 
+  # module"
+  if (is.null(backgroundLabel))
+    backgroundLabel <- vector()
+
+  # Make one for each discovery dataset if its a vector
+  if (is.vector(backgroundLabel)) {
+    tmp <- rep(list(NULL), length(moduleAssignments))
+    names(tmp) <- names(moduleAssignments)
+    for (ii in seq_along(moduleAssignments)) {
+      if (!is.null(moduleAssignments[[ii]])) {
+        tmp[[ii]] <- backgroundLabel
+      }
+    }
+    backgroundLabel <- tmp
+  }
   
+  # if passed as a list, they probably mean one for each discovery dataset 
+  if (length(backgroundLabel) < length(moduleAssignments)) {
+    tmp <- rep(list(NULL), length(moduleAssignments))
+    names(tmp) <- names(moduleAssignments)
+    if (length(discovery) != length(backgroundLabel))
+      stop("must have a 'backgroundLabel' vector for each 'discovery' dataset")
+    tmp[discovery] <- backgroundLabel
+    backgroundLabel <- tmp
+  }
+  
+  # Make sure that its a list of vectors
+  for (ii in seq_along(backgroundLabel)) {
+    if (!is.null(backgroundLabel[[ii]]) & !is.vector(backgroundLabel[[ii]]))
+      stop("expecting a list of vectors for 'backgroundLabel'")
+  }
+  
+  # Check that we can match 'discovery' to the provided 'backgroundLabel'
+  discNames <- names(discovery)
+  if(!is.null(discNames) & is.null(names(backgroundLabel))) {
+    stop("cannot match dataset names in 'discovery' to the provided ",
+         "'backgroundLabel' list")
+  }
+  if (!is.null(discNames) & any(discNames %nin% names(backgroundLabel))) {
+    stop("cannot match dataset names in 'discovery' to the provided ",
+         "'backgroundLabel' list")
+  }
+  if (is.null(discNames) & (length(backgroundLabel) < length(unique(discovery)))) {
+    stop("expecting ", length(discovery), " 'moduleAssignment' vectors, ", 
+         nDatasets, " provided")
+  }
+  
+  # If any nodes are missing module assignments, set them to the background 
+  # label
+  for (di in discovery) {
+    unlabelled <- colnames(network[[di]]) %sub_nin% names(moduleAssignments[[di]])
+    if (length(unlabelled) > 0) {
+      bgnodes <- rep(backgroundLabel[[di]][1], length(unlabelled))
+      names(bgnodes) <- unlabelled
+      moduleAssignments[[di]] <- c(moduleAssignments[[di]], bgnodes)
+    }
+  }
+  
+  # ----------------------------------------------------------------------------
+  # Next, process the 'modules' argument
+  # ----------------------------------------------------------------------------
+
   # If not specified, run for all modules except the network background
   if (is.null(modules)) {
     # Discovery datasets are named
@@ -416,10 +476,6 @@ processInput <- function(discovery, test, network, correlation, data,
       if (any(names(moduleAssignments[[ii]]) %nin% colnames(network[[ii]]))) {
         stop("module assigments are present for nodes that are not in the",
              " 'network' inferred from dataset ", '"', ii, '"')
-      }
-      if (any(colnames(network[[ii]]) %nin% names(moduleAssignments[[ii]]))) {
-        stop("nodes in the 'network' inferred from dataset ", '"', ii, '"',
-             " are missing module assignments in 'moduleAssignments'")
       }
     }
     
