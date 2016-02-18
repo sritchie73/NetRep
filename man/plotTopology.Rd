@@ -30,8 +30,8 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   plotNodeNames = TRUE, plotModuleNames, main = "",
   palette = correlation.palette(), border.width = 2, plotLegend = TRUE,
   legend.main = "Correlation", gaxt.line = -0.5, maxt.line = 3,
-  legend.position, legend.tick.size = 0.03, laxt.line = 2.5,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  legend.position, legend.tick.size, laxt.line, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
@@ -40,8 +40,8 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   plotNodeNames = TRUE, plotModuleNames, main = "",
   palette = network.palette(), border.width = 2, plotLegend = TRUE,
   legend.main = "Edge weight", gaxt.line = -0.5, maxt.line = 3,
-  legend.position, legend.tick.size = 0.03, laxt.line = 2.5,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  legend.position, legend.tick.size, laxt.line, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 
 plotContribution(data = NULL, correlation, network, moduleAssignments,
   modules, discovery = 1, test = 1, orderNodesBy = "discovery",

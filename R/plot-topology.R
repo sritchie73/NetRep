@@ -564,7 +564,7 @@ plotCorrelation <- function(
   orderModules=TRUE, plotNodeNames=TRUE, plotModuleNames, main="", 
   palette=correlation.palette(), border.width=2, plotLegend=TRUE, 
   legend.main="Correlation", gaxt.line=-0.5, maxt.line=3, legend.position, 
-  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  legend.tick.size, laxt.line, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -726,8 +726,13 @@ plotCorrelation <- function(
     gaxt <- nodeOrder
   
   if (symmetric) {
+    # Set defaults
     if (missing(legend.position))
       legend.position <- 0.15
+    if (missing(laxt.line))
+      laxt.line <- 3
+    if (missing(legend.tick.size))
+      legend.tick.size <- 0.03
     
     # Add space for the legend
     if (plotLegend) {
@@ -748,8 +753,14 @@ plotCorrelation <- function(
       legend.line=legend.position, maxt.line=maxt.line
     )
   } else {
+    # Set defaults 
     if (missing(legend.position))
       legend.position <- 0.1
+    if (missing(laxt.line))
+      laxt.line <- 2.5
+    if (missing(legend.tick.size))
+      legend.tick.size <- 0.025
+    
     plotTriangleHeatmap(
       correlation[[ti]][presentNodes, presentNodes], palette, c(-1, 1),
       moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=gaxt, 
@@ -773,8 +784,8 @@ plotNetwork <- function(
   orderSamplesBy="test", orderNodesBy="discovery", symmetric=FALSE,
   orderModules=TRUE, plotNodeNames=TRUE, plotModuleNames, main="",
   palette=network.palette(), border.width=2, plotLegend=TRUE, 
-  legend.main="Edge weight", gaxt.line=-0.5, maxt.line=3, legend.position, 
-  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  legend.main="Edge weight", gaxt.line=-0.5, maxt.line=3, legend.position,
+  legend.tick.size, laxt.line, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -935,8 +946,13 @@ plotNetwork <- function(
     gaxt <- nodeOrder
   
   if (symmetric) {
+    # Set defaults
     if (missing(legend.position))
       legend.position <- 0.15
+    if (missing(laxt.line))
+      laxt.line <- 3
+    if (missing(legend.tick.size))
+      legend.tick.size <- 0.03
     
     # Add space for the legend
     if (plotLegend) {
@@ -958,8 +974,14 @@ plotNetwork <- function(
       border.width=border.width
     )
   } else {
+    # Set defaults 
     if (missing(legend.position))
       legend.position <- 0.1
+    if (missing(laxt.line))
+      laxt.line <- 2.5
+    if (missing(legend.tick.size))
+      legend.tick.size <- 0.025
+    
     plotTriangleHeatmap(
       network[[ti]][presentNodes, presentNodes], palette, c(0, 1), 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=gaxt, 

@@ -380,7 +380,8 @@ addGradientLegend <- function(
     sapply(at, function(aa) {
       lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=border.width, xpd=NA)
     })
-    text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA)
+    text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA, 
+         srt=45, adj=1)
   } else {
     tck <- (par("usr")[2] - par("usr")[1])*tick.size
     
