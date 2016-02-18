@@ -308,7 +308,6 @@ netPropsInternal <- function(
     c(datProps, netProps)
   }
   # Now we need to name the output 
-  browser()
   names(res) <- datasetNames[discovery]
   for (di in discovery) {
     names(res[[di]]) <- datasetNames[test[[di]]]
@@ -612,12 +611,12 @@ nodeOrder <- function(
 #' Get the order of samples within a module based on the module summary vector.
 #' 
 #' @inheritParams common_params
-#'
+#' @inheritParams simplify_param
+#' @inheritParams par_param
+#' 
 #' @param na.rm logical; If \code{TRUE} variables present in the 
 #'   \code{discovery} dataset but missing from the \code{test} dataset are 
 #'   excluded. If \code{FALSE} missing variables are put last in the ordering.
-#' @param simplify logical; If \code{TRUE} a vector is returned instead of a 
-#'  list when applying the function to one module.
 #'   
 #' @details
 #'  \subsection{Input data structure:}{
@@ -658,8 +657,12 @@ nodeOrder <- function(
 #' }
 #' 
 #' @return
-#'  A list of vectors, one per module of interest, each containing the sample 
-#'  names sorted in descending order of the module's summary vector. 
+#'  A nested list structure. At the top level, the list has one element per 
+#'  \code{'discovery'} dataset. Each of these elements is a list that has one
+#'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
+#'  dataset. Each of these elements is a list that has one element per 
+#'  \code{'modules'} specified, containing a vector of sample names or indices 
+#'  for the requested module.
 #'  
 #' @examples
 #' \dontrun{
@@ -750,32 +753,80 @@ nodeOrder <- function(
 #' @name sampleOrder
 #' @export
 sampleOrder <- function(
-  data, correlation, network, moduleAssignments, modules,
-  discovery=1, test=1, na.rm=FALSE, simplify=TRUE
+  data=NULL, correlation, network, moduleAssignments, modules=NULL, 
+  backgroundLabel="0", discovery=1, test=1, nCores=1, na.rm=FALSE, 
+  simplify=TRUE, verbose=TRUE
 ) {
-  if (is.null(data[[test]]))
-    stop("Cannot order samples without 'data'")
-  props <- networkProperties(
-    data, correlation, network, moduleAssignments, modules,
-    discovery, test, simplify=FALSE
-  )
-
-  res <- lapply(props, function(mip) {
-    # Need to handle cases where no rownames are provided
-    if (!is.null(names(mip$summary))) {
-      names(sort(
-        mip$summary, decreasing=TRUE, 
-        na.last=ifelse(na.rm, NA, TRUE)
-      ))
-    } else {
-      order(
-        mip$summary, decreasing=TRUE, 
-        na.last=ifelse(na.rm, NA, TRUE)
-      )
-    }
-  })
-  if (simplify && length(res) == 1) {
-    res <- res[[1]]
+  #-----------------------------------------------------------------------------
+  # Input processing and sanity checking
+  #-----------------------------------------------------------------------------
+  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
+  dir.create(tmp.dir, showWarnings=FALSE)
+  
+  # Register parallel backend. 
+  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
+  nCores <- par$nCores
+  on.exit({
+    cleanupCluster(par$cluster, par$predef)
+  }, add=TRUE)
+  
+  vCat(verbose, 0, "Validating user input...")
+  
+  if (!is.logical(na.rm) | is.na(na.rm) | length(na.rm) > 1) {
+    stop("'na.rm' must be either 'TRUE' or 'FALSE'")
   }
+  
+  # Now try to make sense of the rest of the input
+  finput <- processInput(discovery, test, network, correlation, data, 
+                         moduleAssignments, modules, backgroundLabel,
+                         verbose, tmp.dir)
+  on.exit({
+    vCat(verbose, 0, "Cleaning up temporary objects...")
+    unlink(tmp.dir, recursive = TRUE)
+  }, add = TRUE)
+  
+  # We need to make sure that there is data in each 'test' dataset.
+  for (di in discovery) {
+    for (ti in test[[di]]) {
+      if (is.null(finput$data[[ti]])) {
+        stop("'data' must be provided for all 'test' datasets")
+      }   
+    }
+  }
+  
+  vCat(verbose, 0, "User input ok!")
+  
+  # Calculate the network properties
+  props <- with(finput, {
+    netPropsInternal(scaledData, correlation, network, moduleAssignments, 
+                     modules, discovery, test, datasetNames, verbose)
+  })
+
+  vCat(verbose, 0, "Ordering samples...")
+  res <- lapply(props, function(discProps) {
+    lapply(discProps, function(testProps) {
+      lapply(testProps, function(modProps) {
+        summary <- modProps[["summary"]]
+        if (na.rm) {
+          summary <- na.omit(summary)
+        }
+        summaryOrder <- order(summary, decreasing=TRUE, na.last=TRUE)
+        
+        if(is.null(names(summary))) {
+          return(summaryOrder)
+        } else {
+          return(names(summary)[summaryOrder])
+        }
+      })
+    })
+  })
+  
+
+  # Simplify the output data structure where possible
+  if (simplify) {
+    res <- simplifyList(res, depth=2)
+  }
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
   res
+  return(res)
 }

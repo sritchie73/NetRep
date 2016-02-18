@@ -4,8 +4,9 @@
 \alias{sampleOrder}
 \title{Order samples within a network.}
 \usage{
-sampleOrder(data, correlation, network, moduleAssignments, modules,
-  discovery = 1, test = 1, na.rm = FALSE, simplify = TRUE)
+sampleOrder(data = NULL, correlation, network, moduleAssignments,
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  nCores = 1, na.rm = FALSE, simplify = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -25,24 +26,40 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{modules}{a vector of modules to apply the function to (see details).}
+\item{modules}{a list of vectors, one for each \code{discovery} dataset, 
+of modules to perform the analysis on. The default is to analyse all modules
+with the exception of those specified in \code{backgroundLabel}.}
 
-\item{discovery}{name or index denoting which dataset the module of interest
-was discovered in (see details).}
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
 
-\item{test}{name or index denoting which dataset to apply the function to 
-(see details).}
+\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
+
+\item{test}{a list of vectors of names or indices denoting the test datasets
+for each \code{discovery} dataset. Alternatively can be provided as vector
+if the test datasets are the same for all 'discovery' datasets (e.g. for 
+performing a pairwise comparison).}
+
+\item{nCores}{number of cores to parallelise the calculation of network 
+properties over. Ignored if the user has already registered a parallel 
+backend.}
 
 \item{na.rm}{logical; If \code{TRUE} variables present in the 
 \code{discovery} dataset but missing from the \code{test} dataset are 
 excluded. If \code{FALSE} missing variables are put last in the ordering.}
 
-\item{simplify}{logical; If \code{TRUE} a vector is returned instead of a 
-list when applying the function to one module.}
+\item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
+list if possible (see Return Value).}
+
+\item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 }
 \value{
-A list of vectors, one per module of interest, each containing the sample 
- names sorted in descending order of the module's summary vector.
+A nested list structure. At the top level, the list has one element per 
+ \code{'discovery'} dataset. Each of these elements is a list that has one
+ element per \code{'test'} dataset analysed for that \code{'discovery'} 
+ dataset. Each of these elements is a list that has one element per 
+ \code{'modules'} specified, containing a vector of sample names or indices 
+ for the requested module.
 }
 \description{
 Get the order of samples within a module based on the module summary vector.
