@@ -13,9 +13,10 @@
 \alias{plotTopology}
 \title{Plot a topological feature of network module}
 \usage{
-plotData(data, correlation, network, moduleAssignments, modules,
-  discovery = 1, test = 1, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules, plotNodeNames = TRUE,
+plotData(data, correlation, network, moduleAssignments = NULL,
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "",
   palette = data.palette(), border.width = 2, plotLegend = TRUE,
   legend.main = "data", gaxt.line = -0.5, saxt.line = -0.5,
@@ -96,12 +97,21 @@ then this argument should be a list of such vectors.}
 of modules to perform the analysis on. The default is to analyse all modules
 with the exception of those specified in \code{backgroundLabel}.}
 
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
+
 \item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
 
 \item{test}{a list of vectors of names or indices denoting the test datasets
 for each \code{discovery} dataset. Alternatively can be provided as vector
 if the test datasets are the same for all 'discovery' datasets (e.g. for 
 performing a pairwise comparison).}
+
+\item{nCores}{number of cores to parallelise the calculation of network 
+properties over. Ignored if the user has already registered a parallel 
+backend.}
+
+\item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 
 \item{orderSamplesBy}{one of "discovery", "test" or "none". Controls how 
 samples are ordered on the plot (see details).}
