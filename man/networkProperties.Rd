@@ -6,7 +6,7 @@
 \usage{
 networkProperties(data = NULL, correlation, network, moduleAssignments,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
-  simplify = TRUE)
+  nCores = 1, simplify = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -40,11 +40,19 @@ for each \code{discovery} dataset. Alternatively can be provided as vector
 if the test datasets are the same for all 'discovery' datasets (e.g. for 
 performing a pairwise comparison).}
 
-\item{simplify}{logical; if \code{TRUE} the output data structure is 
-simplified if only one module is specified.}
+\item{nCores}{number of cores to parallelise the calculation of network 
+properties over. Ignored if the user has already registered a parallel 
+backend.}
+
+\item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
+list if possible (see Return Value).}
+
+\item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 }
 \value{
-A list of network properties for each module of interest:
+A list with entries for each \code{'discovery'} dataset containing lists
+ with entries for each \code{'test'} dataset containing a list of network 
+ properties for each module of interest:
  \itemize{
    \item{\code{'degree'}:}{
      The weighted within-module degree: the sum of edge weights for each 
@@ -54,7 +62,7 @@ A list of network properties for each module of interest:
      The average edge weight within the module.
    }
  }
- If the data used to infer the \code{test} network is provided  
+ If the \code{'data'} used to infer the \code{'test'} network is provided  
  then the following are also returned:
  \itemize{
    \item{\code{'summary'}:}{

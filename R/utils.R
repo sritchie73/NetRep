@@ -324,36 +324,60 @@ getModuleVarsUnsorted <- function(
 #' Set up a backend with the requested number of cores, or use existing backend
 #' if the user has set one up already.
 #'
-#' @param nCores number of cores to use.
-setupParallel <- function(nCores=NULL, verbose) {
+#' @param nCores number of cores requested.
+#' @param verbose logical; Is verbose printing on?
+#' @param reporterCore logical; is there a reporter core?
+#' 
+#' @details
+#'  If \code{verbose = TRUE} and \code{reporterCore = TRUE} then an extra core
+#'  will be registered for reporting: This core simply sits and prints out 
+#'  progress bars for the permutation procedure.
+#'  
+#' @return
+#'  A list containing the total number of cores registered, the registered
+#'  cluster if on a Windows machine, and whether an existing parallel backend
+#'  is being used. 
+#'  
+setupParallel <- function(nCores, verbose, reporterCore) {
+  
+  if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)
+    stop("'nCores' must be a single number greater than 0")
+  
+  # Defaults to return
+  cl <- NULL
+  predef <- FALSE
+  
   # First, check whether the user has already set up a parallel backend. In this
   # case, we can ignore the `nCores` argument.
   if (getDoParWorkers() > 1) {
-    vCat(
-      verbose, 0, "Ignoring 'nCores': parallel backend detected.", 
-      "Reserving 1 core for progress reporting.",
-      getDoParWorkers() - 1, "cores will be used for computation"
-    )
+    vCat(verbose, 0, "Ignoring 'nCores': parallel backend detected.")
+    if (reporterCore) {
+      vCat(
+        verbose, 0, "Reserving 1 core for progress reporting.",
+        getDoParWorkers() - 1, "cores will be used for computation"
+      )
+    }
     nCores <- getDoParWorkers()
+    predef <- TRUE
   } 
-  
   # If the user is on a Windows machine, we have to use the `doParallel` package 
   else if (.Platform$OS.type == "windows" & nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
     if(suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
       # we need an additional thread to monitor and report progress
-      if (verbose)  
+      workerCores <- nCores
+      if (verbose & reporterCore) {
         nCores <- nCores + 1
+      }
+        
       cl <- parallel::makeCluster(nCores)
       doParallel::registerDoParallel(cl)
-      on.exit({
-        parallel::stopCluster(cl)
-      }, add=TRUE)
-      vCat(verbose, 0, "Running on", nCores - 1, "cores.")
-      if ((nCores - 1) > parallel::detectCores()) {
+      
+      vCat(verbose, 0, "Running on", workerCores, "cores.")
+      if (workerCores > parallel::detectCores()) {
         stop(
-          "Requested number of threads (", nCores - 1, ") is higher than the ",
+          "Requested number of threads (", workerCores, ") is higher than the ",
           "number of available cores (", parallel::detectCores(), 
           "). Using too many threads may cause the machine to thrash/freeze."
         )
@@ -372,13 +396,15 @@ setupParallel <- function(nCores=NULL, verbose) {
     # continue
     if(suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
       # we need an additional thread to monitor and report progress
-      if (verbose) 
+      workerCores <- nCores
+      if (verbose & reporterCore) {
         nCores <- nCores + 1
+      }
       doMC::registerDoMC(nCores)
-      vCat(verbose, 0, "Running on", nCores - 1, "cores.")
+      vCat(verbose, 0, "Running on", workerCores, "cores.")
       if ((nCores - 1) > parallel::detectCores()) {
         stop(
-          "Requested number of threads (", nCores - 1, ") is higher than the ",
+          "Requested number of threads (", workerCores, ") is higher than the ",
           "number of available cores (", parallel::detectCores(), 
           "). Using too many threads may cause the machine to thrash/freeze."
         )
@@ -410,16 +436,36 @@ setupParallel <- function(nCores=NULL, verbose) {
   # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
   omp_set_num_threads(1)
   blas_set_num_threads(1)
+  
+  return(list(nCores=nCores, cluster=cl, predef=predef))
 }
 
-#' Remove unnecessary list structure at depth = 2
+#' De-register a parallel backend
+#' 
+#' @param cluster registered cluster on a Windows machine
+#' @param predef logical; was a pre-existing parallel backend used?
+#' 
+cleanupCluster <- function(cluster, predef) {
+  if (!is.null(cluster)) {
+    if (suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
+      doParallel::stopCluster(cluster)
+    }
+  } else if (!predef) {
+    if (suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
+      doMC::registerDoMC(1)
+    }
+  }
+}
+
+#' Remove unnecessary list structure 
 #'
 #' Removes entries that are \code{NULL} are extracts element if the length is 1.
 #'
 #' @param l a nested list
+#' @param depth depth to traverse to
 #' 
 #' @return a list
-simplifyList2 <- function(l) {
+simplifyList <- function(l, depth) {
   filterNulls <- function(l) {
     l <- l[!sapply(l, is.null)]
     if (length(l) == 0)
@@ -431,14 +477,21 @@ simplifyList2 <- function(l) {
       return(l[[1]])
     return(l)
   }
-  # At depth 2
-  for (i1 in rev(seq_along(l))) {
-    l[[i1]] <- filterNulls(l[[i1]])
-    l[[i1]] <- collapse(l[[i1]])
+  
+  # Recursively traverse until we hit the depth requested, then filter out NULL
+  # entries and collapse if length == 1.
+  stopifnot(is.numeric(depth) & depth > 0)
+  if (depth == 1) {
+    l <- filterNulls(l)
+    l <- collapse(l)
+    return(l)
+  } else {
+    for (i1 in rev(seq_along(l))) {
+      l[[i1]] <- simplifyList(l[[i1]], depth=depth-1)
+      l <- filterNulls(l)
+      l <- collapse(l)
+    }
+    return(l)
   }
-  # At depth 1
-  l <- filterNulls(l)
-  l <- collapse(l)
-  return(l)
 }
 

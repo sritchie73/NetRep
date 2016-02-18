@@ -26,6 +26,30 @@
 #'  for each \code{discovery} dataset. Alternatively can be provided as vector
 #'  if the test datasets are the same for all 'discovery' datasets (e.g. for 
 #'  performing a pairwise comparison).
-#'  
+#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
+#' 
 #' @name common_params
+NULL
+
+#' Template parameters
+#' 
+#' Template parameters to be imported into other function documentation. This 
+#' is not intended to be a stand-alone help file.
+#'
+#' @param simplify logical; if \code{TRUE}, simplify the structure of the output
+#'  list if possible (see Return Value).
+#'  
+#' @name simplify_param
+NULL
+
+#' Template parameters
+#' 
+#' Template parameters to be imported into other function documentation. This 
+#' is not intended to be a stand-alone help file.
+#'
+#' @param nCores number of cores to parallelise the calculation of network 
+#'  properties over. Ignored if the user has already registered a parallel 
+#'  backend.
+#'
+#' @name simplify_param
 NULL

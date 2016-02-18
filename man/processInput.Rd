@@ -5,7 +5,7 @@
 \title{Process, check, and format input}
 \usage{
 processInput(discovery, test, network, correlation, data, moduleAssignments,
-  modules, backgroundLabel, verbose = TRUE, tempdir)
+  modules, backgroundLabel, verbose, tempdir)
 }
 \arguments{
 \item{discovery}{user input for the 'discovery' argument.}

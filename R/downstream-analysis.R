@@ -47,7 +47,9 @@
 #' }
 #' 
 #' @return 
-#'  A list of network properties for each module of interest:
+#'  A list with entries for each \code{'discovery'} dataset containing lists
+#'  with entries for each \code{'test'} dataset containing a list of network 
+#'  properties for each module of interest:
 #'  \itemize{
 #'    \item{\code{'degree'}:}{
 #'      The weighted within-module degree: the sum of edge weights for each 
@@ -57,7 +59,7 @@
 #'      The average edge weight within the module.
 #'    }
 #'  }
-#'  If the data used to infer the \code{test} network is provided  
+#'  If the \code{'data'} used to infer the \code{'test'} network is provided  
 #'  then the following are also returned:
 #'  \itemize{
 #'    \item{\code{'summary'}:}{
@@ -74,7 +76,7 @@
 #'      vector.
 #'    }
 #'  }
-#' 
+#'   
 #' @examples
 #' \dontrun{
 #' ## Create some example data
@@ -165,7 +167,8 @@
 #' @export
 networkProperties <- function(
   data=NULL, correlation, network, moduleAssignments, modules=NULL,
-  backgroundLabel="0", discovery=1, test=1, simplify=TRUE
+  backgroundLabel="0", discovery=1, test=1, nCores=1, simplify=TRUE, 
+  verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
@@ -173,74 +176,135 @@ networkProperties <- function(
   tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   
-  vCat(TRUE, 0, "Validating user input...")
+  # Register parallel backend. 
+  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
+  nCores <- par$nCores
+  on.exit({
+    cleanupCluster(par$cluster, par$predef)
+  }, add=TRUE)
+  
+  vCat(verbose, 0, "Validating user input...")
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose=TRUE, tmp.dir)
-  data <- finput$data
-  correlation <- finput$correlation
-  network <- finput$network
-  moduleAssignments <- finput$moduleAssignments
-  modules <- finput$modules
-  discovery <- finput$discovery
-  test <- finput$test
-  nDatasets <- finput$nDatasets
-  datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
+                         verbose, tmp.dir)
+  on.exit({
+    vCat(verbose, 0, "Cleaning up temporary objects...")
+    unlink(tmp.dir, recursive = TRUE)
+  }, add = TRUE)
   
-  res <- lapply(discovery, function(di) {
-    r2 <- lapply(test[[di]], function(ti) {
-      r1 <- lapply(modules[[di]], function(mod) {
-        
-        # Get the row/column indices of the module in the dataset of interest 
-        sub <- moduleAssignments[[di]][moduleAssignments[[di]] == mod]
-        modInds <- match(names(sub), rownames(network[[ti]]))
-        na.inds <- which(is.na(modInds))
-        modInds <- na.omit(modInds)
-        
-        if (length(modInds) == 0) {
-          warning(
-            'none of the variables composing module "', mod, 
-            '" from dataset, "', di, '" are present in dataset "', ti
-          )
-          return(NULL)
-        }
-        
-        # Get the properties calculated from the underlying data used to infer the
-        # network
-        datProps <- NULL
-        if (!is.null(scaledData[[ti]])) {
-          datProps <- dataProps(scaledData[[ti]], modInds)
-          # rename for clarity
-          names(datProps) <- c("summary", "contribution", "coherence")
-          datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
-          names(datProps[[1]]) <- rownames(scaledData)
-          names(datProps[[2]]) <- names(sub)
-        }
-        
-        # Get the properties calculated from the network.
-        netProps <- netProps(network[[ti]], modInds)
-        names(netProps) <- c("degree", "avgWeight")
-        netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
-        names(netProps[[1]]) <- names(sub)
-        
-        c(datProps, netProps)
-      })
-      names(r1) <- modules[[di]]
-      return(r1)
-    })
-    names(r2) <- test[[di]]
-    return(r2)
+  vCat(verbose, 0, "User input ok!")
+  
+  # Calculate the network properties
+  res <- with(finput, {
+    netPropsInternal(scaledData, correlation, network, moduleAssignments, 
+                     modules, discovery, test, verbose)
   })
-  names(res) <- discovery
   
+  # Simplify the output data structure where possible
   if (simplify) {
-    res <- simplifyList2(res)
+    res <- simplifyList(res, depth=3)
   }
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
   res
 }
+
+#' Internal function for calculating 'networkProperties'
+#' 
+#' This function is used by several package functions. It assumes that all user
+#' input has been processed already by \code{\link{processInput}}. This allows
+#' for function-specific checking (i.e. failing early where the \code{'data'} is
+#' required), while avoiding duplication of time-intensive checks 
+#' (e.g. \code{\link{checkFinite}}) and data duplication (e.g. through
+#' \code{\link{scaleBigMatrix}}).
+#' 
+#' @param scaledData scaled data generated by \code{'processInput'}.
+#' @param correlation \code{'correlation'} after processing by \code{'processInput'}.
+#' @param network \code{'network'} after processing by \code{'processInput'}.
+#' @param moduleAssignments \code{'moduleAssignments'} after processing by \code{'processInput'}.
+#' @param modules \code{'modules'} after processing by \code{'processInput'}.
+#' @param discovery \code{'discovery'} after processing by \code{'processInput'}.
+#' @param test \code{'test'} after processing by \code{'processInput'}.
+#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
+#' 
+netPropsInternal <- function(
+  scaledData, correlation, network, moduleAssignments, modules, discovery, test,
+  verbose
+) {
+  #-----------------------------------------------------------------------------
+  # Set up variables for running in parallel
+  #-----------------------------------------------------------------------------
+  
+  # The following declarations are for iterators declared inside each foreach 
+  # loop. Declarations are required to satisfy NOTES generated by R CMD check, 
+  # and also serve as useful documentation for the reader of the source code.
+  di <- NULL # discovery dataset 
+  ti <- NULL # test dataset 
+  mi <- NULL # iterator over the modules
+  
+  vCat(verbose, 0, 'Calculating properties for:\n')
+  res <- foreach(di = discovery) %:% 
+           foreach(ti = test[[di]]) %:% 
+             foreach(mi = modules[[di]]) %dopar% {
+    vCat(
+      verbose, 1, sep="", 'Module "', mi, '" from dataset "', di, 
+      '" in dataset "', ti, '"\n'
+    )
+    
+    # Get the row/column indices of the module in the dataset of interest 
+    sub <- moduleAssignments[[di]][moduleAssignments[[di]] == mi]
+    modInds <- match(names(sub), rownames(network[[ti]]))
+    na.inds <- which(is.na(modInds))
+    modInds <- na.omit(modInds)
+    
+    # Get the properties calculated from the underlying data used to infer the
+    # network
+    datProps <- NULL
+    if (!is.null(scaledData[[ti]])) {
+      # We need to handle the case where no module variables are present in the
+      # test dataset differently.
+      if (length(modInds) > 0) {
+        datProps <- dataProps(scaledData[[ti]], modInds)
+        names(datProps) <- c("summary", "contribution", "coherence")
+        datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
+      } else {
+        dataProps <- list(
+          summary=rep(NA, nrow(scaledData[[ti]])),
+          contribution=rep(NA, length(sub)),
+          coherence=NA
+        )
+      }
+      names(datProps[[1]]) <- rownames(scaledData)
+      names(datProps[[2]]) <- names(sub)
+    }
+    
+    # Get the properties calculated from the network.
+    if (length(modInds) > 0) {
+      netProps <- netProps(network[[ti]], modInds)
+      names(netProps) <- c("degree", "avgWeight")
+      netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
+    } else {
+      netProps <- list(
+        degree=rep(NA, length(sub)),
+        avgWeight=NA
+      )
+    }
+    names(netProps[[1]]) <- names(sub)
+    
+    c(datProps, netProps)
+  }
+  # Now we need to name the output 
+  for (di in discovery) {
+    for (ti in test[[di]]) {
+      names(res[[di]][[ti]]) <- modules[[di]]
+    }
+    names(res[[di]]) <- test[[di]]
+  }
+  names(res) <- discovery
+  return(res)
+}
+
 
 #' Order nodes and modules within a network.
 #' 
@@ -248,6 +312,7 @@ networkProperties <- function(
 #' modules by the similarity of their summary vectors.
 #' 
 #' @inheritParams common_params
+#' @inheritParams simplify_param
 #' 
 #' @param na.rm logical; If \code{TRUE}, genes present in the \code{discovery} 
 #'   dataset but missing from the test dataset are excluded. If \code{FALSE}, 
@@ -255,9 +320,6 @@ networkProperties <- function(
 #' @param orderModules logical; if \code{TRUE} modules ordered by clustering
 #'   their summary vectors. If \code{FALSE} modules are returned 
 #'   in the order provided.
-#' @param simplify logical; if \code{FALSE} the returned data structure will be 
-#'   a list of vectors, one list element for each module. If \code{TRUE}, the
-#'   returned data structure will be a single vector of ordered genes.
 #'   
 #' @details
 #'  \subsection{Input data structure:}{

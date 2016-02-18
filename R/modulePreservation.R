@@ -7,6 +7,7 @@
 #' in the test dataset.
 #'
 #' @inheritParams common_params
+#' @inheritParams simplify_param
 #' 
 #' @param selfPreservation logical; if \code{FALSE} (default) then module 
 #'  preservation analysis will not be performed where the \code{discovery} and
@@ -23,9 +24,6 @@
 #'   the correlation based statistics (see details). Must be one of "pearson", 
 #'   "spearman", or "kendall". If the WGCNA package is installed then "bicor" 
 #'   may also be specified as an option (see \code{\link[WGCNA]{bicor}}). 
-#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param simplify logical; if \code{TRUE}, simplify the structure of the output
-#'  list if possible (see Return Value).
 #' @param keepNulls logical; if \code{TRUE}, the null distributions are returned
 #'  as part of the output.
 #'  
@@ -458,9 +456,6 @@ modulePreservation <- function(
   
   vCat(verbose, 0, "Validating user input...")
   
-  if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)
-    stop("'nCores' must be a single number greater than 0")
-  
   # Identify the null hypothesis to use 
   nullModels <- c("overlap", "all")
   if (is.na(pmatch(null, nullModels))) {
@@ -496,6 +491,19 @@ modulePreservation <- function(
     cor <- function(...) stats::cor(..., method=statCorMethod)[,]
   }
   
+  # Validate 'nPerm'. If 'NULL', we need to process the rest of the input to
+  # determine.
+  if (!is.null(nPerm) & (!is.numeric(nPerm) | length(nPerm) > 1 | nPerm < 1)) {
+    stop("'nPerm' must be a single number > 1")
+  }
+  
+  # Register parallel backend. 
+  par <- setupParallel(nCores, verbose, reporterCore=TRUE)
+  nCores <- par$nCores
+  on.exit({
+    cleanupCluster(par$cluster, par$predef)
+  }, add=TRUE)
+  
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
@@ -510,6 +518,11 @@ modulePreservation <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   scaledData <- finput$scaledData
+  
+  on.exit({
+    vCat(verbose, 0, "Cleaning up temporary objects...")
+    unlink(tmp.dir, recursive = TRUE)
+  }, add = TRUE)
 
   # If NULL, automatically determine.
   if (is.null(nPerm)) {
@@ -518,10 +531,10 @@ modulePreservation <- function(
     # of datasets each module is tested in.
     multiplier <- sum(sapply(modules, length) * sapply(test, length))
     nPerm <- max(1000, requiredPerms(0.05/multiplier))
-  } else if (!is.numeric(nPerm) | length(nPerm) > 1 | nPerm < 1) {
-    stop("'nPerm' must be a single number > 1")
   }
 
+  vCat(verbose, 0, "User input ok!")
+  
   # Set up return list 
   res <- rep(list(NULL), nDatasets)
   names(res) <- datasetNames
@@ -530,9 +543,6 @@ modulePreservation <- function(
     names(l) <- datasetNames
     l
   })
-
-  # Register parallel backend. 
-  setupParallel(nCores, verbose)
   
   #-----------------------------------------------------------------------------
   # Set up variables for running module preservation analysis
@@ -814,7 +824,6 @@ modulePreservation <- function(
         ]
         
         gc()
-        vCat(verbose, 0, "Done!")
       }, error=function(e) {
         warning(
           "Failed with error:\n", e$message, "\nSkipping to next comparison"
@@ -822,11 +831,11 @@ modulePreservation <- function(
       })
     }
   }
+  
   # Simplify the output data structure where possible
   if (simplify) {
-    res <- simplifyList2(res)
+    res <- simplifyList(res, depth=2)
   }
-  # Clean up temporary objects
-  unlink(tmp.dir, recursive = TRUE)
-  return(res)
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
+  res
 }

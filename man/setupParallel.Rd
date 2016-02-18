@@ -4,13 +4,27 @@
 \alias{setupParallel}
 \title{Set up a parallel backend}
 \usage{
-setupParallel(nCores = NULL, verbose)
+setupParallel(nCores, verbose, reporterCore)
 }
 \arguments{
-\item{nCores}{number of cores to use.}
+\item{nCores}{number of cores requested.}
+
+\item{verbose}{logical; Is verbose printing on?}
+
+\item{reporterCore}{logical; is there a reporter core?}
+}
+\value{
+A list containing the total number of cores registered, the registered
+ cluster if on a Windows machine, and whether an existing parallel backend
+ is being used.
 }
 \description{
 Set up a backend with the requested number of cores, or use existing backend
 if the user has set one up already.
+}
+\details{
+If \code{verbose = TRUE} and \code{reporterCore = TRUE} then an extra core
+ will be registered for reporting: This core simply sits and prints out 
+ progress bars for the permutation procedure.
 }
 

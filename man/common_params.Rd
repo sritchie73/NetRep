@@ -34,6 +34,8 @@ module are assigned. The default is "0".}
 for each \code{discovery} dataset. Alternatively can be provided as vector
 if the test datasets are the same for all 'discovery' datasets (e.g. for 
 performing a pairwise comparison).}
+
+\item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 }
 \description{
 Template parameters to be imported into other function documentation. This 
