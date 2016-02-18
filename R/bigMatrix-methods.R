@@ -147,7 +147,7 @@ setMethod("dimnames", signature(x = "bigMatrix"), function(x) {
 
 setMethod("dimnames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
-    if (!is.null(value) | !is.list(value))
+    if (!is.null(value) & !is.list(value))
       stop("'dimnames' must be a list")
     if (is.null(value)) {
       dn <- list(NULL, NULL)
