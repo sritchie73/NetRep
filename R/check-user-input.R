@@ -497,7 +497,7 @@ processInput <- function(discovery, test, network, correlation, data,
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang. This can take a while, so 
   # we only want to check datasets that we're analysing (especially for plotting)
-  vCat(verbose, 1, "checking matrices for non-finite values...")
+  vCat(verbose, 1, "Checking matrices for non-finite values...")
   
   # Construct an iterator that includes only the datasets we're analysing
   iterator <- discovery
@@ -593,7 +593,7 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
       return(load.bigMatrix(object))
     } else {
       vCat(
-        verbose, 0,
+        verbose, 1,
         "Creating new 'bigMatrix' in a temporary directory for file ", object,
         ". This could take a while."
       )
@@ -603,7 +603,7 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
     
   } else if (class(object) == "matrix") {
     vCat(
-      verbose, 0,
+      verbose, 1,
       "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
       " This could take a while."
     )
