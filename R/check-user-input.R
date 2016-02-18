@@ -150,7 +150,7 @@ processInput <- function(discovery, test, network, correlation, data,
   
   # Make sure they're 'bigMatrix' objects
   correlation <- lapply(correlation, dynamicMatLoad, tempdir)
-  network <- lapply(network, dynamicMatLoad, tmepdir)
+  network <- lapply(network, dynamicMatLoad, tempdir)
   
   # Add any datasets names that are not in dataNames
   dataNames <- c(dataNames, names(correlation))
@@ -199,6 +199,30 @@ processInput <- function(discovery, test, network, correlation, data,
   # ----------------------------------------------------------------------------
   # Next, process the 'moduleAssignments' argument
   # ----------------------------------------------------------------------------
+  
+  # Handle cases where moduleAssignments is not provided.
+  # Assume the user just wants to look at all nodes as a whole
+  if (is.null(moduleAssignments)) {
+    # Discovery datasets are named
+    if (is.character(discovery)) {
+      moduleAssignments <- lapply(discovery, function(di) {
+        nodes <- colnames(network[[di]])
+        structure(rep("1", length(nodes)), names=nodes)
+      })
+    }
+    # Discovery datasets are referred to by index
+    else if (is.numeric(discovery)) {
+      moduleAssignments <- rep(list(NULL), max(discovery))
+      for (di in discovery) {
+        nodes <- colnames(network[[di]])
+        moduleAssignments[[di]] <- structure(rep("1", length(nodes)), names=nodes)
+      }
+    }
+    else {
+      stop("unexpected error when automatically constructing",
+           " 'moduleAssignments' object")
+    }
+  }
   
   # Handle cases where moduleAssignments assumed to be for discovery dataset
   if (!is.list(moduleAssignments)) 

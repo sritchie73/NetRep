@@ -4,9 +4,10 @@
 \alias{networkProperties}
 \title{Calculate the topological properties for a network module}
 \usage{
-networkProperties(data = NULL, correlation, network, moduleAssignments,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
-  nCores = 1, simplify = TRUE, verbose = TRUE)
+networkProperties(data = NULL, correlation, network,
+  moduleAssignments = NULL, modules = NULL, backgroundLabel = "0",
+  discovery = 1, test = 1, nCores = 1, simplify = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to

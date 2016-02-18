@@ -174,7 +174,7 @@
 #' @rdname networkProperties
 #' @export
 networkProperties <- function(
-  data=NULL, correlation, network, moduleAssignments, modules=NULL,
+  data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=1, test=1, nCores=1, simplify=TRUE, 
   verbose=TRUE
 ) {
@@ -480,7 +480,7 @@ netPropsInternal <- function(
 #' @name nodeOrder
 #' @export
 nodeOrder <- function(
-  data=NULL, correlation, network, moduleAssignments, modules=NULL, 
+  data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
   backgroundLabel="0", discovery=1, test=1, nCores=1, na.rm=FALSE, 
   orderModules=TRUE, simplify=TRUE, verbose=TRUE
 ) {
@@ -753,7 +753,7 @@ nodeOrder <- function(
 #' @name sampleOrder
 #' @export
 sampleOrder <- function(
-  data=NULL, correlation, network, moduleAssignments, modules=NULL, 
+  data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
   backgroundLabel="0", discovery=1, test=1, nCores=1, na.rm=FALSE, 
   simplify=TRUE, verbose=TRUE
 ) {
@@ -824,7 +824,7 @@ sampleOrder <- function(
 
   # Simplify the output data structure where possible
   if (simplify) {
-    res <- simplifyList(res, depth=2)
+    res <- simplifyList(res, depth=3)
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
   res

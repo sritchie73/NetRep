@@ -4,7 +4,7 @@
 \alias{sampleOrder}
 \title{Order samples within a network.}
 \usage{
-sampleOrder(data = NULL, correlation, network, moduleAssignments,
+sampleOrder(data = NULL, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
   nCores = 1, na.rm = FALSE, simplify = TRUE, verbose = TRUE)
 }

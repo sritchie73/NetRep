@@ -508,6 +508,12 @@ modulePreservation <- function(
     cleanupCluster(par$cluster, par$predef)
   }, add=TRUE)
   
+  # For the other functions this isn't necessary.
+  if (missing(moduleAssignments))
+    moduleAssignments <- NULL
+  if (is.null(moduleAssignments))
+    stop("'moduleAssignments' must be provided for each 'discovery' dataset")
+  
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,

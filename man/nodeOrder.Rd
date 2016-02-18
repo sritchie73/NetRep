@@ -4,7 +4,7 @@
 \alias{nodeOrder}
 \title{Order nodes and modules within a network.}
 \usage{
-nodeOrder(data = NULL, correlation, network, moduleAssignments,
+nodeOrder(data = NULL, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
   nCores = 1, na.rm = FALSE, orderModules = TRUE, simplify = TRUE,
   verbose = TRUE)
