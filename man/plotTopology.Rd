@@ -109,9 +109,9 @@ samples are ordered on the plot (see details).}
 \item{orderNodesBy}{one of "discovery", "test" or "none". Controls how nodes
 are ordered on the plot (see details).}
 
-\item{orderModules}{logical; if \code{TRUE} modules will be ordered by 
-similarity (see details). The default is \code{TRUE} if the data for the 
-\code{test} network is provided.}
+\item{orderModules}{logical; if \code{TRUE} modules ordered by clustering 
+their summary vectors. If \code{FALSE} modules are returned in the order
+provided.}
 
 \item{plotNodeNames}{logical; controls whether the node names are 
 rendered on the bottom axis.}
@@ -146,7 +146,8 @@ module names will be drawn.}
 \item{legend.position}{the distance from the plot to start the legend, as a
 proportion of the plot width.}
 
-\item{legend.tick.size}{size of the ticks on the axis legend.}
+\item{legend.tick.size}{size of the ticks on each axis legend relative to the
+size of the correlation, edge weights, and data matrix heatmaps.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis 
 labels, as multiple of \code{legend.tick.size}.}

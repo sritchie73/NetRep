@@ -95,10 +95,9 @@ labels, as multiple of \code{legend.tick.size}.}
 
 \item{cex.axis}{relative size of the node and sample names.}
 
-\item{cex.lab}{relative size of the module names, legend titles, and axis
-labels.}
+\item{cex.lab}{relative size of the module names and legend titles.}
 
-\item{cex.main}{relative size of the plot title.}
+\item{cex.main}{relative size of the plot titles.}
 }
 \description{
 Plot the correlation structure, network edges, (normalised) connectivity, 

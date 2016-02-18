@@ -3,49 +3,24 @@
 #' Functions for plotting the topology of a network module.
 #' 
 #' @inheritParams common_params
-#' @inheritParams common_params2
+#' @inheritParams par_param
+#' @inheritParams orderModules_param
+#' @inheritParams plot_params
 #'
 #' @param symmetric logical; controls whether the correlation and network 
 #'  heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
 #'  heatmaps. If symmetric, then the node and module names will also be rendered
 #'  on the left axis.
-#' @param orderNodesBy one of "discovery", "test" or "none". Controls how nodes
-#' are ordered on the plot (see details).
-#' @param orderSamplesBy one of "discovery", "test" or "none". Controls how 
-#' samples are ordered on the plot (see details).
-#' @param orderModules logical; if \code{TRUE} modules will be ordered by 
-#'  similarity (see details). The default is \code{TRUE} if the data for the 
-#'  \code{test} network is provided.
-#' @param plotNodeNames logical; controls whether the node names are 
-#'  rendered on the bottom axis.
-#' @param plotSampleNames logical; controls whether the sample names are 
-#'  rendered on the left axis.
-#' @param plotModuleNames logical; controls whether module names are rendered.
-#'  The default is for module names to be rendered when multiple \code{modules} 
-#'  are drawn.
 #' @param palette a vector of colors to use for each plot (see details).
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
 #'  in \code{plotContribution}, \code{plotDegree}, and
 #'  \code{plotSummary}.
-#' @param border.width line width for borders.
 #' @param plotLegend logical; controls whether a legend is drawn when using
 #'  \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.
-#' @param gaxt.line the number of lines into the bottom margin at which the node
-#'  names will be drawn.
-#' @param saxt.line the number of lines into the left margin at which the sample
-#'  names will be drawn.
-#' @param maxt.line the number of lines into the bottom margin at which the 
-#'  module names will be drawn.
 #' @param legend.main title for the legend.
 #' @param main title for each plot.
 #' @param legend.position the distance from the plot to start the legend, as a
 #'  proportion of the plot width.
-#' @param legend.tick.size size of the ticks on the axis legend.
-#' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{legend.tick.size}.
-#' @param cex.axis relative size of the node and sample names.
-#' @param cex.lab relative size of the module names and legend titles.
-#' @param cex.main relative size of the plot titles.
 #' @param horizontal logical; controls whether the legend is rendered 
 #'  horizontally or vertically when using \code{plotDataLegend},
 #'  \code{plotCorrelationLegend} or \code{plotNetworkLegend}.
