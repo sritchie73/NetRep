@@ -29,42 +29,39 @@ names(moduleAssignments[[1]]) <- gn1
 test_that("'networkProperties' function runs without error", {
   expect_is(
     networkProperties(
-      exprSets, coexpSets, adjSets, moduleAssignments, modules="1"
+      exprSets, coexpSets, adjSets, moduleAssignments, modules="1", verbose=FALSE
     ), "list"
   )
-  sink(file.path(tempdir(), "tmp.log")) # ignore warnings
   props <- networkProperties(
-    exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10]
+    exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10],
+    verbose=FALSE
   )
-  sink()
   expect_is(props, "list")
 })
 
 test_that("'nodeOrder' function runs without error", {
-  expect_is(
-    nodeOrder(
-      exprSets, coexpSets, adjSets, moduleAssignments, modules="1"
-    ), "character"
+  n <- nodeOrder(
+    exprSets, coexpSets, adjSets, moduleAssignments, modules="1", verbose=FALSE
   )
-  expect_warning(
-    n <- nodeOrder(
-      NULL, coexpSets, adjSets, moduleAssignments, modules=c("1", "7"), 
-      simplify=FALSE
-    )
+  expect_is(n, "character")
+  n <- nodeOrder(
+    NULL, coexpSets, adjSets, moduleAssignments, modules=c("1", "7"), 
+    orderModules=FALSE, verbose=FALSE
   )
-  expect_is(n, "list")
+  expect_is(n, "character")
 })
 
 test_that("'sampleOrder' function runs without error", {
-  expect_is(
-    sampleOrder(
-      exprSets, coexpSets, adjSets, moduleAssignments, modules="1"
-    ), "integer"
+  s <- sampleOrder(
+    exprSets, coexpSets, adjSets, moduleAssignments, modules="1", 
+    verbose=FALSE
   )
+  expect_is(s, "integer")
+
   expect_error(
     sampleOrder(
       NULL, coexpSets, adjSets, moduleAssignments, modules=c("1", "7"), 
-      simplify=FALSE
+      simplify=FALSE, verbose=FALSE
     )
   )
 })
