@@ -291,10 +291,11 @@ plotSquareHeatmap <- function(
 #' @param axis.line distance from the axis to render the axis labels as a 
 #'  multiple of \code{tick.size}.
 #' @param border.width line width for borders.
+#' @param srt angle of text labels
 #' 
 addGradientLegend <- function(
   palette, palette.vlim, legend.vlim, horizontal, main, xlim, ylim, 
-  tick.size=0.04, axis.line=3, border.width=2
+  tick.size=0.04, axis.line=3, border.width=2, srt
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -380,8 +381,12 @@ addGradientLegend <- function(
     sapply(at, function(aa) {
       lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=border.width, xpd=NA)
     })
+    
+    if (missing(srt))
+      srt <- 45
+    
     text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA, 
-         srt=45, adj=1)
+         srt=srt, adj=1)
   } else {
     tck <- (par("usr")[2] - par("usr")[1])*tick.size
     
@@ -401,6 +406,8 @@ addGradientLegend <- function(
     sapply(at, function(aa) {
       lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=border.width, xpd=NA)
     })
+    if (missing(srt))
+      srt <- 0
     text(labels, x=xlim[1]-tck*axis.line, y=at, cex=par("cex.axis"), xpd=NA)
   }
   

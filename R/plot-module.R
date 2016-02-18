@@ -347,7 +347,7 @@ plotModule <- function(
   else {
     # Order modules and samples by the test network
     nodeOrder <- nodeOrderInternal(
-      testProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
+      testProps, orderModules, simplify=FALSE, verbose, na.rm=TRUE
     )[[di]][[ti]]
     moduleOrder <- names(nodeOrder)
     nodeOrder <- unlist(nodeOrder)
@@ -373,7 +373,7 @@ plotModule <- function(
   # Case 3: order samples by their degree in the test network.
   else {
     # Order modules and samples by the test network
-    sampleOrder <- sampleOrderInternal(testProps, verbose, FALSE)[[di]][[ti]][[1]]
+    sampleOrder <- sampleOrderInternal(testProps, verbose, TRUE)[[di]][[ti]][[1]]
   }
   
   #-----------------------------------------------------------------------------
@@ -419,14 +419,14 @@ plotModule <- function(
   wDegreeVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
     testProps[[mi]]$degree/max(na.omit(testProps[[mi]]$degree))
   }
-  wDegreeVec <- wDegreeVec[presentNodes]
+  wDegreeVec <- wDegreeVec[nodeOrder]
   
   if (!is.null(scaledData[[ti]])) {
     # node contribution
     nodeContribVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
       testProps[[mi]]$contribution
     }
-    nodeContribVec <- nodeContribVec[presentNodes]
+    nodeContribVec <- nodeContribVec[nodeOrder]
     
     # and respective colors
     nodeContribCols <- rep(correlation.palette()[1], length(nodeContribVec))
@@ -562,30 +562,32 @@ plotModule <- function(
     )
     
     # Plot data legend
+    nNodes <- ncol(dat) + length(na.pos.x)
+    nSamples <- nrow(dat) + length(na.pos.y)
     if (all(range.dat < 0)) {
       addGradientLegend(
         head(palette, length(palette)/2), range.dat, range.dat, TRUE, 
-        xlim=c(0.5+ncol(dat)*0.1,ncol(dat)+0.5-ncol(dat)*0.1), 
-        ylim=c(nrow(dat)+0.5+nrow(dat)*0.2,nrow(dat)+0.5+nrow(dat)*0.3), 
+        xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
+        ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3), 
         tick.size=legend.tick.size, border.width=border.width,
-        main="Module data", axis.line=laxt.line
+        main="Module data", axis.line=laxt.line, srt=0
       )
     } else if (all(range.dat > 0)) {
       addGradientLegend(
         tail(palette, length(palette)/2), range.dat, range.dat, TRUE, 
-        xlim=c(0.5+ncol(dat)*0.1,ncol(dat)+0.5-ncol(dat)*0.1), 
-        ylim=c(nrow(dat)+0.5+nrow(dat)*0.2,nrow(dat)+0.5+nrow(dat)*0.3), 
+        xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
+        ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3), 
         tick.size=legend.tick.size, border.width=border.width,
-        main="Module data", axis.line=laxt.line
+        main="Module data", axis.line=laxt.line, srt=0
       )
     } else {
       plim <- c(-max(abs(range.dat)), max(abs(range.dat)))
       addGradientLegend(
         palette, plim, range.dat, TRUE, main="Module data",
-        xlim=c(0.5+ncol(dat)*0.1,ncol(dat)+0.5-ncol(dat)*0.1), 
-        ylim=c(nrow(dat)+0.5+nrow(dat)*0.2,nrow(dat)+0.5+nrow(dat)*0.3),  
+        xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
+        ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3),  
         tick.size=legend.tick.size, border.width=border.width,
-        axis.line=laxt.line
+        axis.line=laxt.line, srt=0
       )
     }
     

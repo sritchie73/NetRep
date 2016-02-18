@@ -623,18 +623,23 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
       nodeOrder <- foreach(mi = moduleOrder) %do% {
         nodeDegree <- testProps[[mi]][["degree"]]
         sortedNodes <- sort(nodeDegree, decreasing=TRUE, na.last=TRUE)
-        names(sortedNodes)
+        sortedNodes
       }
       names(nodeOrder) <- moduleOrder
       
       # Remove missing nodes and modules 
       if (na.rm) {
-        for (ii in rev(seq_len(nodeOrder))) {
+        for (ii in rev(seq_along(nodeOrder))) {
           nodeOrder[[ii]] <- na.omit(nodeOrder[[ii]])
           if (length(nodeOrder[[ii]]) == 0) {
             nodeOrder[[ii]] <- NULL
           }
         }
+      }
+      
+      # Now just get the names
+      for (ii in seq_along(nodeOrder)) {
+        nodeOrder[[ii]] <- names(nodeOrder[[ii]])
       }
       
       if (simplify) {

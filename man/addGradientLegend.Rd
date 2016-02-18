@@ -5,7 +5,7 @@
 \title{Plot a color palette legend}
 \usage{
 addGradientLegend(palette, palette.vlim, legend.vlim, horizontal, main, xlim,
-  ylim, tick.size = 0.04, axis.line = 3, border.width = 2)
+  ylim, tick.size = 0.04, axis.line = 3, border.width = 2, srt)
 }
 \arguments{
 \item{palette}{color palette.}
@@ -31,6 +31,8 @@ plot window.}
 multiple of \code{tick.size}.}
 
 \item{border.width}{line width for borders.}
+
+\item{srt}{angle of text labels}
 }
 \description{
 Add a legend to a plot window.

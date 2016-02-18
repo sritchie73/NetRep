@@ -43,12 +43,13 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   legend.position, legend.tick.size, laxt.line, cex.axis = 0.8, cex.lab = 1,
   cex.main = 1.2)
 
-plotContribution(data = NULL, correlation, network, moduleAssignments,
-  modules, discovery = 1, test = 1, orderNodesBy = "discovery",
-  orderModules, plotNodeNames = TRUE, plotModuleNames, main = "",
-  border.width = 2, palette = c("#313695", "#a50026"),
-  drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2)
+plotContribution(data, correlation, network, moduleAssignments = NULL,
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
+  plotModuleNames, main = "", border.width = 2, palette = c("#313695",
+  "#a50026"), drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotDegree(data = NULL, correlation, network, moduleAssignments, modules,
   discovery = 1, test = 1, orderNodesBy = "discovery",
