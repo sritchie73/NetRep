@@ -267,7 +267,7 @@ netPropsInternal <- function(
     
     # Get the row/column indices of the module in the dataset of interest 
     sub <- moduleAssignments[[di]][moduleAssignments[[di]] == mi]
-    modInds <- match(names(sub), rownames(network[[ti]]))
+    modInds <- match(names(sub), rownames(correlation[[ti]]))
     na.inds <- which(is.na(modInds))
     modInds <- na.omit(modInds)
     
@@ -290,22 +290,27 @@ netPropsInternal <- function(
       }
       names(datProps[["summary"]]) <- rownames(scaledData)
       names(datProps[["contribution"]]) <- names(sub)
-    }
-    
-    # Get the properties calculated from the network.
-    if (length(modInds) > 0) {
-      netProps <- netProps(network[[ti]], modInds)
-      names(netProps) <- c("degree", "avgWeight")
-      netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
     } else {
-      netProps <- list(
-        degree=rep(NA, length(sub)),
-        avgWeight=NA
-      )
+      dataProps <- NULL
     }
-    names(netProps[["degree"]]) <- names(sub)
     
-    c(datProps, netProps)
+    if (!is.null(network)) {
+      # Get the properties calculated from the network.
+      if (length(modInds) > 0) {
+        netProps <- netProps(network[[ti]], modInds)
+        names(netProps) <- c("degree", "avgWeight")
+        netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
+      } else {
+        netProps <- list(
+          degree=rep(NA, length(sub)),
+          avgWeight=NA
+        )
+      }
+      names(netProps[["degree"]]) <- names(sub)
+    } else {
+      netProps <- NULL
+    }
+    return(c(datProps, netProps))
   }
   # Now we need to name the output 
   names(res) <- datasetNames[discovery]
@@ -507,6 +512,11 @@ nodeOrder <- function(
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
+  # We can save time and space by not checking, scaling, or calculating 
+  # properties from the 'data' if we're not ordering by module. 
+  if (!orderModules)
+    data <- NULL
+  
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
@@ -516,12 +526,23 @@ nodeOrder <- function(
     unlink(tmp.dir, recursive = TRUE)
   }, add = TRUE)
   
+  
+  # Similarly when 'orderModules = TRUE' but there is only one module (per test)
+  # Then we can save time by not calculating the data-based network properties.
+  # We can't detect this without sanity checking the user input first though, so
+  # unnecessary scaled datasets may have been created
+  for (di in discovery) {
+    if (length(modules[[di]]) == 1) {
+      finput$scaledData[di] <- list(NULL)
+    }
+  }
+  
   # If 'orderModules' is TRUE we need to make sure that there is data in each 
-  # test dataset.
+  # test dataset if there is more than one 'module'
   if (orderModules) {
     for (di in discovery) {
       for (ti in test[[di]]) {
-        if (is.null(finput$data[[ti]])) {
+        if (is.null(finput$scaledData[[ti]]) & length(modules[[di]]) > 1) {
           stop("'data' must be provided for all 'test' datasets ",
                "if 'orderModules' is TRUE")
         }   
@@ -796,9 +817,10 @@ sampleOrder <- function(
   
   vCat(verbose, 0, "User input ok!")
   
-  # Calculate the network properties
+  # Calculate the network properties. We don't actually need the network-based
+  # properties though, so we can speed things up by ignoring them
   props <- with(finput, {
-    netPropsInternal(scaledData, correlation, network, moduleAssignments, 
+    netPropsInternal(scaledData, correlation, NULL, moduleAssignments, 
                      modules, discovery, test, datasetNames, verbose)
   })
 

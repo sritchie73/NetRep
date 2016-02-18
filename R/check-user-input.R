@@ -495,25 +495,43 @@ processInput <- function(discovery, test, network, correlation, data,
   }
   
   # Sanity check input data for values that will cause the calculation of 
-  # network properties and statistics to hang.
+  # network properties and statistics to hang. This can take a while, so 
+  # we only want to check datasets that we're analysing (especially for plotting)
   vCat(verbose, 1, "checking matrices for non-finite values...")
-  lapply(data, function(x) { 
-    if (!is.null(x)) {
-      checkFinite(x)
-    }
-  })
-  lapply(correlation, checkFinite)
-  lapply(network, checkFinite)
   
-  # Temporarily create scaled data set for the calculation of the
-  # summary expression profile
-  scaledData <- data
-  for (ii in seq_along(scaledData)) {
-    if (!is.null(scaledData[[ii]])) {
-      scaledData[[ii]] <- scaleBigMatrix(scaledData[[ii]], tempdir)
+  # Construct an iterator that includes only the datasets we're analysing
+  iterator <- discovery
+  if (is.character(discovery)) {
+    iterator <- match(discovery, names(network))
+  }
+  for (tv in test) {
+    if (is.character(tv)) {
+      iterator <- c(iterator, match(tv, names(network)))
+    } else {
+      iterator <- c(iterator, tv)
     }
   }
+  iterator <- unique(iterator)
 
+  # Now check finite
+  for (ii in iterator) {
+    if (!is.null(data[[ii]])) 
+      checkFinite(data[[ii]])
+    checkFinite(correlation[[ii]])
+    checkFinite(network[[ii]])
+  }
+  
+  # Temporarily create scaled data set for the calculation of the
+  # summary expression profile. Again, to save space and time, only do this for
+  # datasets we're analysing
+  scaledData <- rep(list(NULL), length(data))
+  names(scaledData) <- names(data)
+  for (ii in iterator) {
+    if (!is.null(data[[ii]])) {
+      scaledData[[ii]] <- scaleBigMatrix(data[[ii]], tempdir)
+    }
+  }
+  
   datasetNames <- structure(names(network), names=names(network))
   
   return(list(
