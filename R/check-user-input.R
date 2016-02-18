@@ -324,7 +324,15 @@ processInput <- function(discovery, test, network, correlation, data,
   for (di in discovery) {
     unlabelled <- colnames(network[[di]]) %sub_nin% names(moduleAssignments[[di]])
     if (length(unlabelled) > 0) {
-      bgnodes <- rep(backgroundLabel[[di]][1], length(unlabelled))
+      if (length(backgroundLabel[[di]]) > 0) {
+        bglabel <- backgroundLabel[[di]][1]
+      } else {
+        # We need a label that doesn't conflict with any existing module labels.
+        # This is the simplest way to do it.
+        bglabel <- getUUID() 
+      }
+      
+      bgnodes <- rep(bglabel, length(unlabelled))
       names(bgnodes) <- unlabelled
       moduleAssignments[[di]] <- c(moduleAssignments[[di]], bgnodes)
     }
