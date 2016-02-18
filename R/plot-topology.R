@@ -1593,10 +1593,10 @@ plotSummary <- function(
 #' @rdname plotTopology
 #' @export
 plotDataLegend <- function(
-  data, correlation, network, moduleAssignments, modules,
-  discovery=1, test=1, palette=data.palette(), border.width=2, 
-  horizontal=TRUE, legend.main="data", legend.tick.size=0.03, 
-  laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  backgroundLabel="0", discovery=1, test=1, verbose=TRUE, 
+  palette=data.palette(), border.width=2, horizontal=TRUE, legend.main="Data", 
+  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -1613,50 +1613,64 @@ plotDataLegend <- function(
   })
   
   #-----------------------------------------------------------------------------
-  # Validate user input
+  # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  if (is.null(data))
-    stop("Cannot plot legend without corresponding 'data'")
-  
-  # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
+  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
-  on.exit({
-    unlink(tmp.dir, recursive=TRUE)
-  }, add=TRUE)
   
-  # Unify data structures and load in matrices
-  data <- unifyDS(dynamicMatLoad(data))
-  correlation <- unifyDS(dynamicMatLoad(correlation))
-  network <- unifyDS(dynamicMatLoad(network))
+  vCat(verbose, 0, "Validating user input...")
   
-  # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structuren
-  if (!missing(moduleAssignments) && missing(modules)) {
-    modules <- unique(moduleAssignments[[discovery]])
-  } else if (missing(moduleAssignments) && missing(modules)) {
-    modules <- "1"
-  } else if (missing(moduleAssignments) && !missing(modules)) {
-    stop("'modules' provided but not 'moduleAssignments'")
+  if (is.null(data))
+    stop("Cannot plot data legend without 'data'")
+  
+  # Check plot-specific arguments
+  if (class(legend.main) != "character")
+    stop("'legend.main' must be a characer vector")
+  
+  # At this time, we can only plot within one dataset.
+  if (!is.vector(discovery) | !is.vector(test) | 
+      length(discovery) > 1 | length(test) > 1) {
+    stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
-  # Format optional input data so it doesn't cause cascading error crashes
-  moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(correlation), names(correlation),
-    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
-  )
+  # Now try to make sense of the rest of the input
+  finput <- processInput(discovery, test, network, correlation, data, 
+                         moduleAssignments, modules, backgroundLabel,
+                         verbose, tmp.dir)
+  discovery <- finput$discovery
+  test <- finput$test
+  data <- finput$data
+  correlation <- finput$correlation
+  network <- finput$network
+  moduleAssignments <- finput$moduleAssignments
+  modules <- finput$modules
+  nDatasets <- finput$nDatasets
+  datasetNames <- finput$datasetNames
+  scaledData <- finput$scaledData
   
-  if (is.null(data[[test]]))
-    stop("Cannot plot module summary vector without the corresponding 'data'")
+  # Indexes for this function
+  di <- finput$discovery
+  ti <- finput$test[[di]]
+  mods <- modules[[di]]
+  
+  on.exit({
+    vCat(verbose, 0, "Cleaning up temporary objects...")
+    unlink(tmp.dir, recursive = TRUE)
+  }, add = TRUE)
+  
+  if (is.null(data[[ti]]))
+    stop("Cannot plot data legend without 'data'")
+  
+  vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
   # Get the range of data matrix for the modules in the test dataset 
   #-----------------------------------------------------------------------------
-  modNodes <- getModuleVarsUnsorted(moduleAssignments, modules, discovery)
-  modNodes <- modNodes %sub_in% colnames(data[[test]])
+  modNodes <- getModuleVarsUnsorted(moduleAssignments, mods, di)
+  modNodes <- modNodes %sub_in% colnames(data[[ti]])
   if (length(modNodes) == 0)
     stop("None of the variables composing the module are present in the test dataset")
-  rg <- range(data[[test]][,modNodes])
+  rg <- range(data[[ti]][,modNodes])
   
   #-----------------------------------------------------------------------------
   # Plot the legend

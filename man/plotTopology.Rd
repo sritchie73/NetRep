@@ -65,9 +65,10 @@ plotSummary(data, correlation, network, moduleAssignments = NULL,
   border.width = 2, drawBorders = FALSE, saxt.line = -0.5,
   maxt.line = 0, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
-plotDataLegend(data, correlation, network, moduleAssignments, modules,
-  discovery = 1, test = 1, palette = data.palette(), border.width = 2,
-  horizontal = TRUE, legend.main = "data", legend.tick.size = 0.03,
+plotDataLegend(data, correlation, network, moduleAssignments = NULL,
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  verbose = TRUE, palette = data.palette(), border.width = 2,
+  horizontal = TRUE, legend.main = "Data", legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotCorrelationLegend(palette = correlation.palette(), border.width = 2,
