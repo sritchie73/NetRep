@@ -426,10 +426,12 @@ processInput <- function(discovery, test, network, correlation, data,
     }
   }
 
+  datasetNames <- structure(names(network), names=names(network))
+  
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
-    nDatasets=nDatasets, datasetNames=names(network), scaledData=scaledData
+    nDatasets=nDatasets, datasetNames=datasetNames, scaledData=scaledData
   ))
 }
 

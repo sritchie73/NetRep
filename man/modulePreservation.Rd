@@ -72,12 +72,11 @@ list if possible (see Return Value).}
 as part of the output.}
 }
 \value{
-The returned data structure is organised as a nested list of lists, which 
- should be accessed as \code{results[[discovery]][[test]]}. If
- \code{simplify} is set to \code{TRUE}, then this structure will be 
- simplified as much as possible depending on the combination of dataset 
- comparisons that have been performed. For each dataset-comparison a list of
- the following objects are returned:
+A nested list structure. At the top level, the list has one element per 
+ \code{'discovery'} dataset. Each of these elements is a list that has one
+ element per \code{'test'} dataset analysed for that \code{'discovery'} 
+ dataset. Each of these elements is also a list, containing the following
+ objects:
  \itemize{
    \item{\code{observed}:}{
      A matrix of the observed values for the module preservation statistics.
@@ -114,6 +113,11 @@ The returned data structure is organised as a nested list of lists, which
      dataset.
    }
  }
+ 
+ For example, \code{results[[1]][[2]][["p.values"]]} is the matrix of 
+ module preservation p-values when assessing the preservation of modules from
+ dataset 1 in dataset 2. If \code{simplify = TRUE} then the list structure 
+ will be simplified where possible.
 }
 \description{
 Quantify the preservation of network modules (sub-graphs) in an independent

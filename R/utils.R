@@ -466,12 +466,6 @@ cleanupCluster <- function(cluster, predef) {
 #' 
 #' @return a list
 simplifyList <- function(l, depth) {
-  filterNulls <- function(l) {
-    l <- l[!sapply(l, is.null)]
-    if (length(l) == 0)
-      return(list(NULL))
-    return(l)
-  }
   collapse <- function(l) {
     if (length(l) == 1)
       return(l[[1]])
@@ -482,13 +476,11 @@ simplifyList <- function(l, depth) {
   # entries and collapse if length == 1.
   stopifnot(is.numeric(depth) & depth > 0)
   if (depth == 1) {
-    l <- filterNulls(l)
     l <- collapse(l)
     return(l)
   } else {
     for (i1 in rev(seq_along(l))) {
       l[[i1]] <- simplifyList(l[[i1]], depth=depth-1)
-      l <- filterNulls(l)
       l <- collapse(l)
     }
     return(l)
