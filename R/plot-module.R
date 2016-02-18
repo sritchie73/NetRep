@@ -11,15 +11,13 @@
 #' \code{\link{plotData}}, and \code{\link{plotSummary}}.
 #' 
 #' @inheritParams common_params
-#' @inheritParams common_params2
+#' @inheritParams par_param
+#' @inheritParams orderModules_param
 #' 
 #' @param orderNodesBy one of "discovery", "test" or "none". Controls how nodes
 #' are ordered on the plot (see details).
 #' @param orderSamplesBy one of "discovery", "test" or "none". Controls how 
 #' samples are ordered on the plot (see details).
-#' @param orderModules logical; if \code{TRUE} modules will be ordered by 
-#'  similarity (see details). The default is \code{TRUE} if the data for the 
-#'  \code{test} network is provided.
 #' @param plotNodeNames logical; controls whether the node names are 
 #'  rendered on the bottom axis.
 #' @param plotSampleNames logical; controls whether the sample names are 
@@ -76,7 +74,7 @@
 #'   recommended for the user to store their data as 'bigMatrix' objects, as the
 #'   \link{modulePreservation} function, \link[=plotModule]{plotting} 
 #'   \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
-#'   \link[=sampleOrder]{sample} ordering functions  also expect 'bigMatrix'
+#'   \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
 #'   objects. Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 
@@ -84,12 +82,12 @@
 #'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 #' }
 #' \subsection{Node, sample, and module ordering:}{
-#'   By default, nodes are ordered in decreasing order of within-module
-#'   connectivity in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
+#'   By default, nodes are ordered in decreasing order of \emph{weighted degree}
+#'   in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
 #'   This facilitates the visual comparison of modules across datasets, as the 
 #'   node ordering will be preserved. Missing nodes are colored in grey. If
 #'   \code{orderNodesBy} is "test" nodes will instead be ordered by 
-#'   within-module connectivity in the \code{test} dataset. If "none" nodes are 
+#'   weighted degree in the \code{test} dataset. If "none" nodes are 
 #'   drawn in the order they are provided in the drawn dataset.
 #'   
 #'   When multiple modules are specified, modules are ordered by the similarity
@@ -101,8 +99,8 @@
 #'   order of the module summary vector in the drawn dataset for the left-most 
 #'   module appearing on the plot (see \code{\link{sampleOrder}}.
 #' }
-#' \subsection{Normalised connectivity:}{
-#'   The within-module connectivity is normalised by the maximum connectivity in
+#' \subsection{Normalised degree:}{
+#'   The weighted degree is normalised by the maximum connectivity in
 #'   any given module when rendered on the bar plot. This facilitates visual 
 #'   comparison of multiple modules with differing sizes or densities.
 #' }
@@ -223,13 +221,20 @@
 #' @name plotModule
 #' @export
 plotModule <- function(
-  data, correlation, network, moduleAssignments, modules,
-  discovery=1, test=1, orderSamplesBy="test", orderNodesBy="discovery",
-  orderModules, plotNodeNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
+  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  backgroundLabel="0", discovery=1, test=1, nCores=1, verbose=TRUE,
+  orderSamplesBy="test", orderNodesBy="discovery",
+  orderModules=TRUE, plotNodeNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
   main="Module Topology", drawBorders=FALSE, border.width=2, gaxt.line=-0.5, 
   saxt.line=-0.5, maxt.line, legend.tick.size=0.04, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
+  
+  # Definition in here to prevent code potentially breaking elsewhere.
+  is.vector <- function(obj) {
+    base::is.vector(obj) & !is.list(obj)
+  }
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters
   #-----------------------------------------------------------------------------
@@ -250,6 +255,19 @@ plotModule <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
+  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
+  dir.create(tmp.dir, showWarnings=FALSE)
+  
+  vCat(verbose, 0, "Validating user input...")
+  
+  # Register parallel backend. 
+  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
+  nCores <- par$nCores
+  on.exit({
+    cleanupCluster(par$cluster, par$predef)
+  }, add=TRUE)
+  
+  # Check plot-specific arguments
   if (class(main) != "character")
     stop("'main' must be a characer vector")
   
@@ -257,217 +275,206 @@ plotModule <- function(
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
-  # Temporary directory to store new bigMatrix objects in
-  tmp.dir <- file.path(tempdir(), paste0(".temp-objects", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  on.exit({
-    unlink(tmp.dir, recursive=TRUE)
-  }, add=TRUE)
-  
-  # Unify data structures and load in matrices
-  data <- unifyDS(dynamicMatLoad(data))
-  correlation <- unifyDS(dynamicMatLoad(correlation))
-  network <- unifyDS(dynamicMatLoad(network))
-  
-  # Format optional input data so it doesn't cause cascading error crashes 
-  data <- formatDataList(
-    data, length(correlation), names(correlation)
-  )
-  
-  moduleAssignments <- formatModuleAssignments(
-    moduleAssignments, discovery, length(correlation), names(correlation),
-    ncol(correlation[[discovery]]), colnames(correlation[[discovery]])
-  )
-  
-  # If module discovery has not been performed for all datasets, it may be
-  # easier for the user to provide a simplified list structuren
-  if (!missing(moduleAssignments) && missing(modules)) {
-    modules <- unique(moduleAssignments[[discovery]])
-  } else if (missing(moduleAssignments) && missing(modules)) {
-    modules <- "1"
-  } else if (missing(moduleAssignments) && !missing(modules)) {
-    stop("'modules' provided but not 'moduleAssignments'")
+  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+    stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
-  
-  # Sanity check input for consistency.
-  checkSets(
-    data, correlation, network, moduleAssignments, discovery, test
-  )
   
   if (missing(plotModuleNames))
     plotModuleNames <- !missing(modules) && length(modules) > 1
+  
+  # At this time, we can only plot within one dataset.
+  if (!is.vector(discovery) | !is.vector(test) | 
+      length(discovery) > 1 | length(test) > 1) {
+    stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
+  }
+  
+  # Now try to make sense of the rest of the input
+  finput <- processInput(discovery, test, network, correlation, data, 
+                         moduleAssignments, modules, backgroundLabel,
+                         verbose, tmp.dir)
+  discovery <- finput$discovery
+  test <- finput$test
+  data <- finput$data
+  correlation <- finput$correlation
+  network <- finput$network
+  moduleAssignments <- finput$moduleAssignments
+  modules <- finput$modules
+  nDatasets <- finput$nDatasets
+  datasetNames <- finput$datasetNames
+  scaledData <- finput$scaledData
+  
+  # Indexes for this function
+  di <- finput$discovery
+  ti <- finput$test[[di]]
+  mods <- modules[[di]]
+  
+  # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
+  discAsTest <- list(discovery)
+  names(discAsTest) <- discovery
+  
+  on.exit({
+    vCat(verbose, 0, "Cleaning up temporary objects...")
+    unlink(tmp.dir, recursive = TRUE)
+  }, add = TRUE)
+  
+  if ((orderSamplesBy == "discovery" & is.null(scaledData[[di]])) |
+      (orderSamplesBy == "test" & is.null(scaledData[[ti]]))) {
+    stop("'data' not provided for 'orderSamplesBy' dataset") 
+  }
+  
+  if (orderSamplesBy == "discovery" & 
+      sum(rownames(scaledData[di]) %in% rownames(scaledData[[ti]])) == 0) {
+    stop("'orderBySamples' can only be ", '"discovery"', " when the same",
+         " samples are present in both the 'discovery' and 'test' datasets")
+  }
+  
+  if ((orderModules & length(mods) > 1) & 
+      ((orderNodesBy == "discovery" & is.null(scaledData[[di]])) | 
+       (orderNodesBy == "test" & is.null(scaledData[[ti]])))) {
+    stop("'data' not provided for 'orderNodesBy' dataset and ",
+         "'orderModules' = 'TRUE'") 
+  }
+
+  vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
   # Get ordering of nodes and samples in the 'test' dataset by the dataset 
   # specified in 'orderNodesBy' and 'orderSamplesBy'.
   #-----------------------------------------------------------------------------
-  props <- networkProperties(
-    data, correlation, network, moduleAssignments, modules, 
-    discovery, test, FALSE
+
+  # Calculate the network properties in the dataset we're plotting.
+  testProps <- netPropsInternal(
+    scaledData, correlation, network, moduleAssignments, 
+    modules, discovery, test, datasetNames, FALSE
   )
-  
-  # Determine node ordering, then sample ordering.
-  if (orderNodesBy == "discovery" && discovery != test) {
-    if (missing(orderModules))
-      orderModules <- ifelse(is.null(data[[discovery]]), FALSE, TRUE)
-    
-    propsDisc <- networkProperties(
-      data, correlation, network, moduleAssignments, modules,
-      discovery, discovery, FALSE
-    ) 
-    
-    moduleOrder <- names(propsDisc)
-    if (length(propsDisc) > 1 && orderModules) {
-      if (!is.null(data[[discovery]])) {
-        # Create a matrix of module summary vectors to measure the similarity
-        seps <- matrix(
-          0, ncol=length(propsDisc), 
-          nrow=length(propsDisc[[1]]$summary)
-        )
-        colnames(seps) <- names(propsDisc)
-        for (mi in seq_along(propsDisc)) {
-          seps[,mi] <- propsDisc[[mi]]$summary
-        }
-        moduleOrder <- names(propsDisc)[hclust(as.dist(1-cor(seps)))$order]
-      } else {
-        warning(
-          "Data matrix missing from the 'discovery' dataset, modules will ",
-          "be ordered as provided"
-        )
-      }
-    }
+
+  # Case 1: we want to order nodes by the discovery dataset, which if different
+  # to the test dataset, we need to recalculate the weighted degree for the 
+  # node order.
+  if (orderNodesBy == "discovery" & di != ti) {
+    # This skips all of the data verification
+    discProps <- netPropsInternal(
+      scaledData, correlation, network, moduleAssignments, 
+      modules, discovery, discAsTest, datasetNames, FALSE
+    )
+    nodeOrder <- nodeOrderInternal(
+      discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
+    )[[di]][[di]]
+    moduleOrder <- names(nodeOrder)
+    nodeOrder <- unlist(nodeOrder)
+  } 
+  # Case 2: order nodes as they're provided by the user
+  else if (orderNodesBy == "none") {
+    moduleOrder <- names(testProps[[di]][[ti]])
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(sort(
-        propsDisc[[mi]]$degree, decreasing=TRUE, na.last=TRUE
-      ))
+      names(testProps[[di]][[ti]][[mi]]$degree)
     }
-  } else if (orderNodesBy == "none") {
-    moduleOrder <- names(props)
-    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(props[[mi]]$degree)
-    }
-  } else {
-    if (missing(orderModules))
-      orderModules <- ifelse(is.null(data[[test]]), FALSE, TRUE)
-    
+  } 
+  # Case 3: order nodes by their degree in the test network.
+  else {
     # Order modules and samples by the test network
-    moduleOrder <- names(props)
-    if (length(props) > 1 && orderModules) {
-      if (!is.null(data[[test]])) {
-        seps <- matrix(
-          0, ncol=length(props), 
-          nrow=length(props[[1]]$summary)
-        )
-        colnames(seps) <- names(props)
-        for (mi in seq_along(props)) {
-          seps[,mi] <- props[[mi]]$summary
-        }
-        moduleOrder <- names(props)[hclust(as.dist(1-cor(seps)))$order]
-      } else {
-        warning(
-          "Data matrix missing from the 'test' dataset, modules will be ",
-          "ordered as provided"
-        )
-      }
-    }
-    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(sort(
-        props[[mi]]$degree, decreasing=TRUE, na.last=TRUE
-      ))
-    }
+    nodeOrder <- nodeOrderInternal(
+      testProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
+    )[[di]][[ti]]
+    moduleOrder <- names(nodeOrder)
+    nodeOrder <- unlist(nodeOrder)
   }
   
-  # If test == discovery, we order samples and modules by discovery, and plot
-  # the discovery. So we need to make sure the data matrix exists in the
-  # discovery dataset
-  if (orderSamplesBy == "discovery" && discovery != test) {
-    if (is.null(data[[discovery]])) {
-      stop(
-        "Expecting data matrix for the discovery dataset in order",
-        " to sort samples"
+  # Case 1: we want to order samples by the discovery dataset, which if different
+  # to the test dataset, we need to recalculate the weighted degree for the 
+  # node order.
+  if (orderSamplesBy == "discovery" & di != ti) {
+    # This skips all of the data verification
+    if (!exists("discProps")) {
+      discProps <- netPropsInternal(
+        scaledData, correlation, network, moduleAssignments, 
+        modules, discovery, discAsTest, datasetNames, FALSE
       )
     }
-    if (!exists("propsDisc")) {
-      propsDisc <- networkProperties(
-        data, correlation, network, moduleAssignments, modules,
-        discovery, discovery, FALSE
-      )
-    }
-    sampleOrder <- names(sort(
-      propsDisc[[1]]$summary, decreasing=TRUE
-    ))
-  } else if (!is.null(data[[test]])) {
-    if (orderSamplesBy == "none") {
-      sampleOrder <- rownames(data[[test]])
-    } else {
-      sampleOrder <- names(sort(
-        props[moduleOrder][[1]]$summary, decreasing=TRUE
-      ))
-    }
+    sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)[[di]][[di]][[1]]
+  } 
+  # Case 2: order samples as they're provided by the user
+  else if (orderSamplesBy == "none") {
+    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
+  } 
+  # Case 3: order samples by their degree in the test network.
+  else {
+    # Order modules and samples by the test network
+    sampleOrder <- sampleOrderInternal(testProps, verbose, FALSE)[[di]][[ti]][[1]]
   }
   
   #-----------------------------------------------------------------------------
   # Identify nodes and samples from the 'discovery' dataset not present in the 
   # 'test' dataset.
   #-----------------------------------------------------------------------------
-  if (!is.null(data[[test]])) {
-    if (all(sampleOrder %nin% rownames(data[[test]]))) {
-      stop(
-        "No samples from the 'orderSamplesBy' dataset are present in the",
-        " 'test' dataset"
-      )
+  
+  # Case 1: di == ti. Plotting within the same dataset => nothing missing.
+  # Case 2: orderBy == di: those missing in the discovery should have grey bars.
+  # Case 3: orderBy == ti: ordering within the same dataset => nothing missing.
+  
+  if (orderNodesBy == "discovery" & di != ti) {
+    na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
+    if (length(na.pos.x) > 0) {
+      presentNodes <- nodeOrder[-na.pos.x]
+    } else {
+      presentNodes <- nodeOrder
     }
-    na.pos.y <- which(sampleOrder %nin% rownames(data[[test]]))
+  } else {
+    na.pos.x <- vector()
+    presentNodes <- nodeOrder
+  }
+
+  if (orderSamplesBy == "discovery" & di != ti) {
+    na.pos.y <- which(sampleOrder %nin% colnames(network[[ti]]))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
     } else {
       presentSamples <- sampleOrder
     }
-  }
-
-  # Handle nodes not present in the test dataset
-  na.pos.x <- which(nodeOrder %nin% colnames(correlation[[test]]))
-  if (length(na.pos.x) > 0) {
-    presentVars <- nodeOrder[-na.pos.x]
   } else {
-    presentVars <- nodeOrder
+    na.pos.y <- vector()
+    presentSamples <- sampleOrder
   }
   
   #-----------------------------------------------------------------------------
   # Set up other property vectors and datasets
   #-----------------------------------------------------------------------------
-  # (Normalised) Intramodular Connectivity vector
-  kIM <- foreach(mi = seq_along(props), .combine=c) %do% {
-    # Normalise the connectivity by the maximum. The value has no meaning,
-    # just the relative sizes and ranks
-    props[[mi]]$degree/max(na.omit(props[[mi]]$degree))
-  }
-  kIM <- kIM[nodeOrder]
   
-  if (!is.null(data[[test]])) {
-    # now build the Module Membership vector
-    MM <- foreach(mi = seq_along(props), .combine=c) %do% {
-      props[[mi]]$contribution
+  testProps <- testProps[[di]][[ti]] # collapse for easy access
+  
+  # (Normalised) weighted degree vector
+  wDegreeVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
+    testProps[[mi]]$degree/max(na.omit(testProps[[mi]]$degree))
+  }
+  wDegreeVec <- wDegreeVec[presentNodes]
+  
+  if (!is.null(scaledData[[ti]])) {
+    # node contribution
+    nodeContribVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
+      testProps[[mi]]$contribution
     }
-    MM <- MM[nodeOrder]
-    MM.cols <- rep(correlation.palette()[1], length(MM))
-    MM.cols[MM > 0] <- tail(correlation.palette(), 1)
+    nodeContribVec <- nodeContribVec[presentNodes]
     
-    # Summary Expression profiles matrix
-    SEP <- foreach(mi = moduleOrder, .combine=cbind) %do% {
+    # and respective colors
+    nodeContribCols <- rep(correlation.palette()[1], length(nodeContribVec))
+    nodeContribCols[nodeContribVec > 0] <- tail(correlation.palette(), 1)
+    
+    # Summary profile matrix
+    summaries <- foreach(mi = seq_along(testProps), .combine=cbind) %do% {
       matrix(
-        insert.nas(props[[mi]]$summary[presentSamples], na.pos.y),
+        insert.nas(testProps[[mi]]$summary[presentSamples], na.pos.y),
         ncol=1
       )
     }
-    colnames(SEP) <- moduleOrder
-    rownames(SEP) <- sampleOrder
+    colnames(summaries) <- moduleOrder
+    rownames(summaries) <- sampleOrder
     
-    # Now build the colors
-    cols <- matrix(data.palette()[1], nrow(SEP), ncol(SEP))
-    cols[SEP > 0] <- tail(data.palette(), 1)
+    # and respective colors
+    summaries.cols <- matrix(data.palette()[1], nrow(summaries), ncol(summaries))
+    summaries.cols[summaries > 0] <- tail(data.palette(), 1)
   }
-  
+
+
   #-----------------------------------------------------------------------------
   # Set up plotting region
   #-----------------------------------------------------------------------------
@@ -481,18 +488,18 @@ plotModule <- function(
     maxt.line <- 3
   }
   
-  if (is.null(data[[test]])) {
+  if (is.null(scaledData[[ti]])) {
     # set up plot layout
     layout(
       mat=matrix(1:3, ncol=1), heights=c(0.4, 0.4, 0.2)
     )
   } else {
     # set up plot layout
-    SEPw <- min(0.2 + (length(modules) - 1)* 0.1, 0.5) 
+    summary.window <- min(0.2 + (length(mods) - 1)* 0.1, 0.5) 
     layout(
       mat=matrix(c(rep(8, 5), 7, 1:6), ncol=2), 
       heights=c(0.7/3, 0.7/3, 0.12, 0.12, 0.06, 0.7/3),
-      widths=c(SEPw, 1-SEPw)
+      widths=c(summary.window, 1-summary.window)
     )
   }
   par(oma=old.par[["mar"]]+old.par[["oma"]])
@@ -503,9 +510,9 @@ plotModule <- function(
   # Plot correlation
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    correlation[[test]][presentVars , presentVars], 
+    correlation[[ti]][presentNodes, presentNodes], 
     correlation.palette(), c(-1, 1), 
-    moduleAssignments[[discovery]][nodeOrder], na.pos.x, plotLegend=TRUE, 
+    moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, 
     main="", legend.main="Correlation", plotModuleNames=FALSE, 
     legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
     legend.line=0.1, maxt.line=maxt.line, border.width=border.width
@@ -515,44 +522,45 @@ plotModule <- function(
   # Plot network
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    network[[test]][presentVars , presentVars], network.palette(), 
-    c(0, 1), moduleAssignments[[discovery]][nodeOrder], na.pos.x, 
+    network[[ti]][presentNodes, presentNodes], network.palette(), 
+    c(0, 1), moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main="", legend.main="Edge weights", 
     plotModuleNames=FALSE, legend.tick.size=legend.tick.size, 
     laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,
     border.width=border.width
   )
   
-  # Plot Intamodular Connectivity
+  # Plot weighted degree
   par(mar=c(1,1,1,1))
-  if (is.null(data[[test]])) {
+  if (is.null(scaledData[[ti]])) {
     plotBar(
-      kIM, c(0,1), moduleAssignments[[discovery]][nodeOrder], "#feb24c", 
+      wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], "#feb24c", 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
       xaxt=plotNodeNames, xaxt.line=gaxt.line, main="",
-      ylab="Normalised connectivity", maxt.line=maxt.line, 
+      ylab="Weighted\ndegree", maxt.line=maxt.line, 
       border.width=border.width
     )
   } else {
     plotBar(
-      kIM, c(0,1), moduleAssignments[[discovery]][nodeOrder], "#feb24c", 
+      wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], "#feb24c", 
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
-      ylab="Normalised\nconnectivity", maxt.line=maxt.line, 
+      ylab="Weighted\ndegree", maxt.line=maxt.line, 
       border.width=border.width
     )
   }
   
-  if (!is.null(data[[test]])) {
+  if (!is.null(scaledData[[ti]])) {
     # Plot Module Membership
     par(mar=c(1, 1, 1, 1))
     plotBar(
-      MM, c(-1,1), moduleAssignments[[discovery]][nodeOrder], MM.cols,
-      drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
-      ylab="Module\nMembership", maxt.line=maxt.line, border.width=border.width
+      nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder], 
+      nodeContribCols, drawBorders=drawBorders, plotModuleNames=FALSE, main="", 
+      xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, 
+      border.width=border.width
     )
     
     # Plot the data matrix
-    dat <- data[[test]][presentSamples, presentVars]
+    dat <- data[[ti]][presentSamples, presentNodes]
     range.dat <- range(dat)
     if (all(range.dat > 0)) {
       palette <- tail(data.palette(), length(data.palette())/2)
@@ -574,7 +582,7 @@ plotModule <- function(
     par(mar=c(1, 1, 1, 1))
     plotSquareHeatmap(
       dat, palette, vlim=range.pal, legend.lim=range.dat,
-      moduleAssignments[[discovery]][nodeOrder], na.pos.x, na.pos.y, 
+      moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
       xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
       xaxt.line=gaxt.line, maxt.line=maxt.line, border.width=border.width
@@ -610,12 +618,12 @@ plotModule <- function(
     
     # Plot bar chart
     xlab <- "Module summary"
-    if (length(modules) == 1) 
+    if (length(mods) == 1) 
       xlab <- gsub(" ", "\n", xlab)
     par(mar=c(1, 1, 1, 1))
     plotMultiBar(
-      SEP, rep(list(range(SEP, na.rm=TRUE)), ncol(SEP)),
-      cols=cols, drawBorders=drawBorders, border.width=border.width,
+      summaries, rep(list(range(summaries, na.rm=TRUE)), ncol(summaries)),
+      cols=summaries.cols , drawBorders=drawBorders, border.width=border.width,
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
       yaxt.line=saxt.line, maxt.line=0, xlab=xlab, 
       cex.modules=par("cex.lab")*0.7
