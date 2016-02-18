@@ -4,9 +4,10 @@
 \alias{plotModule}
 \title{Plot the topology of a network module}
 \usage{
-plotModule(data, correlation, network, moduleAssignments, modules,
-  discovery = 1, test = 1, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules, plotNodeNames = TRUE,
+plotModule(data, correlation, network, moduleAssignments = NULL,
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "Module Topology",
   drawBorders = FALSE, border.width = 2, gaxt.line = -0.5,
   saxt.line = -0.5, maxt.line, legend.tick.size = 0.04, laxt.line = 2.5,
@@ -30,13 +31,25 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{modules}{a vector of modules to apply the function to (see details).}
+\item{modules}{a list of vectors, one for each \code{discovery} dataset, 
+of modules to perform the analysis on. The default is to analyse all modules
+with the exception of those specified in \code{backgroundLabel}.}
 
-\item{discovery}{name or index denoting which dataset the module of interest
-was discovered in (see details).}
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
 
-\item{test}{name or index denoting which dataset to apply the function to 
-(see details).}
+\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
+
+\item{test}{a list of vectors of names or indices denoting the test datasets
+for each \code{discovery} dataset. Alternatively can be provided as vector
+if the test datasets are the same for all 'discovery' datasets (e.g. for 
+performing a pairwise comparison).}
+
+\item{nCores}{number of cores to parallelise the calculation of network 
+properties over. Ignored if the user has already registered a parallel 
+backend.}
+
+\item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 
 \item{orderSamplesBy}{one of "discovery", "test" or "none". Controls how 
 samples are ordered on the plot (see details).}
@@ -44,9 +57,9 @@ samples are ordered on the plot (see details).}
 \item{orderNodesBy}{one of "discovery", "test" or "none". Controls how nodes
 are ordered on the plot (see details).}
 
-\item{orderModules}{logical; if \code{TRUE} modules will be ordered by 
-similarity (see details). The default is \code{TRUE} if the data for the 
-\code{test} network is provided.}
+\item{orderModules}{logical; if \code{TRUE} modules ordered by clustering 
+their summary vectors. If \code{FALSE} modules are returned in the order
+provided.}
 
 \item{plotNodeNames}{logical; controls whether the node names are 
 rendered on the bottom axis.}
@@ -127,7 +140,7 @@ Individual components of the module plot can be plotted using
   recommended for the user to store their data as 'bigMatrix' objects, as the
   \link{modulePreservation} function, \link[=plotModule]{plotting} 
   \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
-  \link[=sampleOrder]{sample} ordering functions  also expect 'bigMatrix'
+  \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
   objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
@@ -135,12 +148,12 @@ Individual components of the module plot can be plotted using
   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
 }
 \subsection{Node, sample, and module ordering:}{
-  By default, nodes are ordered in decreasing order of within-module
-  connectivity in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
+  By default, nodes are ordered in decreasing order of \emph{weighted degree}
+  in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
   This facilitates the visual comparison of modules across datasets, as the 
   node ordering will be preserved. Missing nodes are colored in grey. If
   \code{orderNodesBy} is "test" nodes will instead be ordered by 
-  within-module connectivity in the \code{test} dataset. If "none" nodes are 
+  weighted degree in the \code{test} dataset. If "none" nodes are 
   drawn in the order they are provided in the drawn dataset.
   
   When multiple modules are specified, modules are ordered by the similarity
@@ -152,8 +165,8 @@ Individual components of the module plot can be plotted using
   order of the module summary vector in the drawn dataset for the left-most 
   module appearing on the plot (see \code{\link{sampleOrder}}.
 }
-\subsection{Normalised connectivity:}{
-  The within-module connectivity is normalised by the maximum connectivity in
+\subsection{Normalised degree:}{
+  The weighted degree is normalised by the maximum connectivity in
   any given module when rendered on the bar plot. This facilitates visual 
   comparison of multiple modules with differing sizes or densities.
 }
