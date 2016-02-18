@@ -59,9 +59,13 @@ list if possible (see Return Value).}
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 }
 \value{
-A list with entries for each \code{'discovery'} dataset containing lists
- with entries for each \code{'test'} dataset containing a vector of variable
- naems in descending order of weighted degree for each module.
+A nested list structure. At the top level, the list has one element per 
+ \code{'discovery'} dataset. Each of these elements is a list that has one
+ element per \code{'test'} dataset analysed for that \code{'discovery'} 
+ dataset. Each of these elements is a list that has one element per 
+ \code{'modules'} specified, containing a vector of node names for the
+ requested module. If \code{simplify = TRUE}, then there will be a single
+ vector of node names for each \code{'test'} dataset.
 }
 \description{
 Order nodes in descending order of \emph{weighted degree} and order 

@@ -46,9 +46,12 @@
 #' }
 #' 
 #' @return 
-#'  A list with entries for each \code{'discovery'} dataset containing lists
-#'  with entries for each \code{'test'} dataset containing a list of network 
-#'  properties for each module of interest:
+#'  A nested list structure. At the top level, the list has one element per 
+#'  \code{'discovery'} dataset. Each of these elements is a list that has one
+#'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
+#'  dataset. Each of these elements is a list that has one element per 
+#'  \code{'modules'} specified. Each of these is a list containing the following  
+#'  objects:
 #'  \itemize{
 #'    \item{\code{'degree'}:}{
 #'      The weighted within-module degree: the sum of edge weights for each 
@@ -75,7 +78,13 @@
 #'      vector.
 #'    }
 #'  }
-#'   
+#'  For example, \code{results[[1]][[2]][["blue"]][["degree"]]} is a vector
+#'  containing the \emph{weighted node degree} for the "blue" module from the
+#'  dataset 1, as calculated in dataset 2. module preservation p-values when
+#'  assessing the preservation of modules from dataset 1 in dataset 2. If
+#'  \code{simplify = TRUE} then the list structure will be simplified where
+#'  possible.
+#'  
 #' @examples
 #' \dontrun{
 #' ## Create some example data
@@ -375,9 +384,13 @@ netPropsInternal <- function(
 #' }
 #' 
 #' @return
-#'  A list with entries for each \code{'discovery'} dataset containing lists
-#'  with entries for each \code{'test'} dataset containing a vector of variable
-#'  naems in descending order of weighted degree for each module. 
+#'  A nested list structure. At the top level, the list has one element per 
+#'  \code{'discovery'} dataset. Each of these elements is a list that has one
+#'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
+#'  dataset. Each of these elements is a list that has one element per 
+#'  \code{'modules'} specified, containing a vector of node names for the
+#'  requested module. If \code{simplify = TRUE}, then there will be a single
+#'  vector of node names for each \code{'test'} dataset.
 #'  
 #' @examples
 #' \dontrun{
