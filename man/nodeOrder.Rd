@@ -4,9 +4,10 @@
 \alias{nodeOrder}
 \title{Order nodes and modules within a network.}
 \usage{
-nodeOrder(data = NULL, correlation, network, moduleAssignments, modules,
-  discovery = 1, test = 1, na.rm = FALSE, orderModules = TRUE,
-  simplify = TRUE)
+nodeOrder(data = NULL, correlation, network, moduleAssignments,
+  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  nCores = 1, na.rm = FALSE, orderModules = TRUE, simplify = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -26,29 +27,41 @@ between each pair of variables in the dataset.}
 to in the discovery dataset. If there are multiple discovery datasets 
 then this argument should be a list of such vectors.}
 
-\item{modules}{a vector of modules to apply the function to (see details).}
+\item{modules}{a list of vectors, one for each \code{discovery} dataset, 
+of modules to perform the analysis on. The default is to analyse all modules
+with the exception of those specified in \code{backgroundLabel}.}
 
-\item{discovery}{name or index denoting which dataset the module of interest
-was discovered in (see details).}
+\item{backgroundLabel}{a single label that nodes that do not belong to any
+module are assigned. The default is "0".}
 
-\item{test}{name or index denoting which dataset to apply the function to 
-(see details).}
+\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
 
-\item{na.rm}{logical; If \code{TRUE}, genes present in the \code{discovery} 
-dataset but missing from the test dataset are excluded. If \code{FALSE}, 
-missing genes are put last in the ordering.}
+\item{test}{a list of vectors of names or indices denoting the test datasets
+for each \code{discovery} dataset. Alternatively can be provided as vector
+if the test datasets are the same for all 'discovery' datasets (e.g. for 
+performing a pairwise comparison).}
 
-\item{orderModules}{logical; if \code{TRUE} modules ordered by clustering
-their summary vectors. If \code{FALSE} modules are returned 
-in the order provided.}
+\item{nCores}{number of cores to parallelise the calculation of network 
+properties over. Ignored if the user has already registered a parallel 
+backend.}
 
-\item{simplify}{logical; if \code{FALSE} the returned data structure will be 
-a list of vectors, one list element for each module. If \code{TRUE}, the
-returned data structure will be a single vector of ordered genes.}
+\item{na.rm}{logical; If \code{TRUE}, nodes and moduels present in the 
+\code{discovery} dataset but missing from the test dataset are excluded. If
+\code{FALSE}, missing nodes and modules are put last in the ordering.}
+
+\item{orderModules}{logical; if \code{TRUE} modules ordered by clustering 
+their summary vectors. If \code{FALSE} modules are returned in the order
+provided.}
+
+\item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
+list if possible (see Return Value).}
+
+\item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 }
 \value{
-A vector of variable names in descending order of weighted degree
- for each module.
+A list with entries for each \code{'discovery'} dataset containing lists
+ with entries for each \code{'test'} dataset containing a vector of variable
+ naems in descending order of weighted degree for each module.
 }
 \description{
 Order nodes in descending order of \emph{weighted degree} and order 
@@ -76,16 +89,16 @@ modules by the similarity of their summary vectors.
   ignored if data is provided for only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
-  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}}
-  data, regular 'matrix' objects are also accepted. In this case, the
+  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+  data, regular 'matrix' objects are also accepted. In this case, the 
   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-  conversion process involves writing out each matrix as a binary file on
-  disk, which can take a long time for large datasets. It is strongly
+  conversion process involves writing out each matrix as a binary file on 
+  disk, which can take a long time for large datasets. It is strongly 
   recommended for the user to store their data as 'bigMatrix' objects, as the
   \link{modulePreservation} function, \link[=plotModule]{plotting} 
-  \link[=plotTopology]{functions}, \link[=sampleOrder]{sample} ordering, and
-  \link{networkProperties} functions also expect 'bigMatrix' objects. 
-  Further, 'bigMatrix' objects have a number of benefits, including 
+  \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
+  \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
+  objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
   \link[=bigMatrix-get]{converting to, loading in}, and 
