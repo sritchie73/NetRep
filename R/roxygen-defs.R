@@ -51,5 +51,5 @@ NULL
 #'  properties over. Ignored if the user has already registered a parallel 
 #'  backend.
 #'
-#' @name simplify_param
+#' @name par_param
 NULL
