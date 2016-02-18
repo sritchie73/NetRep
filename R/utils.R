@@ -350,10 +350,10 @@ setupParallel <- function(nCores, verbose, reporterCore) {
   # First, check whether the user has already set up a parallel backend. In this
   # case, we can ignore the `nCores` argument.
   if (getDoParWorkers() > 1) {
-    vCat(verbose, 0, "Ignoring 'nCores': parallel backend detected.")
+    vCat(verbose, 1, "Ignoring 'nCores': parallel backend detected.")
     if (reporterCore) {
       vCat(
-        verbose, 0, "Reserving 1 core for progress reporting.",
+        verbose, 1, "Reserving 1 core for progress reporting.",
         getDoParWorkers() - 1, "cores will be used for computation"
       )
     }
@@ -374,7 +374,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
       cl <- parallel::makeCluster(nCores)
       doParallel::registerDoParallel(cl)
       
-      vCat(verbose, 0, "Running on", workerCores, "cores.")
+      vCat(verbose, 1, "Running on", workerCores, "cores.")
       if (workerCores > parallel::detectCores()) {
         stop(
           "Requested number of threads (", workerCores, ") is higher than the ",
@@ -387,7 +387,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
       # We want to immediately print a warning for the user, not at the end 
       # once the analysis has finished.
       vCat(
-        TRUE, 0, file=stderr(),
+        TRUE, 1, file=stderr(),
         "Warning: unable to find 'doParallel' package, running on 1 core." 
       )
     }
@@ -401,7 +401,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
         nCores <- nCores + 1
       }
       doMC::registerDoMC(nCores)
-      vCat(verbose, 0, "Running on", workerCores, "cores.")
+      vCat(verbose, 1, "Running on", workerCores, "cores.")
       if ((nCores - 1) > parallel::detectCores()) {
         stop(
           "Requested number of threads (", workerCores, ") is higher than the ",
@@ -414,12 +414,12 @@ setupParallel <- function(nCores, verbose, reporterCore) {
       # We want to immediately print a warning for the user, not at the end 
       # once the analysis has finished.
       vCat(
-        TRUE, 0, file=stderr(),
+        TRUE, 1, file=stderr(),
         "Unable to find 'doMC' package, running on 1 core."
       )
     }
   } else {
-    vCat(verbose, 0, "Running on 1 cores.")
+    vCat(verbose, 1, "Running on 1 cores.")
   }
   
   # Suppress annoying foreach warning generated when using %dopar% and running 
