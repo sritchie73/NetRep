@@ -149,8 +149,8 @@ processInput <- function(discovery, test, network, correlation, data,
     network <- list(network)
   
   # Make sure they're 'bigMatrix' objects
-  correlation <- lapply(correlation, dynamicMatLoad, tempdir)
-  network <- lapply(network, dynamicMatLoad, tempdir)
+  correlation <- lapply(correlation, dynamicMatLoad, tempdir, verbose)
+  network <- lapply(network, dynamicMatLoad, tempdir, verbose)
   
   # Add any datasets names that are not in dataNames
   dataNames <- c(dataNames, names(correlation))
@@ -182,7 +182,7 @@ processInput <- function(discovery, test, network, correlation, data,
     data <- list(data)
 
   # Make sure they're 'bigMatrix' objects
-  data <- lapply(data, dynamicMatLoad, tempdir)
+  data <- lapply(data, dynamicMatLoad, tempdir, verbose)
 
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
   data <- verifyDatasetOrder(data, "data", dataNames, nDatasets)
@@ -555,11 +555,12 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
 #' 
 #' @param object user input object
 #' @param tempdir temporary directory to save objects in
+#' @param verbose logical; should progress be reported? 
 #' @param ... additional arguments to pass to read.bigMatrix
 #'   
 #' @return
 #'  A 'bigMatrix' object or error.
-dynamicMatLoad <- function(object, tempdir, ...) {
+dynamicMatLoad <- function(object, tempdir, verbose, ...) {
   basename <- paste0("tmp", getUUID())
   if (is.null(object)) {
     return(NULL)
@@ -574,7 +575,7 @@ dynamicMatLoad <- function(object, tempdir, ...) {
       return(load.bigMatrix(object))
     } else {
       vCat(
-        TRUE, 0,
+        verbose, 0,
         "Creating new 'bigMatrix' in a temporary directory for file ", object,
         ". This could take a while."
       )
@@ -584,7 +585,7 @@ dynamicMatLoad <- function(object, tempdir, ...) {
     
   } else if (class(object) == "matrix") {
     vCat(
-      TRUE, 0,
+      verbose, 0,
       "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
       " This could take a while."
     )
