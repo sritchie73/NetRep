@@ -61,6 +61,20 @@ processInput <- function(discovery, test, network, correlation, data,
   # ----------------------------------------------------------------------------
   # First, we need to know what the 'discovery' and 'test' datasets are.
   # ----------------------------------------------------------------------------
+  
+  # If both are not provided we assume the user is using one of the 
+  # downstream analysis or plotting functions on a single dataset
+  if (is.null(discovery) & is.null(test)) {
+    discovery <- 1
+    test <- 1
+  }
+  # If only one is provided, we assume the user meant to use one of the 
+  # downstream analysis or plotting functions within the same dataset
+  else if (is.null(discovery)) {
+    discovery <- test
+  } else if (is.null(test)) {
+    test <- discovery
+  }
 
   # Case 1: both discovery and test are vectors
   if (is.vector(discovery) && is.vector(test)) {

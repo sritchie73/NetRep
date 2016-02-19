@@ -14,7 +14,7 @@
 \title{Plot a topological feature of network module}
 \usage{
 plotData(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "",
@@ -24,7 +24,7 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   laxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderNodesBy = "discovery",
   symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
   plotModuleNames, main = "", palette = correlation.palette(),
@@ -33,7 +33,7 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   laxt.line, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderNodesBy = "discovery",
   symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
   plotModuleNames, main = "", palette = network.palette(),
@@ -42,7 +42,7 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   laxt.line, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotModuleNames, main = "", border.width = 2, palette = c("#313695",
@@ -50,7 +50,7 @@ plotContribution(data, correlation, network, moduleAssignments = NULL,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderNodesBy = "discovery",
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames, main = "",
   palette = "#feb24c", border.width = 2, drawBorders = FALSE,
@@ -58,7 +58,7 @@ plotDegree(data, correlation, network, moduleAssignments = NULL,
   cex.main = 1.2)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotSampleNames = TRUE,
   plotModuleNames, main = "", palette = c("#762a83", "#1b7837"),
@@ -66,7 +66,7 @@ plotSummary(data, correlation, network, moduleAssignments = NULL,
   maxt.line = 0, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotDataLegend(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, palette = data.palette(), border.width = 2,
   horizontal = TRUE, legend.main = "Data", legend.tick.size = 0.03,
   laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)

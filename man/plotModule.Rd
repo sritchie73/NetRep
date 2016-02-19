@@ -5,7 +5,7 @@
 \title{Plot the topology of a network module}
 \usage{
 plotModule(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 1,
+  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = 1, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "Module Topology",

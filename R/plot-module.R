@@ -195,7 +195,7 @@
 #' @export
 plotModule <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=1, test=1, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
   orderSamplesBy="test", orderNodesBy="discovery",
   orderModules=TRUE, plotNodeNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
   main="Module Topology", drawBorders=FALSE, border.width=2, gaxt.line=-0.5, 

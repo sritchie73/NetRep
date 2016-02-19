@@ -6,7 +6,7 @@
 \usage{
 networkProperties(data = NULL, correlation, network,
   moduleAssignments = NULL, modules = NULL, backgroundLabel = "0",
-  discovery = 1, test = 1, nCores = 1, simplify = TRUE,
+  discovery = NULL, test = NULL, nCores = 1, simplify = TRUE,
   verbose = TRUE)
 }
 \arguments{
