@@ -2,7 +2,7 @@ Package: NetRep
 Type: Package
 Title: Testing network module replication and preservation through permutation
     testing
-Version: 0.50.4
+Version: 0.50.5
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for assessing the replication/preservation of a network 

@@ -476,6 +476,20 @@ processInput <- function(discovery, test, network, correlation, data,
   
   
   for (ii in iterator) {
+    # Make sure the 'correlation' and 'network' matrices are square
+    if (nrow(network[[ii]]) != ncol(network[[ii]])) {
+      stop("'network' for dataset ", '"', ii, '"', " is not square")
+    }
+    if (nrow(correlation[[ii]]) != ncol(correlation[[ii]])) {
+      stop("'correlation' for dataset ", '"', ii, '"', " is not square")
+    }
+    # And that they have the same dimensions
+    if ((nrow(correlation[[ii]]) != nrow(network[[ii]])) ||
+        (!is.null(data[[ii]]) && (ncol(data[[ii]]) != ncol(network[[ii]])))) {
+      stop("'correlation', 'network', and 'data' have different numbers of ",
+           'variables for dataset "', ii, '"')
+    }
+    
     # Make sure the 'correlation' and 'network' matrices are symmetric 
     if (any(rownames(network[[ii]]) != colnames(network[ii]))) {
       stop("mismatch between row and column names in 'network' for dataset ", 
