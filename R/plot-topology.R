@@ -341,8 +341,8 @@ plotData <- function(
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -601,8 +601,8 @@ plotCorrelation <- function(
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -823,8 +823,8 @@ plotNetwork <- function(
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1047,8 +1047,8 @@ plotContribution <- function(
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1246,8 +1246,8 @@ plotDegree <- function(
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1413,8 +1413,8 @@ plotSummary <- function(
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1634,8 +1634,8 @@ plotDataLegend <- function(
     stop("'legend.main' must be a characer vector")
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) || !is.vector(test) || 
-      length(discovery) > 1 || length(test) > 1) {
+  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
+      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
