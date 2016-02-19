@@ -166,14 +166,14 @@ plotSquareHeatmap <- function(
   emptyPlot(xlim=c(0.5, nX+0.5), ylim=c(0.5, nY+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
   
-  # render squares / triangles
-  ci <- 1
-  for (ii in 1:nY) {
-    cj <- 1
-    for (jj in 1:nX) {
+  # render squares
+  cj <- 1
+  for (jj in 1:nX) {
+    ci <- 1
+    for (ii in 1:nY) {
       if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
         col <- getColFromPalette(values[ci, cj], palette, vlim)
-        cj <- cj + 1
+        ci <- ci + 1
       } else {
         col <- na.col
       }
@@ -185,8 +185,8 @@ plotSquareHeatmap <- function(
         col=col, border=col
       )
     }
-    if (ii %nin% na.indices.y) {
-      ci <- ci + 1
+    if (jj %nin% na.indices.x) {
+      cj <- cj + 1
     }
   }
   
