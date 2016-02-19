@@ -56,10 +56,15 @@ is.bigMatrix <- function(x) {
 # call the appropriate function on the matrix object.
 #-------------------------------------------------------------------------------
 setMethod("show", signature(object = "bigMatrix"), function(object) {
+  # only show the relative path of the backingfile
+  backingfile <- object@descriptor
+  backingfile <- gsub(paste0(getwd(), "/"), "", backingfile)
+  # show the backingfile not the descriptor file
+  backingfile <- gsub(".desc", ".bin", backingfile)
   cat(
     '"bigMatrix" of type "', typeof(object), '" with ', nrow(object), 
-    " rows and ", ncol(object), ' columns stored at "',  
-    gsub(".desc", ".bin", object@descriptor), '"\n', sep=""
+    " rows and ", ncol(object), ' columns stored at "',  backingfile, '"\n', 
+    sep=""
   )
 })
 
