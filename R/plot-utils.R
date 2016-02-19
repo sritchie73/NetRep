@@ -53,7 +53,7 @@ forceLim <- function(dlim) {
 #'  constrained to the specified \code{xlim} and \code{ylim}.
 #'
 emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
-  if (!missing(xlim) & !missing(ylim)) {
+  if (!missing(xlim) && !missing(ylim)) {
     if(hardlim) {
       xlim <- forceLim(xlim)
       ylim <- forceLim(ylim)

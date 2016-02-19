@@ -24,7 +24,7 @@ scaleBigMatrix <- function(x, tmp.dir) {
     backingfile <- paste0("scaled", stamp, ".bin")
     
     # Handle the infintesimally small chance of a UUID collision
-    if (!file.exists(descriptorfile) & !file.exists(backingfile)) {
+    if (!file.exists(descriptorfile) && !file.exists(backingfile)) {
       break 
     }
   }

@@ -68,7 +68,7 @@ monitorProgress <- function(nChunks, ind, run.dir) {
   init <- FALSE
   while(TRUE) {
     files <- list.files(run.dir)
-    if (init & length(files) == 0) {
+    if (init && length(files) == 0) {
       break;
     } else {
       init <- TRUE

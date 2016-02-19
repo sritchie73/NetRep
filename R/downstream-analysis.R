@@ -501,11 +501,11 @@ nodeOrder <- function(
   
   vCat(verbose, 0, "Validating user input...")
   
-  if (!is.logical(na.rm) | is.na(na.rm) | length(na.rm) > 1) {
+  if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
     stop("'na.rm' must be either 'TRUE' or 'FALSE'")
   }
   
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
@@ -529,7 +529,7 @@ nodeOrder <- function(
     if (orderModules) {
       for (di in discovery) {
         for (ti in test[[di]]) {
-          if (is.null(scaledData[[ti]]) & length(modules[[di]]) > 1) {
+          if (is.null(scaledData[[ti]]) && length(modules[[di]]) > 1) {
             stop("'data' must be provided for all 'test' datasets ",
                  "if 'orderModules' is TRUE")
           }   
@@ -589,7 +589,7 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
   res <- lapply(props, function(discProps) { # For each discovery dataset 
     r1 <- lapply(discProps, function(testProps) {  # For each test dataset
       # First get module order
-      if (length(testProps) > 1 & orderModules) {
+      if (length(testProps) > 1 && orderModules) {
         # Order modules by similarity
         
         # First get the summary profiles for each module
@@ -818,7 +818,7 @@ sampleOrder <- function(
   
   vCat(verbose, 0, "Validating user input...")
   
-  if (!is.logical(na.rm) | is.na(na.rm) | length(na.rm) > 1) {
+  if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
     stop("'na.rm' must be either 'TRUE' or 'FALSE'")
   }
   

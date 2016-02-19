@@ -158,7 +158,7 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
 #' @importFrom iterators nextElem
 #' @importFrom itertools isplitIndices
 ichunkTasks <- function(verbose, n, cores) {
-  if (verbose & (cores > 1)) {
+  if (verbose && (cores > 1)) {
     it <- idiv(n, chunks=cores-1)
     i <- 1L
     first = TRUE
@@ -361,13 +361,13 @@ setupParallel <- function(nCores, verbose, reporterCore) {
     predef <- TRUE
   } 
   # If the user is on a Windows machine, we have to use the `doParallel` package 
-  else if (.Platform$OS.type == "windows" & nCores > 1) {
+  else if (.Platform$OS.type == "windows" && nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
     if(suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
       # we need an additional thread to monitor and report progress
       workerCores <- nCores
-      if (verbose & reporterCore) {
+      if (verbose && reporterCore) {
         nCores <- nCores + 1
       }
         
@@ -391,13 +391,13 @@ setupParallel <- function(nCores, verbose, reporterCore) {
         "Warning: unable to find 'doParallel' package, running on 1 core." 
       )
     }
-  } else if (.Platform$OS.type == "unix" & nCores > 1) {
+  } else if (.Platform$OS.type == "unix" && nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
     if(suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
       # we need an additional thread to monitor and report progress
       workerCores <- nCores
-      if (verbose & reporterCore) {
+      if (verbose && reporterCore) {
         nCores <- nCores + 1
       }
       doMC::registerDoMC(nCores)
@@ -474,7 +474,7 @@ simplifyList <- function(l, depth) {
   
   # Recursively traverse until we hit the depth requested, then filter out NULL
   # entries and collapse if length == 1.
-  stopifnot(is.numeric(depth) & depth > 0)
+  stopifnot(is.numeric(depth) && depth > 0)
   if (depth == 1) {
     l <- collapse(l)
     return(l)

@@ -55,7 +55,7 @@ processInput <- function(discovery, test, network, correlation, data,
   # Because this is what I **actually** meant, obviously. Why does is.vector
   # return TRUE for lists???
   is.vector <- function(obj) {
-    base::is.vector(obj) & !is.list(obj)
+    base::is.vector(obj) && !is.list(obj)
   }
   
   # ----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ processInput <- function(discovery, test, network, correlation, data,
   # ----------------------------------------------------------------------------
 
   # Case 1: both discovery and test are vectors
-  if (is.vector(discovery) & is.vector(test)) {
+  if (is.vector(discovery) && is.vector(test)) {
     # Are the datasets named?
     discNames <- NULL
     if (is.character(discovery))
@@ -83,7 +83,7 @@ processInput <- function(discovery, test, network, correlation, data,
   }
   # Case 2: discovery is a vector, test is a list (i.e. different test datasets
   # for each discovery dataset)
-  else if (is.vector(discovery) & is.list(test)) {
+  else if (is.vector(discovery) && is.list(test)) {
     # Are the datasets named?
     discNames <- NULL
     if (is.character(discovery))
@@ -164,7 +164,7 @@ processInput <- function(discovery, test, network, correlation, data,
   correlation <- verifyDatasetOrder(correlation, "correlation", dataNames, nDatasets)
   network <- verifyDatasetOrder(network, "network", dataNames, nDatasets)
   
-  if (any(dataNames %nin% names(network)) | nDatasets != length(network)) {
+  if (any(dataNames %nin% names(network)) || nDatasets != length(network)) {
     stop("mismatch between 'discovery', 'test', and the datasets provided")
   }
   
@@ -240,21 +240,21 @@ processInput <- function(discovery, test, network, correlation, data,
     
   # Make sure that its a list of vectors
   for (ii in seq_along(moduleAssignments)) {
-    if (!is.null(moduleAssignments[[ii]]) & !is.vector(moduleAssignments[[ii]]))
+    if (!is.null(moduleAssignments[[ii]]) && !is.vector(moduleAssignments[[ii]]))
       stop("expecting a list of vectors for 'moduleAssignments'")
   }
   
   # Check that we can match 'discovery' to the provided 'moduleAssignments'
   discNames <- names(discovery)
-  if(!is.null(discNames) & is.null(names(moduleAssignments))) {
+  if(!is.null(discNames) && is.null(names(moduleAssignments))) {
     stop("cannot match dataset names in 'discovery' to the provided ",
          "'moduleAssignments' list")
   }
-  if (!is.null(discNames) & any(discNames %nin% names(moduleAssignments))) {
+  if (!is.null(discNames) && any(discNames %nin% names(moduleAssignments))) {
     stop("cannot match dataset names in 'discovery' to the provided ",
          "'moduleAssignments' list")
   }
-  if (is.null(discNames) & (length(moduleAssignments) < length(unique(discovery)))) {
+  if (is.null(discNames) && (length(moduleAssignments) < length(unique(discovery)))) {
     stop("expecting ", length(discovery), " 'moduleAssignment' vectors, ", 
          nDatasets, " provided")
   }
@@ -301,21 +301,21 @@ processInput <- function(discovery, test, network, correlation, data,
   
   # Make sure that its a list of vectors
   for (ii in seq_along(backgroundLabel)) {
-    if (!is.null(backgroundLabel[[ii]]) & !is.vector(backgroundLabel[[ii]]))
+    if (!is.null(backgroundLabel[[ii]]) && !is.vector(backgroundLabel[[ii]]))
       stop("expecting a list of vectors for 'backgroundLabel'")
   }
   
   # Check that we can match 'discovery' to the provided 'backgroundLabel'
   discNames <- names(discovery)
-  if(!is.null(discNames) & is.null(names(backgroundLabel))) {
+  if(!is.null(discNames) && is.null(names(backgroundLabel))) {
     stop("cannot match dataset names in 'discovery' to the provided ",
          "'backgroundLabel' list")
   }
-  if (!is.null(discNames) & any(discNames %nin% names(backgroundLabel))) {
+  if (!is.null(discNames) && any(discNames %nin% names(backgroundLabel))) {
     stop("cannot match dataset names in 'discovery' to the provided ",
          "'backgroundLabel' list")
   }
-  if (is.null(discNames) & (length(backgroundLabel) < length(unique(discovery)))) {
+  if (is.null(discNames) && (length(backgroundLabel) < length(unique(discovery)))) {
     stop("expecting ", length(discovery), " 'moduleAssignment' vectors, ", 
          nDatasets, " provided")
   }
@@ -407,21 +407,21 @@ processInput <- function(discovery, test, network, correlation, data,
   
   # Make sure that its a list of vectors
   for (ii in seq_along(modules)) {
-    if (!is.null(modules[[ii]]) & !is.vector(modules[[ii]]))
+    if (!is.null(modules[[ii]]) && !is.vector(modules[[ii]]))
       stop("expecting a list of vectors for 'modules'")
   }
   
   # Check that we can match 'discovery' to the provided 'moduleAssignments'
   discNames <- names(discovery)
-  if(!is.null(discNames) & is.null(names(modules))) {
+  if(!is.null(discNames) && is.null(names(modules))) {
     stop("cannot match dataset names in 'discovery' to the provided ",
          "'modules' list")
   }
-  if (!is.null(discNames) & any(discNames %nin% names(modules))) {
+  if (!is.null(discNames) && any(discNames %nin% names(modules))) {
     stop("cannot match dataset names in 'discovery' to the provided ",
          "'modules' list")
   }
-  if (is.null(discNames) & (length(modules) < nDatasets)) {
+  if (is.null(discNames) && (length(modules) < nDatasets)) {
     stop("expecting ", nDatasets, " 'modules' vectors, ", 
          length(modules), " provided")
   }
@@ -444,15 +444,15 @@ processInput <- function(discovery, test, network, correlation, data,
   hasNames <- c(!is.null(datNames), !is.null(corNames), !is.null(netNames), 
                 !is.null(modLabNames), !is.null(modNames))
   
-  if (sum(hasNames) > 0 & !all(hasNames)) {
+  if (sum(hasNames) > 0 && !all(hasNames)) {
     stop("cannot match dataset names across all input arguments")
   }
 
   # Do the names need to match?
   if (matchByIndice) {
     iterator <- seq_along(network)
-    if (all(hasNames) & (any(datNames != corNames) | any(corNames != netNames) | 
-        any(modNames != netNames) | any(modLabNames != modNames))) {
+    if (all(hasNames) && (any(datNames != corNames) || any(corNames != netNames) || 
+        any(modNames != netNames) || any(modLabNames != modNames))) {
       stop("mismatch in dataset names across input arguments when matching ",
            "'discovery' or 'test' by index")
     }
@@ -474,7 +474,7 @@ processInput <- function(discovery, test, network, correlation, data,
     # Make sure the ordering of nodes is the same between 'correlation', 
     # 'network' and 'data'.
     if (any(colnames(network[[ii]]) != colnames(correlation[ii])) |
-        (!is.null(data[[ii]]) & any(colnames(network[[ii]]) != colnames(data[[ii]])))) {
+        (!is.null(data[[ii]]) && any(colnames(network[[ii]]) != colnames(data[[ii]])))) {
       stop("mismatch in node order between 'correlation' and 'network' for",
            'dataset "', ii, '"')
     }
@@ -558,15 +558,15 @@ processInput <- function(discovery, test, network, correlation, data,
 #' @return ordered 'tocheck' by dataset.
 verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   # Check that we can match 'discovery' and 'test' to the provided matrices
-  if(!is.null(dataNames) & is.null(names(tocheck))) {
+  if(!is.null(dataNames) && is.null(names(tocheck))) {
     stop("cannot match dataset names in 'discovery' and 'test' to the provided ",
          "'", errname, "' matrices")
   }
-  if (!is.null(dataNames) & any(dataNames %nin% names(tocheck))) {
+  if (!is.null(dataNames) && any(dataNames %nin% names(tocheck))) {
     stop("cannot match dataset names in 'discovery' and 'test' to the provided" ,
          "'", errname, "' matrices")
   }
-  if (is.null(dataNames) & (length(tocheck) < nDatasets)) {
+  if (is.null(dataNames) && (length(tocheck) < nDatasets)) {
     stop("expecting ", nDatasets, "'", errname, "' matrices ", length(tocheck),
          " provided")
   }

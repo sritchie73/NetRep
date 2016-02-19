@@ -134,14 +134,14 @@ setMethod("typeof", signature(x = "bigMatrix"), function(x) {
 
 setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
-  if (n < 1 | n > nrow(x)) 
+  if (n < 1 || n > nrow(x)) 
     stop("n must be between 1 and nrow(x)")
   x[1:n,]
 })
 
 setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
-  if (n < 1 | n > nrow(x)) 
+  if (n < 1 || n > nrow(x)) 
     stop("n must be between 1 and nrow(x)")
   x[(nrow(x) - n + 1):nrow(x),]
 })
@@ -152,7 +152,7 @@ setMethod("dimnames", signature(x = "bigMatrix"), function(x) {
 
 setMethod("dimnames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
-    if (!is.null(value) & !is.list(value))
+    if (!is.null(value) && !is.list(value))
       stop("'dimnames' must be a list")
     if (is.null(value)) {
       dn <- list(NULL, NULL)
@@ -178,13 +178,13 @@ setMethod("dimnames<-",
       dn[2L] <- list(NULL)
     }
     
-    if (!is.null(dn[[1L]]) & length(dn[[1L]]) != nrow(x)) {
+    if (!is.null(dn[[1L]]) && length(dn[[1L]]) != nrow(x)) {
       stop(
         "length of 'dimnames' [", length(dn[[1L]]), 
         "] not equal to array extent"
       )
     }
-    if (!is.null(dn[[2L]]) & length(dn[[2L]]) != ncol(x)) {
+    if (!is.null(dn[[2L]]) && length(dn[[2L]]) != ncol(x)) {
       stop(
         "length of 'dimnames' [", length(dn[[2L]]), 
         "] not equal to array extent"
@@ -266,9 +266,9 @@ setMethod(
       # Case: length(ret) == 1, we take EITHER the row or column
       # names if only one exists. Otherwise, no names
       if (length(ret) == 1) {
-        if (!is.null(x@colnames) & is.null(x@rownames)) {
+        if (!is.null(x@colnames) && is.null(x@rownames)) {
           names(ret) <- x@colnames[j]
-        } else if (is.null(x@colnames) & !is.null(x@rownames)) {
+        } else if (is.null(x@colnames) && !is.null(x@rownames)) {
           names(ret) <- x@rownames[i]
         }
       }
@@ -278,7 +278,7 @@ setMethod(
       }
       # Case: length(j) > 1, i is logical and j is not: number of returned 
       # rows == 1 because sum(i) == 1
-      else if (is.logical(i) & !is.logical(j) & length(j) > 1) {
+      else if (is.logical(i) && !is.logical(j) && length(j) > 1) {
         names(ret) <- x@colnames[j]
       }
       # Case: length(j) == 1: number returned columns == 1.
@@ -287,10 +287,10 @@ setMethod(
       }
       # Case: length(i) > 1, j is logical and i is not: number of returned 
       # columns == 1 because sum(j) == 1
-      else if (is.logical(j) & !is.logical(i) & length(i) > 1) {
+      else if (is.logical(j) && !is.logical(i) && length(i) > 1) {
         names(ret) <- x@colnames[j]
       }
-      else if (is.logical(j) & is.logical(i)) {
+      else if (is.logical(j) && is.logical(i)) {
         nr <- sum(i)
         nc <- sum(j)
         if (nr == 1) {
@@ -300,7 +300,7 @@ setMethod(
         }
       }
     } else {
-      if (!is.null(x@rownames) & !is.null(x@colnames)) {
+      if (!is.null(x@rownames) && !is.null(x@colnames)) {
         dimnames(ret) <- list(x@rownames[i], x@colnames[j])
       } else if (!is.null(x@rownames)) {
         rownames(ret) <- x@rownames[i]
@@ -342,13 +342,13 @@ setMethod(
       x <- detach.bigMatrix(x)
     
     # Give the results the approriate row and column names
-    if (is.null(dim(ret)) & length(ret) != 0) {
+    if (is.null(dim(ret)) && length(ret) != 0) {
       # Case: 1 column, length(ret) == 1, we take EITHER the row or column
       # names if only one exists. Otherwise, no names
-      if (ncol(x) == 1 & length(ret) == 1) {
-        if (!is.null(x@colnames) & is.null(x@rownames)) {
+      if (ncol(x) == 1 && length(ret) == 1) {
+        if (!is.null(x@colnames) && is.null(x@rownames)) {
           names(ret) <- x@colnames
-        } else if (is.null(x@colnames) & !is.null(x@rownames)) {
+        } else if (is.null(x@colnames) && !is.null(x@rownames)) {
           names(ret) <- x@rownames[i]
         }
       }
@@ -361,7 +361,7 @@ setMethod(
       else {
         names(ret) <- x@colnames
       }
-    } else if (!is.null(x@rownames) & !is.null(x@colnames)) {
+    } else if (!is.null(x@rownames) && !is.null(x@colnames)) {
       dimnames(ret) <- list(x@rownames[i], x@colnames)
     } else if (!is.null(x@rownames)) {
       rownames(ret) <- x@rownames[i]
@@ -402,13 +402,13 @@ setMethod(
       x <- detach.bigMatrix(x)
     
     # handle the row and column names
-    if (is.null(dim(ret)) & length(ret) != 0) {
+    if (is.null(dim(ret)) && length(ret) != 0) {
       # Case: 1 row, length(ret) == 1, we take EITHER the row or column
       # names if only one exists. Otherwise, no names
-      if (nrow(x) == 1 & length(ret) == 1) {
-        if (!is.null(x@colnames) & is.null(x@rownames)) {
+      if (nrow(x) == 1 && length(ret) == 1) {
+        if (!is.null(x@colnames) && is.null(x@rownames)) {
           names(ret) <- x@colnames[j]
-        } else if (is.null(x@colnames) & !is.null(x@rownames)) {
+        } else if (is.null(x@colnames) && !is.null(x@rownames)) {
           names(ret) <- x@rownames
         }
       }
@@ -421,7 +421,7 @@ setMethod(
       else {
         names(ret) <- x@rownames
       }
-    } else if (!is.null(x@rownames) & !is.null(x@colnames)) {
+    } else if (!is.null(x@rownames) && !is.null(x@colnames)) {
       dimnames(ret) <- list(x@rownames, x@colnames[j])
     } else if (!is.null(x@rownames)) {
       rownames(ret) <- x@rownames
@@ -452,13 +452,13 @@ setMethod(
       x <- detach.bigMatrix(x)
     
     # Give the results the approriate row and column names
-    if (is.null(dim(ret)) & length(ret) != 0) {
+    if (is.null(dim(ret)) && length(ret) != 0) {
       if (nrow(x) == 1) {
         names(ret) <- x@colnames
       } else {
         names(ret) <- x@rownames
       }
-    } else if (!is.null(x@rownames) & !is.null(x@colnames)) {
+    } else if (!is.null(x@rownames) && !is.null(x@colnames)) {
       dimnames(ret) <- list(x@rownames, x@colnames)
     } else if (!is.null(x@rownames)) {
       rownames(ret) <- x@rownames

@@ -336,13 +336,13 @@ plotData <- function(
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -389,18 +389,18 @@ plotData <- function(
   if (is.null(data[[ti]]))
     stop("Cannot plot data matrix without 'data'")
   
-  if ((orderSamplesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderSamplesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderSamplesBy' dataset") 
   }
   
-  if (orderSamplesBy == "discovery" & 
+  if (orderSamplesBy == "discovery" && 
       sum(rownames(scaledData[di]) %in% rownames(scaledData[[ti]])) == 0) {
     stop("'orderBySamples' can only be ", '"discovery"', " when the same",
          " samples are present in both the 'discovery' and 'test' datasets")
   }
   
-  if ((orderModules & length(mods) > 1) & 
-      (orderNodesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderModules && length(mods) > 1) && 
+      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
          "'orderModules' = 'TRUE'") 
   }
@@ -420,7 +420,7 @@ plotData <- function(
   # Case 1: we want to order nodes by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
@@ -452,7 +452,7 @@ plotData <- function(
   # Case 1: we want to order samples by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderSamplesBy == "discovery" & di != ti) {
+  if (orderSamplesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
@@ -481,7 +481,7 @@ plotData <- function(
   # Case 2: orderBy == di: those missing in the discovery should have grey bars.
   # Case 3: orderBy == ti: ordering within the same dataset => nothing missing.
   
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
     if (length(na.pos.x) > 0) {
       presentNodes <- nodeOrder[-na.pos.x]
@@ -493,7 +493,7 @@ plotData <- function(
     presentNodes <- nodeOrder
   }
   
-  if (orderSamplesBy == "discovery" & di != ti) {
+  if (orderSamplesBy == "discovery" && di != ti) {
     na.pos.y <- which(sampleOrder %nin% colnames(network[[ti]]))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
@@ -596,13 +596,13 @@ plotCorrelation <- function(
   orderByArgs <- c("discovery", "test", "none")
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
 
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -646,8 +646,8 @@ plotCorrelation <- function(
   if (missing(plotModuleNames))
     plotModuleNames <- length(mods) > 1
   
-  if ((orderModules & length(mods) > 1) & 
-      (orderNodesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderModules && length(mods) > 1) && 
+      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
          "'orderModules' = 'TRUE'") 
   }
@@ -668,7 +668,7 @@ plotCorrelation <- function(
   # Case 1: we want to order nodes by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
@@ -706,7 +706,7 @@ plotCorrelation <- function(
   # Case 2: orderBy == di: those missing in the discovery should have grey bars.
   # Case 3: orderBy == ti: ordering within the same dataset => nothing missing.
   
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
     if (length(na.pos.x) > 0) {
       presentNodes <- nodeOrder[-na.pos.x]
@@ -818,13 +818,13 @@ plotNetwork <- function(
   orderByArgs <- c("discovery", "test", "none")
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -868,8 +868,8 @@ plotNetwork <- function(
   if (missing(plotModuleNames))
     plotModuleNames <- length(mods) > 1
   
-  if ((orderModules & length(mods) > 1) & 
-      (orderNodesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderModules && length(mods) > 1) && 
+      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
          "'orderModules' = 'TRUE'") 
   }
@@ -889,7 +889,7 @@ plotNetwork <- function(
   # Case 1: we want to order nodes by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
@@ -927,7 +927,7 @@ plotNetwork <- function(
   # Case 2: orderBy == di: those missing in the discovery should have grey bars.
   # Case 3: orderBy == ti: ordering within the same dataset => nothing missing.
   
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
     if (length(na.pos.x) > 0) {
       presentNodes <- nodeOrder[-na.pos.x]
@@ -1042,13 +1042,13 @@ plotContribution <- function(
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1095,18 +1095,18 @@ plotContribution <- function(
   if (is.null(data[[ti]]))
     stop("Cannot plot node contribution without 'data'")
   
-  if ((orderSamplesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderSamplesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderSamplesBy' dataset") 
   }
   
-  if (orderSamplesBy == "discovery" & 
+  if (orderSamplesBy == "discovery" && 
       sum(rownames(scaledData[di]) %in% rownames(scaledData[[ti]])) == 0) {
     stop("'orderBySamples' can only be ", '"discovery"', " when the same",
          " samples are present in both the 'discovery' and 'test' datasets")
   }
   
-  if ((orderModules & length(mods) > 1) & 
-      (orderNodesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderModules && length(mods) > 1) && 
+      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
          "'orderModules' = 'TRUE'") 
   }
@@ -1126,7 +1126,7 @@ plotContribution <- function(
   # Case 1: we want to order nodes by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
@@ -1158,7 +1158,7 @@ plotContribution <- function(
   # Case 1: we want to order samples by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderSamplesBy == "discovery" & di != ti) {
+  if (orderSamplesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
@@ -1241,13 +1241,13 @@ plotDegree <- function(
   orderByArgs <- c("discovery", "test", "none")
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
 
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1291,8 +1291,8 @@ plotDegree <- function(
   if (missing(plotModuleNames))
     plotModuleNames <- length(mods) > 1
 
-  if ((orderModules & length(mods) > 1) & 
-      (orderNodesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderModules && length(mods) > 1) && 
+      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
          "'orderModules' = 'TRUE'") 
   }
@@ -1312,7 +1312,7 @@ plotDegree <- function(
   # Case 1: we want to order nodes by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
@@ -1408,13 +1408,13 @@ plotSummary <- function(
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
   orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
   
-  if (!is.logical(orderModules) | is.na(orderModules) | length(orderModules) > 1) {
+  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   
@@ -1461,18 +1461,18 @@ plotSummary <- function(
   if (is.null(data[[ti]]))
     stop("Cannot plot module summary without 'data'")
   
-  if ((orderSamplesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderSamplesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderSamplesBy' dataset") 
   }
   
-  if (orderSamplesBy == "discovery" & 
+  if (orderSamplesBy == "discovery" && 
       sum(rownames(scaledData[di]) %in% rownames(scaledData[[ti]])) == 0) {
     stop("'orderBySamples' can only be ", '"discovery"', " when the same",
          " samples are present in both the 'discovery' and 'test' datasets")
   }
   
-  if ((orderModules & length(mods) > 1) & 
-      (orderNodesBy == "discovery" & is.null(scaledData[[di]]))) {
+  if ((orderModules && length(mods) > 1) && 
+      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
          "'orderModules' = 'TRUE'") 
   }
@@ -1492,7 +1492,7 @@ plotSummary <- function(
   # Case 1: we want to order nodes by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderNodesBy == "discovery" & di != ti) {
+  if (orderNodesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
@@ -1524,7 +1524,7 @@ plotSummary <- function(
   # Case 1: we want to order samples by the discovery dataset, which if different
   # to the test dataset, we need to recalculate the weighted degree for the 
   # node order.
-  if (orderSamplesBy == "discovery" & di != ti) {
+  if (orderSamplesBy == "discovery" && di != ti) {
     # This skips all of the data verification
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
@@ -1553,7 +1553,7 @@ plotSummary <- function(
   # Case 2: orderBy == di: those missing in the discovery should have grey bars.
   # Case 3: orderBy == ti: ordering within the same dataset => nothing missing.
   
-  if (orderSamplesBy == "discovery" & di != ti) {
+  if (orderSamplesBy == "discovery" && di != ti) {
     na.pos.y <- which(sampleOrder %nin% colnames(network[[ti]]))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
@@ -1634,8 +1634,8 @@ plotDataLegend <- function(
     stop("'legend.main' must be a characer vector")
   
   # At this time, we can only plot within one dataset.
-  if (!is.vector(discovery) | !is.vector(test) | 
-      length(discovery) > 1 | length(test) > 1) {
+  if (!is.vector(discovery) || !is.vector(test) || 
+      length(discovery) > 1 || length(test) > 1) {
     stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
   }
   

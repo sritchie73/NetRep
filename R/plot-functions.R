@@ -352,7 +352,7 @@ addGradientLegend <- function(
   )
   
   # Make sure axis ticks are centred at 0 if within the range of legend.vlim
-  if(legend.vlim[1L] < 0 & legend.vlim[2L] > 0) {
+  if(legend.vlim[1L] < 0 && legend.vlim[2L] > 0) {
     labels <- c(
       seq.int(legend.vlim[1L], 0, length.out=3),
       seq.int(0, legend.vlim[2L], length.out=3)[-1]
@@ -368,7 +368,7 @@ addGradientLegend <- function(
     v.per.x <- (xlim[2] - xlim[1])/(legend.vlim[2] - legend.vlim[1])
     zero <- xlim[1] +  v.per.x * (0 - legend.vlim[1])
     
-    if(legend.vlim[1L] < 0 & legend.vlim[2L] > 0) {
+    if(legend.vlim[1L] < 0 && legend.vlim[2L] > 0) {
       at <- c(
         seq.int(xlim[1L], zero, length.out=3),
         seq.int(zero, xlim[2L], length.out=3)[-1]
@@ -393,7 +393,7 @@ addGradientLegend <- function(
     # for mapping from vlim to plot space
     v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
     zero <- ylim[1] +  v.per.y * (0 - legend.vlim[1])
-    if(legend.vlim[1L] < 0 & legend.vlim[2L] > 0) {
+    if(legend.vlim[1L] < 0 && legend.vlim[2L] > 0) {
       at <- c(
         seq.int(ylim[1L], zero, length.out=3),
         seq.int(zero, ylim[2L], length.out=3)[-1]

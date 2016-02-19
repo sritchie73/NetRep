@@ -497,7 +497,7 @@ modulePreservation <- function(
   
   # Validate 'nPerm'. If 'NULL', we need to process the rest of the input to
   # determine.
-  if (!is.null(nPerm) & (!is.numeric(nPerm) | length(nPerm) > 1 | nPerm < 1)) {
+  if (!is.null(nPerm) && (!is.numeric(nPerm) || length(nPerm) > 1 || nPerm < 1)) {
     stop("'nPerm' must be a single number > 1")
   }
   
@@ -572,7 +572,7 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   for (di in discovery) {
     for (ti in test[[di]]) {
-      if (!selfPreservation & di == ti) {
+      if (!selfPreservation && di == ti) {
         vCat(
           verbose, 0, sep="", "skipping module preservation analysis for modules",
           " from dataset ", '"', di, '"', " within dataset ", '"', di, '"', "."
@@ -849,7 +849,7 @@ modulePreservation <- function(
         res[[di]][[ti]] <- NULL
       }
     }
-    if (is.null(res[[di]]) | length(res[[di]]) == 0) {
+    if (is.null(res[[di]]) || length(res[[di]]) == 0) {
       res[[di]] <- NULL
     }
   }
