@@ -486,8 +486,8 @@ processInput <- function(discovery, test, network, correlation, data,
     # And that they have the same dimensions
     if ((nrow(correlation[[ii]]) != nrow(network[[ii]])) ||
         (!is.null(data[[ii]]) && (ncol(data[[ii]]) != ncol(network[[ii]])))) {
-      stop("'correlation', 'network', and 'data' have different numbers of ",
-           'variables for dataset "', ii, '"')
+      stop("'correlation', 'network', and 'data' have a different number of ",
+           'nodes for dataset "', ii, '"')
     }
     
     # Make sure the 'correlation' and 'network' matrices are symmetric 
