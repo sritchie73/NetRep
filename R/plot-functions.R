@@ -36,37 +36,39 @@ plotTriangleHeatmap <- function(
   emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
   palette <- colorRampPalette(palette)(255)
   
-  # render squares / triangles
-  ci <- 1
-  for (ii in 1:nGenes) {
-    cj <- 1
-    for (jj in 1:ii) {
-      plotRow <- ii - jj
-      topy <- (plotRow + 1)/2
+  # render triangles row by row
+  for (plotRow in 1:nGenes) {
+    startCol <- nGenes - (plotRow - 1)
+    for (ii in 1:plotRow) {
+      jj <- startCol + (ii - 1)
+      ci <- ii
+      cj <- jj
+      
+      topy <- (nGenes - (plotRow - 1))/2
       # If we're on the diagonal, plot a triangle, otherwise a diamond
-      if (plotRow == 0) {
+      if (plotRow == nGenes) {
         boty <- 0
       } else {
         boty <- topy - 1
       }
-      xOffset <- plotRow/2
-      rightx <- jj + xOffset + 0.5
+      
+      xOffset <- (nGenes - (plotRow - 1))/2 
+      rightx <- ii + xOffset
       leftx <- rightx - 1
       
       if (ii %nin% na.indices && jj %nin% na.indices) {
         col <- getColFromPalette(values[ci, cj], palette, vlim)
         cj <- cj + 1
+        ci <- ci + 1
       } else {
         col <- na.col
       }
+      
       polygon(
         x=c(leftx, leftx+0.5, rightx, leftx+0.5, leftx),
         y=c(topy-0.5, topy, topy-0.5, boty, topy-0.5),
         col=col, border=col
       )
-    }
-    if (ii %nin% na.indices) {
-      ci <- ci + 1
     }
   }
   
