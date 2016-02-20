@@ -508,6 +508,8 @@ plotData <- function(
   #-----------------------------------------------------------------------------
   # Plot the data matrix
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
+  
   # First we need to set up the color palette for the data, which 
   # includes the fact that the range may be unbalanced around 0.
   dat <- data[[ti]][presentSamples, presentNodes]
@@ -551,6 +553,7 @@ plotData <- function(
     laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line,
     border.width=border.width
   )
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotCorrelation}: Plot a heatmap of the correlation structure for one 
@@ -721,6 +724,7 @@ plotCorrelation <- function(
   #-----------------------------------------------------------------------------
   # Plot the correlation structure
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
   
   # Plot axis tick labels?
   gaxt <- NULL
@@ -773,6 +777,7 @@ plotCorrelation <- function(
       border.width=border.width
     )
   }
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotNetwork}: Plot a heatmap of the edge weights for one or more
@@ -942,6 +947,8 @@ plotNetwork <- function(
   #-----------------------------------------------------------------------------
   # Plot the network edge weights
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
+  
   # Plot axis tick labels?
   gaxt <- NULL
   if (plotNodeNames)
@@ -994,6 +1001,7 @@ plotNetwork <- function(
       border.width=border.width
     )
   }
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotContribution}: Plot a bar chart of the module membership for
@@ -1181,6 +1189,8 @@ plotContribution <- function(
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
+  
   testProps <- testProps[[di]][[ti]]
   
   # node contribution
@@ -1197,6 +1207,7 @@ plotContribution <- function(
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
     ylab="Node contribution", border.width=border.width
   )
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotDegree:} Plot a bar chart of the normalised intramodular 
@@ -1344,6 +1355,8 @@ plotDegree <- function(
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
+  
   testProps <- testProps[[di]][[ti]]
   
   # (Normalised) weighted degree vector
@@ -1360,6 +1373,7 @@ plotDegree <- function(
     xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
     ylab="Weighted degree", border.width=border.width
   )
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotSummary}: Plot bar charts of the module summary vectors of 
@@ -1568,6 +1582,8 @@ plotSummary <- function(
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
+  
   testProps <- testProps[[di]][[ti]]
   
   # Summary profile matrix
@@ -1591,6 +1607,7 @@ plotSummary <- function(
     yaxt=plotSampleNames, plotModuleNames=plotModuleNames, yaxt.line=saxt.line, 
     maxt.line=maxt.line, xlab="Module summary", border.width=border.width
   )
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotDataLegend}: Plot a legend for the data matrix heatmap
@@ -1681,6 +1698,8 @@ plotDataLegend <- function(
   #-----------------------------------------------------------------------------
   # Plot the legend
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
+  
   emptyPlot(c(0,1), c(0,1), bty="n")
   if (all(rg < 0)) {
     addGradientLegend(
@@ -1701,6 +1720,7 @@ plotDataLegend <- function(
       tick.size=legend.tick.size, axis.line=laxt.line, border.width=border.width
     )
   }
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotCorrelationLegend}: Plot a legend for the correlation structure 
@@ -1736,6 +1756,7 @@ plotCorrelationLegend <- function(
     xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
     axis.line=laxt.line, border.width=border.width
   )
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
 #' \code{plotNetworkLegend}: Plot a legend for the network edge weights heatmap.
@@ -1770,4 +1791,5 @@ plotNetworkLegend <- function(
     xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
     axis.line=laxt.line, border.width=border.width
   )
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }

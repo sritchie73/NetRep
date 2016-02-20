@@ -481,6 +481,7 @@ plotModule <- function(
   #-----------------------------------------------------------------------------
   # Plot topology components
   #-----------------------------------------------------------------------------
+  vCat(verbos, 0, "rendering plot components...")
   # Plot correlation
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
@@ -605,4 +606,5 @@ plotModule <- function(
       cex.modules=par("cex.lab")*0.7
     )
   }
+  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
