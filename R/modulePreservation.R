@@ -49,7 +49,7 @@
 #'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+#'   Although the function expects \code{\link{bigMatrix}} 
 #'   data, regular 'matrix' objects are also accepted. In this case, the 
 #'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
 #'   conversion process involves writing out each matrix as a binary file on 
