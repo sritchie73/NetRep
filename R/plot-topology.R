@@ -1012,10 +1012,10 @@ plotNetwork <- function(
 plotContribution <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
-  orderSamplesBy="test", orderNodesBy="discovery", orderModules=TRUE, 
-  plotNodeNames=TRUE, plotModuleNames, main="", border.width=2,
-  palette=c("#313695", "#a50026"), drawBorders=FALSE, gaxt.line=-0.5, 
-  maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  orderNodesBy="discovery", orderModules=TRUE, plotNodeNames=TRUE, 
+  plotModuleNames, main="", border.width=2, palette=c("#313695", "#a50026"), 
+  drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
+  cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -1103,16 +1103,6 @@ plotContribution <- function(
   if (is.null(data[[ti]]))
     stop("Cannot plot node contribution without 'data'")
   
-  if ((orderSamplesBy == "discovery" && is.null(scaledData[[di]]))) {
-    stop("'data' not provided for 'orderSamplesBy' dataset") 
-  }
-  
-  if (orderSamplesBy == "discovery" && 
-      sum(rownames(scaledData[di]) %in% rownames(scaledData[[ti]])) == 0) {
-    stop("'orderBySamples' can only be ", '"discovery"', " when the same",
-         " samples are present in both the 'discovery' and 'test' datasets")
-  }
-  
   if ((orderModules && length(mods) > 1) && 
       (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
     stop("'data' not provided for 'orderNodesBy' dataset and ",
@@ -1161,29 +1151,6 @@ plotContribution <- function(
     )[[di]][[ti]]
     moduleOrder <- names(nodeOrder)
     nodeOrder <- unlist(nodeOrder)
-  }
-  
-  # Case 1: we want to order samples by the discovery dataset, which if different
-  # to the test dataset, we need to recalculate the weighted degree for the 
-  # node order.
-  if (orderSamplesBy == "discovery" && di != ti) {
-    # This skips all of the data verification
-    if (!exists("discProps")) {
-      discProps <- netPropsInternal(
-        scaledData, correlation, network, moduleAssignments, 
-        modules, discovery, discAsTest, datasetNames, FALSE
-      )
-    }
-    sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)[[di]][[di]][[1]]
-  } 
-  # Case 2: order samples as they're provided by the user
-  else if (orderSamplesBy == "none") {
-    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
-  } 
-  # Case 3: order samples by their degree in the test network.
-  else {
-    # Order modules and samples by the test network
-    sampleOrder <- sampleOrderInternal(testProps, verbose, TRUE)[[di]][[ti]][[1]]
   }
   
   #-----------------------------------------------------------------------------
@@ -1312,7 +1279,7 @@ plotDegree <- function(
   
   #-----------------------------------------------------------------------------
   # Get ordering of nodes and samples in the 'test' dataset by the dataset 
-  # specified in 'orderNodesBy' and 'orderSamplesBy'.
+  # specified in 'orderNodesBy'.
   #-----------------------------------------------------------------------------
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
