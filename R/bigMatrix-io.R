@@ -65,6 +65,12 @@ save.as.bigMatrix <- function(
       stop("could not convert 'x' to a numeric matrix")
   }
   
+  if (missing(backingfile)) {
+    backingfile <- file.path(tempdir(), getUUID())
+    message("no 'backingfile' provided, saving to", backingfile)
+  }
+    
+  
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
   backingpath <- gsub(paste0(backingname, "$"), "", backingfile)
@@ -117,9 +123,7 @@ save.as.bigMatrix <- function(
 
 #' @rdname bigMatrix-get
 #' @export
-load.bigMatrix <- function(
-  backingfile
-) {
+load.bigMatrix <- function(backingfile) {
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
   backingpath <- gsub(paste0(backingname, "$"), "", backingfile)
@@ -194,6 +198,11 @@ as.bigMatrix <- function(
       stop("could not convert 'x' to a numeric matrix")
   }
   
+  if (missing(backingfile)) {
+    backingfile <- file.path(tempdir(), getUUID())
+    message("no 'backingfile' provided, saving to", backingfile)
+  }
+  
   save.as.bigMatrix(x, backingfile, type)
   load.bigMatrix(backingfile)
 }
@@ -205,6 +214,11 @@ read.bigMatrix <- function(
   type=options("bigmemory.default.type")[[1]],
   row.names=TRUE, header=TRUE, ...
 ) {
+  if (missing(backingfile)) {
+    backingfile <- file.path(tempdir(), getUUID())
+    message("no 'backingfile' provided, saving to", backingfile)
+  }
+  
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
   backingpath <- gsub(paste0(backingname, "$"), "", backingfile)

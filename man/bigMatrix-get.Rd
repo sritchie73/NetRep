@@ -20,7 +20,7 @@ read.bigMatrix(file, backingfile,
   header = TRUE, ...)
 }
 \arguments{
-\item{x}{a regular matrix to convert}
+\item{x}{a numeric matrix or data.frame to convert}
 
 \item{backingfile}{location on disk the bigMatrix is, or will be, stored at.}
 
