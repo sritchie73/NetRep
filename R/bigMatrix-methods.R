@@ -36,11 +36,6 @@ detach.bigMatrix <- function(x) {
   x
 }
 
-#' @rdname bigMatrix
-#' @export
-is.bigMatrix <- function(x) {
-  return(class(x) == "bigMatrix")
-}
 
 #-------------------------------------------------------------------------------
 # Methods for standard functions, e.g. dim, nrow, ncol, etc.
@@ -49,8 +44,63 @@ is.bigMatrix <- function(x) {
 # call the appropriate function on the matrix object.
 #-------------------------------------------------------------------------------
 
-#' @rdname bigMatrix
-#' @export
+#' Methods for interacting with and accessing 'bigMatrix' objects
+#' 
+#' Standard methods for accessing \code{\link{bigMatrix}} objects.
+#' 
+#' @details 
+#' \code{bigMatrix} objects must be converted back to \code{matrix} objects to
+#' perform matrix algebra, e.g. transposing (\code{\link[base]{t}}), either 
+#' through \code{as.matrix} or by extracting elements of interest through 
+#' \code{[}.
+#'
+#' @param x,object a \code{bigMatrix} object.
+#' @param n number of rows to show in \code{head} or \code{tail}
+#' @param i,j indices specifying elements to extract. Indices can be 
+#'  \code{numeric}, \code{character} vectors, \code{logical} vectors, or empty
+#'  (missing). See \link[=base]{Extract}.
+#' @param drop logical; If \code{TRUE} the result is coerced to a vector when
+#'  extracting a single row, column, or element.
+#' @param value a possivle value for \code{dimnames(x)}. See 
+#'  \link[=base]{dimnames}.
+#'
+#' @seealso \code{\link{bigMatrix}}
+#' 
+#' @examples 
+#' \dontrun{
+#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' data("NetRep")
+#' 
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
+#' 
+#' # 'bigMatrix' objects can be manipulated the same way as regular matrices:
+#' head(discovery_data)
+#' test_network[1:5, 1:5]
+#' discovery_data[,"Node_1"]
+#' dim(test_data)
+#' rownames(test_data)
+#' nrow(test_network)
+#' ncol(test_correlation)
+#' is.bigMatrix(discovery_data)
+#' typeof(discovery_data)
+#' 
+#' # For matrix algebra the whole matrix must be copied into memory first:
+#' discovery_data <- as.matrix(discovery_data)
+#' test_data <- test_data[,] # equivalent to 'as.matrix'
+#' t(test_network[,])
+#' }
+#' @name bigMatrix-methods
+NULL
+
+#' @return \code{as.matrix}: a \code{matrix}.
+#'
+#' @rdname bigMatrix-methods
 setMethod("as.matrix", signature(x="bigMatrix"), function(x) {
   x[,]
 })

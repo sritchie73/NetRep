@@ -2,7 +2,9 @@
 #' in shared memory as a \code{bigMatrix} at the provided \code{backingfile}
 #' location. 
 #' 
-#' @param x an object
+#' @param x \code{save.as.bigMatrix} and \code{as.bigMatrix}: a \code{matrix}
+#'  or \code{data.frame} to convert to a \code{bigMatrix}. 
+#'  \code{write.bigMatrix} and \code{is.bigMatrix}: a \code{bigMatrix} object. 
 #' @param file the name of the file which the (non-bigMatrix) data are to be
 #'  read from or written to (see \code{\link[bigmemory]{read.big.matrix}} and
 #'  \code{\link[bigmemory]{write.big.matrix}}).
@@ -21,7 +23,6 @@
 #' @return
 #'   \code{read.bigMatrix}, \code{load.bigMatrix}, \code{as.bigMatrix}: an 
 #'   object of class \code{bigMatrix}.
-#'
 #'
 #' @rdname bigMatrix
 #'  
@@ -94,6 +95,37 @@ save.as.bigMatrix <- function(
   invisible(NULL)
 }
 
+#' \code{as.bigMatrix} converts a numeric \code{matrix} or \code{data.frame}
+#' into a \code{bigMatrix} object and stores it on disk at the provided 
+#' \code{backingfile} location. 
+#'  
+#' @rdname bigMatrix
+#' @export
+as.bigMatrix <- function(
+  x, backingfile, type="double"
+) {
+  if (class(x) == "big.matrix") 
+    stop(
+      "use load.bigMatrix to load in an existing 'big.matrix' as a 'bigMatrix"
+    )
+  if (!(class(x) %in% c("matrix", "data.frame")))
+    stop("'x' must be a 'matrix' or 'data.frame'")
+  
+  if (class(x) == "data.frame") {
+    x <- as.matrix(x)
+    if (typeof(x) %nin% c("numeric", "integer", "double"))
+      stop("could not convert 'x' to a numeric matrix")
+  }
+  
+  if (missing(backingfile)) {
+    backingfile <- file.path(tempdir(), getUUID())
+    message("no 'backingfile' provided, saving to", backingfile)
+  }
+  
+  save.as.bigMatrix(x, backingfile, type)
+  load.bigMatrix(backingfile)
+}
+
 #' \code{load.bigMatrix} loads a \code{bigMatrix} object stored at the provided
 #' \code{backingfile} location into R.
 #'  
@@ -154,38 +186,6 @@ load.bigMatrix <- function(backingfile) {
     attached=FALSE
   )
 }
-
-#' \code{as.bigMatrix} converts a numeric \code{matrix} or \code{data.frame}
-#' into a \code{bigMatrix} object and stores it on disk at the provided 
-#' \code{backingfile} location. 
-#'  
-#' @rdname bigMatrix
-#' @export
-as.bigMatrix <- function(
-  x, backingfile, type="double"
-) {
-  if (class(x) == "big.matrix") 
-    stop(
-      "use load.bigMatrix to load in an existing 'big.matrix' as a 'bigMatrix"
-    )
-  if (!(class(x) %in% c("matrix", "data.frame")))
-    stop("'x' must be a 'matrix' or 'data.frame'")
-  
-  if (class(x) == "data.frame") {
-    x <- as.matrix(x)
-    if (typeof(x) %nin% c("numeric", "integer", "double"))
-      stop("could not convert 'x' to a numeric matrix")
-  }
-  
-  if (missing(backingfile)) {
-    backingfile <- file.path(tempdir(), getUUID())
-    message("no 'backingfile' provided, saving to", backingfile)
-  }
-  
-  save.as.bigMatrix(x, backingfile, type)
-  load.bigMatrix(backingfile)
-}
-
 
 #' \code{read.bigMatrix} reads a file in table format (i.e. 
 #' \code{\link[utils]{read.table}}) into R, creates a \code{bigMatrix} from
@@ -263,9 +263,21 @@ read.bigMatrix <- function(
 
 #' \code{write.bigMatrix} writes a \code{bigMatrix} object out as a file in 
 #' table format (i.e. \code{\link[utils]{write.table}}).
-#' 
+#'
+#' @return
+#'   \code{save.as.bigMatrix}, \code{write.bigMatrix}: \code{NULL}, but create
+#'   files on disk as a side effect.
+#'
 #' @rdname bigMatrix
 #' @export
 write.bigMatrix <- function(x, file, ...) {
   write.table(x=x[,,drop=FALSE], file, ...)
+}
+
+#' @return \code{is.bigMatrix}: \code{TRUE} if \code{x} is a \code{bigMatrix}.
+#'
+#' @rdname bigMatrix
+#' @export
+is.bigMatrix <- function(x) {
+  return(class(x) == "bigMatrix")
 }

@@ -12,17 +12,10 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' massive parallisation of \code{\link{modulePreservation}} with constant 
 #' memory usage. These matrices are stored on disk, and dynamically loaded as 
 #' required, allowing instantaneous loading and access of very large matrices
-#' in new R sessions.
+#' in new R sessions. They can be interacted with the same way as \code{matrix}
+#' objects (see also \link[=bigMatrix-methods]{'bigMatrix' methods}).
 #' 
 #' @details
-#' \subsection{Interacting with \code{bigMatrix} objects}{
-#' \code{'bigMatrix'} objects can be accessed and manipulated with the same 
-#' standard set of functions as \code{'matrix'} objects. These include: 
-#' \code{head}, \code{tail}, \code{print}, \code{show}, \code{dimnames},
-#' \code{rownames}, \code{colnames}, \code{nrow}, \code{ncol}, \code{dim}, 
-#' and element access with \code{[} (see examples). \code{is.bigMatrix} will
-#' check whether an object is a \code{bigMatrix}.
-#' }
 #' \subsection{\code{bigMatrix} types}{
 #' The numeric data within a \code{bigMatrix} can be stored either as a 
 #' \code{"double"}, \code{"float"}, \code{"integer"}, \code{"short"}, or
@@ -46,7 +39,9 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' with "_rownames.txt" and "_colnames.txt" store the row and column names of 
 #' the \code{bigMatrix} that are loaded in by R when calling 
 #' \code{load.bigMatrix}.
-#' 
+#' }
+#' \subsection{Compatability with \code{big.matrix} objects from the bigmemory
+#' package}{
 #' \strong{Warning:} \code{load.bigMatrix} can also be used to load in 
 #' \code{\link[bigmemory]{big.matrix}} objects from the bigmemory package, but 
 #' existing row and column information will be stripped out from its descriptor 
@@ -82,7 +77,8 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #'  R session, and \code{FALSE} otherwise. 
 #' 
 #' @seealso 
-#'  \code{\link[bigmemory]{big.matrix}}.
+#'  \code{\link[=bigMatrix-methods]{methods for interacting with and accesing
+#'  'bigMatrix' objects}}, \code{\link[bigmemory]{big.matrix}}.
 #'  
 #' @aliases 
 #'  [,bigMatrix,ANY,ANY,ANY-method 
