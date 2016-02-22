@@ -24,7 +24,7 @@ void CheckFinite(XPtr<BigMatrix> xpDat, MatrixAccessor<T> dat) {
         throw Rcpp::exception("'big.matrix' has non-finite values!");
       } else if (type == 4 && (value == NA_INTEGER)) {
         throw Rcpp::exception("'big.matrix' has non-finite values!");
-      } else if (type == 8 && !R_FINITE(value)) {
+      } else if ((type == 8 || type == 6) && !R_FINITE(value)) {
         throw Rcpp::exception("'big.matrix' has non-finite values!");
       }
     }
@@ -50,6 +50,8 @@ void CheckFinite(SEXP pDat) {
     return CheckFinite(xpDat, MatrixAccessor<short>(*xpDat));
   } else if (type == 4) {
     return CheckFinite(xpDat, MatrixAccessor<int>(*xpDat));
+  } else if (type == 6) {
+    return CheckFinite(xpDat, MatrixAccessor<float>(*xpDat));
   } else if (type == 8) {
     return CheckFinite(xpDat, MatrixAccessor<double>(*xpDat));
   } else {
