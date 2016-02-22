@@ -508,7 +508,7 @@ plotData <- function(
   #-----------------------------------------------------------------------------
   # Plot the data matrix
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   # First we need to set up the color palette for the data, which 
   # includes the fact that the range may be unbalanced around 0.
@@ -724,7 +724,7 @@ plotCorrelation <- function(
   #-----------------------------------------------------------------------------
   # Plot the correlation structure
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   # Plot axis tick labels?
   gaxt <- NULL
@@ -947,7 +947,7 @@ plotNetwork <- function(
   #-----------------------------------------------------------------------------
   # Plot the network edge weights
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   # Plot axis tick labels?
   gaxt <- NULL
@@ -1189,7 +1189,7 @@ plotContribution <- function(
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   testProps <- testProps[[di]][[ti]]
   
@@ -1355,7 +1355,7 @@ plotDegree <- function(
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   testProps <- testProps[[di]][[ti]]
   
@@ -1582,7 +1582,7 @@ plotSummary <- function(
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   testProps <- testProps[[di]][[ti]]
   
@@ -1698,7 +1698,7 @@ plotDataLegend <- function(
   #-----------------------------------------------------------------------------
   # Plot the legend
   #-----------------------------------------------------------------------------
-  vCat(verbos, 0, "rendering plot components...")
+  vCat(verbose, 0, "rendering plot components...")
   
   emptyPlot(c(0,1), c(0,1), bty="n")
   if (all(rg < 0)) {
