@@ -3,7 +3,7 @@
 #' Functions for converting to, reading in, and loading a 
 #' \code{\link[=bigMatrix-class]{bigMatrix}} object.
 #'
-#' @param x a regular matrix to convert 
+#' @param x a numeric matrix or data.frame to convert 
 #' @param file the name of the file which the (non-bigMatrix) data are to be
 #'  read from (see \code{\link[bigmemory]{read.big.matrix}}).
 #' @param backingfile location on disk the bigMatrix is, or will be, stored at.
@@ -56,8 +56,14 @@
 save.as.bigMatrix <- function(
   x, backingfile, type=options("bigmemory.default.type")[[1]]
 ) {
-  if (!(class(x) == "matrix"))
-    stop("'x' must be a 'matrix'")
+  if (!(class(x) %in% c("matrix", "data.frame")))
+    stop("'x' must be a 'matrix' or 'data.frame'")
+  
+  if (class(x) == "data.frame") {
+    x <- as.matrix(x)
+    if (typeof(x) %nin% c("numeric", "integer", "double"))
+      stop("could not convert 'x' to a numeric matrix")
+  }
   
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
@@ -179,8 +185,14 @@ as.bigMatrix <- function(
     stop(
       "use load.bigMatrix to load in an existing 'big.matrix' as a 'bigMatrix"
     )
-  if (class(x) != "matrix")
-    stop("Cannot convert from ", class(x), " to 'bigMatrix'")
+  if (!(class(x) %in% c("matrix", "data.frame")))
+    stop("'x' must be a 'matrix' or 'data.frame'")
+  
+  if (class(x) == "data.frame") {
+    x <- as.matrix(x)
+    if (typeof(x) %nin% c("numeric", "integer", "double"))
+      stop("could not convert 'x' to a numeric matrix")
+  }
   
   save.as.bigMatrix(x, backingfile, type)
   load.bigMatrix(backingfile)
