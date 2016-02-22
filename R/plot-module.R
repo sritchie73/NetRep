@@ -222,7 +222,7 @@ plotModule <- function(
     par(cex.main=old.par[[3]])
     par(mar=old.par[[4]])
     par(oma=old.par[[5]])
-    layout(1)
+    try(layout(1))
   })
   
   #-----------------------------------------------------------------------------
