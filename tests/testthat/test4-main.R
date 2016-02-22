@@ -30,7 +30,7 @@ names(moduleAssignments[[1]]) <- gn1
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, 
-    discovery=1, test=2, nPerm=10, keepNulls=TRUE, verbose=FALSE
+    discovery=1, test=2, nPerm=10, verbose=FALSE, nCores=1
   )
   expect_equal(dim(res1$nulls), c(7, 7, 10))
   expect_equal(dim(res1$observed), c(7, 7))
@@ -39,7 +39,8 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(length(res1$nVarsPresent), 7)
   res2 <- modulePreservation(
     NULL, coexpSets, adjSets, moduleAssignments, 
-    discovery=1, test=2, nPerm=10, keepNulls=TRUE, verbose=FALSE
+    discovery=1, test=2, nPerm=10, verbose=FALSE, 
+    nCores=1
   )
   expect_equal(dim(res2$nulls), c(7, 4, 10))
   expect_equal(dim(res2$observed), c(7, 4))
@@ -50,7 +51,7 @@ test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, 
     discovery="a", test="b", nPerm=10, modules=c(1,2,3), 
-    keepNulls=TRUE, verbose=FALSE
+    verbose=FALSE, nCores=1
   )
 })
 unlink(file.path(tempdir(), 'tmp*'))

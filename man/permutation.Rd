@@ -87,7 +87,7 @@ nPerm <- requiredPerms(0.05/5)
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
  moduleAssignments=labels_list, nPerm=nPerm, discovery="discovery", 
- test="test", keepNulls=TRUE
+ test="test"
 )
 
 # Re-calculate the permutation test P-values

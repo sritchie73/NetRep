@@ -121,13 +121,11 @@ permutationTest <- function(
   }
   
   # Calculate module preservation statistic p-values
-  warn <- FALSE
   p.values <- matrix(NA, nrow(nulls), ncol(nulls), dimnames=dimnames(observed))
   for (mi in seq_len(nrow(p.values))) {
     for (si in seq_len(ncol(p.values))) {
       # If the observed value is missing, leave the p-value missing.
       if (is.na(observed[mi, si])) {
-        warn <- TRUE
         next
       }
       
@@ -146,9 +144,6 @@ permutationTest <- function(
         total.nperm = choose(totalSize, nVarsPresent[mi])
       }
       
-      if (any(is.na(permuted)))
-        warn <- TRUE
-      
       # Calculate necessary components to perform any of the alternative tests
       permuted <- sort(nulls[mi,si,])
       nPerm <- length(permuted)
@@ -166,7 +161,7 @@ permutationTest <- function(
       } 
     }
   }
-  if (warn) {
+  if (any(is.na(observed)) || any(is.na(nulls))) {
     warning("Missing values encountered in the observed test statistics and/or ",
             "in their null distributions. P-values may be biased for these tests.",
             " See 'help(", '"permutationTest"', ")'")

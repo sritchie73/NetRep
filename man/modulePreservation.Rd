@@ -8,7 +8,7 @@ modulePreservation(data = NULL, correlation, network, moduleAssignments,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 2,
   selfPreservation = FALSE, nCores = NULL, nPerm = NULL,
   null = "overlap", alternative = "greater", statCorMethod = "pearson",
-  simplify = TRUE, verbose = TRUE, keepNulls = FALSE)
+  simplify = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -70,9 +70,6 @@ may also be specified as an option (see \code{\link[WGCNA]{bicor}}).}
 list if possible (see Return Value).}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
-
-\item{keepNulls}{logical; if \code{TRUE}, the null distributions are returned
-as part of the output.}
 }
 \value{
 A nested list structure. At the top level, the list has one element per 

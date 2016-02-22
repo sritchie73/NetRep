@@ -19,10 +19,6 @@ This function takes the output from multiple runs of
 set of permutation test P-values. This is useful for parallelising 
 calculations across multiple machines.
 }
-\details{
-Note that \code{'keepNulls = TRUE'} and \code{'simplify = FALSE'} must be 
-specified in each run of \code{\link{modulePreservation}}.
-}
 \examples{
 \dontrun{
 data("netrep_example")
@@ -42,17 +38,17 @@ network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
 # Assess module preservation on two different machines to spread computational
-# burden. For this, 'keepNulls = TRUE' is required.
+# burden.
 pres1 <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
  moduleAssignments=labels_list, nPerm=500, discovery="discovery", 
- test="test", keepNulls=TRUE
+ test="test"
 )
 
 pres2 <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
  moduleAssignments=labels_list, nPerm=500, discovery="discovery", 
- test="test", keepNulls=TRUE
+ test="test"
 )
 
 combined <- combineAnalyses(pres1, pres2)

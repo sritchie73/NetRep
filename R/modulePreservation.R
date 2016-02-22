@@ -729,8 +729,8 @@ modulePreservation <- function(
         vCat(verbose, 1, "Collating results...")
     
         res[[di]][[ti]] <- list(
-          observed = observed,
           nulls = nulls,
+          observed = observed,
           p.values = p.values,
           nVarsPresent = varsPres,
           propVarsPresent = propVarsPres,
