@@ -42,7 +42,7 @@
 #'  
 #' @examples 
 #' \dontrun{
-#' data("netrep_example")
+#' data("NetRep")
 #' 
 #' # Convert them to the 'bigMatrix' format:
 #' discovery_data <- as.bigMatrix(discovery_data)
@@ -58,9 +58,9 @@
 #' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # How many permutations are required to Bonferroni adjust for the 5 modules 
+#' # How many permutations are required to Bonferroni adjust for the 4 modules 
 #' # in the example data? 
-#' nPerm <- requiredPerms(0.05/5) 
+#' nPerm <- requiredPerms(0.05/4) 
 #' 
 #' # Note that we recommend running at least 1000 permutations to make sure that
 #' # the null distributions are representative.

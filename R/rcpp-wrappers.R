@@ -5,9 +5,9 @@
 #' They provide a nicer interface for input handling and format the output in
 #' an R-friendly way.
 #'
-#' @param discCor a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+#' @param discCor a \code{\link{bigMatrix}} containing the
 #'   correlation structure among variables in the \emph{discovery} dataset.
-#' @param testCor a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+#' @param testCor a \code{\link{bigMatrix}} containing the
 #'   correlation structure among variables in the \emph{test} dataset.
 #' @param discIndices indices corresponding to the network module in 
 #'  \code{discCor}.
@@ -70,7 +70,7 @@ corStats <- function(
 
 #' @rdname wrappers
 #' 
-#' @param adj a \code{\link[=bigMatrix-class]{bigMatrix}} containing an
+#' @param adj a \code{\link{bigMatrix}} containing an
 #' adjacency matrix representation of the network (i.e. an \eqn{n * n} matrix 
 #' containing the edge weights between each pair of variables).  
 #' 
@@ -101,7 +101,7 @@ netProps <- function(adj, moduleIndices) {
 
 #' @rdname wrappers
 #' 
-#' @param sdat a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+#' @param sdat a \code{\link{bigMatrix}} containing scaled 
 #'  numeric data. Assumes columns correspond to variables (e.g. genes, 
 #'  microbial operational taxonomic unit) and rows correspond to samples.
 #' 

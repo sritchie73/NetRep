@@ -47,7 +47,7 @@
 #'   ignored if data is provided for only one dataset.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
-#'   Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+#'   Although the function expects \code{\link{bigMatrix}} 
 #'   data, regular 'matrix' objects are also accepted. In this case, the 
 #'   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
 #'   conversion process involves writing out each matrix as a binary file on 
@@ -59,8 +59,7 @@
 #'   objects. Further, 'bigMatrix' objects have a number of benefits, including 
 #'   instantaneous load time from any future R session, and parallel access from
 #'   mutliple independent R sessions. Methods are provided for 
-#'   \link[=bigMatrix-get]{converting to, loading in}, and 
-#'   \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
+#'   converting to, loading in, and writing out \code{\link{bigMatrix}} objects.
 #' }
 #' \subsection{Node, sample, and module ordering:}{
 #'   By default, nodes are ordered in decreasing order of \emph{weighted degree}
@@ -165,7 +164,7 @@
 #' @examples
 #' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery and test dataset:
-#' data("netrep_example")
+#' data("NetRep")
 #' 
 #' # Convert them to the 'bigMatrix' format:
 #' discovery_data <- as.bigMatrix(discovery_data)
@@ -181,23 +180,23 @@
 #' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # Plot the data for module 1, 2 and 5 in the discovery dataset
+#' # Plot the data for module 1, 2 and 4 in the discovery dataset
 #' plotData(
 #'   data=data_list, correlation=correlation_list, network=network_list, 
-#'   moduleAssignments=labels_list, modules=c(1, 2, 5)
+#'   moduleAssignments=labels_list, modules=c(1, 2, 4)
 #' )
 #' 
 #' # Symmetric = TRUE gives a traditional heatmap for the correlation structure
 #' # and weighted network
 #' plotCorrelation(
 #'   data=data_list, correlation=correlation_list, network=network_list, 
-#'   moduleAssignments=labels_list, modules=c(1, 2, 5), symmetric=TRUE
+#'   moduleAssignments=labels_list, modules=c(1, 2, 4), symmetric=TRUE
 #' )
 #' 
 #' # While the default is to render only one half of the (symmetric) matrix
 #' plotNetwork(
 #'   data=data_list, correlation=correlation_list, network=network_list, 
-#'   moduleAssignments=labels_list, modules=c(1, 2, 5)
+#'   moduleAssignments=labels_list, modules=c(1, 2, 4)
 #' )
 #' 
 #' # Plot the degree of nodes in each module in the test dataset, but show them
@@ -205,14 +204,14 @@
 #' # changes
 #' plotDegree(
 #'   data=data_list, correlation=correlation_list, network=network_list, 
-#'   moduleAssignments=labels_list, modules=c(1, 2, 5), discovery="discovery",
+#'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test"
 #' )
 #' 
 #' # Alternatively nodes can be order on the plot by degree in the test dataset
 #' plotDegree(
 #'   data=data_list, correlation=correlation_list, network=network_list, 
-#'   moduleAssignments=labels_list, modules=c(1, 2, 5), discovery="discovery",
+#'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test", orderNodesBy="test"
 #' )
 #' 
@@ -225,7 +224,7 @@
 #' # Plot the module summary vectors for multiple modules:
 #' plotSummary(
 #'   data=data_list, correlation=correlation_list, network=network_list, 
-#'   moduleAssignments=labels_list, modules=c(1, 2, 5), discovery="discovery",
+#'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test", orderSamplesBy="test"
 #' )
 #' }

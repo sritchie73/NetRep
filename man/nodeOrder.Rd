@@ -95,7 +95,7 @@ modules by the similarity of their summary vectors.
   ignored if data is provided for only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
-  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+  Although the function expects \code{\link{bigMatrix}} 
   data, regular 'matrix' objects are also accepted. In this case, the 
   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
   conversion process involves writing out each matrix as a binary file on 
@@ -107,14 +107,13 @@ modules by the similarity of their summary vectors.
   objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
-  \link[=bigMatrix-get]{converting to, loading in}, and 
-  \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
+  converting to, loading in, and writing out \code{\link{bigMatrix}} objects.
 }
 }
 \examples{
 \dontrun{
 # load in example data, correlation, and network matrices for a discovery and test dataset:
-data("netrep_example")
+data("NetRep")
 
 # Convert them to the 'bigMatrix' format:
 discovery_data <- as.bigMatrix(discovery_data)

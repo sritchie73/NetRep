@@ -21,7 +21,7 @@ calculations across multiple machines.
 }
 \examples{
 \dontrun{
-data("netrep_example")
+data("NetRep")
 
 # Convert them to the 'bigMatrix' format:
 discovery_data <- as.bigMatrix(discovery_data)

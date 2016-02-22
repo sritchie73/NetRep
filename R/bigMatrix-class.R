@@ -5,34 +5,73 @@ setClassUnion("maybe.big.matrix", c("big.matrix", "NULL"))
 # Allows the rownames and colnames slots of the big.matrix class to be empty.
 setClassUnion("optional.dimnames", c("character", "NULL"))
 
-#' The bigMatrix class
+#' The 'bigMatrix' class
 #' 
-#' A \code{bigMatrix} is an object which points to a data matrix stored on disk,
-#' which is accessible via shared memory. This has a number of advantages, 
-#' including instananeous load times and shared access to the same object across
-#' multiple R sessions, enabling massively parallel operations on a matrix 
-#' without the burden of excessive memory consumption.
+#' A \code{'bigMatrix'} is a numeric matrix that is stored in shared memory. 
+#' This memory is accessible from multiple parallel R sessions, allowing for 
+#' massive parallisation of \code{\link{modulePreservation}} with constant 
+#' memory usage. These matrices are stored on disk, and dynamically loaded as 
+#' required, allowing instantaneous loading and access of very large matrices
+#' in new R sessions.
 #' 
 #' @details
+#' \subsection{Interacting with \code{bigMatrix} objects}{
+#' \code{'bigMatrix'} objects can be accessed and manipulated with the same 
+#' standard set of functions as \code{'matrix'} objects. These include: 
+#' \code{head}, \code{tail}, \code{print}, \code{show}, \code{dimnames},
+#' \code{rownames}, \code{colnames}, \code{nrow}, \code{ncol}, \code{dim}, 
+#' and element access with \code{[} (see examples). \code{is.bigMatrix} will
+#' check whether an object is a \code{bigMatrix}.
+#' }
+#' \subsection{\code{bigMatrix} types}{
+#' The numeric data within a \code{bigMatrix} can be stored either as a 
+#' \code{"double"}, \code{"float"}, \code{"integer"}, \code{"short"}, or
+#' \code{"char"}. The default is as \code{"double"}: which keeps the values
+#' within the \code{'bigMatrix'} at the same numerical precision as when stored
+#' in a regular \code{'matrix'}. Storing data as type \code{"float"} results in 
+#' a loss of precision, but cuts memory usage in half. Matrices containing whole
+#' numbers only can be stored as \code{"integer"}, increasing both speed and 
+#' memory efficiency. Memory usage can be reduced further if whole numbers are
+#' between -32768 and 32767 by storing the data as type \code{"short"}, and even
+#' further if all values are between -128 and 127 by storing values as type 
+#' \code{"char"}. \code{typeof} will return the type of data stored within a
+#' \code{'bigMatrix'}.
+#' }
+#' \subsection{\code{bigMatrix} backing files}{
+#' \code{bigMatrix} objects are stored on disk at the path provided in the 
+#' \code{backingfile} argument. There a four files associated with every
+#' \code{bigMatrix}: the file with the ".bin" extension stores the binary 
+#' representation of the data. The file with the ".desc" extension stores a 
+#' description used by R to load the \code{bigMatrix} object. The files ending
+#' with "_rownames.txt" and "_colnames.txt" store the row and column names of 
+#' the \code{bigMatrix} that are loaded in by R when calling 
+#' \code{load.bigMatrix}.
+#' 
+#' \strong{Warning:} \code{load.bigMatrix} can also be used to load in 
+#' \code{\link[bigmemory]{big.matrix}} objects from the bigmemory package, but 
+#' existing row and column information will be stripped out from its descriptor 
+#' file. This means if you later load in the data as a \code{big.matrix} instead
+#' of a \code{bigMatrix} the row and column names will be missing unless you
+#' convert back using \code{\link{as.big.matrix}}.
+#' }
+#' \subsection{Implementation details}{
 #' A \code{bigMatrix} object is simply a wrapper around a 
 #' \code{\link[bigmemory]{big.matrix}} object from the 
-#' \code{\link[bigmemory]{bigmemory}} package. 
-#' 
-#' The advantage of the \code{bigMatrix} over \code{big.matrix} is that it keeps
-#' the object in a "detached" state: the \code{big.matrix} is only attached on
-#' access through some other method (e.g. subsetting or element access). This
-#' allows for finer control over memory usage in the 
-#' \code{\link{modulePreservation}} routine for users with limited RAM who wish 
-#' to run \code{modulePreservation} in the background on their laptop or 
-#' desktop. This is also nice for RStudio users, as it prevents R from crashing 
-#' when reloading a session containing the \code{bigMatrix} objects.
-#' 
-#' The authors of the \code{bigmemory} package also explicitly warn against
-#' storage of row and column names in a \code{big.matrix} as it can slow down 
-#' computation. A \code{bigMatrix} object handles these by keeping the dimension
-#' names stored in R, which offers (minor) speed improvements when running 
-#' \code{modulePreservation} in comparison to keeping to row and column names 
-#' stored in shared memory data structure.
+#' \code{\link[bigmemory]{bigmemory}} package, with a few minor differences:
+#' \enumerate{
+#'  \item{\code{'bigMatrix'} objects must be backed by a file on disk.}
+#'  \item{\code{'bigMatrix'} allows overwriting of these files by the user}
+#'  \item{\code{'bigMatrix'} objects are stored as absolute file paths and
+#'            are attached only as required.}
+#'  \item{The row and column names are stored separately on disk and only
+#'            accessible from R}
+#' }
+#' In particular, keeping the \code{'bigMatrix'} in a detached state makes the 
+#' R session more reproducible: the data can be trivially reloaded into an R 
+#' session, and R sessions can be reloaed within RStudio without causing the
+#' application to crash. Storing the row and column names separately also offers
+#' speed improvements for computation on the matrices in C++.
+#' }
 #' 
 #' @slot descriptor path of the descriptor file for the big.matrix.
 #' @slot matrix either the big.matrix object, or empty, depending on the value
@@ -43,9 +82,7 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #'  R session, and \code{FALSE} otherwise. 
 #' 
 #' @seealso 
-#'  \code{\link[bigmemory]{big.matrix}},
-#'  \code{\link{bigMatrix-get}}
-#'  \code{\link{bigMatrix-out}}
+#'  \code{\link[bigmemory]{big.matrix}}.
 #'  
 #' @aliases 
 #'  [,bigMatrix,ANY,ANY,ANY-method 
@@ -59,10 +96,43 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #'  dim,bigMatrix-method
 #'  dimnames,bigMatrix-method
 #'  dimnames<-,bigMatrix,ANY-method
+#'  bigMatrix
 #'  
+#'  
+#' @examples 
+#' \dontrun{
+#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' data("NetRep")
+#' 
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
+#' 
+#' # 'bigMatrix' objects can be manipulated the same way as regular matrices:
+#' head(discovery_data)
+#' test_network[1:5, 1:5]
+#' discovery_data[,"Node_1"]
+#' dim(test_data)
+#' rownames(test_data)
+#' nrow(test_network)
+#' ncol(test_correlation)
+#' is.bigMtrix(discovery_data)
+#' typeof(discovery_data)
+#' 
+#' # For matrix algebra the whole matrix must be copied into memory first:
+#' discovery_data <- as.matrix(discovery_data)
+#' test_data <- test_data[,] # equivalent to 'as.matrix'
+#' t(test_network[,])
+#' 
+#' }
+#'
 #' @import bigmemory
 #' @import methods
-#' @name bigMatrix-class
+#' @name bigMatrix
 setClass("bigMatrix",
     slots=list(
       descriptor="character",

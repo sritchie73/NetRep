@@ -1,6 +1,6 @@
 #' Scale and Center the rows of a 'big.matrix'
 #' 
-#' Create a new \code{\link[=bigMatrix-class]{bigMatrix}} containing column-wise
+#' Create a new \code{\link{bigMatrix}} containing column-wise
 #' scaled data.
 #' 
 #' @param x the bigMatrix to scale.
@@ -73,7 +73,7 @@ rangeBigMatrix <- function(x, subsetIndices) {
 #' If there are non-finite entires (\code{NA}, \code{NaN}, \code{-Inf}, 
 #' \code{Inf}), throw an exception. 
 #' 
-#' @param x a \code{\link[=bigMatrix-class]{bigMatrix}}
+#' @param x a \code{\link{bigMatrix}}
 checkFinite <- function(x) {
   is.attached <- x@attached
   if (!is.attached)

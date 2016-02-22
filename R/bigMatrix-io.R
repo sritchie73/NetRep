@@ -1,60 +1,34 @@
-#' Loading in data as a 'bigMatrix'
+#' \code{save.as.bigMatrix} saves a numeric \code{matrix} or \code{data.frame} 
+#' in shared memory as a \code{bigMatrix} at the provided \code{backingfile}
+#' location. 
 #' 
-#' Functions for converting to, reading in, and loading a 
-#' \code{\link[=bigMatrix-class]{bigMatrix}} object.
-#'
-#' @param x a numeric matrix or data.frame to convert 
+#' @param x an object
 #' @param file the name of the file which the (non-bigMatrix) data are to be
-#'  read from (see \code{\link[bigmemory]{read.big.matrix}}).
+#'  read from or written to (see \code{\link[bigmemory]{read.big.matrix}} and
+#'  \code{\link[bigmemory]{write.big.matrix}}).
 #' @param backingfile location on disk the bigMatrix is, or will be, stored at.
-#' @param type the type of the atomic element 
-#'  (\code{options()$bigmemory.default.type} by default - "\code{double}" - 
-#'  but can be changed by the user to "\code{integer}", "\code{short}", or 
-#'  "\code{char}").
+#' @param type the type of the atomic element. \code{"double"} by default,
+#'  but can be changed by the user to \code{"float"} , \code{"integer"}, 
+#'  \code{"short"}, or \code{"char"} (see details).
 #' @param row.names logical; does the first column of the file to be read in
 #'  contain row names?
 #' @param header logical; does the first line of the file to be read in contain
 #'  column names?
 #' @param ... additional arguments to pass to 
-#'  \code{\link[bigmemory]{read.big.matrix}}.
-#' 
+#'  \code{\link[bigmemory]{read.big.matrix}} or 
+#'  \code{\link[bigmemory]{write.big.matrix}}.
+#'
 #' @return
 #'   \code{read.bigMatrix}, \code{load.bigMatrix}, \code{as.bigMatrix}: an 
-#'   object of class \code{\link[=bigMatrix-class]{bigMatrix}}.
+#'   object of class \code{bigMatrix}.
 #'
-#' @details 
-#' \code{\link[=bigMatrix-class]{bigMatrix}} objects are stored on disk using
-#' across four different files per object. The \code{backingname} designates the
-#' basename of these files, and the backingpath designates the directory they
-#' are stored in. The matrix data are stored in the file with the ".bin"
-#' extension. The file with the ".desc" extension contains a description
-#' allowing R to load in this data (see
-#' \code{\link[bigmemory]{attach.big.matrix}}). Row and column names are stored
-#' separately in the files ending with "_rownames.txt" and "_colnames.txt".
-#' 
-#' \code{save.as.bigMatrix} takes a standard matrix and writes it out as a 
-#' \code{bigMatrix}. This can then be loaded into an R session using 
-#' \code{load.bigMatrix}. \code{as.bigMatrix} combines these two steps, taking
-#' a standard matrix and returning a \code{bigMatrix} object. Finally, 
-#' \code{read.bigMatrix} can be used to read in matrix data from a file (i.e. 
-#' data recongisiable by \code{read.table}) as a \code{bigMatrix} object.
-#' 
-#' \code{load.bigMatrix} can also be used to load in a 
-#' \code{\link[bigmemory]{big.matrix}} as a 'bigMarix', but existing row and 
-#' column information will be stripped out from the existing backing file. This
-#' means if you later load in the data as a 'big.matrix' instead of a
-#' 'bigMatrix' the row and column names will be missing unless you convert back
-#' using \code{\link{as.big.matrix}}.
-#' 
-#' @name bigMatrix-get
-#' @seealso 
-#'  \code{\link[=bigMatrix-class]{bigMatrix}},
-#'  \code{\link[bigmemory]{big.matrix}},
-#'  \code{\link[bigmemory]{read.big.matrix}}
+#'
+#' @rdname bigMatrix
+#'  
 #' @export
 #' @import bigmemory
 save.as.bigMatrix <- function(
-  x, backingfile, type=options("bigmemory.default.type")[[1]]
+  x, backingfile, type="double"
 ) {
   if (!(class(x) %in% c("matrix", "data.frame")))
     stop("'x' must be a 'matrix' or 'data.frame'")
@@ -70,7 +44,6 @@ save.as.bigMatrix <- function(
     message("no 'backingfile' provided, saving to", backingfile)
   }
     
-  
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
   backingpath <- gsub(paste0(backingname, "$"), "", backingfile)
@@ -121,7 +94,10 @@ save.as.bigMatrix <- function(
   invisible(NULL)
 }
 
-#' @rdname bigMatrix-get
+#' \code{load.bigMatrix} loads a \code{bigMatrix} object stored at the provided
+#' \code{backingfile} location into R.
+#'  
+#' @rdname bigMatrix
 #' @export
 load.bigMatrix <- function(backingfile) {
   # Get components for interfacing with bigmemory and resolve paths as absolute
@@ -179,11 +155,14 @@ load.bigMatrix <- function(backingfile) {
   )
 }
 
-#' @rdname bigMatrix-get
-#' 
+#' \code{as.bigMatrix} converts a numeric \code{matrix} or \code{data.frame}
+#' into a \code{bigMatrix} object and stores it on disk at the provided 
+#' \code{backingfile} location. 
+#'  
+#' @rdname bigMatrix
 #' @export
 as.bigMatrix <- function(
-  x, backingfile, type=options("bigmemory.default.type")[[1]]
+  x, backingfile, type="double"
 ) {
   if (class(x) == "big.matrix") 
     stop(
@@ -207,11 +186,16 @@ as.bigMatrix <- function(
   load.bigMatrix(backingfile)
 }
 
-#' @rdname bigMatrix-get
+
+#' \code{read.bigMatrix} reads a file in table format (i.e. 
+#' \code{\link[utils]{read.table}}) into R, creates a \code{bigMatrix} from
+#' it, and stores it at the provided \code{backingfile} location.
+#' 
+#' @rdname bigMatrix
 #' @export
 read.bigMatrix <- function(
   file, backingfile, 
-  type=options("bigmemory.default.type")[[1]],
+  type="double",
   row.names=TRUE, header=TRUE, ...
 ) {
   if (missing(backingfile)) {
@@ -277,52 +261,11 @@ read.bigMatrix <- function(
   suppressWarnings(load.bigMatrix(backingfile)) 
 }
 
-
-#' Writing out data, or converting from, a 'bigMatrix'.
+#' \code{write.bigMatrix} writes a \code{bigMatrix} object out as a file in 
+#' table format (i.e. \code{\link[utils]{write.table}}).
 #' 
-#' Functions for converting 'bigMatrix' objects to other classes.
-#' 
-#' @param x an object of type 'bigMatrix'.
-#' @param file file to write out the data from \code{x} into.
-#' @param ... additional arguments to pass to 
-#'  \code{\link[bigmemory]{write.big.matrix}}.
-#' 
-#' @details
-#' \code{as.big.matrix} converts to a \code{\link[bigmemory]{big.matrix}}
-#' object.
-#' \code{as.matrix} converts to a \code{\link[base]{matrix}} object.
-#' \code{write.bigMatrix} will write out the data into a regularly structure
-#' file (see \code{\link[utils]{write.table}})
-#' 
-#' @name bigMatrix-out
+#' @rdname bigMatrix
 #' @export
 write.bigMatrix <- function(x, file, ...) {
   write.table(x=x[,,drop=FALSE], file, ...)
 }
-
-#' @rdname bigMatrix-out
-setMethod("as.matrix", signature(x="bigMatrix"), function(x) {
-  x[,]
-})
-
-#' @rdname bigMatrix-out
-setMethod(
-  "as.big.matrix", signature(x="bigMatrix"), function(x) {
-    if (!file.exists(x@descriptor))
-      stop("Could not find backing file. Have you changed working directory?")
-    rnFile <- gsub(".desc", "_rownames.txt", x@descriptor)
-    cnFile <- gsub(".desc", "_colnames.txt", x@descriptor)
-    
-    desc <- dget(x@descriptor)
-    
-    if (!is.null(x@colnames))
-      desc@description$colNames <- x@colnames
-    if (!is.null(x@rownames))
-      desc@description$rowNames <- x@rownames
-    
-    dput(desc, x@descriptor)
-    unlink(rnFile)
-    unlink(cnFile)
-    
-    bigmemory::attach.big.matrix(x@descriptor)
-  })

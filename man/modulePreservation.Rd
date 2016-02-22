@@ -160,8 +160,7 @@ in the test dataset.
   objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
-  \link[=bigMatrix-get]{converting to, loading in}, and 
-  \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
+  converting to, loading in, and writing out \code{\link{bigMatrix}} objects.
 }
 \subsection{Memory usage:}{
   A trade off has been made between memory usage and computation time. 
@@ -355,13 +354,13 @@ in the test dataset.
  determine the correct number of permtutations breaks down when assessing the
  preservation of modules in a very small dataset (e.g. gene sets in a dataset
  with less than 100 genes total). However, the reported p-values will still
- be accurate (see \code{\link{perm.test}}) \emph{(3)}.
+ be accurate (see \code{\link{permutationTest}}) \emph{(3)}.
 }
 }
 \examples{
 \dontrun{
 # load in example data, correlation, and network matrices for a discovery and test dataset:
-data("netrep_example")
+data("NetRep")
 
 # Convert them to the 'bigMatrix' format:
 discovery_data <- as.bigMatrix(discovery_data)
@@ -413,7 +412,7 @@ preservation <- modulePreservation(
 }
 \seealso{
 Functions for: 
-  \link[=bigMatrix-class]{bigMatrix objects},
+  \link[=bigMatrix]{bigMatrix objects},
   \link[=plotModule]{visualising network modules},
   \link[=networkProperties]{calculating module topology}, 
   \link[=permutationTest]{calculating permutation test P-values}, and 

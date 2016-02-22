@@ -16,7 +16,7 @@ bigMatrix.}
 an object of type \code{bigMatrix}.
 }
 \description{
-Create a new \code{\link[=bigMatrix-class]{bigMatrix}} containing column-wise
+Create a new \code{\link{bigMatrix}} containing column-wise
 scaled data.
 }
 \note{

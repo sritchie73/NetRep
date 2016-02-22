@@ -133,7 +133,7 @@ Individual components of the module plot can be plotted using
   ignored if data is provided for only one dataset.
 }
 \subsection{'bigMatrix' vs. 'matrix' input data:}{
-  Although the function expects \code{\link[=bigMatrix-class]{bigMatrix}} 
+  Although the function expects \code{\link{bigMatrix}} 
   data, regular 'matrix' objects are also accepted. In this case, the 
   'matrix' data is temporarily converted to 'bigMatrix' by the function. This
   conversion process involves writing out each matrix as a binary file on 
@@ -145,8 +145,7 @@ Individual components of the module plot can be plotted using
   objects. Further, 'bigMatrix' objects have a number of benefits, including 
   instantaneous load time from any future R session, and parallel access from
   mutliple independent R sessions. Methods are provided for 
-  \link[=bigMatrix-get]{converting to, loading in}, and 
-  \link[=bigMatrix-out]{writing out} 'bigMatrix' objects.
+  converting to, loading in, and writing out \code{\link{bigMatrix}} objects.
 }
 \subsection{Node, sample, and module ordering:}{
   By default, nodes are ordered in decreasing order of \emph{weighted degree}
@@ -200,7 +199,7 @@ Individual components of the module plot can be plotted using
 \examples{
 \dontrun{
 # load in example data, correlation, and network matrices for a discovery and test dataset:
-data("netrep_example")
+data("NetRep")
 
 # Convert them to the 'bigMatrix' format:
 discovery_data <- as.bigMatrix(discovery_data)
@@ -216,16 +215,16 @@ correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
-# Plot module 1, 2 and 5 in the discovery dataset
+# Plot module 1, 2 and 4in the discovery dataset
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
-  moduleAssignments=labels_list, modules=c(1, 2, 5)
+  moduleAssignments=labels_list, modules=c(1, 2, 4)
 )
 
 # Now plot them in the test dataset (module 2 does not replicate)
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
-  moduleAssignments=labels_list, modules=c(1, 2, 5), discovery="discovery",
+  moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test"
 )
 }

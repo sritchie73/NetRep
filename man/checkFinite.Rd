@@ -7,7 +7,7 @@
 checkFinite(x)
 }
 \arguments{
-\item{x}{a \code{\link[=bigMatrix-class]{bigMatrix}}}
+\item{x}{a \code{\link{bigMatrix}}}
 }
 \description{
 If there are non-finite entires (\code{NA}, \code{NaN}, \code{-Inf}, 

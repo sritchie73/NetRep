@@ -17,26 +17,26 @@ dataProps(sdat, moduleIndices)
 moduleProps(adj, moduleIndices, sdat)
 }
 \arguments{
-\item{discCor}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+\item{discCor}{a \code{\link{bigMatrix}} containing the
 correlation structure among variables in the \emph{discovery} dataset.}
 
 \item{discIndices}{indices corresponding to the network module in 
 \code{discCor}.}
 
-\item{testCor}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing the
+\item{testCor}{a \code{\link{bigMatrix}} containing the
 correlation structure among variables in the \emph{test} dataset.}
 
 \item{testIndices}{indices corresponding to the network module in
 \code{testCor}.}
 
-\item{adj}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing an
+\item{adj}{a \code{\link{bigMatrix}} containing an
 adjacency matrix representation of the network (i.e. an \eqn{n * n} matrix 
 containing the edge weights between each pair of variables).}
 
 \item{moduleIndices}{indices for the network module of interest in the
 supplied data matrix.}
 
-\item{sdat}{a \code{\link[=bigMatrix-class]{bigMatrix}} containing scaled 
+\item{sdat}{a \code{\link{bigMatrix}} containing scaled 
 numeric data. Assumes columns correspond to variables (e.g. genes, 
 microbial operational taxonomic unit) and rows correspond to samples.}
 }
