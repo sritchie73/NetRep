@@ -1049,8 +1049,7 @@ plotContribution <- function(
   
   orderByArgs <- c("discovery", "test", "none")
   orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
-  orderSamplesBy <- orderByArgs[pmatch(orderSamplesBy, orderByArgs, nomatch=3)]
-  
+
   if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
     stop("'orderModules' must be either 'TRUE' or 'FALSE'")
   }
@@ -1114,7 +1113,7 @@ plotContribution <- function(
   
   #-----------------------------------------------------------------------------
   # Get ordering of nodes and samples in the 'test' dataset by the dataset 
-  # specified in 'orderNodesBy' and 'orderSamplesBy'.
+  # specified in 'orderNodesBy'.
   #-----------------------------------------------------------------------------
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
