@@ -120,7 +120,7 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' rownames(test_data)
 #' nrow(test_network)
 #' ncol(test_correlation)
-#' is.bigMtrix(discovery_data)
+#' is.bigMatrix(discovery_data)
 #' typeof(discovery_data)
 #' 
 #' # For matrix algebra the whole matrix must be copied into memory first:
@@ -128,6 +128,18 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' test_data <- test_data[,] # equivalent to 'as.matrix'
 #' t(test_network[,])
 #' 
+#' # Write out a 'bigMatrix' object as a regular table file:
+#' write.bigMatrix(discovery_data, file="discovery_data.csv", sep=",")
+#' 
+#' # Read in a regular table file as a 'bigMatrix':
+#' discovery_data <- read.bigMatrix(file="discovery_data.csv", sep=",")
+#' 
+#' # 'bigMatrix' objects are backed by files on disk. These can be explictly set:
+#' discovery_data <- read.bigMatrix(file="discovery_data.csv", sep=",",
+#'  backingfile="cached_discovery_data")
+#'  
+#' # Allowing for instant loading of these matrices in future R sessions:
+#' discovery_data <- load.bigMatrix(backingfile="cached_discovery_data")
 #' }
 #'
 #' @import bigmemory
