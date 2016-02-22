@@ -26,8 +26,6 @@
 #'   the correlation based statistics (see details). Must be one of "pearson", 
 #'   "spearman", or "kendall". If the WGCNA package is installed then "bicor" 
 #'   may also be specified as an option (see \code{\link[WGCNA]{bicor}}). 
-#' @param keepNulls logical; if \code{TRUE}, the null distributions are returned
-#'  as part of the output.
 #'  
 #' @details
 #'  \subsection{Input data structure:}{
@@ -334,9 +332,12 @@
 #'  will be simplified where possible.
 #'  
 #' @seealso 
+#'   Functions for: 
 #'   \link[=bigMatrix-class]{bigMatrix objects},
-#'   \link[=plotModule]{visualising network modules}, and
-#'   \link[=networkProperties]{calculating module topology}.
+#'   \link[=plotModule]{visualising network modules},
+#'   \link[=networkProperties]{calculating module topology}, 
+#'   \link[=permutationTest]{calculating permutation test P-values}, and 
+#'   \link[=combineAnalyses]{splitting computation over multiple machines}.
 #'   
 #' @examples
 #' \dontrun{
@@ -360,7 +361,7 @@
 #' # Assess module preservation.
 #' preservation <- modulePreservation(
 #'  data=data_list, correlation=correlation_list, network=network_list,
-#'  moduleAssignments=labels_list, nCores=2, nPerm=1000, discovery="discovery", 
+#'  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
 #'  test="test"
 #' )
 #' 
@@ -372,7 +373,7 @@ modulePreservation <- function(
   data=NULL, correlation, network, moduleAssignments, modules=NULL, 
   backgroundLabel="0", discovery=1, test=2, selfPreservation=FALSE,
   nCores=NULL, nPerm=NULL, null="overlap", alternative="greater", 
-  statCorMethod="pearson", simplify=TRUE, verbose=TRUE, keepNulls=FALSE
+  statCorMethod="pearson", simplify=TRUE, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
@@ -694,34 +695,11 @@ modulePreservation <- function(
           dimnames(nulls)[1:2] <- dimnames(chunk)[1:2]
           dimnames(nulls)[[3]][offset:(offset+nCPerm-1)] <- dimnames(chunk)[[3]]
           offset <- offset + nCPerm
-        }        
-        
-        #---------------------------------------------------------------------
-        # Calculate permutation p-value
-        #---------------------------------------------------------------------
-        vCat(verbose, 1, "Calculating P-values...")
-        p.values <- matrix(NA, nrow=nModules, ncol=nStatistics)
-        dimnames(p.values) <- dimnames(observed)
-        for (mi in overlapModules) {
-          for (si in seq_len(nStatistics)) {
-            # Does the order of nodes in each permutation affect the statistic?
-            if (colnames(observed)[si] %in% c("avg.weight", "coherence")) {
-              order <- FALSE
-            } else {
-              order <- TRUE
-            }
-            
-            # Get the p-values
-            p.values[mi, si] <- perm.test(
-              nulls[mi, si, ], observed[mi, si], 
-              varsPres[mi], length(overlapVars),
-              order=order, alternative=alternative
-            )
-            
-          }
         }
         
+        #----------------------------------------------------------------------
         # Order statistics: First density stats, then connectivity, then hybrid
+        #----------------------------------------------------------------------
         if (!is.null(scaledData[[di]])) {
           statOrder <- c(
             "avg.weight", "coherence", 
@@ -731,23 +709,33 @@ modulePreservation <- function(
         } else {
           statOrder <- c("avg.weight", "cor.degree", "cor.cor", "avg.cor")
         }
+        observed <- observed[, statOrder, drop=FALSE]
+        nulls <- nulls[, statOrder, , drop=FALSE]
         
+        #---------------------------------------------------------------------
+        # Calculate permutation p-value
+        #---------------------------------------------------------------------
+        vCat(verbose, 1, "Calculating P-values...")
+        if (model == 'overlap') {
+          totalSize <- length(overlapVars)
+        } else {
+          totalSize <- ncol(correlation[[ti]])
+        }
+        p.values <- permutationTest(nulls, observed, varsPres, totalSize, alternative)
         
         #---------------------------------------------------------------------
         # Collate results
         #---------------------------------------------------------------------
         vCat(verbose, 1, "Collating results...")
-        if (!keepNulls) {
-          nulls <- NULL # ha!
-        } else {
-          nulls <- nulls[, statOrder,]
-        }
+    
         res[[di]][[ti]] <- list(
-          observed = observed[, statOrder],
+          observed = observed,
           nulls = nulls,
-          p.values = p.values[, statOrder],
+          p.values = p.values,
           nVarsPresent = varsPres,
           propVarsPresent = propVarsPres,
+          totalSize = totalSize,
+          alternative = alternative,
           contingency = contingency
         )
         # remove NULL outputs

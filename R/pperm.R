@@ -1,13 +1,18 @@
-#' @title Permutation Test
+#' Permutation test P-values for module preservation statistics
 #' 
-#' @description 
-#'  Evaluates the statistical significance of a test statistic given a vector
-#'  of "nulls": values for that test statistic drawn from random sampling.
+#' Evaluates the statistical significance of each module preservation test 
+#' statistic for one or more modules.
 #'  
 #' @details 
 #'  Calculates exact p-values for permutation tests when permutations are 
 #'  randomly drawn with replacement using the \code{\link[statmod]{permp}} 
-#'  function in the \code{\link{statmod}} package.
+#'  function in the \code{\link{statmod}} package. 
+#'  
+#'  This function may be useful for re-calculating permutation test P-values,
+#'  for example when there are missing values due to sparse data. In this case
+#'  the user may decide that these missing values should be assigned 0 so that
+#'  P-values aren't signficant purely due to many incalculable statistics leading
+#'  to low power.
 #'  
 #' @references 
 #'   \enumerate{
@@ -18,51 +23,156 @@
 #'     }
 #'   }
 #'  
-#' @param permuted vector of values making up the empirical distribution.
-#' @param observed the observed value of the test statistic.
-#' @param subsetSize the size of the network subset the null distribution is 
-#'  drawn for.
-#' @param totalSize the size of the whole network
-#' @param order logical; does the order of nodes in the permutation affect the 
-#'  value of the test statistic?
+#' @param nulls a 3-dimension matrix where the columns correspond to module
+#'   preservation statistics, rows correspond to modules, and the third 
+#'   dimension to null distribution observations drawn from the permutation 
+#'   procedure in \code{\link{modulePreservation}}.
+#' @param observed a matrix of observed values for each module preservation
+#'  statistc (columns) for each module (rows) returned from 
+#'  \code{\link{modulePreservation}}.
+#' @param nVarsPresent a vector containing the number of variables/nodes in each
+#'  module that was present in the \emph{test} dataset. Returned as a list 
+#'  element of the same name by \code{\link{modulePreservation}}.
+#' @param totalSize the size of the test network used to perform the test. 
+#'  Returned as a list element of the same name by 
+#'  \code{\link{modulePreservation}}.
 #' @param alternative a character string specifying the alternative hypothesis, 
 #'  must be one of "greater" (default), "less", or "two.sided". 
 #'  You can specify just the initial letter.
 #'  
+#' @examples 
+#' \dontrun{
+#' data("netrep_example")
+#' 
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
+#' 
+#' # Set up input lists for each input matrix type across datasets:
+#' data_list <- list(discovery=discovery_data, test=test_data)
+#' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+#' network_list <- list(discovery=discovery_network, test=test_network)
+#' labels_list <- list(discovery=module_labels)
+#' 
+#' # How many permutations are required to Bonferroni adjust for the 5 modules 
+#' # in the example data? 
+#' nPerm <- requiredPerms(0.05/5) 
+#' 
+#' # Note that we recommend running at least 1000 permutations to make sure that
+#' # the null distributions are representative.
+#'
+#' preservation <- modulePreservation(
+#'  data=data_list, correlation=correlation_list, network=network_list,
+#'  moduleAssignments=labels_list, nPerm=nPerm, discovery="discovery", 
+#'  test="test"
+#' )
+#' 
+#' # Re-calculate the permutation test P-values
+#' p.values <- permutationTest(
+#'   preservation$nulls, preservation$observed, preservation$nVarsPresent,
+#'   preservation$totalSize, preservation$alternative
+#' )
+#' }
+#' 
 #' @aliases permutation permuted
 #' @name permutation
 #' @export
-perm.test <- function(
-  permuted, observed, subsetSize, totalSize, order=TRUE, alternative="greater"
+permutationTest <- function(
+  nulls, observed, nVarsPresent, totalSize, alternative="greater"
 ) {
+  # Validate user input
   validAlts <- c("two.sided", "less", "greater")
   altMatch <- pmatch(alternative, validAlts)
   if (is.na(altMatch))
     stop("Alternative must be one of ", validAlts)
   
-  if (is.na(observed))
-    return(NA)
+  if (!is.numeric(totalSize) || length(totalSize) > 1 || totalSize < 1)
+    stop("'totalSize' must be a single number > 0")
   
-  if (order) {
-    total.nperm = prod(totalSize:(totalSize - subsetSize + 1))
-  } else {
-    total.nperm = choose(totalSize, subsetSize)
+  statNames <- c("avg.weight", "coherence", "cor.cor", "cor.degree", 
+                 "cor.contrib", "avg.cor", "avg.contrib")
+  
+  if (!is.matrix(observed) || ncol(observed) %nin% c(4,7) || 
+      any(colnames(observed) %nin% statNames) || !is.numeric(observed)) {
+    stop("expecting 'observed' to be a numeric matrix output by the ", 
+         "'modulePreservation' function")
   }
-  permuted <- sort(permuted)
-  nPerm <- length(permuted)
+  if (!is.array(nulls) || ncol(nulls) %nin% c(4,7) || length(dim(nulls)) != 3 ||
+      any(colnames(nulls) %nin% statNames) || !is.numeric(nulls)) {
+    stop("expecting 'nulls' to be a numeric matrix output by the ", 
+         "'modulePreservation' function")
+  }
+  if (any(colnames(nulls) != colnames(observed)) || 
+      any(rownames(nulls) != rownames(observed)) ||
+      any(colnames(observed) != colnames(nulls)) || 
+      any(rownames(observed) != rownames(nulls))) {
+    stop("mismatch in dimension names between 'nulls' and 'observed'")
+  }
   
-  less.extreme <- length(permuted[permuted <= observed])
-  more.extreme <- length(permuted[permuted >= observed])
-  lower.pval <- permp(less.extreme, nPerm, total.nperm=total.nperm)
-  upper.pval <- permp(more.extreme, nPerm, total.nperm=total.nperm)
+  if (!is.numeric(nVarsPresent) || length(nVarsPresent) != nrow(nulls) ||
+      any(rownames(nulls) != names(nVarsPresent)) || 
+      any(names(nVarsPresent) != rownames(nulls))) {
+    stop("expecting 'nVarsPresent' to be a numeric vector output by the ",
+         "'modulePreservation' function")
+  }
   
-  if (altMatch == 1L) {
-    return(min(lower.pval, upper.pval)*2)
-  } else if (altMatch == 2L) {
-    return(lower.pval) 
-  } else if (altMatch == 3L) {
-    return(upper.pval)
-  } 
+  # Calculate module preservation statistic p-values
+  warn <- FALSE
+  p.values <- matrix(NA, nrow(nulls), ncol(nulls), dimnames=dimnames(observed))
+  for (mi in seq_len(nrow(p.values))) {
+    for (si in seq_len(ncol(p.values))) {
+      # If the observed value is missing, leave the p-value missing.
+      if (is.na(observed[mi, si])) {
+        warn <- TRUE
+        next
+      }
+      
+      # Node order in the sampling does not matter when calculating the average
+      # edge weight or module coherence
+      if (colnames(observed)[si] %in% c("avg.weight", "coherence")) {
+        order <- FALSE
+      } else {
+        order <- TRUE
+      }
+      
+      # This in turn affects the total number of possible permutations
+      if (order) {
+        total.nperm = prod(totalSize:(totalSize - nVarsPresent[mi] + 1))
+      } else {
+        total.nperm = choose(totalSize, nVarsPresent[mi])
+      }
+      
+      if (any(is.na(permuted)))
+        warn <- TRUE
+      
+      # Calculate necessary components to perform any of the alternative tests
+      permuted <- sort(nulls[mi,si,])
+      nPerm <- length(permuted)
+      less.extreme <- length(permuted[permuted <= observed[mi, si]])
+      more.extreme <- length(permuted[permuted >= observed[mi, si]])
+      lower.pval <- permp(less.extreme, nPerm, total.nperm=total.nperm)
+      upper.pval <- permp(more.extreme, nPerm, total.nperm=total.nperm)
+      
+      if (altMatch == 1L) {
+        p.values[mi, si] <- min(lower.pval, upper.pval)*2
+      } else if (altMatch == 2L) {
+        p.values[mi, si] <- lower.pval
+      } else if (altMatch == 3L) {
+        p.values[mi, si] <- upper.pval
+      } 
+    }
+  }
+  if (warn) {
+    warning("Missing values encountered in the observed test statistics and/or ",
+            "in their null distributions. P-values may be biased for these tests.",
+            " See 'help(", '"permutationTest"', ")'")
+  }
+  
+  return(p.values)
 }
 
 #' Exact permutation p-values wrapper
@@ -101,9 +211,11 @@ permp <- function(x, nperm, ...) {
 #'  significance at a given threshold \code{alpha}?
 #' 
 #' @param alpha desired significance threshold.
+#' 
 #' @return The minimum number of permutations required to detect any significant
 #'  associations at the provided \code{alpha}. The minimum p-value will always
 #'  be smaller than \code{alpha}.
+#'  
 #' @rdname permutation
 #' @export
 requiredPerms <- function(alpha, alternative="greater") {

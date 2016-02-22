@@ -251,21 +251,6 @@ getUUID <- function() {
   )
 }
 
-#' Combine null distribution calculations
-#' 
-#' @param ... any number of three dimensional arrays holding the null 
-#'   distributions calculated by \code{\link{modulePreservation}}.
-#'
-#' @return
-#'  A three dimensional array combined from the input. The rows correspond to
-#'  the modules, columns to the module preservation statistics.
-#'
-#' @importFrom abind abind
-#' @export
-combineNulls <- function(...) {
-  abind(..., along=3)
-}
-
 #' Insert NAs into a vector at specified positions
 #' 
 #' Useful for inserting NAs into the correct positions when examining module 

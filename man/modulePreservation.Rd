@@ -383,7 +383,7 @@ labels_list <- list(discovery=module_labels)
 # Assess module preservation.
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
- moduleAssignments=labels_list, nCores=2, nPerm=1000, discovery="discovery", 
+ moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
  test="test"
 )
 
@@ -415,8 +415,11 @@ preservation <- modulePreservation(
   }
 }
 \seealso{
-\link[=bigMatrix-class]{bigMatrix objects},
-  \link[=plotModule]{visualising network modules}, and
-  \link[=networkProperties]{calculating module topology}.
+Functions for: 
+  \link[=bigMatrix-class]{bigMatrix objects},
+  \link[=plotModule]{visualising network modules},
+  \link[=networkProperties]{calculating module topology}, 
+  \link[=permutationTest]{calculating permutation test P-values}, and 
+  \link[=combineAnalyses]{splitting computation over multiple machines}.
 }
 
