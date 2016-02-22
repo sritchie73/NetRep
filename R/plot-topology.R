@@ -1644,7 +1644,7 @@ plotDataLegend <- function(
 plotCorrelationLegend <- function(
   palette=correlation.palette(), border.width=2, horizontal=TRUE, 
   legend.main="correlation", legend.tick.size=0.03, laxt.line=2.5, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2
+  cex.axis=0.8, cex.lab=1, cex.main=1.2, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
@@ -1679,7 +1679,7 @@ plotCorrelationLegend <- function(
 plotNetworkLegend <- function(
   palette=network.palette(), border.width=2, horizontal=TRUE, 
   legend.main="network", legend.tick.size=0.03, laxt.line=2.5, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2
+  cex.axis=0.8, cex.lab=1, cex.main=1.2, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters
