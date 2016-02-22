@@ -338,6 +338,7 @@ getModuleVarsUnsorted <- function(
 #'  cluster if on a Windows machine, and whether an existing parallel backend
 #'  is being used. 
 #'  
+#' @import RhpcBLASctl
 setupParallel <- function(nCores, verbose, reporterCore) {
   
   if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)

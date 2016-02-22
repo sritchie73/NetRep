@@ -444,7 +444,6 @@
 #' }
 #' 
 #' @import foreach
-#' @import RhpcBLASctl
 #' @export
 modulePreservation <- function(
   data=NULL, correlation, network, moduleAssignments, modules=NULL, 
