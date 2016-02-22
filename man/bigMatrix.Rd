@@ -2,19 +2,8 @@
 % Please edit documentation in R/bigMatrix-class.R, R/bigMatrix-io.R
 \docType{class}
 \name{bigMatrix}
-\alias{[,bigMatrix,ANY,ANY,ANY-method}
-\alias{[,bigMatrix,ANY,missing,ANY-method}
-\alias{[,bigMatrix,missing,ANY,ANY-method}
-\alias{[,bigMatrix,missing,missing,ANY-method}
-\alias{[<-,bigMatrix,ANY,ANY-method}
-\alias{[<-,bigMatrix,ANY,missing-method}
-\alias{[<-,bigMatrix,missing,ANY-method}
-\alias{[<-,bigMatrix,missing,missing-method}
 \alias{as.bigMatrix}
 \alias{bigMatrix}
-\alias{dim,bigMatrix-method}
-\alias{dimnames,bigMatrix-method}
-\alias{dimnames<-,bigMatrix,ANY-method}
 \alias{is.bigMatrix}
 \alias{load.bigMatrix}
 \alias{read.bigMatrix}

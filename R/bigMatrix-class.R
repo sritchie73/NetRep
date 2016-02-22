@@ -80,21 +80,6 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #'  \code{\link[=bigMatrix-methods]{methods for interacting with and accesing
 #'  'bigMatrix' objects}}, \code{\link[bigmemory]{big.matrix}}.
 #'  
-#' @aliases 
-#'  [,bigMatrix,ANY,ANY,ANY-method 
-#'  [,bigMatrix,ANY,missing,ANY-method
-#'  [,bigMatrix,missing,ANY,ANY-method
-#'  [,bigMatrix,missing,missing,ANY-method
-#'  [<-,bigMatrix,ANY,ANY-method
-#'  [<-,bigMatrix,ANY,missing-method
-#'  [<-,bigMatrix,missing,ANY-method
-#'  [<-,bigMatrix,missing,missing-method
-#'  dim,bigMatrix-method
-#'  dimnames,bigMatrix-method
-#'  dimnames<-,bigMatrix,ANY-method
-#'  bigMatrix
-#'  
-#'  
 #' @examples 
 #' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery and test dataset:
