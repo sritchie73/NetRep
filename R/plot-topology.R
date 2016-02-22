@@ -460,7 +460,8 @@ plotData <- function(
         modules, discovery, discAsTest, datasetNames, FALSE
       )
     }
-    sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)[[di]][[di]][[1]]
+    sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)
+    sampleOrder <- sampleOrder[[di]][[di]][[moduleOrder[1]]]
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
@@ -469,9 +470,9 @@ plotData <- function(
   # Case 3: order samples by their degree in the test network.
   else {
     # Order modules and samples by the test network
-    sampleOrder <- sampleOrderInternal(testProps, verbose, TRUE)[[di]][[ti]][[1]]
+    sampleOrder <- sampleOrderInternal(testProps, verbose, TRUE)
+    sampleOrder <- sampleOrder[[di]][[ti]][[moduleOrder[1]]]
   }
-  
   #-----------------------------------------------------------------------------
   # Identify nodes and samples from the 'discovery' dataset not present in the 
   # 'test' dataset.
@@ -1513,7 +1514,8 @@ plotSummary <- function(
         modules, discovery, discAsTest, datasetNames, FALSE
       )
     }
-    sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)[[di]][[di]][[1]]
+    sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)
+    sampleOrder <- sampleOrder[[di]][[di]][[moduleOrder[1]]]
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
@@ -1522,7 +1524,8 @@ plotSummary <- function(
   # Case 3: order samples by their degree in the test network.
   else {
     # Order modules and samples by the test network
-    sampleOrder <- sampleOrderInternal(testProps, verbose, TRUE)[[di]][[ti]][[1]]
+    sampleOrder <- sampleOrderInternal(testProps, verbose, TRUE)
+    sampleOrder <- sampleOrder[[di]][[ti]][[moduleOrder[1]]]
   }
   
   #-----------------------------------------------------------------------------
@@ -1554,7 +1557,7 @@ plotSummary <- function(
   testProps <- testProps[[di]][[ti]]
   
   # Summary profile matrix
-  summaries <- foreach(mi = seq_along(testProps), .combine=cbind) %do% {
+  summaries <- foreach(mi = moduleOrder, .combine=cbind) %do% {
     matrix(
       insert.nas(testProps[[mi]]$summary[presentSamples], na.pos.y),
       ncol=1
