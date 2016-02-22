@@ -73,11 +73,13 @@ plotDataLegend(data, correlation, network, moduleAssignments = NULL,
 
 plotCorrelationLegend(palette = correlation.palette(), border.width = 2,
   horizontal = TRUE, legend.main = "correlation", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
+  verbose = TRUE)
 
 plotNetworkLegend(palette = network.palette(), border.width = 2,
   horizontal = TRUE, legend.main = "network", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
+  verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
