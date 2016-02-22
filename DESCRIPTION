@@ -10,14 +10,14 @@ Description: Functions for assessing the replication/preservation of a network
 License: GPL-2
 Depends:
     R (>= 3.0.0),
-    methods
+    methods,
+    utils
 Imports:
     bigmemory,
     foreach,
     iterators,
     itertools,
     Rcpp (>= 0.11),
-    utils,
     statmod,
     RcppArmadillo,
     BH,

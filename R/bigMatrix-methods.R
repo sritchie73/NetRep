@@ -55,8 +55,9 @@ setMethod("as.matrix", signature(x="bigMatrix"), function(x) {
   x[,]
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @return \code{as.big.matrix}: a \code{\link[bigmemory]{big.matrix}} object.
+#' 
+#' @rdname bigMatrix-methods
 setMethod(
   "as.big.matrix", signature(x="bigMatrix"), function(x) {
     if (!file.exists(x@descriptor))
@@ -78,9 +79,7 @@ setMethod(
     bigmemory::attach.big.matrix(x@descriptor)
 })
 
-
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("show", signature(object = "bigMatrix"), function(object) {
   # only show the relative path of the backingfile
   backingfile <- object@descriptor
@@ -94,14 +93,12 @@ setMethod("show", signature(object = "bigMatrix"), function(object) {
   )
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("print", signature(x = "bigMatrix"), function(x) {
   show(x)
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("dim", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -117,8 +114,7 @@ setMethod("dim", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("nrow", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -134,8 +130,7 @@ setMethod("nrow", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("ncol", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -151,8 +146,7 @@ setMethod("ncol", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("typeof", signature(x = "bigMatrix"), function(x) {
   # Attach the big.matrix object if not attached yet
   is.attached <- x@attached
@@ -168,8 +162,7 @@ setMethod("typeof", signature(x = "bigMatrix"), function(x) {
   res
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
   if (n < 1 || n > nrow(x)) 
@@ -177,8 +170,7 @@ setMethod("head", signature(x = "bigMatrix"), function(x, n=6){
   x[1:n,]
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
   n <- min(as.integer(n), nrow(x))
   if (n < 1 || n > nrow(x)) 
@@ -186,14 +178,12 @@ setMethod("tail", signature(x = "bigMatrix"), function(x, n=6){
   x[(nrow(x) - n + 1):nrow(x),]
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("dimnames", signature(x = "bigMatrix"), function(x) {
   list(x@rownames, x@colnames)
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod("dimnames<-", 
   signature(x = "bigMatrix", value="ANY"), function(x, value) {
     if (!is.null(value) && !is.list(value))
@@ -271,8 +261,7 @@ setMethod("dimnames<-",
 #-------------------------------------------------------------------------------
 # Matrix subsetting methods
 #-------------------------------------------------------------------------------
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[", signature(x = "bigMatrix", i="ANY", j="ANY", drop="ANY"), 
   function(x, i, j, drop){
@@ -357,8 +346,7 @@ setMethod(
     ret
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[", signature(x = "bigMatrix", i="ANY", j="missing", drop="ANY"), 
   function(x, i, j, drop){
@@ -419,8 +407,7 @@ setMethod(
     ret
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[", signature(x = "bigMatrix", i="missing", j="ANY", drop="ANY"), 
   function(x, i, j, drop){
@@ -481,8 +468,7 @@ setMethod(
     ret
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[", signature(x = "bigMatrix", i="missing", j="missing", drop="ANY"), 
   function(x, i, j, drop){
@@ -523,8 +509,7 @@ setMethod(
 #-------------------------------------------------------------------------------
 # Matrix assignment methods
 #-------------------------------------------------------------------------------
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[<-", signature(x = "bigMatrix", i="ANY", j="ANY"), 
   function(x, i, j, value){
@@ -558,8 +543,7 @@ setMethod(
     x
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[<-", signature(x = "bigMatrix", i="ANY", j="missing"), 
   function(x, i, j, value){
@@ -589,8 +573,7 @@ setMethod(
     x
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[<-", signature(x = "bigMatrix", i="missing", j="ANY"), 
   function(x, i, j, value){
@@ -620,8 +603,7 @@ setMethod(
     x
 })
 
-#' @rdname bigMatrix
-#' @export
+#' @rdname bigMatrix-methods
 setMethod(
   "[<-", signature(x = "bigMatrix", i="missing", j="missing"), 
   function(x, i, j, value){
