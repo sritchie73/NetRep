@@ -8,7 +8,6 @@ Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for assessing the replication/preservation of a network 
   module's topology across datasets through permutation testing.
 License: GPL-2
-LazyData: TRUE
 Depends:
     R (>= 3.0.0),
     methods
