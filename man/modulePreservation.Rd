@@ -30,7 +30,8 @@ then this argument should be a list of such vectors.}
 
 \item{modules}{a list of vectors, one for each \code{discovery} dataset, 
 of modules to perform the analysis on. The default is to analyse all modules
-with the exception of those specified in \code{backgroundLabel}.}
+in each \code{discovery} dataset, with the exception of those specified in 
+\code{backgroundLabel}.}
 
 \item{backgroundLabel}{a single label that nodes that do not belong to any
 module are assigned. The default is "0".}
@@ -362,114 +363,30 @@ in the test dataset.
 }
 \examples{
 \dontrun{
-set.seed(1)
+# load in example data, correlation, and network matrices for a discovery and test dataset:
+data("netrep_example")
 
-## Example 1: Assess replication of all modules from one 
-## cohort in an independent dataset
+# Convert them to the 'bigMatrix' format:
+discovery_data <- as.bigMatrix(discovery_data)
+discovery_correlation <- as.bigMatrix(discovery_correlation)
+discovery_network <- as.bigMatrix(discovery_network)
+test_data <- as.bigMatrix(test_data)
+test_correlation <- as.bigMatrix(test_correlation)
+test_network <- as.bigMatrix(test_network)
 
-# First we need some example data
-geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geA) <- paste0("Gene_", 1:100)
-rownames(geA) <- paste0("CohortA_", 1:50)
-coexpA <- cor(geA) # correlation
-adjA <- abs(coexpA)^5 # adjacency
-moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-names(moduleAssignments) <- paste0("Gene_", 1:100)
+# Set up input lists for each input matrix type across datasets:
+data_list <- list(discovery=discovery_data, test=test_data)
+correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+network_list <- list(discovery=discovery_network, test=test_network)
+labels_list <- list(discovery=module_labels)
 
-geB <- matrix(rnorm(70*100), ncol=100) # gene expression
-colnames(geB) <- paste0("Gene_", 1:100) 
-rownames(geB) <- paste0("CohortB_", 1:70)
-coexpB <- cor(geB) # correlation
-adjB <- abs(coexpB)^6 # adjacency
-
-# Now format the data for input to modulePreservation
-data <- list(
-  cohortA=as.bigMatrix(geA, "geA_bm"),
-  cohortB=as.bigMatrix(geA, "geB_bm")    
-)
-correlation <- list(
-  cohortA=as.bigMatrix(coexpA, "coexpA_bm"),
-  cohortB=as.bigMatrix(coexpB, "coexpB_bm")
-)
-adjacency <- list(
-  cohortA=as.bigMatrix(adjA, "adjA_bm"),
-  cohortB=as.bigMatrix(adjB, "adjB_bm")
-)
-
-# Assess module preservation, using two cores
-replication <- modulePreservation(
-  data, correlation, adjacency, moduleAssignments, 
-  nCores=2
-)
-
-## Example 2: assess replication of two disease-associated modules
-replication <- modulePreservation(
-  data, correlation, adjacency, moduleAssignments,
-  nCores=2, include = c("4", "7")
-)
-
-## Example 3: exclude a module from the analysis
-replication <- modulePreservation(
-  data, correlation, adjacency, moduleAssignments,
-  nCores=2, exclude = "0"
-)
-
-## Example 4: assess preservation of modules across multiple
-## tissues
-geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geAdipose) <- paste0("Gene_", 1:100)
-rownames(geAdipose) <- paste0("Sample_", 1:50)
-coexpAdipose <- cor(geAdipose) # correlation
-adjAdipose <- abs(coexpAdipose)^5 # adjacency
-adiposeModules <- sample(0:7, size=100, replace=TRUE)
-names(adiposeModules) <- paste0("Gene_", 1:100)
-
-geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geLiver) <- paste0("Gene_", 1:100)
-rownames(geLiver) <- paste0("Sample_", 1:50)
-coexpLiver <- cor(geLiver) # correlation
-adjLiver <- abs(coexpLiver)^6 # adjacency
-liverModules <- sample(0:12, size=100, replace=TRUE)
-names(liverModules) <- paste0("Gene_", 1:100)
-
-geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-colnames(geHeart) <- paste0("Gene_", 1:100)
-rownames(geHeart) <- paste0("Sample_", 1:50)
-coexpHeart <- cor(geHeart) # correlation
-adjHeart <- abs(coexpHeart)^4 # adjacency
-heartModules <- sample(0:5, size=100, replace=TRUE)
-names(heartModules) <- paste0("Gene_", 1:100)
-
-# Now format the data for input to modulePreservation
-data <- list(
-  adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-  liver=as.bigMatrix(geLiver, "geLiver_bm"),  
-  heart=as.bigMatrix(geHeart, "geHeart_bm") 
-)
-correlation <- list(
-  adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-  liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
-  heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
-)
-adjacency <- list(
-  adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-  liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
-  heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
-)
-moduleAssignments <- list(
-  adipose=adiposeModules, liver=liverModules, heart=heartModules
-)
-
-# Assess the preservation of each module in each non-discovery
-# tissue.
+# Assess module preservation.
 preservation <- modulePreservation(
-  data, correlation, adjacency, moduleAssignments,
-  nCores=2, discovery=c("adipose", "liver", "heart"), 
-  test=c("adipose", "liver", "heart")
+ data=data_list, correlation=correlation_list, network=network_list,
+ moduleAssignments=labels_list, nCores=2, nPerm=1000, discovery="discovery", 
+ test="test"
 )
 
-# Remove bigMatrix files used in examples
-unlink("*_bm*")
 }
 
 }
@@ -496,5 +413,10 @@ unlink("*_bm*")
       (2008).
     }
   }
+}
+\seealso{
+\link[=bigMatrix-class]{bigMatrix objects},
+  \link[=plotModule]{visualising network modules}, and
+  \link[=networkProperties]{calculating module topology}.
 }
 

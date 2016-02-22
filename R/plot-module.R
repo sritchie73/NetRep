@@ -113,82 +113,35 @@
 #' 
 #' @examples
 #' \dontrun{
-#' ## Create some example data
-#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geA) <- paste0("Gene_", 1:100)
-#' rownames(geA) <- paste0("CohortA_", 1:50)
-#' coexpA <- cor(geA) # correlation
-#' adjA <- abs(coexpA)^5 # network
-#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-#' names(moduleAssignments) <- paste0("Gene_", 1:100)
+#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' data("netrep_example")
 #' 
-#' # Create bigMatrix objects for each matrix.
-#' geA <- as.bigMatrix(geA, "geA_bm")
-#' coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
-#' adjA <- as.bigMatrix(adjA, "adjA_bm")
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
 #' 
-#' ## Example 1: Plot Module 2 in cohort A.
-#' plotModule(geA, coexpA, adjA, moduleAssignments, modules="2")
+#' # Set up input lists for each input matrix type across datasets:
+#' data_list <- list(discovery=discovery_data, test=test_data)
+#' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+#' network_list <- list(discovery=discovery_network, test=test_network)
+#' labels_list <- list(discovery=module_labels)
 #' 
-#' ## Example 2: Plot an arbitrary set of genes in cohort A
-#' plotModule(geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10])
-#' 
-#' ## Example 3: Plot the topology of two adipose tissue modules in the liver
-#' ## tissue data 
-#' 
-#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geAdipose) <- paste0("Gene_", 1:100)
-#' rownames(geAdipose) <- paste0("Sample_", 1:50)
-#' coexpAdipose <- cor(geAdipose) # correlation
-#' adjAdipose <- abs(coexpAdipose)^5 # network
-#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
-#' names(adiposeModules) <- paste0("Gene_", 1:100)
-#' 
-#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geLiver) <- paste0("Gene_", 1:100)
-#' rownames(geLiver) <- paste0("Sample_", 1:50)
-#' coexpLiver <- cor(geLiver) # correlation
-#' adjLiver <- abs(coexpLiver)^6 # network
-#' liverModules <- sample(0:12, size=100, replace=TRUE)
-#' names(liverModules) <- paste0("Gene_", 1:100)
-#'
-#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geHeart) <- paste0("Gene_", 1:100)
-#' rownames(geHeart) <- paste0("Sample_", 1:50)
-#' coexpHeart <- cor(geHeart) # correlation
-#' adjHeart <- abs(coexpHeart)^4 # network
-#' heartModules <- sample(0:5, size=100, replace=TRUE)
-#' names(heartModules) <- paste0("Gene_", 1:100)
-#' 
-#' # Store each input type as a list, where each element corresponds
-#' # to one of the datasets
-#' data <- list(
-#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
-#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
-#' )
-#' correlation <- list(
-#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
-#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
-#' )
-#' network <- list(
-#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
-#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
-#' )
-#' moduleAssignments <- list(
-#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
-#' )
-#' 
-#' # Show the plot
+#' # Plot module 1, 2 and 5 in the discovery dataset
 #' plotModule(
-#'   data, correlation, network, moduleAssignments,
-#'   modules=c("3", "7"), discovery="adipose", test="liver"
+#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   moduleAssignments=labels_list, modules=c(1, 2, 5)
 #' )
 #' 
-#' # clean up bigMatrix files from examples
-#' unlink("*_bm*")
+#' # Now plot them in the test dataset (module 2 does not replicate)
+#' plotModule(
+#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   moduleAssignments=labels_list, modules=c(1, 2, 5), discovery="discovery",
+#'   test="test"
+#' )
 #' }
 #' 
 #' @name plotModule

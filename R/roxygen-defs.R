@@ -18,7 +18,8 @@
 #'  then this argument should be a list of such vectors.
 #' @param modules a list of vectors, one for each \code{discovery} dataset, 
 #'  of modules to perform the analysis on. The default is to analyse all modules
-#'  with the exception of those specified in \code{backgroundLabel}.
+#'  in each \code{discovery} dataset, with the exception of those specified in 
+#'  \code{backgroundLabel}.
 #' @param backgroundLabel a single label that nodes that do not belong to any
 #'  module are assigned. The default is "0".
 #' @param discovery a vector of names or indices denoting the discovery dataset(s).

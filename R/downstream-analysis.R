@@ -87,89 +87,38 @@
 #'  
 #' @examples
 #' \dontrun{
-#' ## Create some example data
-#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geA) <- paste0("Gene_", 1:100)
-#' rownames(geA) <- paste0("CohortA_", 1:50)
-#' coexpA <- cor(geA) # coexpression
-#' adjA <- abs(coexpA)^5 # adjacency
-#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-#' names(moduleAssignments) <- paste0("Gene_", 1:100)
+#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' data("netrep_example")
 #' 
-#' # Create bigMatrix objects for each matrix.
-#' geA <- as.bigMatrix(geA, "geA_bm")
-#' coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
-#' adjA <- as.bigMatrix(adjA, "adjA_bm")
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
 #' 
-#' ## Example 1: calculate network properties for a single module
-#' networkProperties(
-#'   geA, coexpA, adjA, moduleAssignments, modules="2"
+#' # Set up input lists for each input matrix type across datasets:
+#' data_list <- list(discovery=discovery_data, test=test_data)
+#' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+#' network_list <- list(discovery=discovery_network, test=test_network)
+#' labels_list <- list(discovery=module_labels)
+#' 
+#' # Calculate the topological properties of all network modules in the discovery dataset
+#' props <- networkProperties(
+#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   moduleAssignments=labels_list
 #' )
-#' 
-#' ## Example 2: calculate the network properties on a user defined 
-#' ## subset of the first 10 genes.
-#' networkProperties(
-#'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10]
+#'   
+#' # Calculate the topological properties in the test dataset for the same modules
+#' test_props <- networkProperties(
+#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   moduleAssignments=labels_list, discovery="discovery", test="test"
 #' )
-#' 
-#' ## Example 3: calculate the network properties of an adipose tissue
-#' ## module in the liver tissue of the same samples
-#' 
-#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geAdipose) <- paste0("Gene_", 1:100)
-#' rownames(geAdipose) <- paste0("Sample_", 1:50)
-#' coexpAdipose <- cor(geAdipose) # coexpression
-#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
-#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
-#' names(adiposeModules) <- paste0("Gene_", 1:100)
-#' 
-#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geLiver) <- paste0("Gene_", 1:100)
-#' rownames(geLiver) <- paste0("Sample_", 1:50)
-#' coexpLiver <- cor(geLiver) # coexpression
-#' adjLiver <- abs(coexpLiver)^6 # adjacency
-#' liverModules <- sample(0:12, size=100, replace=TRUE)
-#' names(liverModules) <- paste0("Gene_", 1:100)
-#'
-#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geHeart) <- paste0("Gene_", 1:100)
-#' rownames(geHeart) <- paste0("Sample_", 1:50)
-#' coexpHeart <- cor(geHeart) # coexpression
-#' adjHeart <- abs(coexpHeart)^4 # adjacency
-#' heartModules <- sample(0:5, size=100, replace=TRUE)
-#' names(heartModules) <- paste0("Gene_", 1:100)
-#' 
-#' # Store each input type as a list, where each element corresponds
-#' # to one of the datasets
-#' geneExpression <- list(
-#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
-#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
-#' )
-#' coexpression <- list(
-#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
-#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
-#' )
-#' adjacency <- list(
-#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
-#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
-#' )
-#' moduleAssignments <- list(
-#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
-#' )
-#' 
-#' # Get the network properties in the liver tissue for modules 
-#' # 3 and 7, which were discovered in the adipose tissue. 
-#' networkProperties(
-#'   geneExpression, coexpression, adjacency, moduleAssignments,
-#'   modules=c("3", "7"), discovery="adipose", test="liver"
-#' )
-#' 
-#' # clean up bigMatrix files from examples
-#' unlink("*_bm*")
 #' }
+#' 
+#' @seealso \link[=nodeOrder]{Getting nodes ordered by degree.}, and
+#'   \link[=sampleOrder]{Ordering samples by module summary}
 #' 
 #' @rdname networkProperties
 #' @export
@@ -392,91 +341,33 @@ netPropsInternal <- function(
 #'  \code{'modules'} specified, containing a vector of node names for the
 #'  requested module. If \code{simplify = TRUE}, then there will be a single
 #'  vector of node names for each \code{'test'} dataset.
+#'
+#' @seealso \code{\link{networkProperties}}
 #'  
 #' @examples
 #' \dontrun{
-#' ## Create some example data
-#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geA) <- paste0("Gene_", 1:100)
-#' rownames(geA) <- paste0("CohortA_", 1:50)
-#' coexpA <- cor(geA) # coexpression
-#' adjA <- abs(coexpA)^5 # adjacency
-#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-#' names(moduleAssignments) <- paste0("Gene_", 1:100)
+#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' data("netrep_example")
 #' 
-#' # Create bigMatrix objects for each matrix.
-#' geA <- as.bigMatrix(geA, "geA_bm")
-#' coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
-#' adjA <- as.bigMatrix(adjA, "adjA_bm")
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
 #' 
-#' ## Example 1: get the ordering of samples for a single module
-#' nodeOrder(
-#'   geA, coexpA, adjA, moduleAssignments, modules="2"
+#' # Set up input lists for each input matrix type across datasets:
+#' data_list <- list(discovery=discovery_data, test=test_data)
+#' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+#' network_list <- list(discovery=discovery_network, test=test_network)
+#' labels_list <- list(discovery=module_labels)
+#' 
+#' # Sort nodes by module similarity and node degree
+#' nodes <- nodeOrder(
+#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   moduleAssignments=labels_list
 #' )
-#' 
-#' ## Example 2: get the order of genes of an arbitrary subset
-#' ## (the first 10 genes)
-#' nodeOrder(
-#'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10]
-#' )
-#' 
-#' ## Example 3: get the ordering of genes for two adipose 
-#' ## tissue modules in the liver tissue of the same samples
-#' 
-#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geAdipose) <- paste0("Gene_", 1:100)
-#' rownames(geAdipose) <- paste0("Sample_", 1:50)
-#' coexpAdipose <- cor(geAdipose) # coexpression
-#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
-#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
-#' names(adiposeModules) <- paste0("Gene_", 1:100)
-#' 
-#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geLiver) <- paste0("Gene_", 1:100)
-#' rownames(geLiver) <- paste0("Sample_", 1:50)
-#' coexpLiver <- cor(geLiver) # coexpression
-#' adjLiver <- abs(coexpLiver)^6 # adjacency
-#' liverModules <- sample(0:12, size=100, replace=TRUE)
-#' names(liverModules) <- paste0("Gene_", 1:100)
-#'
-#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geHeart) <- paste0("Gene_", 1:100)
-#' rownames(geHeart) <- paste0("Sample_", 1:50)
-#' coexpHeart <- cor(geHeart) # coexpression
-#' adjHeart <- abs(coexpHeart)^4 # adjacency
-#' heartModules <- sample(0:5, size=100, replace=TRUE)
-#' names(heartModules) <- paste0("Gene_", 1:100)
-#' 
-#' # Store each input type as a list, where each element corresponds
-#' # to one of the datasets
-#' geneExpression <- list(
-#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
-#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
-#' )
-#' coexpression <- list(
-#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
-#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
-#' )
-#' adjacency <- list(
-#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
-#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
-#' )
-#' moduleAssignments <- list(
-#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
-#' )
-#' 
-#' # Get the order of genes in the liver tissue for modules 
-#' # 3 and 7, which were discovered in the adipose tissue. 
-#' nodeOrder(
-#'   geneExpression, coexpression, adjacency, moduleAssignments,
-#'   modules=c("3", "7"), discovery="adipose", test="liver"
-#' )
-#' 
-#' # clean up bigMatrix files from examples
-#' unlink("*_bm*")
 #' }
 #' 
 #' @name nodeOrder
@@ -708,93 +599,35 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
 #'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
 #'  dataset. Each of these elements is a list that has one element per 
 #'  \code{'modules'} specified, containing a vector of sample names or indices 
-#'  for the requested module.
+#'  for the requested module.'
 #'  
-#' @examples
+#' @examples 
 #' \dontrun{
-#' ## Create some example data
-#' geA <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geA) <- paste0("Gene_", 1:100)
-#' rownames(geA) <- paste0("CohortA_", 1:50)
-#' coexpA <- cor(geA) # coexpression
-#' adjA <- abs(coexpA)^5 # adjacency
-#' moduleAssignments <- sample(1:7, size=100, replace=TRUE)
-#' names(moduleAssignments) <- paste0("Gene_", 1:100)
+#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' data("netrep_example")
 #' 
-#' # Create bigMatrix objects for each matrix.
-#' geA <- as.bigMatrix(geA, "geA_bm")
-#' coexpA <- as.bigMatrix(coexpA, "coexpA_bm")
-#' adjA <- as.bigMatrix(adjA, "adjA_bm")
+#' # Convert them to the 'bigMatrix' format:
+#' discovery_data <- as.bigMatrix(discovery_data)
+#' discovery_correlation <- as.bigMatrix(discovery_correlation)
+#' discovery_network <- as.bigMatrix(discovery_network)
+#' test_data <- as.bigMatrix(test_data)
+#' test_correlation <- as.bigMatrix(test_correlation)
+#' test_network <- as.bigMatrix(test_network)
 #' 
-#' ## Example 1: get the ordering of samples for a single module
-#' sampleOrder(
-#'   geA, coexpA, adjA, moduleAssignments, modules="2"
+#' # Set up input lists for each input matrix type across datasets:
+#' data_list <- list(discovery=discovery_data, test=test_data)
+#' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+#' network_list <- list(discovery=discovery_network, test=test_network)
+#' labels_list <- list(discovery=module_labels)
+#' 
+#' # Sort nodes within module 1 in descending order by module summary
+#' samples <- sampleOrder(
+#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   moduleAssignments=labels_list, modules="1" 
 #' )
-#' 
-#' ## Example 2: get the order of genes of an arbitrary subset
-#' ## (the first 10 genes)
-#' sampleOrder(
-#'  geA[,1:10], coexpA[1:10, 1:10], adjA[1:10, 1:10]
-#' )
-#' 
-#' ## Example 3: get the ordering of genes for two adipose 
-#' ## tissue modules in the liver tissue of the same samples
-#' 
-#' geAdipose <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geAdipose) <- paste0("Gene_", 1:100)
-#' rownames(geAdipose) <- paste0("Sample_", 1:50)
-#' coexpAdipose <- cor(geAdipose) # coexpression
-#' adjAdipose <- abs(coexpAdipose)^5 # adjacency
-#' adiposeModules <- sample(0:7, size=100, replace=TRUE)
-#' names(adiposeModules) <- paste0("Gene_", 1:100)
-#' 
-#' geLiver <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geLiver) <- paste0("Gene_", 1:100)
-#' rownames(geLiver) <- paste0("Sample_", 1:50)
-#' coexpLiver <- cor(geLiver) # coexpression
-#' adjLiver <- abs(coexpLiver)^6 # adjacency
-#' liverModules <- sample(0:12, size=100, replace=TRUE)
-#' names(liverModules) <- paste0("Gene_", 1:100)
-#'
-#' geHeart <- matrix(rnorm(50*100), ncol=100) # gene expression
-#' colnames(geHeart) <- paste0("Gene_", 1:100)
-#' rownames(geHeart) <- paste0("Sample_", 1:50)
-#' coexpHeart <- cor(geHeart) # coexpression
-#' adjHeart <- abs(coexpHeart)^4 # adjacency
-#' heartModules <- sample(0:5, size=100, replace=TRUE)
-#' names(heartModules) <- paste0("Gene_", 1:100)
-#' 
-#' # Store each input type as a list, where each element corresponds
-#' # to one of the datasets
-#' geneExpression <- list(
-#'   adipose=as.bigMatrix(geAdipose, "geAdipose_bm"),
-#'   liver=as.bigMatrix(geLiver, "geLiver_bm"),  
-#'   heart=as.bigMatrix(geHeart, "geHeart_bm") 
-#' )
-#' coexpression <- list(
-#'   adipose=as.bigMatrix(coexpAdipose, "coexpAdipose_bm"),
-#'   liver=as.bigMatrix(coexpLiver, "coexpLiver_bm"),  
-#'   heart=as.bigMatrix(coexpHeart, "coexpHeart_bm") 
-#' )
-#' adjacency <- list(
-#'   adipose=as.bigMatrix(adjAdipose, "adjAdipose_bm"),
-#'   liver=as.bigMatrix(adjLiver, "adjLiver_bm"),  
-#'   heart=as.bigMatrix(adjHeart, "adjHeart_bm") 
-#' )
-#' moduleAssignments <- list(
-#'   adipose=adiposeModules, liver=liverModules, heart=heartModules
-#' )
-#' 
-#' # Get the order of samples in the liver tissue for modules 
-#' # 3 and 7, which were discovered in the adipose tissue. 
-#' sampleOrder(
-#'   geneExpression, coexpression, adjacency, moduleAssignments,
-#'   modules=c("3", "7"), discovery="adipose", test="liver"
-#' )
-#' 
-#' # clean up bigMatrix files from examples
-#' unlink("*_bm*")
 #' }
+#' 
+#' @seealso \code{\link{networkProperties}}
 #' 
 #' @name sampleOrder
 #' @export
