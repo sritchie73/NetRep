@@ -295,7 +295,7 @@ NULL
 #' @export
 plotData <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy="test", orderNodesBy="discovery",
   orderModules=TRUE, plotNodeNames=TRUE, plotSampleNames=TRUE, plotModuleNames,
   main="", palette=data.palette(), border.width=2, plotLegend=TRUE, 
@@ -563,7 +563,7 @@ plotData <- function(
 #' @export
 plotCorrelation <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy="discovery", symmetric=FALSE, orderModules=TRUE, 
   plotNodeNames=TRUE, plotModuleNames, main="", palette=correlation.palette(), 
   border.width=2, plotLegend=TRUE, legend.main="Correlation", gaxt.line=-0.5, 
@@ -787,7 +787,7 @@ plotCorrelation <- function(
 #' @export
 plotNetwork <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy="discovery", symmetric=FALSE, orderModules=TRUE, 
   plotNodeNames=TRUE, plotModuleNames, main="", palette=network.palette(), 
   border.width=2, plotLegend=TRUE, legend.main="Edge weight", gaxt.line=-0.5, 
@@ -1011,7 +1011,7 @@ plotNetwork <- function(
 #' @export
 plotContribution <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy="test", orderNodesBy="discovery", orderModules=TRUE, 
   plotNodeNames=TRUE, plotModuleNames, main="", border.width=2,
   palette=c("#313695", "#a50026"), drawBorders=FALSE, gaxt.line=-0.5, 
@@ -1217,7 +1217,7 @@ plotContribution <- function(
 #' @export
 plotDegree <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy="discovery", orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames, main="", palette="#feb24c", border.width=2, 
   drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
@@ -1383,7 +1383,7 @@ plotDegree <- function(
 #' @export
 plotSummary <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=1, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy="test", orderNodesBy="discovery", orderModules=TRUE, 
   plotSampleNames=TRUE, plotModuleNames, main="", 
   palette=c("#762a83", "#1b7837"), border.width=2, drawBorders=FALSE, 

@@ -340,7 +340,14 @@ getModuleVarsUnsorted <- function(
 #'  
 #' @import RhpcBLASctl
 setupParallel <- function(nCores, verbose, reporterCore) {
-  
+  if (is.null(nCores)) {
+    if(requireNamespace("parallel")) {
+      nCores <- parallel::detectCores()
+    } else {
+      nCores <- 1
+      vCat(verbose, 1, "Unable to find 'parallel' package, running on 1 core")
+    }
+  }
   if (!is.numeric(nCores) || length(nCores) > 1 || nCores < 1)
     stop("'nCores' must be a single number greater than 0")
   

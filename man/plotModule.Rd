@@ -6,7 +6,7 @@
 \usage{
 plotModule(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "Module Topology",
   drawBorders = FALSE, border.width = 2, gaxt.line = -0.5,
@@ -47,7 +47,8 @@ performing a pairwise comparison).}
 
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 
-backend.}
+backend.If \code{NULL} (default) the maximum number of cores on the machine
+will be used.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 

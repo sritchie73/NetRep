@@ -6,7 +6,7 @@
 \usage{
 networkProperties(data = NULL, correlation, network,
   moduleAssignments = NULL, modules = NULL, backgroundLabel = "0",
-  discovery = NULL, test = NULL, nCores = 1, simplify = TRUE,
+  discovery = NULL, test = NULL, nCores = NULL, simplify = TRUE,
   verbose = TRUE)
 }
 \arguments{
@@ -43,7 +43,8 @@ performing a pairwise comparison).}
 
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 
-backend.}
+backend.If \code{NULL} (default) the maximum number of cores on the machine
+will be used.}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}

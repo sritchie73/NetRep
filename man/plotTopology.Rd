@@ -15,7 +15,7 @@
 \usage{
 plotData(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames, main = "",
   palette = data.palette(), border.width = 2, plotLegend = TRUE,
@@ -25,7 +25,7 @@ plotData(data, correlation, network, moduleAssignments = NULL,
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderNodesBy = "discovery",
+  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
   symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
   plotModuleNames, main = "", palette = correlation.palette(),
   border.width = 2, plotLegend = TRUE, legend.main = "Correlation",
@@ -34,7 +34,7 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderNodesBy = "discovery",
+  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
   symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
   plotModuleNames, main = "", palette = network.palette(),
   border.width = 2, plotLegend = TRUE, legend.main = "Edge weight",
@@ -43,7 +43,7 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
   plotModuleNames, main = "", border.width = 2, palette = c("#313695",
   "#a50026"), drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3,
@@ -51,7 +51,7 @@ plotContribution(data, correlation, network, moduleAssignments = NULL,
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderNodesBy = "discovery",
+  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames, main = "",
   palette = "#feb24c", border.width = 2, drawBorders = FALSE,
   gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
@@ -59,7 +59,7 @@ plotDegree(data, correlation, network, moduleAssignments = NULL,
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, verbose = TRUE, orderSamplesBy = "test",
+  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
   orderNodesBy = "discovery", orderModules = TRUE, plotSampleNames = TRUE,
   plotModuleNames, main = "", palette = c("#762a83", "#1b7837"),
   border.width = 2, drawBorders = FALSE, saxt.line = -0.5,
@@ -113,7 +113,8 @@ performing a pairwise comparison).}
 
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 
-backend.}
+backend.If \code{NULL} (default) the maximum number of cores on the machine
+will be used.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 

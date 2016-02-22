@@ -13,9 +13,11 @@
 #'  preservation analysis will not be performed where the \code{discovery} and
 #'  \code{test} datasets are the same.
 #' @param nPerm number of permutations to use. If not specified, the number of 
-#'  permutations will be automaticallydetermined (see details).
+#'  permutations will be automatically determined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
-#'  Ignored if the user has already registered a parallel backend.
+#'  Ignored if the user has already registered a parallel backend. If 
+#'  \code{NULL} (default) the maximum number of cores on the machine will be 
+#'  used.
 #' @param null variables to include when generating the null distributions. 
 #'  Must be either "overlap" or "all" (see details).
 #' @param alternative The type of module preservation test to perform. Must be 
@@ -448,7 +450,7 @@
 modulePreservation <- function(
   data=NULL, correlation, network, moduleAssignments, modules=NULL, 
   backgroundLabel="0", discovery=1, test=2, selfPreservation=FALSE,
-  nCores=1, nPerm=NULL, null="overlap", alternative="greater", 
+  nCores=NULL, nPerm=NULL, null="overlap", alternative="greater", 
   statCorMethod="pearson", simplify=TRUE, verbose=TRUE, keepNulls=FALSE
 ) {
   #-----------------------------------------------------------------------------

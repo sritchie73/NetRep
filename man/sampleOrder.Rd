@@ -6,7 +6,7 @@
 \usage{
 sampleOrder(data = NULL, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = 1, na.rm = FALSE, simplify = TRUE, verbose = TRUE)
+  nCores = NULL, na.rm = FALSE, simplify = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of numeric matrices. Each entry of the list corresponds to
@@ -42,7 +42,8 @@ performing a pairwise comparison).}
 
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 
-backend.}
+backend.If \code{NULL} (default) the maximum number of cores on the machine
+will be used.}
 
 \item{na.rm}{logical; If \code{TRUE} variables present in the 
 \code{discovery} dataset but missing from the \code{test} dataset are 
