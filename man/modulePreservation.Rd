@@ -52,8 +52,7 @@ where the \code{discovery} and \code{test} datasets are the same).}
 
 \item{nCores}{number of cores to parallelise the permutation procedure over.
 Ignored if the user has already registered a parallel backend. If 
-\code{NULL} (default) the maximum number of cores on the machine will be 
-used.}
+\code{NULL} (default) the all but one core on the machine will be used.}
 
 \item{nPerm}{number of permutations to use. If not specified, the number of 
 permutations will be automatically determined (see details).}
@@ -397,7 +396,8 @@ correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
-# Assess module preservation.
+# Assess module preservation. This will take a few minutes depending on the 
+# number of cores on your machine
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 

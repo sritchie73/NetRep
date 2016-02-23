@@ -6,8 +6,8 @@
 \arguments{
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 
-backend.If \code{NULL} (default) the maximum number of cores on the machine
-will be used.}
+backend. If \code{NULL} (default) the all but one core on the machine will
+be used.}
 }
 \description{
 Template parameters to be imported into other function documentation. This 

@@ -47,8 +47,8 @@ of names or indices denoting the \emph{test} dataset(s) in the \code{data},
 
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 
-backend.If \code{NULL} (default) the maximum number of cores on the machine
-will be used.}
+backend. If \code{NULL} (default) the all but one core on the machine will
+be used.}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}

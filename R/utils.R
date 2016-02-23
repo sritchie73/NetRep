@@ -327,7 +327,7 @@ getModuleVarsUnsorted <- function(
 setupParallel <- function(nCores, verbose, reporterCore) {
   if (is.null(nCores)) {
     if(requireNamespace("parallel")) {
-      nCores <- parallel::detectCores()
+      nCores <- parallel::detectCores() - 1
     } else {
       nCores <- 1
       vCat(verbose, 1, "Unable to find 'parallel' package, running on 1 core")

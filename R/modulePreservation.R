@@ -16,8 +16,7 @@
 #'  permutations will be automatically determined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
 #'  Ignored if the user has already registered a parallel backend. If 
-#'  \code{NULL} (default) the maximum number of cores on the machine will be 
-#'  used.
+#'  \code{NULL} (default) the all but one core on the machine will be used.
 #' @param null variables to include when generating the null distributions. 
 #'  Must be either "overlap" or "all" (see details).
 #' @param alternative The type of module preservation test to perform. Must be 
@@ -375,7 +374,8 @@
 #' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # Assess module preservation.
+#' # Assess module preservation. This will take a few minutes depending on the 
+#' # number of cores on your machine
 #' preservation <- modulePreservation(
 #'  data=data_list, correlation=correlation_list, network=network_list,
 #'  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
