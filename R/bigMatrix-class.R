@@ -71,6 +71,12 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #'   Provided there are no additional objects in the R session only the memory 
 #'   required to store each matrix once will be used, along with an additional 
 #'   200 MB per core used by each vanilla R session.
+#'   
+#'   \strong{Note:} although the implementation based on
+#'   \code{\link[bigmemory]{big.matrix}} implies that the matrices may be larger
+#'   than the available RAM, in practice we find that in this scenario the
+#'   permutation procedure slows down the permutation procedue by several orders
+#'   of magnitude making permutation testing infeasible.
 #' }
 #' 
 #' @slot descriptor path of the descriptor file for the big.matrix.
