@@ -1,0 +1,169 @@
+---
+title: "NetRep"
+author: "Scott Ritchie"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_document
+abstract: >
+  Introduction to NetRep with example workflow on simulated data
+vignette: >
+  %\VignetteIndexEntry{NetRep}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+The *NetRep* package provides functions for assessing the reproducibility and
+preservation of network modules across datasets. The preservation of network 
+modules in a second dataset is quantified through a permutation procedure that 
+tests whether topological properties are more similar in the test dataset than
+expected by chance: \emph{i.e.} when calculated between a module in the 
+*discovery* dataset and random groups of nodes in the *test* dataset. 
+
+This type of analysis is suitable for networks that can be meaningfully inferred
+from multiple datasets. These include gene coexpression networks,
+protein-protein interaction networks, and microbial interaction networks.
+Modules within these networks consist of groups of nodes that are particularly
+interesting: for example a group of tightly connected genes associated with a
+disease, groups of genes annotated with the same term in the Gene Ontology
+database, or groups of interacting microbial species, i.e. communities.
+Application of this method can answer questions such as; (1) do the
+relationships between genes in a module replicate in an independent cohort? (2)
+are these gene coexpression modules preserved across tissues or tissue specific?
+(3) are these modules conserved across species? (4) are microbial communities
+preseved across multiple spatial locations?
+
+In this tutorial, we will learn how to:
+
+ 1. Assess module preservation using the `modulePreservation` function.
+ 2. Visualise a module's network topology in both the discovery and test 
+    datasets using the `plotModule` function.
+ 3. Calculate the topological properties of a network module for other 
+    downstream analyses using the `networkProperties` function.
+    
+## Tutorial data
+
+For this tutorial, we will use gene expression data simulated for two independent
+cohorts. This data is provided with the package to demonstrate function usage: 
+
+```{r}
+library("NetRep")
+data("NetRep")
+ls()
+```
+
+This loads seven objects into the R session:
+
+  - `discovery_data`: a matrix with 150 columns (genes) and 30 rows (samples) 
+     whose entries correspond to the expression level of each gene in each 
+     sample in the discovery dataset.
+  - `discovery_correlation`: a matrix with 150 columns and 150 rows containing 
+     the correlation-coefficients between each pair of genes calculated from the 
+    `discovery_data` matrix.
+  - `discovery_network`: a matrix with 150 columns and 150 rows containing the 
+     network edge weights encoding the interaction strength between each pair of 
+     genes in the discovery dataset.
+  - `module_labels`: a named vector with 150 entries containing the module 
+     assignment for each gene as identified in the discovery dataset.
+  - `test_data`: a matrix with 150 columns (genes) and 30 rows (samples) whose 
+     entries correspond to the expression level of each gene in each sample in 
+     the test dataset.
+  - `test_correlation`: a matrix with 150 columns and 150 rows containing the 
+     correlation-coefficients between each pair of genes calculated from the 
+    `test_data` matrix.
+  - `test_network`: a matrix with 150 columns and 150 rows containing the 
+     network edge weights encoding the interaction strength between each pair of
+     genes in the test dataset.
+     
+The *discovery* dataset was simulated to contain four modules of varying size,
+two of which (Modules 1 and 4) replicate in the *test* dataset. Details of the
+simulation are provided in the documentation for the package data 
+(see `help("NetRep-data")`).
+
+## Setting up the input data 
+
+The topological properties used to quantify module preservation are calculated 
+not only from the interaction networks inferred in each dataset, but also from 
+the data used to infer those networks (e.g. gene expression data) as well as 
+the correlation structure between variables/nodes. 
+
+All functions in the *NetRep* package have the following arguments:
+
+ - `network`: a list of interaction networks, one for each dataset.
+ - `data`: a list of data matrices used to infer those networks, one for each 
+    dataset.
+ - `correlation`: a list of matrices containing the pairwise correlation 
+    coefficients between variables/nodes in each dataset.
+ - `moduleAssignments`: a list of vectors, one for each *discovery* dataset, 
+    containing the module assignments for each node in that dataset.
+ - `modules`: a list of vectors, one vector for each *discovery* dataset, 
+    containing the names of the modules from that dataset to analyse.
+ - `discovery`: a vector indicating the names or indices to use as the 
+   *discovery* datasets in the `network`, `data`, `correlation`, 
+   `moduleAssignments`, and `modules` arguments.
+ - `test`: a list of vectors, one vector for each *discovery* dataset, 
+    containing the names or indices of the `network`, `data`, and `correlation` 
+    argument lists to use as the *test* dataset(s) for the analysis of each 
+   *discovery* dataset.
+
+*NetRep* requires the matrix data for each of the `network`, `data`, and 
+`correlation` arguments to be stored in the `bigMatrix` format. This is a class
+provided by *NetRep* that stores the data in shared memory, which allows the 
+data to be accessed from multiple parallel R sessions (see `help("bigMatrix")` 
+for more details).
+
+First, we will convert the tutorial data into the `bigMatrix` format:
+
+```{r}
+# Convert the data to the 'bigMatrix' format:
+discovery_data <- as.bigMatrix(discovery_data)
+discovery_correlation <- as.bigMatrix(discovery_correlation)
+discovery_network <- as.bigMatrix(discovery_network)
+test_data <- as.bigMatrix(test_data)
+test_correlation <- as.bigMatrix(test_correlation)
+test_network <- as.bigMatrix(test_network)
+```
+
+If you are using your own data, you can convert it either using `as.bigMatrix`,
+or by reading it in directly using `read.bigMatrix`. 
+
+Next, we will set up the input lists:
+
+```{r}
+data_list <- list(discovery=discovery_data, test=test_data)
+correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
+network_list <- list(discovery=discovery_network, test=test_network)
+```
+
+Since we only have one discovery and one test dataset we do not have to set up
+list structures for the other common arguments.
+
+## Assessing module preservation
+
+Now we can use the `modulePreservation` function to assess the reproducibility 
+of the four simulated modules in the test dataset. We recommend running the 
+procedure with at least 10,000 permutations to ensure the permutation procedure
+generates representative null distributions for each statistic.
+
+On a single core machine this should take an hour to an hour and a half to run.
+*NetRep* will automatically detect the number of cores and use all but one. 
+Alternatively, the number of cores can be set by the user using the `nCores`
+argument. For a full list of arguments see `help("modulePreservation")`.
+
+```{r, cache=TRUE}
+# NetRep will assess module preservation for *all* modules by default
+preservation <- modulePreservation(
+ data=data_list, correlation=correlation_list, network=network_list,
+ moduleAssignments=module_labels, nPerm=10000, discovery="discovery", 
+ test="test"
+)
+```
+
+Now we can look at the observed values and permutation P-values for each module 
+preservation statistic:
+
+```{r}
+# Each row corresponds to a module
+preservation$observed
+preservation$p.values
+```
