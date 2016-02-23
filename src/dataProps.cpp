@@ -135,12 +135,7 @@ List DataProps(SEXP pDat, IntegerVector subsetIndices) {
   
   // Dispatch function for all types of big.matrix.
   unsigned short type = xpDat->matrix_type();
-  if (type == 6) {
-    return DataProps(
-      arma::Mat<float>((float *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
-      subsetIndices
-    );
-  } else if (type == 8) {
+  if (type == 8) {
     return DataProps(
       arma::Mat<double>((double *)xpDat->matrix(), xpDat->nrow(), xpDat->ncol(), false),
       subsetIndices
@@ -148,7 +143,7 @@ List DataProps(SEXP pDat, IntegerVector subsetIndices) {
   } else {
     throw Rcpp::exception(
       "SVD can only be calculated on a 'bigMatrix' whose underlying type is"
-      "'double' or 'float'."
+      "'double'."
     );
   }
 }
