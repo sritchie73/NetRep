@@ -165,7 +165,7 @@ additional objects in the R session only the memory required to store each
 `bigMatrix` in memory once will be used, along with approximately additional 200
 MB per core used by each vanilla R session.
 
-```{r, cache=TRUE}
+```{r}
 # NetRep will assess module preservation for *all* modules by default
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
@@ -262,7 +262,7 @@ at `help("plotTopology")`.
 Finally, the network properties for each module can be calculated in both 
 datasets through the `networkProperties` function:
 
-```{r, cache=TRUE}
+```{r}
 properties <- networkProperties(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, 
