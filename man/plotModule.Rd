@@ -209,7 +209,7 @@ Individual components of the module plot can be plotted using
   module appearing on the plot (see \code{\link{sampleOrder}}.
 }
 \subsection{Normalised degree:}{
-  The weighted degree is normalised by the maximum connectivity in
+  The weighted degree is normalised by the maximum weighted degree in
   any given module when rendered on the bar plot. This facilitates visual 
   comparison of multiple modules with differing sizes or densities.
 }
