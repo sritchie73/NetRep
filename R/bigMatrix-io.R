@@ -64,10 +64,11 @@ save.as.bigMatrix <- function(
   
   # Allow overwriting
   if (file.exists(fullBinFile)) {
-    unlink(fullBinFile)
-    unlink(fullDescFile)
-    unlink(cnFile)
-    unlink(rnFile)
+    file.remove(fullBinFile)
+    file.remove(fullDescFile)
+    file.remove(cnFile)
+    file.remove(rnFile)
+    
   }
   
   # Dimension names are saved separately from the big.matrix object.
@@ -222,10 +223,10 @@ read.bigMatrix <- function(
   
   # Allow overwriting
   if (file.exists(fullBinFile)) {
-    unlink(fullBinFile)
-    unlink(fullDescFile)
-    unlink(cnFile)
-    unlink(rnFile)
+    file.remove(fullBinFile)
+    file.remove(fullDescFile)
+    file.remove(cnFile)
+    file.remove(rnFile)
   }
   
   bm <- read.big.matrix(
