@@ -29,6 +29,9 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' further if all values are between -128 and 127 by storing values as type 
 #' \code{"char"}. \code{typeof} will return the type of data stored within a
 #' \code{'bigMatrix'}.
+#' 
+#' \strong{Note:} matrices containing data used to infer networks (\emph{i.e.}
+#' provided in the \code{data} argument) can only be of type \code{"double"}.
 #' }
 #' \subsection{\code{bigMatrix} backing files}{
 #' \code{bigMatrix} objects are stored on disk at the path provided in the 
