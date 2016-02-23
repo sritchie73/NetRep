@@ -1,10 +1,10 @@
 ---
-title: "Using the NetRep package"
+title: "NetRep"
 author: "Scott Ritchie"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{"NetRep"}
+  %\VignetteIndexEntry{NetRep}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
