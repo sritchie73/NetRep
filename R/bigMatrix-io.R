@@ -64,7 +64,10 @@ save.as.bigMatrix <- function(
   
   # Allow overwriting
   if (file.exists(fullBinFile)) {
-    file.remove(fullBinFile)
+    if (!file.remove(fullBinFile)) {
+      stop("cannot remove 'bigMatrix' backingfile. Object must first be removed",
+           " in R and then the garbage collector ('gc') must be called")
+    }
     file.remove(fullDescFile)
     file.remove(cnFile)
     file.remove(rnFile)
@@ -223,7 +226,10 @@ read.bigMatrix <- function(
   
   # Allow overwriting
   if (file.exists(fullBinFile)) {
-    file.remove(fullBinFile)
+    if (!file.remove(fullBinFile)) {
+      stop("cannot remove 'bigMatrix' backingfile. Object must first be removed",
+           " in R and then the garbage collector ('gc') must be called")
+    }
     file.remove(fullDescFile)
     file.remove(cnFile)
     file.remove(rnFile)

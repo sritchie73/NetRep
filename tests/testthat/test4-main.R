@@ -60,4 +60,6 @@ test_that("Main routine runs and produces sane output", {
     verbose=FALSE, nCores=1
   )
 })
+rm(exprSets, coexpSets, adjSets)
+gc()
 unlink(file.path(tempdir(), 'tmp*'))

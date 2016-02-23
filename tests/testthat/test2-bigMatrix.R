@@ -69,6 +69,9 @@ for (mm in 1:3) { # Matrix, single column, and single row behave differently
       header=ifelse(is.null(colnames(d1)), FALSE, TRUE)
     )
     expect_identical(d1[,], d5[,])
+    
+    rm(d1, d2, d3, d4, d5)
+    gc()
   }
 }
 
