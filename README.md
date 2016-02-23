@@ -30,7 +30,7 @@ library(devtools)
 install_github("InouyeLab/NetRep", build_vignettes=TRUE)
 vignette("NetRep")
 ```
-But can otherwise be read online at [vignettes/NetRep.md](blob/master/vignettes/NetRep.md)
+But can otherwise be read online at [vignettes/NetRep.md](vignettes/NetRep.md)
 
 To ensure the package has installed correctly and will run on your system, run the following:
 
