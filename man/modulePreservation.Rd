@@ -389,9 +389,9 @@ preservation <- modulePreservation(
 \references{
 \enumerate{
     \item{
-     Ritchie, S.C., et al., \emph{A scalable permutation approach reveals 
-     replication and preservation patterns of network modules.} Cell Systems.
-     \emph{in review} (2016).
+     Ritchie, S.C., \emph{et al.}, \emph{A scalable permutation approach
+     reveals replication and preservation patterns of gene coexpression
+     modules}. bioRxiv. 029553 (2015).
     }
     \item{
       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
