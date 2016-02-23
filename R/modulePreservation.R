@@ -480,7 +480,7 @@ modulePreservation <- function(
     # Bonferonni correct for the total number of modules, multiplied the number
     # of datasets each module is tested in.
     multiplier <- sum(sapply(modules, length) * sapply(test, length))
-    nPerm <- max(1000, requiredPerms(0.05/multiplier))
+    nPerm <- max(10000, requiredPerms(0.05/multiplier))
   }
 
   vCat(verbose, 0, "User input ok!")
