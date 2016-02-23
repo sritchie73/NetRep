@@ -70,7 +70,7 @@ for (mm in 1:3) { # Matrix, single column, and single row behave differently
     )
     expect_identical(d1[,], d5[,])
     
-    rm(d1, d2, d3, d4, d5)
+    rm(d1, d2, d3, d5)
     gc()
   }
 }

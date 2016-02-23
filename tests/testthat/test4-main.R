@@ -1,5 +1,4 @@
 context("Testing 'modulePreservation' function")
-set.seed(37)
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
 
@@ -32,27 +31,28 @@ modules <- moduleAssignments[[1]][intersect(names(moduleAssignments[[1]]),
                                             colnames(adjSets[[2]]))]
 modules <- table(modules)
 modules <- names(modules[modules > 2])
+nModules <- length(modules)
 
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, modules,
     discovery=1, test=2, nPerm=10, verbose=FALSE, nCores=1
   )
-  expect_equal(dim(res1$nulls), c(7, 7, 10))
-  expect_equal(dim(res1$observed), c(7, 7))
-  expect_equal(dim(res1$p.values), c(7, 7))
-  expect_equal(length(res1$propVarsPresent), 7)
-  expect_equal(length(res1$nVarsPresent), 7)
+  expect_equal(dim(res1$nulls), c(nModules , 7, 10))
+  expect_equal(dim(res1$observed), c(nModules , 7))
+  expect_equal(dim(res1$p.values), c(nModules , 7))
+  expect_equal(length(res1$propVarsPresent), nModules)
+  expect_equal(length(res1$nVarsPresent), nModules)
   res2 <- modulePreservation(
     NULL, coexpSets, adjSets, moduleAssignments,
     modules, discovery=1, test=2, nPerm=10, 
     verbose=FALSE, nCores=1
   )
-  expect_equal(dim(res2$nulls), c(7, 4, 10))
-  expect_equal(dim(res2$observed), c(7, 4))
-  expect_equal(dim(res2$p.values), c(7, 4))
-  expect_equal(length(res2$propVarsPresent), 7)
-  expect_equal(length(res2$nVarsPresent), 7)
+  expect_equal(dim(res2$nulls), c(nModules, 4, 10))
+  expect_equal(dim(res2$observed), c(nModules, 4))
+  expect_equal(dim(res2$p.values), c(nModules, 4))
+  expect_equal(length(res2$propVarsPresent), nModules)
+  expect_equal(length(res2$nVarsPresent), nModules)
   
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, 
