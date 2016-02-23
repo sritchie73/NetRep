@@ -1,5 +1,4 @@
 context("Testing downstream analysis functions")
-set.seed(1000)
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
 
@@ -27,10 +26,18 @@ exprSets <- list(
 moduleAssignments <- list(a=sample(1:7, 100, replace=TRUE), b=NULL)
 names(moduleAssignments[[1]]) <- gn1
 
+# Only analyse modules with > 2 genes
+modules <- moduleAssignments[[1]][intersect(names(moduleAssignments[[1]]), 
+                                            colnames(adjSets[[2]]))]
+modules <- table(modules)
+modules <- names(modules[modules > 2])
+nModules <- length(modules)
+
 test_that("'networkProperties' function runs without error", {
   expect_is(
     networkProperties(
-      exprSets, coexpSets, adjSets, moduleAssignments, modules="1", verbose=FALSE
+      exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
+      verbose=FALSE
     ), "list"
   )
   props <- networkProperties(
@@ -42,11 +49,11 @@ test_that("'networkProperties' function runs without error", {
 
 test_that("'nodeOrder' function runs without error", {
   n <- nodeOrder(
-    exprSets, coexpSets, adjSets, moduleAssignments, modules="1", verbose=FALSE
+    exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], verbose=FALSE
   )
   expect_is(n, "character")
   n <- nodeOrder(
-    NULL, coexpSets, adjSets, moduleAssignments, modules=c("1", "7"), 
+    NULL, coexpSets, adjSets, moduleAssignments, modules=modules[1:2], 
     orderModules=FALSE, verbose=FALSE
   )
   expect_is(n, "character")
@@ -54,14 +61,14 @@ test_that("'nodeOrder' function runs without error", {
 
 test_that("'sampleOrder' function runs without error", {
   s <- sampleOrder(
-    exprSets, coexpSets, adjSets, moduleAssignments, modules="1", 
+    exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
     verbose=FALSE
   )
   expect_is(s, "integer")
 
   expect_error(
     sampleOrder(
-      NULL, coexpSets, adjSets, moduleAssignments, modules=c("1", "7"), 
+      NULL, coexpSets, adjSets, moduleAssignments, modules=modules[1:2], 
       simplify=FALSE, verbose=FALSE
     )
   )
