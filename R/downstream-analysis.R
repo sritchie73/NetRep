@@ -172,15 +172,15 @@ networkProperties <- function(
   tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   
+  vCat(verbose, 0, "Validating user input...")
+  
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
     cleanupCluster(par$cluster, par$predef)
   }, add=TRUE)
-  
-  vCat(verbose, 0, "Validating user input...")
-  
+
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
