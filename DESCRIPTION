@@ -8,11 +8,11 @@ Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 Description: Functions for assessing the replication/preservation of a network 
   module's topology across datasets through permutation testing.
 License: GPL-2
-Depends:
+Depends: 
     R (>= 3.0.0),
     methods,
     utils
-Imports:
+Imports: 
     bigmemory,
     foreach,
     iterators,
@@ -24,10 +24,13 @@ Imports:
     RhpcBLASctl,
     abind,
     RColorBrewer
-Suggests:
+Suggests: 
     testthat,
     doMC,
     doParallel,
-    WGCNA
+    WGCNA,
+    knitr,
+    rmarkdown
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
 RoxygenNote: 5.0.0
+VignetteBuilder: knitr
