@@ -10,37 +10,40 @@ networkProperties(data = NULL, correlation, network,
   verbose = TRUE)
 }
 \arguments{
-\item{data}{a list of numeric matrices. Each entry of the list corresponds to
-a dataset and contains the data used to infer the interaction network
-between variables (e.g. genes). Expects matrix columns to correspond to
-variables and matrix rows to correspond to samples.}
+\item{data}{a list of matrices, one for each dataset. Each 
+entry of the list should be a numeric \code{\link{bigMatrix}} of data used
+to infer the interaction network for that dataset. The columns should
+correspond to variables in the data (nodes in the network) and rows to 
+samples in that dataset.}
 
-\item{correlation}{a list of matrices. Each entry of the list corresponds to a 
-dataset and contains an \eqn{n * n} matrix of the correlation between 
-each pair of variables in the dataset.}
+\item{correlation}{a list of matrices, one for each dataset. Each entry of
+the list should be a \eqn{n * n} numeric \code{\link{bigMatrix}} where each
+element contains the correlation coefficient between nodes \eqn{i} and
+\eqn{j} in data used to infer the interaction network for that dataset.}
 
-\item{network}{a list of matrices. Each entry of the list corresponds to a 
-dataset and contains an \eqn{n * n} matrix of the network edge weights 
-between each pair of variables in the dataset.}
+\item{network}{a list of interaction networks, one for each dataset. Each 
+entry of the list should be a \eqn{n * n} numeric \code{\link{bigMatrix}}
+where each element contains the edge weight between nodes \eqn{i} and 
+\eqn{j} in the inferred network for that dataset.}
 
-\item{moduleAssignments}{a vector containing the module each variable belongs
-to in the discovery dataset. If there are multiple discovery datasets 
-then this argument should be a list of such vectors.}
+\item{moduleAssignments}{a list of vectors, one for each \emph{discovery} 
+dataset, containing the module assignments for each node in that dataset.}
 
 \item{modules}{a list of vectors, one for each \code{discovery} dataset, 
-of modules to perform the analysis on. The default is to analyse all modules
-in each \code{discovery} dataset, with the exception of those specified in 
-\code{backgroundLabel}.}
+of modules to perform the analysis on. If unspecified, all modules
+in each \code{discovery} dataset will be analysed, with the exception of 
+those specified in \code{backgroundLabel} argument.}
 
-\item{backgroundLabel}{a single label that nodes that do not belong to any
-module are assigned. The default is "0".}
+\item{backgroundLabel}{a single label given to nodes that do not belong to 
+any module in the \code{moduleAssignments} argument.}
 
-\item{discovery}{a vector of names or indices denoting the discovery dataset(s).}
+\item{discovery}{a vector of names or indices denoting the \emph{discovery}
+dataset(s) in the \code{data}, \code{correlation}, \code{network}, 
+\code{moduleAssignments}, \code{modules}, and \code{test} lists.}
 
-\item{test}{a list of vectors of names or indices denoting the test datasets
-for each \code{discovery} dataset. Alternatively can be provided as vector
-if the test datasets are the same for all 'discovery' datasets (e.g. for 
-performing a pairwise comparison).}
+\item{test}{a list of vectors, one for each \code{discovery} dataset,
+of names or indices denoting the \emph{test} dataset(s) in the \code{data}, 
+\code{correlation}, and \code{network} lists.}
 
 \item{nCores}{number of cores to parallelise the calculation of network 
 properties over. Ignored if the user has already registered a parallel 

@@ -10,8 +10,8 @@
 #' @inheritParams simplify_param
 #' 
 #' @param selfPreservation logical; if \code{FALSE} (default) then module 
-#'  preservation analysis will not be performed where the \code{discovery} and
-#'  \code{test} datasets are the same.
+#'  preservation analysis will not be performed within a dataset (\emph{i.e.} 
+#'  where the \code{discovery} and \code{test} datasets are the same).
 #' @param nPerm number of permutations to use. If not specified, the number of 
 #'  permutations will be automatically determined (see details).
 #' @param nCores number of cores to parallelise the permutation procedure over.
