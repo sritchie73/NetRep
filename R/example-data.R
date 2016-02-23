@@ -17,7 +17,8 @@
 #'   }
 #'   \item{\code{"discovery_network"}:}{
 #'      a \code{matrix} with 150 columns and 150 rows containing the network 
-#'      edge weights between each pair of genes in the \emph{discovery} dataset.
+#'      edge weights encoding the interaction strength between each pair of
+#'      genes in the \emph{discovery} dataset.
 #'   }
 #'   \item{\code{"module_labels"}:}{
 #'      a named \code{vector} with 150 entries containing the module assignment
@@ -33,9 +34,10 @@
 #'      correlation-coefficients between each pair of genes calculated from the
 #'      \code{"test_data"} \code{matrix}.
 #'   }
-#'   \item{\code{"test"}:}{
+#'   \item{\code{"test_network"}:}{
 #'      a \code{matrix} with 150 columns and 150 rows containing the network 
-#'      edge weights between each pair of genes in the \emph{test} dataset.
+#'      edge weights encoding the interaction strength between each pair of
+#'      genes in the \emph{test} dataset.
 #'   }  
 #' }
 #' 
@@ -139,6 +141,8 @@
 #'      modules}. bioRxiv. 029553 (2015).
 #'     }
 #'  }
+#'
+#' @aliases NetRep-data
 #'
 #' @seealso 
 #'   \code{\link{modulePreservation}}, \code{\link{plotModule}}, and

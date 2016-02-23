@@ -2,6 +2,7 @@
 % Please edit documentation in R/example-data.R
 \docType{data}
 \name{example-data}
+\alias{NetRep-data}
 \alias{discovery_correlation}
 \alias{discovery_data}
 \alias{discovery_network}
@@ -24,7 +25,8 @@
   }
   \item{\code{"discovery_network"}:}{
      a \code{matrix} with 150 columns and 150 rows containing the network 
-     edge weights between each pair of genes in the \emph{discovery} dataset.
+     edge weights encoding the interaction strength between each pair of
+     genes in the \emph{discovery} dataset.
   }
   \item{\code{"module_labels"}:}{
      a named \code{vector} with 150 entries containing the module assignment
@@ -40,9 +42,10 @@
      correlation-coefficients between each pair of genes calculated from the
      \code{"test_data"} \code{matrix}.
   }
-  \item{\code{"test"}:}{
+  \item{\code{"test_network"}:}{
      a \code{matrix} with 150 columns and 150 rows containing the network 
-     edge weights between each pair of genes in the \emph{test} dataset.
+     edge weights encoding the interaction strength between each pair of
+     genes in the \emph{test} dataset.
   }  
 }}
 \usage{

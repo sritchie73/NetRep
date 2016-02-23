@@ -81,8 +81,8 @@ labels_list <- list(discovery=module_labels)
 # in the example data? 
 nPerm <- requiredPerms(0.05/4) 
 
-# Note that we recommend running at least 1000 permutations to make sure that
-# the null distributions are representative.
+# Note that we recommend running at least 10,000 permutations to make sure 
+# that the null distributions are representative.
 
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
