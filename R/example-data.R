@@ -65,7 +65,7 @@
 #'      the module assignments for each node in that dataset.
 #'     }
 #'     \item{\code{modules}:}{
-#'      a list of vectors, one for each \emph{discovery} dataset, containing
+#'      a list of vectors, one vector for each \emph{discovery} dataset, containing
 #'      the names of the modules from that dataset to analyse.  
 #'     }
 #'     \item{\code{discovery}:}{
@@ -73,9 +73,10 @@
 #'       lists to use as the \emph{discovery} dataset(s) for the analyses.
 #'     }
 #'     \item{\code{test}:}{
-#'       a vector (or list) indicating the names or indices of the previous 
-#'       arguments' lists to use as the \emph{test} dataset(s) for the analysis
-#'       of each \emph{discovery} dataset.
+#'       a list of vectors, one vector for each \emph{discovery} dataset, 
+#'       containing the names or indices of the \code{network}, \code{data}, and 
+#'       \code{correlation} argument lists to use as the \emph{test} dataset(s) 
+#'       for the analysis of each \emph{discovery} dataset.
 #'     }
 #'   }
 #'   This data is used to provide concrete examples of the usage of these 

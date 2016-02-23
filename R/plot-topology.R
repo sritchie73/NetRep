@@ -27,24 +27,55 @@
 #'
 #' @details
 #'  \subsection{Input data structure:}{
-#'   This function allows for input data formatted in a number of ways. Where 
-#'   there are multiple datasets of interest (e.g. multiple tissues, locations, 
-#'   or a discovery dataset and an independent test dataset) the arguments 
-#'   \code{data}, \code{correlation}, and \code{network} should be
-#'   \code{\link[=list]{lists}} where each element contains the matrix data for 
-#'   each respective dataset. Alternatively, if only one dataset is of interest, 
-#'   the \code{data}, \code{correlation}, and \code{network} arguments
-#'   will also each accept a 'matrix' object.
+#'   The \link[=modulePreservation]{preservation of network modules} in a second
+#'   dataset is quantified by measuring the preservation of topological
+#'   properties between the \emph{discovery} and \emph{test} datasets. These 
+#'   properties are calculated not only from the interaction networks inferred
+#'   in each dataset, but also from the data used to infer those networks (e.g.
+#'   gene expression data) as well as the correlation structure between 
+#'   variables/nodes. Thus, all functions in the \code{NetRep} package have the 
+#'   following arguments: 
+#'   \itemize{
+#'     \item{\code{network}:}{
+#'       a list of interaction networks, one for each dataset.
+#'     }
+#'     \item{\code{data}:}{
+#'       a list of data matrices used to infer those networks, one for each 
+#'       dataset.
+#'     }
+#'     \item{\code{correlation}:}{
+#'      a list of matrices containing the pairwise correlation coefficients 
+#'      between variables/nodes in each dataset.
+#'     } 
+#'     \item{\code{moduleAssignments}:}{
+#'      a list of vectors, one for each \emph{discovery} dataset, containing 
+#'      the module assignments for each node in that dataset.
+#'     }
+#'     \item{\code{modules}:}{
+#'      a list of vectors, one for each \emph{discovery} dataset, containing
+#'      the names of the modules from that dataset to analyse.  
+#'     }
+#'     \item{\code{discovery}:}{
+#'       a vector indicating the names or indices of the previous arguments' 
+#'       lists to use as the \emph{discovery} dataset(s) for the analyses.
+#'     }
+#'     \item{\code{test}:}{
+#'       a list of vectors, one vector for each \emph{discovery} dataset, 
+#'       containing the names or indices of the \code{network}, \code{data}, and 
+#'       \code{correlation} argument lists to use as the \emph{test} dataset(s) 
+#'       for the analysis of each \emph{discovery} dataset.
+#'     }
+#'   }
 #'   
-#'   Similarly, the \code{moduleAssignments} argument expects a list of named
-#'   vectors, which denote the module each variable belongs to in the discovery
-#'   dataset. If module discovery has only been performed in one dataset, then 
-#'   the \code{moduleAssignments} argument will also accept a named vector.
-#'   
-#'   The \code{discovery} arguments specifies which dataset the \code{modules} 
-#'   of interest were discovered in, and the \code{test} argument specifies 
-#'   which dataset to calculate the network properties in. These arguments are
-#'   ignored if data is provided for only one dataset.
+#'   The formatting of these arguments is not strict: each function will attempt
+#'   to make sense of the user input. For example, if there is only one 
+#'   \code{discovery} dataset, then input to the \code{moduleAssigments} and 
+#'   \code{test} arguments may be vectors, rather than lists. If the node and
+#'   sample ordering is being calculated within the same dataset being 
+#'   visualised, then the \code{discovery} and \code{test} arguments do
+#'   not need to be specified, and the input matrices for the \code{network},
+#'   \code{data}, and \code{correlation} arguments do not need to be wrapped in
+#'   a list.
 #' }
 #' \subsection{'bigMatrix' vs. 'matrix' input data:}{
 #'   Although the function expects \code{\link{bigMatrix}} 
