@@ -1,21 +1,8 @@
----
-title: "NetRep"
-author: "Scott Ritchie"
-date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_document: 
-    keep_md: true
-abstract: >
-  Introduction to NetRep with example workflow on simulated data
-vignette: >
-  %\VignetteIndexEntry{NetRep}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
+# NetRep
+Scott Ritchie  
+`r Sys.Date()`  
 
-```{r, echo=FALSE, cache=FALSE}
-options(width = 100)
-```
+
 
 ## Introduction
 
@@ -52,10 +39,16 @@ In this tutorial, we will learn how to:
 For this tutorial, we will use gene expression data simulated for two independent
 cohorts. This data is provided with the package to demonstrate function usage: 
 
-```{r}
+
+```r
 library("NetRep")
 data("NetRep")
 ls()
+```
+
+```
+## [1] "discovery_correlation" "discovery_data"        "discovery_network"     "module_labels"        
+## [5] "oldLC"                 "test_correlation"      "test_data"             "test_network"
 ```
 
 This loads seven objects into the R session:
@@ -120,7 +113,8 @@ for more details).
 
 First, we will convert the tutorial data into the `bigMatrix` format:
 
-```{r, message=FALSE}
+
+```r
 # Convert the data to the 'bigMatrix' format:
 discovery_data <- as.bigMatrix(discovery_data)
 discovery_correlation <- as.bigMatrix(discovery_correlation)
@@ -135,7 +129,8 @@ or by reading it in directly using `read.bigMatrix`.
 
 Next, we will set up the input lists:
 
-```{r}
+
+```r
 data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 network_list <- list(discovery=discovery_network, test=test_network)
@@ -165,7 +160,8 @@ additional objects in the R session only the memory required to store each
 `bigMatrix` in memory once will be used, along with approximately additional 200
 MB per core used by each vanilla R session.
 
-```{r, cache=TRUE}
+
+```r
 # NetRep will assess module preservation for *all* modules by default
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
@@ -174,13 +170,47 @@ preservation <- modulePreservation(
 )
 ```
 
+```
+##  Validating user input...
+##    Running on 7 cores.
+##    Checking matrices for non-finite values...
+##  User input ok!
+##  Calculating preservation of network subsets from dataset "discovery" in dataset "test".
+##    Calculating observed test statistics...
+##    Calculating null distributions with 10000 permutations...
+##    Calculating P-values...
+##    Collating results...
+##  Cleaning up temporary objects...
+##  Done!
+```
+
 Now we can look at the observed values and permutation P-values for each module 
 preservation statistic:
 
-```{r}
+
+```r
 # Each row corresponds to a module
 preservation$observed
+```
+
+```
+##    avg.weight coherence    cor.cor  cor.degree cor.contrib      avg.cor avg.contrib
+## 1 0.161069393 0.6187688 0.78448573  0.90843993   0.8795006  0.550004272  0.76084777
+## 2 0.001872928 0.1359063 0.17270312 -0.03542772   0.5390504  0.034040922  0.23124826
+## 3 0.001957475 0.1263280 0.01121223 -0.17179855  -0.1074944 -0.007631867  0.05412794
+## 4 0.046291489 0.4871179 0.32610667  0.68122446   0.5251965  0.442614173  0.68239136
+```
+
+```r
 preservation$p.values
+```
+
+```
+##   avg.weight  coherence    cor.cor cor.degree cor.contrib    avg.cor avg.contrib
+## 1 0.00009999 0.00009999 0.00009999 0.00009999  0.00009999 0.00009999  0.00009999
+## 2 0.97710229 0.97100290 0.01019898 0.56204380  0.00359964 0.01799820  0.00659934
+## 3 0.98890111 0.98550145 0.41805819 0.81081892  0.71152885 0.99420058  0.88131187
+## 4 0.00009999 0.00009999 0.00009999 0.00009999  0.00059994 0.00009999  0.00009999
 ```
 
 Details for each statistic are provided in the documentation (see 
@@ -188,9 +218,15 @@ Details for each statistic are provided in the documentation (see
 
 Here, we will consider a module to be reprocible if all statistics have P < 0.01:
 
-```{r}
+
+```r
 max_pval <- apply(preservation$p.value, 1, max)
 max_pval
+```
+
+```
+##          1          2          3          4 
+## 0.00009999 0.97710229 0.99420058 0.00059994
 ```
 
 Only modules 1 and 4 are reproducible at this significance threshold.
@@ -201,12 +237,30 @@ The topological properties that contribute to each module preservation statistic
 can be visualised using `plotModule`. First, let's look at the four module in
 the *discovery* dataset:
 
-```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+
+```r
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="discovery", test="discovery"
 )
+```
+
+```
+##  Validating user input...
+##    Running on 7 cores.
+##    Checking matrices for non-finite values...
+##  User input ok!
+##  Ordering nodes...
+##  Ordering samples...
+##  rendering plot components...
+```
+
+<img src="NetRep_files/figure-html/unnamed-chunk-8-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+```
+##  Cleaning up temporary objects...
+##  Done!
 ```
 
 The `discovery` argument tells `plotModule` which dataset the modules were 
@@ -221,7 +275,8 @@ If we set `test = "test"`, then `plotModule` will show the properties in the
 *test* dataset while keeping the ordering of nodes and modules the same as if 
 calculated in the `discovery` dataset:
 
-```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+
+```r
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
@@ -229,12 +284,30 @@ plotModule(
 )
 ```
 
+```
+##  Validating user input...
+##    Running on 7 cores.
+##    Checking matrices for non-finite values...
+##  User input ok!
+##  Ordering nodes...
+##  Ordering samples...
+##  rendering plot components...
+```
+
+<img src="NetRep_files/figure-html/unnamed-chunk-9-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+```
+##  Cleaning up temporary objects...
+##  Done!
+```
+
 There are many arguments to adjust the way modules are drawn (see 
 `help("plotModule"))`). For example, we can change the previous plot so that 
 nodes are ordered within the `test` dataset and modules are drawn in the order 
 provided rather than by the similarity of their summary profiles:
 
-```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+
+```r
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
@@ -242,16 +315,50 @@ plotModule(
 )
 ```
 
+```
+##  Validating user input...
+##    Running on 7 cores.
+##    Checking matrices for non-finite values...
+##  User input ok!
+##  Ordering nodes...
+##  Ordering samples...
+##  rendering plot components...
+```
+
+<img src="NetRep_files/figure-html/unnamed-chunk-10-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+```
+##  Cleaning up temporary objects...
+##  Done!
+```
+
 We can also plot individual components of the plot separately. For example, 
 a heatmap of the correlation structure:
 
-```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+
+```r
 par(mar=c(6,6,6,4)+0.1)
 plotCorrelation(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=0:4, discovery="discovery",
   test="discovery", symmetric=TRUE, orderModules=FALSE
 )
+```
+
+```
+##  Validating user input...
+##    Running on 7 cores.
+##    Checking matrices for non-finite values...
+##  User input ok!
+##  Ordering nodes...
+##  rendering plot components...
+```
+
+<img src="NetRep_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+```
+##  Cleaning up temporary objects...
+##  Done!
 ```
 
 A full list of function and arguments for these individual plots can be found
@@ -262,7 +369,8 @@ at `help("plotTopology")`.
 Finally, the network properties for each module can be calculated in both 
 datasets through the `networkProperties` function:
 
-```{r, cache=TRUE}
+
+```r
 properties <- networkProperties(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, 
@@ -275,19 +383,72 @@ properties <- networkProperties(
 )
 ```
 
+```
+##  Validating user input...
+##    Running on 7 cores.
+##    Checking matrices for non-finite values...
+##  User input ok!
+##  Calculating properties for:
+##  Cleaning up temporary objects...
+##  Done!
+```
+
 These properties can be useful for downstream analysis. For example, the 
 module summary profiles can be used to assess associations between modules and
 external information, e.g. case or control status:
 
-```{r}
+
+```r
 # The summary profile of module 1 in the discovery dataset:
 properties[["discovery"]][["1"]][["summary"]]
+```
+
+```
+##  Discovery_1  Discovery_2  Discovery_3  Discovery_4  Discovery_5  Discovery_6  Discovery_7 
+##  -0.15173019  -0.09817810  -0.10356266  -0.21351111  -0.06424053  -0.25787365  -0.06191222 
+##  Discovery_8  Discovery_9 Discovery_10 Discovery_11 Discovery_12 Discovery_13 Discovery_14 
+##  -0.05886898   0.04544493   0.16790065  -0.16163254  -0.07158769  -0.16775343   0.39457572 
+## Discovery_15 Discovery_16 Discovery_17 Discovery_18 Discovery_19 Discovery_20 Discovery_21 
+##   0.10762551   0.25872801   0.01187731   0.57266243   0.15737963   0.02368060  -0.07088476 
+## Discovery_22 Discovery_23 Discovery_24 Discovery_25 Discovery_26 Discovery_27 Discovery_28 
+##   0.03726126  -0.13770047  -0.01978039  -0.06336512  -0.06360727  -0.30044215   0.14682841 
+## Discovery_29 Discovery_30 
+##   0.07036710   0.07229971
+```
+
+```r
 # Along with the proportion of variance in the module data explained by the 
 # summary profile:
 properties[["discovery"]][["1"]][["coherence"]]
+```
 
+```
+## [1] 0.585781
+```
+
+```r
 # The same information in the test dataset:
 properties[["test"]][["1"]][["summary"]]
+```
+
+```
+##       Test_1       Test_2       Test_3       Test_4       Test_5       Test_6       Test_7 
+## -0.099957918  0.061501299  0.043541623  0.051055323  0.056572949  0.136605203  0.116491092 
+##       Test_8       Test_9      Test_10      Test_11      Test_12      Test_13      Test_14 
+## -0.395294200 -0.099564626  0.092715774 -0.005526985  0.256963062  0.028746029 -0.076793357 
+##      Test_15      Test_16      Test_17      Test_18      Test_19      Test_20      Test_21 
+## -0.435677499  0.100475978 -0.339161521 -0.195830382 -0.104643904  0.050046780  0.238180614 
+##      Test_22      Test_23      Test_24      Test_25      Test_26      Test_27      Test_28 
+##  0.144114251  0.211841029  0.228291634 -0.171340087 -0.188991911 -0.093239829  0.063972325 
+##      Test_29      Test_30 
+##  0.278339356  0.046567899
+```
+
+```r
 properties[["test"]][["1"]][["coherence"]]
+```
+
+```
+## [1] 0.6187688
 ```
 

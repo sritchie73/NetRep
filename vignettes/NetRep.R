@@ -20,6 +20,14 @@ data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 network_list <- list(discovery=discovery_network, test=test_network)
 
+## ---- cache=TRUE----------------------------------------------------------------------------------
+# NetRep will assess module preservation for *all* modules by default
+preservation <- modulePreservation(
+ data=data_list, correlation=correlation_list, network=network_list,
+ moduleAssignments=module_labels, nPerm=10000, discovery="discovery", 
+ test="test"
+)
+
 ## -------------------------------------------------------------------------------------------------
 # Each row corresponds to a module
 preservation$observed
@@ -56,6 +64,18 @@ plotCorrelation(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=0:4, discovery="discovery",
   test="discovery", symmetric=TRUE, orderModules=FALSE
+)
+
+## ---- cache=TRUE----------------------------------------------------------------------------------
+properties <- networkProperties(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, 
+  # Only calculate for the reproducible modules
+  modules=c(1,4),
+  # what dataset were the modules identified in?
+  discovery="discovery", 
+  # which datasets do we want to calculate their properties in?
+  test=c("discovery", "test")
 )
 
 ## -------------------------------------------------------------------------------------------------
