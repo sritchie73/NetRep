@@ -11,6 +11,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, echo=FALSE, cache=FALSE}
+options(width = 100)
+```
+
 ## Introduction
 
 The *NetRep* package provides functions for assessing the reproducibility and
@@ -114,7 +118,7 @@ for more details).
 
 First, we will convert the tutorial data into the `bigMatrix` format:
 
-```{r}
+```{r, message=FALSE}
 # Convert the data to the 'bigMatrix' format:
 discovery_data <- as.bigMatrix(discovery_data)
 discovery_correlation <- as.bigMatrix(discovery_correlation)
@@ -145,10 +149,19 @@ of the four simulated modules in the test dataset. We recommend running the
 procedure with at least 10,000 permutations to ensure the permutation procedure
 generates representative null distributions for each statistic.
 
-On a single core machine this should take an hour to an hour and a half to run.
 *NetRep* will automatically detect the number of cores and use all but one. 
 Alternatively, the number of cores can be set by the user using the `nCores`
-argument. For a full list of arguments see `help("modulePreservation")`.
+argument. For a full list of arguments see `help("modulePreservation")`. On a 
+single core machine the following should take an hour to an hour and a half 
+to run. On a laptop with 8 cores it took just under 10 minutes when parallelised
+over seven cores.
+
+**Note:** scalable memory usage depends on clean R sessions. All objects in the 
+R session are copied to each parallel core, with the exception of the
+`bigMatrix` objects which are stored in shared memory. Provided there are no
+additional objects in the R session only the memory required to store each 
+`bigMatrix` in memory once will be used, along with approximately additional 200
+MB per core used by each vanilla R session.
 
 ```{r, cache=TRUE}
 # NetRep will assess module preservation for *all* modules by default
@@ -167,3 +180,112 @@ preservation statistic:
 preservation$observed
 preservation$p.values
 ```
+
+Details for each statistic are provided in the documentation (see 
+`help("modulePreservation")`).
+
+Here, we will consider a module to be reprocible if all statistics have P < 0.01:
+
+```{r}
+max_pval <- apply(preservation$p.value, 1, max)
+max_pval
+```
+
+Only modules 1 and 4 are reproducible at this significance threshold.
+
+## Visualising network modules
+
+The topological properties that contribute to each module preservation statistic
+can be visualised using `plotModule`. First, let's look at the four module in
+the *discovery* dataset:
+
+```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+plotModule(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, modules=c(1,2,3,4),
+  discovery="discovery", test="discovery"
+)
+```
+
+The `discovery` argument tells `plotModule` which dataset the modules were 
+identified in, while the `test` argument tells `plotModule` which dataset to
+calculate those modules' properties in. By default, nodes are ordered from left
+to right in decreasing order of *weighted degree* and modules are ordered by the
+similarity of their summary profiles. For visualisation, the *weighted degree* 
+is normalised within each module by the maximum value since the *weighted degree*
+of nodes can be dramatically different for modules of different sizes.
+
+If we set `test = "test"`, then `plotModule` will show the properties in the 
+*test* dataset while keeping the ordering of nodes and modules the same as if 
+calculated in the `discovery` dataset:
+
+```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+plotModule(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, modules=c(1,2,3,4),
+  discovery="discovery", test="test"
+)
+```
+
+There are many arguments to adjust the way modules are drawn (see 
+`help("plotModule"))`). For example, we can change the previous plot so that 
+nodes are ordered within the `test` dataset and modules are drawn in the order 
+provided rather than by the similarity of their summary profiles:
+
+```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+plotModule(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, modules=c(1,2,3,4),
+  discovery="discovery", test="test", orderNodesBy="test", orderModules=FALSE
+)
+```
+
+We can also plot individual components of the plot separately. For example, 
+a heatmap of the correlation structure:
+
+```{r, dev="png", fig.height=7, fig.width=7, fig.align="center"}
+par(mar=c(6,6,6,4)+0.1)
+plotCorrelation(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, modules=0:4, discovery="discovery",
+  test="discovery", symmetric=TRUE, orderModules=FALSE
+)
+```
+
+A full list of function and arguments for these individual plots can be found
+at `help("plotTopology")`.
+
+## Calculating the network properties
+
+Finally, the network properties for each module can be calculated in both 
+datasets through the `networkProperties` function:
+
+```{r, cache=TRUE}
+properties <- networkProperties(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, 
+  # Only calculate for the reproducible modules
+  modules=c(1,4),
+  # what dataset were the modules identified in?
+  discovery="discovery", 
+  # which datasets do we want to calculate their properties in?
+  test=c("discovery", "test")
+)
+```
+
+These properties can be useful for downstream analysis. For example, the 
+module summary profiles can be used to assess associations between modules and
+external information, e.g. case or control status:
+
+```{r}
+# The summary profile of module 1 in the discovery dataset:
+properties[["discovery"]][["1"]][["summary"]]
+# Along with the proportion of variance in the module data explained by the 
+# summary profile:
+properties[["discovery"]][["1"]][["coherence"]]
+
+# The same information in the test dataset:
+properties[["test"]][["1"]][["summary"]]
+properties[["test"]][["1"]][["coherence"]]
+```
+
