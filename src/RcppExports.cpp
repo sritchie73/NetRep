@@ -6,16 +6,6 @@
 
 using namespace Rcpp;
 
-// CheckFinite
-void CheckFinite(SEXP pDat);
-RcppExport SEXP NetRep_CheckFinite(SEXP pDatSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
-    CheckFinite(pDat);
-    return R_NilValue;
-END_RCPP
-}
 // CorStats
 List CorStats(SEXP pCorD, IntegerVector discIndices, SEXP pCorT, IntegerVector testIndices);
 RcppExport SEXP NetRep_CorStats(SEXP pCorDSEXP, SEXP discIndicesSEXP, SEXP pCorTSEXP, SEXP testIndicesSEXP) {
@@ -75,6 +65,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
     __result = Rcpp::wrap(BigRange(pDat));
     return __result;
+END_RCPP
+}
+// CheckFinite
+void CheckFinite(SEXP pDat);
+RcppExport SEXP NetRep_CheckFinite(SEXP pDatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
+    CheckFinite(pDat);
+    return R_NilValue;
 END_RCPP
 }
 // Scale
