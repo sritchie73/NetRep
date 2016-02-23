@@ -58,7 +58,7 @@ save.as.bigMatrix <- function(
   descFile <- paste0(backingname, ".desc")
   
   fullBinFile <- paste0(backingfile, ".bin")
-  fullDescFile <- paste0(backingfile, ".bin")
+  fullDescFile <- paste0(backingfile, ".desc")
   cnFile <- paste0(backingfile, "_colnames.txt")
   rnFile <- paste0(backingfile,  "_rownames.txt")
   
@@ -69,9 +69,13 @@ save.as.bigMatrix <- function(
            " in R and then the garbage collector ('gc') must be called")
     }
     file.remove(fullDescFile)
-    file.remove(cnFile)
-    file.remove(rnFile)
-    
+    # Files do not exist if matrix does not have row/column names
+    if (file.exists(cnFile)) {
+      file.remove(cnFile)
+    }
+    if (file.exists(rnFile)) {
+      file.remove(rnFile)
+    }
   }
   
   # Dimension names are saved separately from the big.matrix object.
@@ -220,7 +224,7 @@ read.bigMatrix <- function(
   descFile <- paste0(backingname, ".desc")
   
   fullBinFile <- paste0(backingfile, ".bin")
-  fullDescFile <- paste0(backingfile, ".bin")
+  fullDescFile <- paste0(backingfile, ".desc")
   cnFile <- paste0(backingfile, "_colnames.txt")
   rnFile <- paste0(backingfile,  "_rownames.txt")
   
@@ -231,8 +235,13 @@ read.bigMatrix <- function(
            " in R and then the garbage collector ('gc') must be called")
     }
     file.remove(fullDescFile)
-    file.remove(cnFile)
-    file.remove(rnFile)
+    # Files do not exist if matrix does not have row/column names
+    if (file.exists(cnFile)) {
+      file.remove(cnFile)
+    }
+    if (file.exists(rnFile)) {
+      file.remove(rnFile)
+    }
   }
   
   bm <- read.big.matrix(
