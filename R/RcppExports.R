@@ -46,6 +46,58 @@ CorStats <- function(pCorD, discIndices, pCorT, testIndices) {
     .Call('NetRep_CorStats', PACKAGE = 'NetRep', pCorD, discIndices, pCorT, testIndices)
 }
 
+#' Calculate the topological properties based on network edge weights
+#'
+#' @param pAdjacency SEXP container for the pointer to the adjacency matrix of
+#'   the interaction network.
+#' @param subsetIndices indices of the network subset of interest.
+#'   
+#' @return
+#'   A List containing:
+#'   \enumerate{
+#'     \item{\emph{weightedDegree}:}{The weighted within-module degree for each node.}
+#'     \item{\emph{averageEdgeWeight}:}{The mean absolute edge weight of the network subset.}
+#'   }
+#' @rdname NetProps-cpp
+NetProps <- function(pAdjacency, subsetIndices) {
+    .Call('NetRep_NetProps', PACKAGE = 'NetRep', pAdjacency, subsetIndices)
+}
+
+#' Get the range of a big.matrix
+#' 
+#' @description
+#'  \code{RangeSubset}: get the range of values in the column-subset of a 
+#'  big.matrix.
+#' 
+#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
+#' @param subsetIndices indices of the network subset of interest in 
+#'   \code{pDat}.
+#'   
+#' @rdname range-cpp
+RangeSubset <- function(pDat, subsetIndices) {
+    .Call('NetRep_RangeSubset', PACKAGE = 'NetRep', pDat, subsetIndices)
+}
+
+#' @name range-cpp
+#' @description
+#'   \code{BigRange}: get the range of values in a big.matrix
+#' 
+BigRange <- function(pDat) {
+    .Call('NetRep_BigRange', PACKAGE = 'NetRep', pDat)
+}
+
+#' Check the elements of a `big.matrix`
+#' 
+#' Are all the values finite? 
+#' 
+#' @param pDat SEXP container for the pointer to the 
+#'   \code{\link[bigmemory]{big.matrix}} to be checked.
+#'
+#' @rdname chekcFinite-cpp
+CheckFinite <- function(pDat) {
+    invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', pDat))
+}
+
 #' Get the module summary vector and the proportion of variance it explains
 #' 
 #' @param pDat SEXP container for the pointer to a scaled version of the 
@@ -100,58 +152,6 @@ CorStats <- function(pCorD, discIndices, pCorT, testIndices) {
 #'  
 DataProps <- function(pDat, subsetIndices) {
     .Call('NetRep_DataProps', PACKAGE = 'NetRep', pDat, subsetIndices)
-}
-
-#' Calculate the topological properties based on network edge weights
-#'
-#' @param pAdjacency SEXP container for the pointer to the adjacency matrix of
-#'   the interaction network.
-#' @param subsetIndices indices of the network subset of interest.
-#'   
-#' @return
-#'   A List containing:
-#'   \enumerate{
-#'     \item{\emph{weightedDegree}:}{The weighted within-module degree for each node.}
-#'     \item{\emph{averageEdgeWeight}:}{The mean absolute edge weight of the network subset.}
-#'   }
-#' @rdname NetProps-cpp
-NetProps <- function(pAdjacency, subsetIndices) {
-    .Call('NetRep_NetProps', PACKAGE = 'NetRep', pAdjacency, subsetIndices)
-}
-
-#' Get the range of a big.matrix
-#' 
-#' @description
-#'  \code{RangeSubset}: get the range of values in the column-subset of a 
-#'  big.matrix.
-#' 
-#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-#' @param subsetIndices indices of the network subset of interest in 
-#'   \code{pDat}.
-#'   
-#' @rdname range-cpp
-RangeSubset <- function(pDat, subsetIndices) {
-    .Call('NetRep_RangeSubset', PACKAGE = 'NetRep', pDat, subsetIndices)
-}
-
-#' @name range-cpp
-#' @description
-#'   \code{BigRange}: get the range of values in a big.matrix
-#' 
-BigRange <- function(pDat) {
-    .Call('NetRep_BigRange', PACKAGE = 'NetRep', pDat)
-}
-
-#' Check the elements of a `big.matrix`
-#' 
-#' Are all the values finite? 
-#' 
-#' @param pDat SEXP container for the pointer to the 
-#'   \code{\link[bigmemory]{big.matrix}} to be checked.
-#'
-#' @rdname chekcFinite-cpp
-CheckFinite <- function(pDat) {
-    invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', pDat))
 }
 
 #' Scale a matrix by its rows

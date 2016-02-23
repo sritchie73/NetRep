@@ -368,7 +368,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
         nCores <- nCores + 1
       }
         
-      cl <- parallel::makeCluster(nCores)
+      cl <- parallel::makeCluster(nCores, type="PSOCK")
       doParallel::registerDoParallel(cl)
       
       vCat(verbose, 1, "Running on", workerCores, "cores.")
@@ -444,8 +444,12 @@ setupParallel <- function(nCores, verbose, reporterCore) {
 #' 
 cleanupCluster <- function(cluster, predef) {
   if (!is.null(cluster)) {
-    if (suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
+    if (suppressWarnings(suppressMessages(requireNamespace("parallel")))) {
+      # Clobber the backend
       parallel::stopCluster(cluster)
+      cl <- parallel::makeCluster(1, type="PSOCK")
+      doParallel::registerDoParallel(cl)
+      closeAllConnections()
     }
   } else if (!predef) {
     if (suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
