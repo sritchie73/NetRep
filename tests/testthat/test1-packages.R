@@ -2,7 +2,7 @@ context("Checking package dependencies")
 flag <- FALSE
 
 # First check R version
-Rversion <- "3.2.2"
+Rversion <- "3.2.3"
 thisVersion <- paste(R.Version()[["major"]], R.Version()[["minor"]], sep=".")
 if (thisVersion > Rversion) {
   if (!flag) cat("\n")
@@ -16,12 +16,12 @@ if (thisVersion > Rversion) {
 
 # Check the dependencies
 expectedVersionsDepends <- c(
-  bigmemory="4.5.8",
+  bigmemory="4.5.10",
   foreach="1.4.3",
   iterators="1.0.8",
   itertools="0.1.3",
   Rcpp="0.12.3",
-  utils="3.2.2",
+  utils="3.2.3",
   statmod="1.4.24",
   RcppArmadillo="0.6.500.4.0",
   BH="1.60.0.1",
