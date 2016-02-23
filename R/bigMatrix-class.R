@@ -67,6 +67,11 @@ setClassUnion("optional.dimnames", c("character", "NULL"))
 #' application to crash. Storing the row and column names separately also offers
 #' speed improvements for computation on the matrices in C++.
 #' }
+#' \subsection{Memory usage:}{
+#'   Provided there are no additional objects in the R session only the memory 
+#'   required to store each matrix once will be used, along with an additional 
+#'   200 MB per core used by each vanilla R session.
+#' }
 #' 
 #' @slot descriptor path of the descriptor file for the big.matrix.
 #' @slot matrix either the big.matrix object, or empty, depending on the value

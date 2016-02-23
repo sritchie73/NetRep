@@ -75,17 +75,16 @@
 #'   provided as regular \code{\link[base]{matrix}} objects, in which case they 
 #'   will be temporarily converted to \code{bigMatrix} objects. \strong{This is 
 #'   not recommended}, as each matrix will be copied into memory of each 
-#'   parallel R session, resulting in much higher memory usage (\code{bigMatrix}
-#'   objects can be simultaneously accessed from multiple R sessions with no 
-#'   additional memory overhead), and increased computation time for the 
-#'   conversion and copying processes. It is therefore strongly recommended that
-#'   the user save their data separately as \code{\link{bigMatrix}} objects
-#'   prior to running the permutation procedure or using any other package
-#'   function. This is also useful for other analyses, as \code{bigMatrix} 
-#'   objects can be instantaneously loaded into any future R session.
+#'   parallel R session, resulting in much higher memory usage (see section on
+#'   Memory usage ), and increased computation time for the conversion and
+#'   copying processes. It is therefore strongly recommended that the user save
+#'   their data separately as \code{\link{bigMatrix}} objects prior to running
+#'   the permutation procedure or using any other package function. This is also
+#'   useful for other analyses, as \code{bigMatrix} objects can be
+#'   instantaneously loaded into any future R session.
 #'   
 #'   Alternatively, the \code{data}, \code{correlation}, and \code{network} 
-#'   arguments will also accept file paths to tabular data or \code{bigMatrix}
+#'   arguments will also accept file paths to tabular data or \code{bigMatrix} 
 #'   backingfiles.
 #' }
 #' \subsection{Memory usage:}{

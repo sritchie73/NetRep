@@ -273,20 +273,29 @@ heatmap.
   \code{data}, and \code{correlation} arguments do not need to be wrapped in
   a list.
 }
-\subsection{'bigMatrix' vs. 'matrix' input data:}{
-  Although the function expects \code{\link{bigMatrix}} 
-  data, regular 'matrix' objects are also accepted. In this case, the 
-  'matrix' data is temporarily converted to 'bigMatrix' by the function. This
-  conversion process involves writing out each matrix as a binary file on 
-  disk, which can take a long time for large datasets. It is strongly 
-  recommended for the user to store their data as 'bigMatrix' objects, as the
-  \link{modulePreservation} function, \link[=plotModule]{plotting} 
-  \link[=plotTopology]{functions}, \link[=nodeOrder]{node} and 
-  \link[=sampleOrder]{sample} ordering functions also expect 'bigMatrix'
-  objects. Further, 'bigMatrix' objects have a number of benefits, including 
-  instantaneous load time from any future R session, and parallel access from
-  mutliple independent R sessions. Methods are provided for 
-  converting to, loading in, and writing out \code{\link{bigMatrix}} objects.
+\subsection{'bigMatrix' input data:}{
+  Although the \code{data}, \code{correlation}, and \code{network} arguments 
+  expect data to be provided in the \code{\link{bigMatrix}}, they can be 
+  provided as regular \code{\link[base]{matrix}} objects, in which case they 
+  will be temporarily converted to \code{bigMatrix} objects. \strong{This is 
+  not recommended}, as each matrix will be copied into memory of each 
+  parallel R session, resulting in much higher memory usage (see section on
+  Memory usage ), and increased computation time for the conversion and
+  copying processes. It is therefore strongly recommended that the user save
+  their data separately as \code{\link{bigMatrix}} objects prior to running
+  the permutation procedure or using any other package function. This is also
+  useful for other analyses, as \code{bigMatrix} objects can be
+  instantaneously loaded into any future R session.
+  
+  Alternatively, the \code{data}, \code{correlation}, and \code{network} 
+  arguments will also accept file paths to tabular data or \code{bigMatrix} 
+  backingfiles.
+}
+\subsection{Memory usage:}{
+  Provided there are no additional objects in the R session the
+  permutation procedure will use only the memory required to store each 
+  matrix once, along with an additional 200 MB per core used by each vanilla
+  R session.
 }
 \subsection{Node, sample, and module ordering:}{
   By default, nodes are ordered in decreasing order of \emph{weighted degree}

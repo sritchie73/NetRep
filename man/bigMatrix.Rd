@@ -137,6 +137,11 @@ session, and R sessions can be reloaed within RStudio without causing the
 application to crash. Storing the row and column names separately also offers
 speed improvements for computation on the matrices in C++.
 }
+\subsection{Memory usage:}{
+  Provided there are no additional objects in the R session only the memory 
+  required to store each matrix once will be used, along with an additional 
+  200 MB per core used by each vanilla R session.
+}
 }
 \section{Slots}{
 
