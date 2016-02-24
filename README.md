@@ -44,13 +44,34 @@ test_package("NetRep")
 `NetRep` and its dependencies require several third party libraries to be
 installed. If not found, installation of the package will fail.
 
-The `g++` compiler is required for the `bigmemory` package to install, 
-`gfortran` is required for the `statmod` package to install, and a `BLAS` 
-library is required for `RcppArmadillo` to install.
+ 1. A compiler with `C++11` support
+ 2. A compiler with `fortran` support
+ 3. `BLAS` and `LAPACK` libraries.
 
-BLAS libraries must be installed prior to the installation of R, otherwise R 
-won't link to them correctly and `RcppArmadillo` will fail to install. You've 
-encountered this error if `RcppArmadillo` partially compiles, but then throws 
-an error about failing to link to `-llapack`. LAPACK libraries come bundled with
-most BLAS libraries.
+### OSX
+
+The necessary `fortran` and `C++11` compilers are provided with the `Xcode` 
+application and subsequent installation of `Command line tools`. The most
+recent version of OSX should prompt you to install these tools when 
+installing the `devtools` package. Unfortunately, Apple does not allow
+users on older versions of OSX to install these tools without upgrading
+to the most recent version of OSX. 
+
+### Windows
+
+The necessary `fortran` and `C++11` compilers are provided with the `Rtools`
+program. We recommend installation of `NetRep` through `RStudio`, which 
+should prompt the user and install these tools when running 
+`devtools::install_github("InouyeLab/NetRep")`. This command may need to be
+run again after `Rtools` finishes installing.
+
+### Linux
+
+If installation fails on linux it is likely that you will need to install
+the necessary compilers and libraries, then reinstall R. For `C++` and 
+`fortran` compilers we recommend installing `g++` and `gfortran` from the
+appropriate package manager for your operating system (e.g. `apt-get` for 
+Ubuntu). `BLAS` and `LAPACK` libraries can be installed by installing 
+`libblas-dev` and `liblapack-dev`. Note that these libraries **must** be
+installed prior to installation of R.
 
