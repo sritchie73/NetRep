@@ -103,21 +103,47 @@
 #' }
 #' \subsection{Node, sample, and module ordering:}{
 #'   By default, nodes are ordered in decreasing order of \emph{weighted degree}
-#'   in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
-#'   This facilitates the visual comparison of modules across datasets, as the 
-#'   node ordering will be preserved. Missing nodes are colored in grey. If
-#'   \code{orderNodesBy} is "test" nodes will instead be ordered by 
-#'   weighted degree in the \code{test} dataset. If "none" nodes are 
-#'   drawn in the order they are provided in the drawn dataset.
+#'   in the \code{discovery} dataset (see \code{\link{nodeOrder}}). Missing 
+#'   nodes are colored in grey. This facilitates the visual comparison of 
+#'   modules across datasets, as the node ordering will be preserved. 
 #'   
-#'   When multiple modules are specified, modules are ordered by the similarity
-#'   of their summary vectors in the drawn dataset. To disable this behaviour, 
-#'   set \code{orderModules} to \code{FALSE}.
+#'   Alternatively, a vector containing the names or indices of one or more
+#'   datasets can be provided to the \code{orderNodesBy} argument. If a single
+#'   dataset is provided, then nodes will be ordered in decreasing order of
+#'   \emph{weighted degree} in that dataset. If multiple datasets are provided
+#'   then the \emph{weighted degree} will be calculated in each dataset and
+#'   nodes will be ordered in decreasing order of average weighted degree. This
+#'   is useful for obtaining a robust ordering of nodes by importance across
+#'   independent datasets where a module is reproducible.
 #'   
-#'   Sample ordering only applies to \code{plotData} and 
-#'   \code{plotModuleSummary}. By default, samples are ordered in descending
-#'   order of the module summary vector in the drawn dataset for the left-most 
-#'   module appearing on the plot (see \code{\link{sampleOrder}}.
+#'   Ordering of nodes by \emph{weighted degree} can be suppressed by setting
+#'   \code{orderNodesBy} to \code{NA}, in which case nodes will be ordered as in
+#'   the matrices provided in the \code{data}, \code{correlation} and
+#'   \code{network} arguments.
+#'   
+#'   When multiple modules are drawn, modules are ordered by the similarity
+#'   of their summary vectors in the drawn dataset (specified by the \code{test} 
+#'   argument) \code{test} dataset. If \code{orderModules} is \code{FALSE} then
+#'   modules will be drawn in the order specified in the \code{modules} 
+#'   argument.
+#'   
+#'   By default, samples in the data heatmap drawn by \code{plotData} and the 
+#'   bar plot drawn by \code{plotModuleSummary} are ordered in descending order
+#'   of \emph{module summary} in the drawn dataset (specified by the \code{test}
+#'   argument). If multiple modules are drawn, samples are ordered as per the
+#'   left-most module on the plot.
+#'   
+#'   Alternatively, a vector containing the name or index of another dataset may
+#'   be provided to the \code{orderSamplesBy} argument. In this case, samples
+#'   will be ordered in descending order of \emph{module summary} in the 
+#'   specified dataset. This is useful when comparing different measurements 
+#'   across samples, for example, gene expression data obtained from multiple 
+#'   tissues samples across the same individuals. Samples that are not present 
+#'   in the drawn dataset will be colored in grey.
+#'   
+#'   Order of samples by \emph{module summary} can be suppressed by setting 
+#'   \code{orderSamplesBy} to \code{NA}, in which case samples will be order as
+#'   in the matrix provided to the \code{data} argument for the drawn dataset.
 #' }
 #' \subsection{Normalised degree:}{
 #'   The weighted degree is normalised by the maximum weighted degree in

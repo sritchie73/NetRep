@@ -76,10 +76,11 @@ NULL
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
 #'
-#' @param orderNodesBy one of "discovery", "test" or "none". Controls how nodes
-#' are ordered on the plot (see details).
-#' @param orderSamplesBy one of "discovery", "test" or "none". Controls how 
-#' samples are ordered on the plot (see details).
+#' @param orderNodesBy \code{NULL} (default), \code{NA}, or a vector of dataset
+#'  names or indices. Controls how nodes are ordered on the plot (see details).
+#' @param orderSamplesBy \code{NULL} (default), \code{NA}, or a vector 
+#'  containing a single dataset name or index. Controls how samples are ordered 
+#'  on the plot (see details).
 #' @param plotNodeNames logical; controls whether the node names are 
 #'  rendered on the bottom axis.
 #' @param plotSampleNames logical; controls whether the sample names are 
