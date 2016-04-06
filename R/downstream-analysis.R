@@ -850,22 +850,24 @@ sampleOrder <- function(
 #' @return list structure of ordered nodes.
 sampleOrderInternal <- function(props, verbose, na.rm) {
   vCat(verbose, 0, "Ordering samples...")
-  res <- lapply(props, function(discProps) {
-    lapply(discProps, function(testProps) {
-      lapply(testProps, function(modProps) {
-        summary <- modProps[["summary"]]
-        if (na.rm) {
-          summary <- na.omit(summary)
+  for (ii in seq_along(props)) {
+    for (jj in seq_along(props[[ii]])) {
+      for (kk in seq_along(props[[ii]][[jj]])) {
+        if (!is.null(props[[ii]][[jj]][[kk]])) {
+          summary <- props[[ii]][[jj]][[kk]][["summary"]]
+          if (na.rm) {
+            summary <- na.omit(summary)
+          }
+          summaryOrder <- order(summary, decreasing=TRUE, na.last=TRUE)
+          
+          if(is.null(names(summary))) {
+            props[[ii]][[jj]][[kk]] <- summaryOrder
+          } else {
+            props[[ii]][[jj]][[kk]] <- names(summary)[summaryOrder]
+          }
         }
-        summaryOrder <- order(summary, decreasing=TRUE, na.last=TRUE)
-        
-        if(is.null(names(summary))) {
-          return(summaryOrder)
-        } else {
-          return(names(summary)[summaryOrder])
-        }
-      })
-    })
-  })
-  return(res)
+      }
+    }
+  }
+  return(props)
 }
