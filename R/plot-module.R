@@ -311,7 +311,7 @@ plotModule <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
 
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -321,7 +321,7 @@ plotModule <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -354,7 +354,7 @@ plotModule <- function(
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
         scaledData, correlation, network, moduleAssignments, 
-        modules, discovery, discAsTest, datasetNames, FALSE
+        modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
       )
     }
     sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)

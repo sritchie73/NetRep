@@ -195,7 +195,7 @@ networkProperties <- function(
   # Calculate the network properties
   res <- with(finput, {
     netPropsInternal(scaledData, correlation, network, moduleAssignments, 
-                     modules, discovery, test, datasetNames, verbose)
+                     modules, discovery, test, nDatasets, datasetNames, verbose)
   })
   
   # Simplify the output data structure where possible
@@ -225,13 +225,15 @@ networkProperties <- function(
 #' @param discovery \code{'discovery'} after processing by
 #'   \code{'processInput'}.
 #' @param test \code{'test'} after processing by \code{'processInput'}.
+#' @param nDatasets a vector containing the total number of input datasets, 
+#'  returned by \code{'processInput'}.
 #' @param datasetNames a vector of dataset names returned by
 #'   \code{'processInput'}.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #'   
 netPropsInternal <- function(
   scaledData, correlation, network, moduleAssignments, modules, discovery, test,
-  datasetNames, verbose
+  nDatasets, datasetNames, verbose
 ) {
   #-----------------------------------------------------------------------------
   # Set up variables for running in parallel
@@ -525,7 +527,7 @@ nodeOrder <- function(
   props <- with(finput, { 
     netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, test, datasetNames, verbose
+      modules, discovery, test, nDatasets, datasetNames, verbose
     ) 
   })
   
@@ -800,7 +802,7 @@ sampleOrder <- function(
   # properties though, so we can speed things up by ignoring them
   props <- with(finput, {
     netPropsInternal(scaledData, correlation, NULL, moduleAssignments, 
-                     modules, discovery, test, datasetNames, verbose)
+                     modules, discovery, test, nDatasets, datasetNames, verbose)
   })
 
   res <- sampleOrderInternal(props, verbose, na.rm)
