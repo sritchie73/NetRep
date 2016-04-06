@@ -486,14 +486,14 @@ nodeOrder <- function(
   tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   
+  vCat(verbose, 0, "Validating user input...")
+  
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
     cleanupCluster(par$cluster, par$predef)
   }, add=TRUE)
-  
-  vCat(verbose, 0, "Validating user input...")
   
   if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
     stop("'na.rm' must be either 'TRUE' or 'FALSE'")
@@ -560,7 +560,7 @@ nodeOrder <- function(
 
   # Simplify the output data structure where possible
   if (simplify) {
-    res <- simplifyList(res, depth=2)
+    res <- simplifyList(res, depth=3)
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
   res
@@ -580,19 +580,23 @@ nodeOrder <- function(
 #' @return list structure of ordered nodes.
 nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
   vCat(verbose, 0, "Ordering nodes...")
-  res <- lapply(props, function(discProps) { # For each discovery dataset 
-    r1 <- lapply(discProps, function(testProps) {  # For each test dataset
+  for (ii in seq_along(props)) {
+    for (jj in seq_along(props[[ii]])) {
+      hasProps <- which(!sapply(props[[ii]][[jj]], is.null))
+      if (length(hasProps) == 0) {
+        next
+      }
       # First get module order
-      if (length(testProps) > 1 && orderModules) {
-        # Order modules by similarity
+      if (length(hasProps) > 1 && orderModules) {
+        modProps <- props[[ii]][[jj]][hasProps]
         
         # First get the summary profiles for each module
-        summaries <- matrix(0, ncol=length(testProps), 
-                            nrow=length(testProps[[1]][["summary"]]))
-        colnames(summaries) <- names(testProps)
-        rownames(summaries) <- names(testProps[[1]][["summary"]])
-        for (mi in seq_along(testProps)) {
-          summaries[,mi] <- testProps[[mi]][["summary"]]
+        summaries <- matrix(0, ncol=length(hasProps), 
+                            nrow=length(modProps[[1]][["summary"]]))
+        colnames(summaries) <- names(modProps)
+        rownames(summaries) <- names(modProps[[1]][["summary"]])
+        for (mi in seq_along(modProps)) {
+          summaries[,mi] <- modProps[[mi]][["summary"]]
         }
         
         # Identify modules where no nodes are present in the test dataset
@@ -604,46 +608,34 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
         
         # Cluster modules that do have summary profiles
         clusteredMods <- hclust(as.dist(1-cor(summaries)))
-        moduleOrder <- colnames(summaries)[clusteredMods$order]
+        hasProps <- colnames(summaries)[clusteredMods$order]
         
         # Add the 'NA' modules
-        moduleOrder <- c(moduleOrder, na.mods)
-      } else {
-        # Otherwise order as is
-        moduleOrder <- names(testProps)
+        hasProps  <- c(hasProps , na.mods)
       }
       
-      # next order nodes within each module
-      nodeOrder <- foreach(mi = moduleOrder) %do% {
-        nodeDegree <- testProps[[mi]][["degree"]]
+      # order nodes within each module
+      modProps <- props[[ii]][[jj]][hasProps]
+      for (kk in rev(seq_along(modProps))) {
+        nodeDegree <- modProps[[kk]][["degree"]]
         sortedNodes <- sort(nodeDegree, decreasing=TRUE, na.last=TRUE)
-        sortedNodes
-      }
-      names(nodeOrder) <- moduleOrder
-      
-      # Remove missing nodes and modules 
-      if (na.rm) {
-        for (ii in rev(seq_along(nodeOrder))) {
-          nodeOrder[[ii]] <- na.omit(nodeOrder[[ii]])
-          if (length(nodeOrder[[ii]]) == 0) {
-            nodeOrder[[ii]] <- NULL
+        # Remove missing nodes and modules
+        if (na.rm) {
+          sortedNodes <- na.omit(sortedNodes)
+          if (length(sortedNodes) == 0) {
+            sortedNodes <- NULL
           }
         }
+        modProps[[kk]] <- names(sortedNodes)
       }
-      
-      # Now just get the names
-      for (ii in seq_along(nodeOrder)) {
-        nodeOrder[[ii]] <- names(nodeOrder[[ii]])
-      }
-      
       if (simplify) {
-        nodeOrder <- unlist(nodeOrder)
-        names(nodeOrder) <- NULL
+        modProps <- unlist(modProps)
+        names(modProps) <- NULL
       }
-      return(nodeOrder)
-    })
-  })
-  return(res)
+      props[[ii]][[jj]] <- modProps
+    }
+  }
+  return(props)
 }
 
 #' Order samples within a network.
