@@ -564,7 +564,7 @@ processInput <- function(discovery, test, network, correlation, data,
   if (!is.null(names(network))) {
     datasetNames <- structure(names(network), names=names(network))
   } else {
-    datasetNames <- NULL
+    datasetNames <- paste0("Dataset", seq_len(nDatasets))
   }
 
   return(list(
