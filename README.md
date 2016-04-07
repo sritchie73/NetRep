@@ -47,10 +47,10 @@ test_package("NetRep")
 Older versions of NetRep can be installed by specifying the version number in the `ref` argument:
 
 ```{r}
-install_github("InouyeLab/NetRep", ref="v0.54.0")
+install_github("InouyeLab/NetRep", ref="v0.55.0")
 ```
 
-Versions prior to 0.54.0 should be treated as unstable (they contain bugs and are inaccurately documented). 
+Versions prior to 0.55.0 should be treated as unstable (they contain bugs and are inaccurately documented). 
 Versions prior to 0.21.1 cannot be installed via this command. 
 
 ## Installation troubleshooting
