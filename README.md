@@ -22,11 +22,16 @@ library(devtools)
 install_github("InouyeLab/NetRep")
 ```
 
+The latest developmental version can be installed by:
+
+```{r}
+install_github("InouyeLab/NetRep", ref="devel")
+```
+
 If you have `rmarkdown` installed, a package vignette (tutorial) is also 
 available to install:
 
 ```{r}
-library(devtools)
 install_github("InouyeLab/NetRep", build_vignettes=TRUE)
 vignette("NetRep")
 ```
@@ -38,6 +43,15 @@ To ensure the package has installed correctly and will run on your system, run t
 library(testthat)
 test_package("NetRep")
 ```
+
+Older versions of NetRep can be installed by specifying the version number in the `ref` argument:
+
+```{r}
+install_github("InouyeLab/NetRep", ref="v0.54.0")
+```
+
+Versions prior to 0.54.0 should be treated as unstable (they contain bugs and are inaccurately documented). 
+Versions prior to 0.21.1 cannot be installed via this command. 
 
 ## Installation troubleshooting
 
