@@ -172,7 +172,7 @@ processInput <- function(discovery, test, network, correlation, data,
   dataNames <- c(dataNames, names(network))
   dataNames <- unique(dataNames)
   
-  nDatasets <- max(nDatasets, length(dataNames))
+  nDatasets <- max(c(nDatasets, length(dataNames), length(network)))
   
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
   correlation <- verifyDatasetOrder(correlation, "correlation", dataNames, nDatasets)
