@@ -418,7 +418,7 @@ plotData <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -449,7 +449,7 @@ plotData <- function(
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
-    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
+    sampleOrder <- seq_along(simplifyList(testProps[[di]][[ti]], 3)[[1]]$summary)
   } 
   # Case 3: order samples by their degree in the test network.
   else {
@@ -670,7 +670,7 @@ plotCorrelation <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -893,7 +893,7 @@ plotNetwork <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1122,7 +1122,7 @@ plotContribution <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1142,7 +1142,7 @@ plotContribution <- function(
   #-----------------------------------------------------------------------------
   vCat(verbose, 0, "rendering plot components...")
   
-  testProps <- testProps[[di]][[ti]]
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # node contribution
   nodeContribVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
@@ -1288,7 +1288,7 @@ plotDegree <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1308,7 +1308,7 @@ plotDegree <- function(
   #-----------------------------------------------------------------------------
   vCat(verbose, 0, "rendering plot components...")
   
-  testProps <- testProps[[di]][[ti]]
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # (Normalised) weighted degree vector
   wDegreeVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
@@ -1471,7 +1471,7 @@ plotSummary <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1502,7 +1502,7 @@ plotSummary <- function(
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
-    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
+    sampleOrder <- seq_along(simplifyList(testProps[[di]][[ti]], 3)[[1]]$summary)
   } 
   # Case 3: order samples by their degree in the test network.
   else {
@@ -1537,7 +1537,7 @@ plotSummary <- function(
   #-----------------------------------------------------------------------------
   vCat(verbose, 0, "rendering plot components...")
   
-  testProps <- testProps[[di]][[ti]]
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # Summary profile matrix
   summaries <- foreach(mi = moduleOrder, .combine=cbind) %do% {
