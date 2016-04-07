@@ -485,14 +485,13 @@ modulePreservation <- function(
 
   vCat(verbose, 0, "User input ok!")
   
-  # Set up return list 
-  res <- rep(list(NULL), nDatasets)
+  # Set up return list
+  res <- foreach(di = seq_len(nDatasets)) %do% {
+    res2 <- foreach(ti = seq_len(nDatasets)) %do% {}
+    names(res2) <- datasetNames
+    return(res2)
+  } 
   names(res) <- datasetNames
-  res <- lapply(res, function(x) { 
-    l <- rep(list(NULL), nDatasets)
-    names(l) <- datasetNames
-    l
-  })
   
   #-----------------------------------------------------------------------------
   # Set up variables for running module preservation analysis
@@ -770,17 +769,6 @@ modulePreservation <- function(
   }
   
   # Simplify the output data structure where possible
-  for (di in rev(seq_along(res))) {
-    for (ti in rev(seq_along(res[[di]]))) {
-      if (is.null(res[[di]][[ti]])) {
-        res[[di]][[ti]] <- NULL
-      }
-    }
-    if (is.null(res[[di]]) || length(res[[di]]) == 0) {
-      res[[di]] <- NULL
-    }
-  }
-
   if (simplify) {
     res <- simplifyList(res, depth=2)
   }
