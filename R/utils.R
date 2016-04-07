@@ -467,23 +467,49 @@ cleanupCluster <- function(cluster, predef) {
 #' 
 #' @return a list
 simplifyList <- function(l, depth) {
-  collapse <- function(l) {
-    if (length(l) == 1)
-      return(l[[1]])
-    return(l)
-  }
-  
-  # Recursively traverse until we hit the depth requested, then filter out NULL
-  # entries and collapse if length == 1.
+  # Recursively traverse until we hit the depth requested or we cant go deeper
   stopifnot(is.numeric(depth) && depth > 0)
   if (depth == 1) {
-    l <- collapse(l)
-    return(l)
-  } else {
-    for (i1 in rev(seq_along(l))) {
-      l[[i1]] <- simplifyList(l[[i1]], depth=depth-1)
-      l <- collapse(l)
+    if (is.null(l)) {
+      return(NULL)
     }
-    return(l)
+    # Delete empty leaf nodes
+    for (ii in rev(seq_along(l))) {
+      if (is.null(l[[ii]]))
+        l[[ii]] <- NULL
+    }
+    if (length(l) == 0) {
+      return(NULL)
+    } else if (length(l) == 1) {
+      return(l[[1]])
+    } else {
+      return(l) 
+    }
+  } else {
+    for (ii in rev(seq_along(l))) {
+      l[[ii]] <- simplifyList(l[[ii]], depth-1)
+    }
+    if (length(l) == 0) {
+      return(NULL)
+    } else if (length(l) == 1) {
+      return(l[[1]])
+    } else {
+      return(l) 
+    }
   }
+}
+
+#' Get a sorted list of module names
+#' 
+#' If module labels are numeric, sorts numerically, otherwise sorts 
+#' alphabetically.
+#' 
+#' @param modules a vector of module labels to sort
+#' @return a sorted vector   
+sortModuleNames <- function(modules) {
+  tryCatch({
+    modules[order(as.numeric(modules))]
+  }, warning=function(w) {
+    sort(modules)
+  })
 }

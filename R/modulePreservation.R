@@ -341,11 +341,16 @@
 #'      dataset.
 #'    }
 #'  }
+#'  When \code{simplify = TRUE} then the simplest possible structure will be 
+#'  returned. E.g. if module preservation is tested in only one dataset, then
+#'  the returned list will have only the above elements. 
 #'  
-#'  For example, \code{results[[1]][[2]][["p.values"]]} is the matrix of 
-#'  module preservation p-values when assessing the preservation of modules from
-#'  dataset 1 in dataset 2. If \code{simplify = TRUE} then the list structure 
-#'  will be simplified where possible.
+#'  When \code{simplify = FALSE} then a nested list of datasets will always be 
+#'  returned, i.e. each element at the top level and second level correspond to
+#'  a dataset, e.g. \code{results[["Dataset1"]][["Dataset2"]]} indicates an 
+#'  analysis where modules discovered in "Dataset1" are assessed for 
+#'  preservation in "Dataset2". Dataset comparisons which have not been 
+#'  assessed will contain \code{NULL}.
 #'  
 #' @seealso 
 #'   Functions for: 
@@ -485,14 +490,13 @@ modulePreservation <- function(
 
   vCat(verbose, 0, "User input ok!")
   
-  # Set up return list 
-  res <- rep(list(NULL), nDatasets)
+  # Set up return list
+  res <- foreach(di = seq_len(nDatasets)) %do% {
+    res2 <- foreach(ti = seq_len(nDatasets)) %do% {}
+    names(res2) <- datasetNames
+    return(res2)
+  } 
   names(res) <- datasetNames
-  res <- lapply(res, function(x) { 
-    l <- rep(list(NULL), nDatasets)
-    names(l) <- datasetNames
-    l
-  })
   
   #-----------------------------------------------------------------------------
   # Set up variables for running module preservation analysis
@@ -770,17 +774,6 @@ modulePreservation <- function(
   }
   
   # Simplify the output data structure where possible
-  for (di in rev(seq_along(res))) {
-    for (ti in rev(seq_along(res[[di]]))) {
-      if (is.null(res[[di]][[ti]])) {
-        res[[di]][[ti]] <- NULL
-      }
-    }
-    if (is.null(res[[di]]) || length(res[[di]]) == 0) {
-      res[[di]] <- NULL
-    }
-  }
-
   if (simplify) {
     res <- simplifyList(res, depth=2)
   }

@@ -336,7 +336,7 @@ plotModule <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
 
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -346,7 +346,7 @@ plotModule <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -356,7 +356,7 @@ plotModule <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -379,7 +379,7 @@ plotModule <- function(
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
         scaledData, correlation, network, moduleAssignments, 
-        modules, discovery, discAsTest, datasetNames, FALSE
+        modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
       )
     }
     sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)
@@ -387,7 +387,7 @@ plotModule <- function(
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
-    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
+    sampleOrder <- seq_along(simplifyList(testProps[[di]][[ti]], 3)[[1]]$summary)
   } 
   # Case 3: order samples by their degree in the test network.
   else {
@@ -433,7 +433,7 @@ plotModule <- function(
   # Set up other property vectors and datasets
   #-----------------------------------------------------------------------------
   
-  testProps <- testProps[[di]][[ti]] # collapse for easy access
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # (Normalised) weighted degree vector
   wDegreeVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {

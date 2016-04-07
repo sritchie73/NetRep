@@ -63,8 +63,20 @@ A nested list structure. At the top level, the list has one element per
  \code{'discovery'} dataset. Each of these elements is a list that has one
  element per \code{'test'} dataset analysed for that \code{'discovery'} 
  dataset. Each of these elements is a list that has one element per 
- \code{'modules'} specified, containing a vector of sample names or indices 
- for the requested module.'
+ \code{'modules'} specified, containing a vector of node names for the
+ requested module. When \code{simplify = TRUE} then the simplest possible 
+ structure will be returned. E.g. if the sample ordering are requested for 
+ in only one dataset, then a single vector of node labels will be returned. 
+ 
+When \code{simplify = FALSE} then a nested list of datasets will always be 
+returned, i.e. each element at the top level and second level correspond to 
+a dataset, and each element at the third level will correspond to modules 
+discovered in the dataset specified at the top level if module labels are 
+provided in the corresponding \code{moduleAssignments} list element. E.g. 
+\code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+order of samples calculated in "Dataset2", where "module1" was indentified
+in "Dataset1". Modules and datasets for which calculation of the sample
+order have not been requested will contain \code{NULL}.
 }
 \description{
 Get the order of samples within a module based on the module summary vector.
@@ -148,7 +160,8 @@ Get the order of samples within a module based on the module summary vector.
 }
 \examples{
 \dontrun{
-# load in example data, correlation, and network matrices for a discovery and test dataset:
+# load in example data, correlation, and network matrices for a discovery 
+# and test dataset:
 data("NetRep")
 
 # Convert them to the 'bigMatrix' format:

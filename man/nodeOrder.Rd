@@ -69,8 +69,20 @@ A nested list structure. At the top level, the list has one element per
  element per \code{'test'} dataset analysed for that \code{'discovery'} 
  dataset. Each of these elements is a list that has one element per 
  \code{'modules'} specified, containing a vector of node names for the
- requested module. If \code{simplify = TRUE}, then there will be a single
- vector of node names for each \code{'test'} dataset.
+ requested module. When \code{simplify = TRUE} then the simplest possible 
+ structure will be returned. E.g. if the node ordering are requested for 
+ module(s) in only one dataset, then a single vector of node labels will
+ be returned. 
+ 
+When \code{simplify = FALSE} then a nested list of datasets will always be 
+returned, i.e. each element at the top level and second level correspond to 
+a dataset, and each element at the third level will correspond to modules 
+discovered in the dataset specified at the top level if module labels are 
+provided in the corresponding \code{moduleAssignments} list element. E.g. 
+\code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+order of nodes calculated in "Dataset2", where "module1" was indentified in
+"Dataset1". Modules and datasets for which calculation of the node order 
+have not been requested will contain \code{NULL}.
 }
 \description{
 Order nodes in descending order of \emph{weighted degree} and order 
@@ -155,7 +167,8 @@ modules by the similarity of their summary vectors.
 }
 \examples{
 \dontrun{
-# load in example data, correlation, and network matrices for a discovery and test dataset:
+# load in example data, correlation, and network matrices for a discovery
+# and test dataset:
 data("NetRep")
 
 # Convert them to the 'bigMatrix' format:

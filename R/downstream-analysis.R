@@ -117,12 +117,19 @@
 #'      vector.
 #'    }
 #'  }
-#'  For example, \code{results[[1]][[2]][["blue"]][["degree"]]} is a vector
-#'  containing the \emph{weighted node degree} for the "blue" module from the
-#'  dataset 1, as calculated in dataset 2. module preservation p-values when
-#'  assessing the preservation of modules from dataset 1 in dataset 2. If
-#'  \code{simplify = TRUE} then the list structure will be simplified where
-#'  possible.
+#'  When \code{simplify = TRUE} then the simplest possible structure will be 
+#'  returned. E.g. if the network properties are requested for only one module 
+#'  in only one dataset, then the returned list will have only the above elements. 
+#'  
+#'  When \code{simplify = FALSE} then a nested list of datasets will always be 
+#'  returned, i.e. each element at the top level and second level correspond to
+#'  a dataset, and each element at the third level will correspond to modules 
+#'  discovered in the dataset specified at the top level if module labels are 
+#'  provided in the corresponding \code{moduleAssignments} list element. E.g. 
+#'  \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+#'  properties of "module1" as calculated in "Dataset2", where "module1" was 
+#'  indentified in "Dataset1". Modules and datasets for which calculation of 
+#'  the network properties have not been requested will contain \code{NULL}.
 #'  
 #' @examples
 #' \dontrun{
@@ -195,7 +202,7 @@ networkProperties <- function(
   # Calculate the network properties
   res <- with(finput, {
     netPropsInternal(scaledData, correlation, network, moduleAssignments, 
-                     modules, discovery, test, datasetNames, verbose)
+                     modules, discovery, test, nDatasets, datasetNames, verbose)
   })
   
   # Simplify the output data structure where possible
@@ -225,13 +232,15 @@ networkProperties <- function(
 #' @param discovery \code{'discovery'} after processing by
 #'   \code{'processInput'}.
 #' @param test \code{'test'} after processing by \code{'processInput'}.
+#' @param nDatasets a vector containing the total number of input datasets, 
+#'  returned by \code{'processInput'}.
 #' @param datasetNames a vector of dataset names returned by
 #'   \code{'processInput'}.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #'   
 netPropsInternal <- function(
   scaledData, correlation, network, moduleAssignments, modules, discovery, test,
-  datasetNames, verbose
+  nDatasets, datasetNames, verbose
 ) {
   #-----------------------------------------------------------------------------
   # Set up variables for running in parallel
@@ -243,70 +252,93 @@ netPropsInternal <- function(
   ti <- NULL # test dataset 
   mi <- NULL # iterator over the modules
   
+  # Set up results list
+  res <- foreach(di = seq_len(nDatasets)) %do% {
+    res2 <- foreach(ti = seq_len(nDatasets)) %do% {
+      if (!is.null(moduleAssignments[[di]])) {
+        allMods <- sortModuleNames(unique(moduleAssignments[[di]]))
+        res3 <- foreach(mi = seq_along(allMods)) %do% {} 
+        names(res3) <- allMods
+        return(res3)
+      }
+    }
+    names(res2) <- datasetNames
+    return(res2)
+  } 
+  names(res) <- datasetNames
+
+  
+  # Calculate properties in parallel
   vCat(verbose, 0, 'Calculating properties for:\n')
-  res <- foreach(di = discovery) %:% 
-           foreach(ti = test[[di]]) %:% 
-             foreach(mi = modules[[di]]) %dopar% {
-    vCat(
-      verbose, 1, sep="", 'Module "', mi, '" from dataset "', di, 
-      '" in dataset "', ti, '"\n'
-    )
-    
-    # Get the row/column indices of the module in the dataset of interest 
-    sub <- moduleAssignments[[di]][moduleAssignments[[di]] == mi]
-    modInds <- match(names(sub), rownames(correlation[[ti]]))
-    na.inds <- which(is.na(modInds))
-    modInds <- na.omit(modInds)
-    
-    # Get the properties calculated from the underlying data used to infer the
-    # network
-    datProps <- NULL
-    if (!is.null(scaledData[[ti]])) {
-      # We need to handle the case where no module variables are present in the
-      # test dataset differently.
-      if (length(modInds) > 0) {
-        datProps <- dataProps(scaledData[[ti]], modInds)
-        names(datProps) <- c("summary", "contribution", "coherence")
-        datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
-      } else {
-        dataProps <- list(
-          summary=rep(NA, nrow(scaledData[[ti]])),
-          contribution=rep(NA, length(sub)),
-          coherence=NA
+  props <- foreach(di = discovery) %:% 
+    foreach(ti = test[[di]]) %:% 
+      foreach(mi = modules[[di]]) %dopar% {
+        vCat(
+          verbose, 1, sep="", 'Module "', mi, '" from dataset "', di, 
+          '" in dataset "', ti, '"\n'
         )
-      }
-      names(datProps[["summary"]]) <- rownames(scaledData[[ti]])
-      names(datProps[["contribution"]]) <- names(sub)
-    } else {
-      dataProps <- NULL
-    }
-    
-    if (!is.null(network)) {
-      # Get the properties calculated from the network.
-      if (length(modInds) > 0) {
-        netProps <- netProps(network[[ti]], modInds)
-        names(netProps) <- c("degree", "avgWeight")
-        netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
-      } else {
-        netProps <- list(
-          degree=rep(NA, length(sub)),
-          avgWeight=NA
-        )
-      }
-      names(netProps[["degree"]]) <- names(sub)
-    } else {
-      netProps <- NULL
-    }
-    return(c(datProps, netProps))
+        
+        # Get the row/column indices of the module in the dataset of interest 
+        sub <- moduleAssignments[[di]][moduleAssignments[[di]] == mi]
+        modInds <- match(names(sub), rownames(correlation[[ti]]))
+        na.inds <- which(is.na(modInds))
+        modInds <- na.omit(modInds)
+        
+        # Get the properties calculated from the underlying data used to infer 
+        # the network
+        datProps <- NULL
+        if (!is.null(scaledData[[ti]])) {
+          # We need to handle the case where no module variables are present in 
+          # the test dataset differently.
+          if (length(modInds) > 0) {
+            datProps <- dataProps(scaledData[[ti]], modInds)
+            names(datProps) <- c("summary", "contribution", "coherence")
+            datProps[[2]] <- insert.nas(datProps[[2]], na.inds)
+          } else {
+            dataProps <- list(
+              summary=rep(NA, nrow(scaledData[[ti]])),
+              contribution=rep(NA, length(sub)),
+              coherence=NA
+            )
+          }
+          names(datProps[["summary"]]) <- rownames(scaledData[[ti]])
+          names(datProps[["contribution"]]) <- names(sub)
+        } else {
+          dataProps <- NULL
+        }
+        
+        if (!is.null(network)) {
+          # Get the properties calculated from the network.
+          if (length(modInds) > 0) {
+            netProps <- netProps(network[[ti]], modInds)
+            names(netProps) <- c("degree", "avgWeight")
+            netProps[[1]] <- insert.nas(netProps[[1]], na.inds)
+          } else {
+            netProps <- list(
+              degree=rep(NA, length(sub)),
+              avgWeight=NA
+            )
+          }
+          names(netProps[["degree"]]) <- names(sub)
+        } else {
+          netProps <- NULL
+        }
+        return(c(datProps, netProps))
   }
-  # Now we need to name the output 
-  names(res) <- datasetNames[discovery]
-  for (di in discovery) {
-    names(res[[di]]) <- datasetNames[test[[di]]]
-    for (ti in test[[di]]) {
-      names(res[[di]][[ti]]) <- modules[[di]]
+  
+  # We populate the results list separately since they cannot be assigned 
+  # directly in a parallel loop.
+  for (ii in seq_along(props)) {
+    for (jj in seq_along(props[[ii]])) {
+      for (kk in seq_along(props[[ii]][[jj]])) {
+        di <- discovery[ii]
+        ti <- test[[di]][jj]
+        mi <- as.character(modules[[di]][kk])
+        res[[di]][[ti]][[mi]] <- props[[ii]][[jj]][[kk]]
+      }
     }
   }
+  
   return(res)
 }
 
@@ -417,14 +449,27 @@ netPropsInternal <- function(
 #'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
 #'  dataset. Each of these elements is a list that has one element per 
 #'  \code{'modules'} specified, containing a vector of node names for the
-#'  requested module. If \code{simplify = TRUE}, then there will be a single
-#'  vector of node names for each \code{'test'} dataset.
-#'
+#'  requested module. When \code{simplify = TRUE} then the simplest possible 
+#'  structure will be returned. E.g. if the node ordering are requested for 
+#'  module(s) in only one dataset, then a single vector of node labels will
+#'  be returned. 
+#'  
+#' When \code{simplify = FALSE} then a nested list of datasets will always be 
+#' returned, i.e. each element at the top level and second level correspond to 
+#' a dataset, and each element at the third level will correspond to modules 
+#' discovered in the dataset specified at the top level if module labels are 
+#' provided in the corresponding \code{moduleAssignments} list element. E.g. 
+#' \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+#' order of nodes calculated in "Dataset2", where "module1" was indentified in
+#' "Dataset1". Modules and datasets for which calculation of the node order 
+#' have not been requested will contain \code{NULL}.
+#'  
 #' @seealso \code{\link{networkProperties}}
 #'  
 #' @examples
 #' \dontrun{
-#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' # load in example data, correlation, and network matrices for a discovery
+#' # and test dataset:
 #' data("NetRep")
 #' 
 #' # Convert them to the 'bigMatrix' format:
@@ -461,14 +506,14 @@ nodeOrder <- function(
   tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
   
+  vCat(verbose, 0, "Validating user input...")
+  
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
     cleanupCluster(par$cluster, par$predef)
   }, add=TRUE)
-  
-  vCat(verbose, 0, "Validating user input...")
   
   if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
     stop("'na.rm' must be either 'TRUE' or 'FALSE'")
@@ -525,7 +570,7 @@ nodeOrder <- function(
   props <- with(finput, { 
     netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, test, datasetNames, verbose
+      modules, discovery, test, nDatasets, datasetNames, verbose
     ) 
   })
   
@@ -535,7 +580,7 @@ nodeOrder <- function(
 
   # Simplify the output data structure where possible
   if (simplify) {
-    res <- simplifyList(res, depth=2)
+    res <- simplifyList(res, depth=3)
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
   res
@@ -555,19 +600,23 @@ nodeOrder <- function(
 #' @return list structure of ordered nodes.
 nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
   vCat(verbose, 0, "Ordering nodes...")
-  res <- lapply(props, function(discProps) { # For each discovery dataset 
-    r1 <- lapply(discProps, function(testProps) {  # For each test dataset
+  for (ii in seq_along(props)) {
+    for (jj in seq_along(props[[ii]])) {
+      hasProps <- which(!sapply(props[[ii]][[jj]], is.null))
+      if (length(hasProps) == 0) {
+        next
+      }
       # First get module order
-      if (length(testProps) > 1 && orderModules) {
-        # Order modules by similarity
+      if (length(hasProps) > 1 && orderModules) {
+        modProps <- props[[ii]][[jj]][hasProps]
         
         # First get the summary profiles for each module
-        summaries <- matrix(0, ncol=length(testProps), 
-                            nrow=length(testProps[[1]][["summary"]]))
-        colnames(summaries) <- names(testProps)
-        rownames(summaries) <- names(testProps[[1]][["summary"]])
-        for (mi in seq_along(testProps)) {
-          summaries[,mi] <- testProps[[mi]][["summary"]]
+        summaries <- matrix(0, ncol=length(hasProps), 
+                            nrow=length(modProps[[1]][["summary"]]))
+        colnames(summaries) <- names(modProps)
+        rownames(summaries) <- names(modProps[[1]][["summary"]])
+        for (mi in seq_along(modProps)) {
+          summaries[,mi] <- modProps[[mi]][["summary"]]
         }
         
         # Identify modules where no nodes are present in the test dataset
@@ -579,46 +628,34 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
         
         # Cluster modules that do have summary profiles
         clusteredMods <- hclust(as.dist(1-cor(summaries)))
-        moduleOrder <- colnames(summaries)[clusteredMods$order]
+        hasProps <- colnames(summaries)[clusteredMods$order]
         
         # Add the 'NA' modules
-        moduleOrder <- c(moduleOrder, na.mods)
-      } else {
-        # Otherwise order as is
-        moduleOrder <- names(testProps)
+        hasProps  <- c(hasProps , na.mods)
       }
       
-      # next order nodes within each module
-      nodeOrder <- foreach(mi = moduleOrder) %do% {
-        nodeDegree <- testProps[[mi]][["degree"]]
+      # order nodes within each module
+      modProps <- props[[ii]][[jj]][hasProps]
+      for (kk in rev(seq_along(modProps))) {
+        nodeDegree <- modProps[[kk]][["degree"]]
         sortedNodes <- sort(nodeDegree, decreasing=TRUE, na.last=TRUE)
-        sortedNodes
-      }
-      names(nodeOrder) <- moduleOrder
-      
-      # Remove missing nodes and modules 
-      if (na.rm) {
-        for (ii in rev(seq_along(nodeOrder))) {
-          nodeOrder[[ii]] <- na.omit(nodeOrder[[ii]])
-          if (length(nodeOrder[[ii]]) == 0) {
-            nodeOrder[[ii]] <- NULL
+        # Remove missing nodes and modules
+        if (na.rm) {
+          sortedNodes <- na.omit(sortedNodes)
+          if (length(sortedNodes) == 0) {
+            sortedNodes <- NULL
           }
         }
+        modProps[[kk]] <- names(sortedNodes)
       }
-      
-      # Now just get the names
-      for (ii in seq_along(nodeOrder)) {
-        nodeOrder[[ii]] <- names(nodeOrder[[ii]])
-      }
-      
       if (simplify) {
-        nodeOrder <- unlist(nodeOrder)
-        names(nodeOrder) <- NULL
+        modProps <- unlist(modProps)
+        names(modProps) <- NULL
       }
-      return(nodeOrder)
-    })
-  })
-  return(res)
+      props[[ii]][[jj]] <- modProps
+    }
+  }
+  return(props)
 }
 
 #' Order samples within a network.
@@ -715,12 +752,25 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
 #'  \code{'discovery'} dataset. Each of these elements is a list that has one
 #'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
 #'  dataset. Each of these elements is a list that has one element per 
-#'  \code{'modules'} specified, containing a vector of sample names or indices 
-#'  for the requested module.'
+#'  \code{'modules'} specified, containing a vector of node names for the
+#'  requested module. When \code{simplify = TRUE} then the simplest possible 
+#'  structure will be returned. E.g. if the sample ordering are requested for 
+#'  in only one dataset, then a single vector of node labels will be returned. 
+#'  
+#' When \code{simplify = FALSE} then a nested list of datasets will always be 
+#' returned, i.e. each element at the top level and second level correspond to 
+#' a dataset, and each element at the third level will correspond to modules 
+#' discovered in the dataset specified at the top level if module labels are 
+#' provided in the corresponding \code{moduleAssignments} list element. E.g. 
+#' \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+#' order of samples calculated in "Dataset2", where "module1" was indentified
+#' in "Dataset1". Modules and datasets for which calculation of the sample
+#' order have not been requested will contain \code{NULL}.
 #'  
 #' @examples 
 #' \dontrun{
-#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' # load in example data, correlation, and network matrices for a discovery 
+#' # and test dataset:
 #' data("NetRep")
 #' 
 #' # Convert them to the 'bigMatrix' format:
@@ -800,7 +850,7 @@ sampleOrder <- function(
   # properties though, so we can speed things up by ignoring them
   props <- with(finput, {
     netPropsInternal(scaledData, correlation, NULL, moduleAssignments, 
-                     modules, discovery, test, datasetNames, verbose)
+                     modules, discovery, test, nDatasets, datasetNames, verbose)
   })
 
   res <- sampleOrderInternal(props, verbose, na.rm)
@@ -825,22 +875,24 @@ sampleOrder <- function(
 #' @return list structure of ordered nodes.
 sampleOrderInternal <- function(props, verbose, na.rm) {
   vCat(verbose, 0, "Ordering samples...")
-  res <- lapply(props, function(discProps) {
-    lapply(discProps, function(testProps) {
-      lapply(testProps, function(modProps) {
-        summary <- modProps[["summary"]]
-        if (na.rm) {
-          summary <- na.omit(summary)
+  for (ii in seq_along(props)) {
+    for (jj in seq_along(props[[ii]])) {
+      for (kk in seq_along(props[[ii]][[jj]])) {
+        if (!is.null(props[[ii]][[jj]][[kk]])) {
+          summary <- props[[ii]][[jj]][[kk]][["summary"]]
+          if (na.rm) {
+            summary <- na.omit(summary)
+          }
+          summaryOrder <- order(summary, decreasing=TRUE, na.last=TRUE)
+          
+          if(is.null(names(summary))) {
+            props[[ii]][[jj]][[kk]] <- summaryOrder
+          } else {
+            props[[ii]][[jj]][[kk]] <- names(summary)[summaryOrder]
+          }
         }
-        summaryOrder <- order(summary, decreasing=TRUE, na.last=TRUE)
-        
-        if(is.null(names(summary))) {
-          return(summaryOrder)
-        } else {
-          return(names(summary)[summaryOrder])
-        }
-      })
-    })
-  })
-  return(res)
+      }
+    }
+  }
+  return(props)
 }

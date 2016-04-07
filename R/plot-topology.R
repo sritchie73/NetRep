@@ -424,7 +424,7 @@ plotData <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
   
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -434,7 +434,7 @@ plotData <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -444,7 +444,7 @@ plotData <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -467,7 +467,7 @@ plotData <- function(
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
         scaledData, correlation, network, moduleAssignments, 
-        modules, discovery, discAsTest, datasetNames, FALSE
+        modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
       )
     }
     sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)
@@ -475,7 +475,7 @@ plotData <- function(
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
-    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
+    sampleOrder <- seq_along(simplifyList(testProps[[di]][[ti]], 3)[[1]]$summary)
   } 
   # Case 3: order samples by their degree in the test network.
   else {
@@ -676,7 +676,7 @@ plotCorrelation <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
   
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -686,7 +686,7 @@ plotCorrelation <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -696,7 +696,7 @@ plotCorrelation <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -899,7 +899,7 @@ plotNetwork <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
   
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -909,7 +909,7 @@ plotNetwork <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -919,7 +919,7 @@ plotNetwork <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1128,7 +1128,7 @@ plotContribution <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
   
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -1138,7 +1138,7 @@ plotContribution <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -1148,7 +1148,7 @@ plotContribution <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1168,7 +1168,7 @@ plotContribution <- function(
   #-----------------------------------------------------------------------------
   vCat(verbose, 0, "rendering plot components...")
   
-  testProps <- testProps[[di]][[ti]]
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # node contribution
   nodeContribVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
@@ -1294,7 +1294,7 @@ plotDegree <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
   
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -1304,7 +1304,7 @@ plotDegree <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -1314,7 +1314,7 @@ plotDegree <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1334,7 +1334,7 @@ plotDegree <- function(
   #-----------------------------------------------------------------------------
   vCat(verbose, 0, "rendering plot components...")
   
-  testProps <- testProps[[di]][[ti]]
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # (Normalised) weighted degree vector
   wDegreeVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
@@ -1477,7 +1477,7 @@ plotSummary <- function(
   # Calculate the network properties in the dataset we're plotting.
   testProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, datasetNames, FALSE
+    modules, discovery, test, nDatasets, datasetNames, FALSE
   )
   
   # Case 1: we want to order nodes by the discovery dataset, which if different
@@ -1487,7 +1487,7 @@ plotSummary <- function(
     # This skips all of the data verification
     discProps <- netPropsInternal(
       scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, datasetNames, FALSE
+      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
     )
     nodeOrder <- nodeOrderInternal(
       discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
@@ -1497,7 +1497,7 @@ plotSummary <- function(
   } 
   # Case 2: order nodes as they're provided by the user
   else if (orderNodesBy == "none") {
-    moduleOrder <- names(testProps[[di]][[ti]])
+    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(testProps[[di]][[ti]][[mi]]$degree)
     }
@@ -1520,7 +1520,7 @@ plotSummary <- function(
     if (!exists("discProps")) {
       discProps <- netPropsInternal(
         scaledData, correlation, network, moduleAssignments, 
-        modules, discovery, discAsTest, datasetNames, FALSE
+        modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
       )
     }
     sampleOrder <- sampleOrderInternal(discProps, verbose, FALSE)
@@ -1528,7 +1528,7 @@ plotSummary <- function(
   } 
   # Case 2: order samples as they're provided by the user
   else if (orderSamplesBy == "none") {
-    sampleOrder <- seq_along(testProps[[di]][[ti]][[moduleOrder[1]]]$summary)
+    sampleOrder <- seq_along(simplifyList(testProps[[di]][[ti]], 3)[[1]]$summary)
   } 
   # Case 3: order samples by their degree in the test network.
   else {
@@ -1563,7 +1563,7 @@ plotSummary <- function(
   #-----------------------------------------------------------------------------
   vCat(verbose, 0, "rendering plot components...")
   
-  testProps <- testProps[[di]][[ti]]
+  testProps <- simplifyList(testProps, depth=3) # collapse for easy access
   
   # Summary profile matrix
   summaries <- foreach(mi = moduleOrder, .combine=cbind) %do% {
