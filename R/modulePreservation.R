@@ -341,11 +341,16 @@
 #'      dataset.
 #'    }
 #'  }
+#'  When \code{simplify = TRUE} then the simplest possible structure will be 
+#'  returned. E.g. if module preservation is tested in only one dataset, then
+#'  the returned list will have only the above elements. 
 #'  
-#'  For example, \code{results[[1]][[2]][["p.values"]]} is the matrix of 
-#'  module preservation p-values when assessing the preservation of modules from
-#'  dataset 1 in dataset 2. If \code{simplify = TRUE} then the list structure 
-#'  will be simplified where possible.
+#'  When \code{simplify = FALSE} then a nested list of datasets will always be 
+#'  returned, i.e. each element at the top level and second level correspond to
+#'  a dataset, e.g. \code{results[["Dataset1"]][["Dataset2"]]} indicates an 
+#'  analysis where modules discovered in "Dataset1" are assessed for 
+#'  preservation in "Dataset2". Dataset comparisons which have not been 
+#'  assessed will contain \code{NULL}.
 #'  
 #' @seealso 
 #'   Functions for: 

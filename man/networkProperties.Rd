@@ -88,12 +88,19 @@ A nested list structure. At the top level, the list has one element per
      vector.
    }
  }
- For example, \code{results[[1]][[2]][["blue"]][["degree"]]} is a vector
- containing the \emph{weighted node degree} for the "blue" module from the
- dataset 1, as calculated in dataset 2. module preservation p-values when
- assessing the preservation of modules from dataset 1 in dataset 2. If
- \code{simplify = TRUE} then the list structure will be simplified where
- possible.
+ When \code{simplify = TRUE} then the simplest possible structure will be 
+ returned. E.g. if the network properties are requested for only one module 
+ in only one dataset, then the returned list will have only the above elements. 
+ 
+ When \code{simplify = FALSE} then a nested list of datasets will always be 
+ returned, i.e. each element at the top level and second level correspond to
+ a dataset, and each element at the third level will correspond to modules 
+ discovered in the dataset specified at the top level if module labels are 
+ provided in the corresponding \code{moduleAssignments} list element. E.g. 
+ \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+ properties of "module1" as calculated in "Dataset2", where "module1" was 
+ indentified in "Dataset1". Modules and datasets for which calculation of 
+ the network properties have not been requested will contain \code{NULL}.
 }
 \description{
 Calculates the network properties used to assess module preservation for one

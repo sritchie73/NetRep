@@ -117,12 +117,19 @@
 #'      vector.
 #'    }
 #'  }
-#'  For example, \code{results[[1]][[2]][["blue"]][["degree"]]} is a vector
-#'  containing the \emph{weighted node degree} for the "blue" module from the
-#'  dataset 1, as calculated in dataset 2. module preservation p-values when
-#'  assessing the preservation of modules from dataset 1 in dataset 2. If
-#'  \code{simplify = TRUE} then the list structure will be simplified where
-#'  possible.
+#'  When \code{simplify = TRUE} then the simplest possible structure will be 
+#'  returned. E.g. if the network properties are requested for only one module 
+#'  in only one dataset, then the returned list will have only the above elements. 
+#'  
+#'  When \code{simplify = FALSE} then a nested list of datasets will always be 
+#'  returned, i.e. each element at the top level and second level correspond to
+#'  a dataset, and each element at the third level will correspond to modules 
+#'  discovered in the dataset specified at the top level if module labels are 
+#'  provided in the corresponding \code{moduleAssignments} list element. E.g. 
+#'  \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+#'  properties of "module1" as calculated in "Dataset2", where "module1" was 
+#'  indentified in "Dataset1". Modules and datasets for which calculation of 
+#'  the network properties have not been requested will contain \code{NULL}.
 #'  
 #' @examples
 #' \dontrun{
@@ -442,14 +449,27 @@ netPropsInternal <- function(
 #'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
 #'  dataset. Each of these elements is a list that has one element per 
 #'  \code{'modules'} specified, containing a vector of node names for the
-#'  requested module. If \code{simplify = TRUE}, then there will be a single
-#'  vector of node names for each \code{'test'} dataset.
-#'
+#'  requested module. When \code{simplify = TRUE} then the simplest possible 
+#'  structure will be returned. E.g. if the node ordering are requested for 
+#'  module(s) in only one dataset, then a single vector of node labels will
+#'  be returned. 
+#'  
+#' When \code{simplify = FALSE} then a nested list of datasets will always be 
+#' returned, i.e. each element at the top level and second level correspond to 
+#' a dataset, and each element at the third level will correspond to modules 
+#' discovered in the dataset specified at the top level if module labels are 
+#' provided in the corresponding \code{moduleAssignments} list element. E.g. 
+#' \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+#' order of nodes calculated in "Dataset2", where "module1" was indentified in
+#' "Dataset1". Modules and datasets for which calculation of the node order 
+#' have not been requested will contain \code{NULL}.
+#'  
 #' @seealso \code{\link{networkProperties}}
 #'  
 #' @examples
 #' \dontrun{
-#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' # load in example data, correlation, and network matrices for a discovery
+#' # and test dataset:
 #' data("NetRep")
 #' 
 #' # Convert them to the 'bigMatrix' format:
@@ -732,12 +752,25 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
 #'  \code{'discovery'} dataset. Each of these elements is a list that has one
 #'  element per \code{'test'} dataset analysed for that \code{'discovery'} 
 #'  dataset. Each of these elements is a list that has one element per 
-#'  \code{'modules'} specified, containing a vector of sample names or indices 
-#'  for the requested module.'
+#'  \code{'modules'} specified, containing a vector of node names for the
+#'  requested module. When \code{simplify = TRUE} then the simplest possible 
+#'  structure will be returned. E.g. if the sample ordering are requested for 
+#'  in only one dataset, then a single vector of node labels will be returned. 
+#'  
+#' When \code{simplify = FALSE} then a nested list of datasets will always be 
+#' returned, i.e. each element at the top level and second level correspond to 
+#' a dataset, and each element at the third level will correspond to modules 
+#' discovered in the dataset specified at the top level if module labels are 
+#' provided in the corresponding \code{moduleAssignments} list element. E.g. 
+#' \code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+#' order of samples calculated in "Dataset2", where "module1" was indentified
+#' in "Dataset1". Modules and datasets for which calculation of the sample
+#' order have not been requested will contain \code{NULL}.
 #'  
 #' @examples 
 #' \dontrun{
-#' # load in example data, correlation, and network matrices for a discovery and test dataset:
+#' # load in example data, correlation, and network matrices for a discovery 
+#' # and test dataset:
 #' data("NetRep")
 #' 
 #' # Convert them to the 'bigMatrix' format:
