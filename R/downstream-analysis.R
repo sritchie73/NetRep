@@ -353,10 +353,15 @@ netPropsInternal <- function(
 #' @inheritParams par_param
 #' @inheritParams orderModules_param
 #' 
-#' @param na.rm logical; If \code{TRUE}, nodes and moduels present in the 
+#' @param na.rm logical; If \code{TRUE}, nodes and modules present in the 
 #'   \code{discovery} dataset but missing from the test dataset are excluded. If
 #'   \code{FALSE}, missing nodes and modules are put last in the ordering.
-#'   
+#' @param mean logical; if \code{TRUE}, node order will be calculated for each
+#'   \code{discovery} dataset by averaging the weighted degree and pooling 
+#'   \emph{module summary} vectors across the specified \code{test} datasets.
+#'   If \code{FALSE}, the node order is calculated separately in each test 
+#'   dataset.
+#'      
 #' @details
 #'  \subsection{Input data structure:}{
 #'   The \link[=modulePreservation]{preservation of network modules} in a second
@@ -498,7 +503,7 @@ netPropsInternal <- function(
 nodeOrder <- function(
   data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, na.rm=FALSE, 
-  orderModules=TRUE, simplify=TRUE, verbose=TRUE
+  orderModules=TRUE, mean=FALSE, simplify=TRUE, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
@@ -575,7 +580,7 @@ nodeOrder <- function(
   })
   
   res <- nodeOrderInternal(
-    props, orderModules, simplify, verbose, na.rm
+    props, orderModules, simplify, verbose, na.rm, mean
   )
 
   # Simplify the output data structure where possible
@@ -596,10 +601,69 @@ nodeOrder <- function(
 #' @param simplify logical; are we simplifying the output?
 #' @param verbose logical; is verbose printing turned on?
 #' @param na.rm logical; remove missing nodes?
+#' @param mean logical; should the node order be calculated by averaging across
+#'  test datasets?
 #' 
 #' @return list structure of ordered nodes.
-nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
+nodeOrderInternal <- function(
+  props, orderModules, simplify, verbose, na.rm, mean
+) {
   vCat(verbose, 0, "Ordering nodes...")
+  
+  # Average weighted degree and pool summary profiles across datasets if 'mean'
+  # is 'TRUE'
+  if (mean) {
+    avgProps <- foreach(ii = seq_along(props)) %do% {
+      # Skip datasets if they have not had modules discovered in them 
+      if (is.null(props[[ii]][[1]])) {
+        return(list(avgProps=NULL))
+      }
+      warned <- FALSE
+      # For each module in the discovery dataset, loop through the test datasets
+      # to combine the properties.
+      modProps <- foreach(mi = names(props[[ii]][[1]])) %do% {
+        # If the order of this module has not been requested, return NULL
+        notRequested <- foreach(jj = seq_along(props[[ii]]), .combine=c) %do% { 
+          is.null(props[[ii]][[jj]][[mi]]) 
+        }
+        if (all(notRequested)) {
+          return(NULL)
+        }
+        
+        if (sum(!notRequested) == 1 & !warned) {
+          warning("'mean' is 'TRUE' where only one 'test' dataset specified ", 
+                  "for discovery dataset ", '"', names(props)[ii], '"')
+          warned <- TRUE # suppress printing out many warnings across modules
+        }
+        
+        # Get the node names
+        nodeNames <- names(props[[ii]][!notRequested][[1]][[mi]][["degree"]])
+        
+        # Otherwise calculate the mean weighted degree and concatenate the 
+        # summary profiles
+        degreeMat <- foreach(jj = seq_along(props[[ii]]), .combine = rbind) %do% {
+          degree <- props[[ii]][[jj]][[mi]][["degree"]]
+        }
+        # Gracefully handles case where the module is only requested across 1 
+        # dataset.
+        if(is.null(dim(degreeMat))) {
+          degreeMat <- matrix(degreeMat, nrow=1)
+        }
+        avgDegree <- colMeans(degreeMat)
+        names(avgDegree) <- nodeNames
+        
+        pooledSummary <- foreach(jj = seq_along(props[[ii]]), .combine=c) %do% {
+          props[[ii]][[jj]][[mi]][["summary"]]
+        }
+        return(list(degree = avgDegree, summary = pooledSummary))
+      }
+      names(modProps) <- names(props[[ii]][[1]])
+      return(list(avgProps=modProps))
+    }
+    names(avgProps) <- names(props)
+    props <- avgProps
+  }
+  
   for (ii in seq_along(props)) {
     for (jj in seq_along(props[[ii]])) {
       hasProps <- which(!sapply(props[[ii]][[jj]], is.null))
@@ -653,6 +717,17 @@ nodeOrderInternal <- function(props, orderModules, simplify, verbose, na.rm) {
         names(modProps) <- NULL
       }
       props[[ii]][[jj]] <- modProps
+    }
+  }
+  # remove the extra list level in 'avgProps': this was added so that the
+  # above code would work regardless of the 'mean' argument.
+  if (mean) { 
+    for (ii in rev(seq_along(props))) {
+      if (!is.null(props[[ii]][["avgProps"]])) {
+        props[[ii]] <- props[[ii]][["avgProps"]]
+      } else {
+        props[ii] <- list(NULL)
+      }
     }
   }
   return(props)

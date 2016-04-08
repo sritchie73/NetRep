@@ -6,8 +6,8 @@
 \usage{
 nodeOrder(data = NULL, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, na.rm = FALSE, orderModules = TRUE, simplify = TRUE,
-  verbose = TRUE)
+  nCores = NULL, na.rm = FALSE, orderModules = TRUE, mean = FALSE,
+  simplify = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -50,13 +50,19 @@ properties over. Ignored if the user has already registered a parallel
 backend. If \code{NULL} (default) the all but one core on the machine will
 be used.}
 
-\item{na.rm}{logical; If \code{TRUE}, nodes and moduels present in the 
+\item{na.rm}{logical; If \code{TRUE}, nodes and modules present in the 
 \code{discovery} dataset but missing from the test dataset are excluded. If
 \code{FALSE}, missing nodes and modules are put last in the ordering.}
 
 \item{orderModules}{logical; if \code{TRUE} modules ordered by clustering 
 their summary vectors. If \code{FALSE} modules are returned in the order
 provided.}
+
+\item{mean}{logical; if \code{TRUE}, node order will be calculated for each
+\code{discovery} dataset by averaging the weighted degree and pooling 
+\emph{module summary} vectors across the specified \code{test} datasets.
+If \code{FALSE}, the node order is calculated separately in each test 
+dataset.}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}
