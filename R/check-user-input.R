@@ -11,7 +11,12 @@
 #' @param modules user input for the 'modules' argument.
 #' @param backgroundLabel user input for the 'backgroundLabel' argument.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param tempdir temporary directory to save new objects in
+#' @param tempdir temporary directory to save new objects in.
+#' @param plotFunction logical; are we checking for a plot function?
+#' @param orderNodesBy use input for the 'orderNodesBy' argument in the 
+#'  plotting functions.
+#' @param orderSamplesBy use input for the 'orderSamplesBy' argument in the 
+#'  plotting functions.
 #' 
 #' @seealso
 #' \code{\link{modulePreservation}}
@@ -19,9 +24,11 @@
 #' \code{\link{plotTopology}}
 #' 
 #' @return a list of containing the formatted user input
-processInput <- function(discovery, test, network, correlation, data, 
-                         moduleAssignments, modules, backgroundLabel, 
-                         verbose, tempdir) {
+processInput <- function(
+  discovery, test, network, correlation, data, moduleAssignments, modules, 
+  backgroundLabel, verbose, tempdir, plotFunction=FALSE, orderNodesBy=NA, 
+  orderSamplesBy=NA, orderModules=NULL
+) {
   # Where do we want to get:
   #   Each "argument" has a list of lists: at the top level, each element 
   #   corresponds to a "discovery" dataset, containing a list, where each element
@@ -153,6 +160,15 @@ processInput <- function(discovery, test, network, correlation, data,
   # Make sure test and discovery are ordered the same way
   if (!is.null(names(discovery)))
     test <- test[names(discovery)]
+  
+  # Plots can only be generated within a single dataset at a time
+  if (plotFunction) { 
+    if ((!is.vector(discovery) || length(discovery) > 1) ||
+        (!is.vector(test[[discovery]]) || length(test[[discovery]]) > 1)) {
+      stop("only one 'discovery' and 'test' dataset can be specified when plotting")
+    }
+  }
+
   
   # ----------------------------------------------------------------------------
   # Next, process the 'correlation' and 'network' arguments
@@ -441,6 +457,36 @@ processInput <- function(discovery, test, network, correlation, data,
   }
   
   # ----------------------------------------------------------------------------
+  # Next, process the plot function arguments
+  # ----------------------------------------------------------------------------
+  
+  if (plotFunction) {
+    if (!(
+      is.null(orderNodesBy) ||
+      is.vector(orderNodesBy) && is.numeric(orderNodesBy) ||
+      is.vector(orderNodesBy) && is.character(orderNodesBy) ||
+      is.vector(orderNodesBy) && length(orderNodesBy) == 1 && is.na(orderNodesBy)
+    )) {
+      stop("'orderNodesBy' must be a vector of dataset names or indices, 'NA' or",
+           " 'NULL'")
+    }
+    
+    if (!(
+      is.null(orderSamplesBy) ||
+      is.vector(orderSamplesBy) && length(orderSamplesBy) == 1 && 
+      (is.numeric(orderSamplesBy) || is.character(orderSamplesBy) || is.na(orderSamplesBy))
+    )) {
+      stop("'orderSamplesBy' must be a vector containing a single dataset name, ",
+           "or index, 'NA' or 'NULL'")
+    }
+    
+    if (is.null(orderNodesBy))
+      orderNodesBy <- discovery
+    if (is.null(orderSamplesBy))
+      orderSamplesBy <- test[[discovery]]
+  }
+
+  # ----------------------------------------------------------------------------
   # Check for data consistency
   # ----------------------------------------------------------------------------
   # Now that we have made sure the input data can be sensibly accessed using the
@@ -473,7 +519,6 @@ processInput <- function(discovery, test, network, correlation, data,
   } else {
     iterator <- names(network)
   }
-  
   
   for (ii in iterator) {
     # Make sure the 'correlation' and 'network' matrices are square
@@ -523,21 +568,77 @@ processInput <- function(discovery, test, network, correlation, data,
     }
   }
   
+  if (plotFunction) {
+    ti <- test[[discovery]]
+    # Are the datasets specified in 'orderNodesBy' and 'orderSamplesBy' valid?
+    if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
+      if (is.character(orderNodesBy) && any(orderNodesBy %nin% names(network))) {
+        stop("unable to match datasets in 'orderNodesBy' to provided datasets")
+      } else if (is.numeric(orderNodesBy) && any(orderNodesBy > nDatasets) || 
+                 any(orderNodesBy < 1)) {
+        stop("unable to match datasets in 'orderNodesBy' to provided datasets")
+      }
+    }
+    if (!is.na(orderSamplesBy)) {
+      if (is.character(orderSamplesBy) && any(orderSamplesBy %nin% names(network))) {
+        stop("unable to match datasets in 'orderSamplesBy' to provided datasets")
+      } else if (is.numeric(orderSamplesBy) && (orderSamplesBy > nDatasets || orderSamplesBy < 1)) {
+        stop("unable to match datasets in 'orderSamplesBy' to provided datasets")
+      }
+    }
+    
+    # Check that samples from the 'orderSamplesBy' dataset are present in the 
+    # 'test' dataset to be drawn and that data for that dataset is present
+    if (!is.na(orderSamplesBy) && is.null(data[[orderSamplesBy]])) {
+      stop("'data' not provided for 'orderSamplesBy' dataset") 
+    }
+    
+    if (!is.na(orderSamplesBy) && 
+        sum(rownames(data[[orderSamplesBy]]) %in% rownames(data[[ti]])) == 0) {
+      stop("no samples in the dataset specified by 'orderSamplesBy' are in the", 
+           " 'test' dataset to be drawn.")
+    }
+    
+    # Check that data is provided for the 'orderNodesBy' dataset(s) if 
+    # 'orderModules' is true.
+    if ((orderModules && length(modules) > 1) && 
+        (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) && 
+        any(sapply(data[orderNodesBy], is.null))) {
+      stop("'data' not provided for 'orderNodesBy' dataset(s) and ",
+           "'orderModules' = 'TRUE'") 
+    }
+  }
+  
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang. This can take a while, so 
   # we only want to check datasets that we're analysing (especially for plotting)
   vCat(verbose, 1, "Checking matrices for non-finite values...")
   
-  # Construct an iterator that includes only the datasets we're analysing
-  iterator <- discovery
+  # Construct an iterator that includes only the datasets we're analysing:
   if (is.character(discovery)) {
     iterator <- match(discovery, names(network))
+  } else {
+    iterator <- discovery
   }
   for (tv in test) {
     if (is.character(tv)) {
       iterator <- c(iterator, match(tv, names(network)))
     } else {
       iterator <- c(iterator, tv)
+    }
+  }
+  if (plotFunction) {
+    if (orderModules) {
+      if (is.character(orderNodesBy)) {
+        iterator <- c(iterator, match(orderNodesBy, names(network)))
+      } else if (is.numeric(orderNodesBy)) {
+        iterator <- c(iterator, orderNodesBy)
+      }
+    }
+    if (is.character(orderSamplesBy)) {
+      iterator <- c(iterator, match(orderSamplesBy, names(network)))
+    } else if (is.numeric(orderSamplesBy)) {
+      iterator <- c(iterator, orderSamplesBy)
     }
   }
   iterator <- unique(iterator)
@@ -562,15 +663,27 @@ processInput <- function(discovery, test, network, correlation, data,
   }
   
   if (!is.null(names(network))) {
-    datasetNames <- structure(names(network), names=names(network))
+    datasetNames <- names(network)
   } else {
     datasetNames <- paste0("Dataset", seq_len(nDatasets))
+  }
+  names(datasetNames) <- datasetNames
+  
+  # Convert indices to dataset names for the plot functions
+  if (plotFunction) {
+    if (is.numeric(orderNodesBy)) {
+      orderNodesBy <- datasetNames[orderNodesBy]
+    }
+    if (is.numeric(orderSamplesBy)) {
+      orderSamplesBy <- datasetNames[orderSamplesBy]
+    }
   }
 
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
-    nDatasets=nDatasets, datasetNames=datasetNames, scaledData=scaledData
+    nDatasets=nDatasets, datasetNames=datasetNames, scaledData=scaledData,
+    orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy
   ))
 }
 
