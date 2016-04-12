@@ -59,9 +59,9 @@ plotDegree(data, correlation, network, moduleAssignments = NULL,
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules = TRUE, plotSampleNames = TRUE,
-  plotModuleNames, main = "", palette = c("#762a83", "#1b7837"),
+  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
+  orderNodesBy = NULL, orderModules = TRUE, plotSampleNames = TRUE,
+  plotModuleNames = NULL, main = "", palette = c("#762a83", "#1b7837"),
   border.width = 2, drawBorders = FALSE, saxt.line = -0.5,
   maxt.line = 0, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
