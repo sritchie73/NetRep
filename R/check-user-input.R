@@ -806,42 +806,42 @@ checkPlotArgs <- function(
     is.vector(obj) && length(obj) == 1 && is.logical(obj) && !is.na(obj)
   }
   
-  if (!is.slog(orderModules))
+  if (!(missing(orderModules) || is.slog(orderModules)))
     stop("'orderModules' must be one of 'TRUE' or 'FALSE'")
   
-  if (!is.slog(plotNodeNames)) 
+  if (!(missing(plotNodeNames) || is.slog(plotNodeNames)))
     stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
   
-  if (!is.slog(plotSampleNames)) 
+  if (!(missing(plotSampleNames) || is.slog(plotSampleNames)))
     stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
   
-  if (!(is.null(plotModuleNames) || is.slog(plotModuleNames)))
+  if (!(missing(plotModuleNames) || is.null(plotModuleNames) || is.slog(plotModuleNames)))
     stop("'plotModuleNames' must be one of 'TRUE', 'FALSE', or 'NULL'")
   
-  if (!(is.null(main) || is.schar(main) || is.na(main)))
+  if (!(missing(main) || is.null(main) || is.schar(main) || is.na(main)))
     stop("'main' must be 'NULL' or a character vector of length 1")
   
-  if (!(is.slog(drawBorders)))
+  if (!(missing(drawBorders) || is.slog(drawBorders)))
     stop("'drawBorders' must be one of 'TRUE' or 'FALSE'")
   
-  if (!is.snum(border.width))
+  if (!(missing(border.width) || is.snum(border.width))) 
     stop("'border.width' must be a numeric vector of length 1")
-  if (border.width < 0)
+  if (!missing(border.width) && border.width < 0)
     stop("'border.width' must be greater than 0")
   
-  if (!(is.snum(gaxt.line) || is.na(gaxt.line)))
+  if (!(missing(gaxt.line) || is.snum(gaxt.line) || is.na(gaxt.line)))
     stop("'gaxt.line' must be a numeric vector of length 1 or 'NA'")
   
-  if (!(is.snum(saxt.line) || is.na(saxt.line)))
+  if (!(missing(saxt.line) || is.snum(saxt.line) || is.na(saxt.line)))
     stop("'saxt.line' must be a numeric vector of length 1 or 'NA'")
   
-  if (!(is.null(maxt.line) || is.snum(maxt.line) || is.na(maxt.line)))
+  if (!(missing(maxt.line) || is.null(maxt.line) || is.snum(maxt.line) || is.na(maxt.line)))
     stop("'maxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
-  if (!is.snum(laxt.line) || is.na(laxt.line))
+  if (!(missing(laxt.line) || is.snum(laxt.line) || is.na(laxt.line)))
     stop("'laxt.line' must be a numeric vector of length 1 or 'NA'")
   
-  if (!(is.snum(legend.tick.size) || is.na(legend.tick.size)))
+  if (!(missing(legend.tick.size) || is.snum(legend.tick.size) || is.na(legend.tick.size)))
     stop("'legend.tick.size' must be a numeric vector of length 1 or 'NA'")
   
   

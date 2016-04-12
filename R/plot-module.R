@@ -253,11 +253,11 @@ plotModule <- function(
   
   vCat(verbose, 0, "Validating user input...")
   
-  checkPlotArgs(
-    orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main, 
-    drawBorders, border.width, gaxt.line, saxt.line, maxt.line, 
-    legend.tick.size, laxt.line
-  )
+  checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
+    plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
+    main=main, drawBorders=drawBorders, border.width=border.width, 
+    gaxt.line=gaxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
+    legend.tick.size=legend.tick.size, laxt.line=laxt.line)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
