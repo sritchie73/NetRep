@@ -640,7 +640,7 @@ plotCorrelation <- function(
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
-  # Get ordering of nodes and samples as specified in 'orderNodesBy'
+  # Get ordering of nodes as specified in 'orderNodesBy'
   #-----------------------------------------------------------------------------
   
   # Scenarios:
@@ -782,16 +782,16 @@ plotCorrelation <- function(
 plotNetwork <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
-  orderNodesBy="discovery", symmetric=FALSE, orderModules=TRUE, 
-  plotNodeNames=TRUE, plotModuleNames, main="", palette=network.palette(), 
-  border.width=2, plotLegend=TRUE, legend.main="Edge weight", gaxt.line=-0.5, 
-  maxt.line=3, legend.position, legend.tick.size, laxt.line, cex.axis=0.8,
-  cex.lab=1, cex.main=1.2
+  orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
+  plotModuleNames=NULL, main="", palette=NULL, border.width=2, plotLegend=TRUE, 
+  legend.main="Edge weight", gaxt.line=-0.5, maxt.line=3, legend.position=NULL, 
+  legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
-  # Set graphical parameters
+  # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
   par(cex.axis=cex.axis)
   par(cex.lab=cex.lab)
   par(cex.main=cex.main)
@@ -800,7 +800,10 @@ plotNetwork <- function(
     par(cex.axis=old.par[[1]])
     par(cex.lab=old.par[[2]])
     par(cex.main=old.par[[3]])
-  })
+    par(mar=old.par[[4]])
+    par(oma=old.par[[5]])
+    try(layout(1))
+  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
@@ -811,21 +814,12 @@ plotNetwork <- function(
   vCat(verbose, 0, "Validating user input...")
   
   # Check plot-specific arguments
-  if (class(main) != "character")
-    stop("'main' must be a characer vector")
-  
-  orderByArgs <- c("discovery", "test", "none")
-  orderNodesBy <- orderByArgs[pmatch(orderNodesBy, orderByArgs, nomatch=3)]
-  
-  if (!is.logical(orderModules) || is.na(orderModules) || length(orderModules) > 1) {
-    stop("'orderModules' must be either 'TRUE' or 'FALSE'")
-  }
-  
-  # At this time, we can only plot within one dataset.
-  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
-      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
-    stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
-  }
+  checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
+    plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
+    gaxt.line=gaxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
+    legend.tick.size=legend.tick.size, palette=palette, plotLegend=plotLegend, 
+    legend.main=legend.main, legend.position=legend.position, 
+    symmetric=symmetric)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -837,7 +831,8 @@ plotNetwork <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir)
+                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -848,6 +843,7 @@ plotNetwork <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   scaledData <- finput$scaledData
+  orderNodesBy <- finput$orderNodesBy
   
   # Indexes for this function
   di <- finput$discovery
@@ -855,87 +851,109 @@ plotNetwork <- function(
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
   
-  # set up 'discovery' as 'test' so we can use it on 'netPropsInternal'
-  discAsTest <- list(discovery)
-  names(discAsTest) <- discovery
+  # Convert dataset indices to dataset names
+  if (is.numeric(di))
+    di <- datasetNames[di]
+  if (is.numeric(ti))
+    ti <- datasetNames[ti]
   
   on.exit({
     vCat(verbose, 0, "Cleaning up temporary objects...")
     unlink(tmp.dir, recursive = TRUE)
   }, add = TRUE)
   
-  if (missing(plotModuleNames))
-    plotModuleNames <- length(mods) > 1
-  
-  if ((orderModules && length(mods) > 1) && 
-      (orderNodesBy == "discovery" && is.null(scaledData[[di]]))) {
-    stop("'data' not provided for 'orderNodesBy' dataset and ",
-         "'orderModules' = 'TRUE'") 
-  }
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
-  # Get ordering of nodes in the 'test' dataset by the dataset specified in 
-  # 'orderNodesBy'.
+  # Get ordering of nodes as specified in 'orderNodesBy'
   #-----------------------------------------------------------------------------
   
-  # Calculate the network properties in the dataset we're plotting.
-  testProps <- netPropsInternal(
-    scaledData, correlation, network, moduleAssignments, 
-    modules, discovery, test, nDatasets, datasetNames, FALSE
+  # Scenarios:
+  # - No ordering of nodes. We only need to calculate the network 
+  #   properties for the 'test' dataset.
+  # - Ordering of nodes only. We need to calculate the network properties in
+  #   all datasets specified in 'orderNodesBy' (may be one or more) and in the
+  #   'test' dataset (may or may not be specified in 'orderNodesBy').
+  
+  # this vector contains all datasets required for plotting
+  plotDatasets <- list(unique(na.omit(c(ti, orderNodesBy))))
+  names(plotDatasets) <- datasetNames[di]
+  
+  # Convert to name so that it matches 'plotDatasets'
+  if (is.numeric(discovery))
+    discovery <- datasetNames[[di]]
+  
+  # Calculate the network properties for all datasets required
+  plotProps <- netPropsInternal(
+    scaledData, correlation, network, moduleAssignments, modules, di,
+    plotDatasets, nDatasets, datasetNames, FALSE
   )
   
-  # Case 1: we want to order nodes by the discovery dataset, which if different
-  # to the test dataset, we need to recalculate the weighted degree for the 
-  # node order.
-  if (orderNodesBy == "discovery" && di != ti) {
-    # This skips all of the data verification
-    discProps <- netPropsInternal(
-      scaledData, correlation, network, moduleAssignments, 
-      modules, discovery, discAsTest, nDatasets, datasetNames, FALSE
-    )
-    nodeOrder <- nodeOrderInternal(
-      discProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE
-    )[[di]][[di]]
-    moduleOrder <- names(nodeOrder)
-    nodeOrder <- unlist(nodeOrder)
-  } 
-  # Case 2: order nodes as they're provided by the user
-  else if (orderNodesBy == "none") {
-    moduleOrder <- names(simplifyList(testProps[[di]][[ti]], depth=3))
-    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(testProps[[di]][[ti]][[mi]]$degree)
+  # Order nodes based on degree
+  if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
+    if (length(orderNodesBy) > 1) {
+      mean <- TRUE
+    } else {
+      mean <- FALSE
     }
-  } 
-  # Case 3: order nodes by their degree in the test network.
-  else {
-    # Order modules and samples by the test network
+    
+    # nodeOrderInternal will average acros all test datasets, so we need to 
+    # filter just to those specified in 'orderNodesBy' while preserving the
+    # structure of 'plotProps'
+    orderProps <- filterInternalProps(plotProps, orderNodesBy, di)
     nodeOrder <- nodeOrderInternal(
-      testProps, orderModules, simplify=FALSE, verbose, na.rm=TRUE
-    )[[di]][[ti]]
+      orderProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE, mean
+    )
+    nodeOrder <- simplifyList(nodeOrder, depth=3)
     moduleOrder <- names(nodeOrder)
     nodeOrder <- unlist(nodeOrder)
+  } else {
+    moduleOrder <- names(simplifyList(plotProps[[di]][[ti]], depth=1))
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+      names(plotProps[[di]][[ti]][[mi]]$degree)
+    }
   }
   
   #-----------------------------------------------------------------------------
-  # Identify nodes from the 'discovery' dataset not present in the 'test' 
-  # dataset.
+  # Identify nodes in the 'discovery' dataset not present in the 'test' dataset
   #-----------------------------------------------------------------------------
   
-  # Case 1: di == ti. Plotting within the same dataset => nothing missing.
-  # Case 2: orderBy == di: those missing in the discovery should have grey bars.
-  # Case 3: orderBy == ti: ordering within the same dataset => nothing missing.
-  
-  if (orderNodesBy == "discovery" && di != ti) {
-    na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
-    if (length(na.pos.x) > 0) {
-      presentNodes <- nodeOrder[-na.pos.x]
-    } else {
-      presentNodes <- nodeOrder
-    }
+  na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
+  if (length(na.pos.x) > 0) {
+    presentNodes <- nodeOrder[-na.pos.x]
   } else {
-    na.pos.x <- vector()
     presentNodes <- nodeOrder
+  }
+  
+  #-----------------------------------------------------------------------------
+  # Set default values for 'NULL' arguments
+  #-----------------------------------------------------------------------------
+  
+  # Plot module names only if drawing more than one module
+  if (is.null(plotModuleNames)) {
+    plotModuleNames <- length(mods) > 1
+  }
+  
+  # Set up the color palette for the data if unspecified
+  if (is.null(palette))
+    palette <- network.palette()
+  
+  # Default legend parameters depend on whether the heatmap is square or
+  # triangular
+  if (symmetric) {
+    if (is.null(legend.position))
+      legend.position <- 0.15
+    if (is.null(laxt.line))
+      laxt.line <- 3
+    if (is.null(legend.tick.size))
+      legend.tick.size <- 0.03
+  } else {
+    if (is.null(legend.position))
+      legend.position <- 0.1
+    if (is.null(laxt.line))
+      laxt.line <- 2.5
+    if (is.null(legend.tick.size))
+      legend.tick.size <- 0.025
   }
   
   #-----------------------------------------------------------------------------
@@ -949,14 +967,6 @@ plotNetwork <- function(
     gaxt <- nodeOrder
   
   if (symmetric) {
-    # Set defaults
-    if (missing(legend.position))
-      legend.position <- 0.15
-    if (missing(laxt.line))
-      laxt.line <- 3
-    if (missing(legend.tick.size))
-      legend.tick.size <- 0.03
-    
     # Add space for the legend
     if (plotLegend) {
       old.mar <- par("mar")
@@ -977,14 +987,6 @@ plotNetwork <- function(
       border.width=border.width
     )
   } else {
-    # Set defaults 
-    if (missing(legend.position))
-      legend.position <- 0.1
-    if (missing(laxt.line))
-      laxt.line <- 2.5
-    if (missing(legend.tick.size))
-      legend.tick.size <- 0.025
-    
     plotTriangleHeatmap(
       network[[ti]][presentNodes, presentNodes], palette, c(0, 1), 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=gaxt, 

@@ -34,12 +34,12 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
-  plotModuleNames, main = "", palette = network.palette(),
-  border.width = 2, plotLegend = TRUE, legend.main = "Edge weight",
-  gaxt.line = -0.5, maxt.line = 3, legend.position, legend.tick.size,
-  laxt.line, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", palette = NULL, border.width = 2, plotLegend = TRUE,
+  legend.main = "Edge weight", gaxt.line = -0.5, maxt.line = 3,
+  legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
