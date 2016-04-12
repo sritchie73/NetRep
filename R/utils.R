@@ -62,6 +62,11 @@ NULL
 #' @param labels character vector of labels for the lines printed. Ignored if 
 #'   fill is \code{FALSE}.
 vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
+  if (!(is.vector(verbose) && !is.list(verbose) && is.logical(verbose) &&
+        length(verbose) == 1 && !is.na(verbose))) {
+    stop("'verbose' must be one of 'TRUE' or 'FALSE'")
+  }
+  
   if(verbose) {
     # We need to format each line with the indendation level
     if (ind > 0) {
