@@ -775,11 +775,15 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param maxt.line user input for the corresponding argument in the plot functions.
 #' @param legend.tick.size user input for the corresponding argument in the plot functions.
 #' @param laxt.line user input for the corresponding argument in the plot functions.
+#' @param plotLegend user input for the corresponding argument in the plot functions.
+#' @param legend.position user input for the corresponding argument in the plot functions.
+#' @param legend.main user input for the corresponding argument in the plot functions.
+#' @param palette user input for the corresponding argument in the plot functions.
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main, 
   drawBorders, border.width, gaxt.line, saxt.line, maxt.line, legend.tick.size, 
-  laxt.line
+  laxt.line, plotLegend, legend.position, legend.main, palette
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -844,5 +848,19 @@ checkPlotArgs <- function(
   if (!(missing(legend.tick.size) || is.snum(legend.tick.size) || is.na(legend.tick.size)))
     stop("'legend.tick.size' must be a numeric vector of length 1 or 'NA'")
   
+  if (!(missing(plotLegend) || is.slog(plotLegend)))
+    stop("'plotLegend' must be on of 'TRUE' or 'FALSE'")
+  
+  if (!(missing(legend.position) || is.snum(legend.position) || is.na(legend.position)))
+    stop("'legend.position' must be a numeric vector of length 1 or 'NA'")
+  
+  if (!(missing(legend.main) || is.schar(legend.main) || is.na(legend.main) || is.null(legend.main)))
+    stop("'legend.main' must be a character vector of length 1")
+  
+  if (!(missing(palette) || is.null(palette) || (is.vector(palette) & is.character(palette))))
+    stop("'palette' must be a character vector")
+  if (!missing(palette) && !all(areColors(palette)))
+    stop("invalid colors found in 'palette':", 
+         paste(paste0('"', palette[!areColors(palette)], '"'), collapse=","))
   
 }

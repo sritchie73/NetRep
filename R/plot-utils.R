@@ -162,4 +162,14 @@ getModuleMidPoints <- function(mas) {
   mids
 }
 
-
+#' Check if a character vector of colors is valid
+#' 
+#' Courtesy of Josh O'Brien's stackoverflow answer at
+#' \link{http://stackoverflow.com/a/13290832/2341679}
+#' 
+#' @param colvec a character vectors of colors (hex or name) to validate.
+areColors <- function(colvec) {
+  sapply(colvec, function(col) {
+    tryCatch(is.matrix(col2rgb(col)), error = function(e) FALSE)
+  })
+}

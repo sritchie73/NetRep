@@ -319,10 +319,9 @@ heatmap.
   \code{network} arguments.
   
   When multiple modules are drawn, modules are ordered by the similarity
-  of their summary vectors in the drawn dataset (specified by the \code{test} 
-  argument) \code{test} dataset. If \code{orderModules} is \code{FALSE} then
-  modules will be drawn in the order specified in the \code{modules} 
-  argument.
+  of their summary vectors in the dataset(s) specified in \code{orderNodesBy}
+  argument. If multiple datasets are provided to the \code{orderNodesBy}
+  argument then the module summary vectors are concatenated across datasets.
   
   By default, samples in the data heatmap drawn by \code{plotData} and the 
   bar plot drawn by \code{plotModuleSummary} are ordered in descending order
