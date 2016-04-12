@@ -341,6 +341,10 @@ plotModule <- function(
   plotDatasets <- list(unique(na.omit(c(ti, orderSamplesBy, orderNodesBy))))
   names(plotDatasets) <- datasetNames[di]
   
+  # Convert to name so that it matches 'plotDatasets'
+  if (is.numeric(discovery))
+    discovery <- datasetNames[[di]]
+  
   # Calculate the network properties for all datasets required
   plotProps <- netPropsInternal(
     scaledData, correlation, network, moduleAssignments, modules, discovery,
