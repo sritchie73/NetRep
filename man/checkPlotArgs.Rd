@@ -4,11 +4,14 @@
 \alias{checkPlotArgs}
 \title{Validate plot function arguments}
 \usage{
-checkPlotArgs(plotNodeNames, plotSampleNames, plotModuleNames, main,
-  drawBorders, border.width, gaxt.line, saxt.line, maxt.line, legend.tick.size,
-  laxt.line)
+checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
+  main, drawBorders, border.width, gaxt.line, saxt.line, maxt.line,
+  legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
+  palette, symmetric)
 }
 \arguments{
+\item{orderModules}{user input for the corresponding argument in the plot functions.}
+
 \item{plotSampleNames}{user input for the corresponding argument in the plot functions.}
 
 \item{plotModuleNames}{user input for the corresponding argument in the plot functions.}
@@ -28,6 +31,16 @@ checkPlotArgs(plotNodeNames, plotSampleNames, plotModuleNames, main,
 \item{legend.tick.size}{user input for the corresponding argument in the plot functions.}
 
 \item{laxt.line}{user input for the corresponding argument in the plot functions.}
+
+\item{plotLegend}{user input for the corresponding argument in the plot functions.}
+
+\item{legend.position}{user input for the corresponding argument in the plot functions.}
+
+\item{legend.main}{user input for the corresponding argument in the plot functions.}
+
+\item{palette}{user input for the corresponding argument in the plot functions.}
+
+\item{symmetric}{user input for the corresponding argument in the plot functions.}
 
 \item{plotNodesNames}{user input for the corresponding argument in the plot functions.}
 }

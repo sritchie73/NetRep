@@ -779,11 +779,12 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param legend.position user input for the corresponding argument in the plot functions.
 #' @param legend.main user input for the corresponding argument in the plot functions.
 #' @param palette user input for the corresponding argument in the plot functions.
+#' @param symmetric user input for the corresponding argument in the plot functions.
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main, 
   drawBorders, border.width, gaxt.line, saxt.line, maxt.line, legend.tick.size, 
-  laxt.line, plotLegend, legend.position, legend.main, palette
+  laxt.line, plotLegend, legend.position, legend.main, palette, symmetric
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -819,7 +820,8 @@ checkPlotArgs <- function(
   if (!(missing(plotSampleNames) || is.slog(plotSampleNames)))
     stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
   
-  if (!(missing(plotModuleNames) || is.null(plotModuleNames) || is.slog(plotModuleNames)))
+  if (!(missing(plotModuleNames) || is.null(plotModuleNames) 
+        || is.slog(plotModuleNames)))
     stop("'plotModuleNames' must be one of 'TRUE', 'FALSE', or 'NULL'")
   
   if (!(missing(main) || is.null(main) || is.schar(main) || is.na(main)))
@@ -833,34 +835,45 @@ checkPlotArgs <- function(
   if (!missing(border.width) && border.width < 0)
     stop("'border.width' must be greater than 0")
   
-  if (!(missing(gaxt.line) || is.snum(gaxt.line) || is.na(gaxt.line)))
-    stop("'gaxt.line' must be a numeric vector of length 1 or 'NA'")
+  if (!(missing(gaxt.line) || is.snum(gaxt.line) || 
+        is.na(gaxt.line) || is.null(gaxt.line)))
+    stop("'gaxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
-  if (!(missing(saxt.line) || is.snum(saxt.line) || is.na(saxt.line)))
-    stop("'saxt.line' must be a numeric vector of length 1 or 'NA'")
+  if (!(missing(saxt.line) || is.snum(saxt.line) || 
+        is.na(saxt.line) || is.null(saxt.line)))
+    stop("'saxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
-  if (!(missing(maxt.line) || is.null(maxt.line) || is.snum(maxt.line) || is.na(maxt.line)))
+  if (!(missing(maxt.line) ||  is.snum(maxt.line) || 
+        is.na(maxt.line) || is.null(maxt.line)))
     stop("'maxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
-  if (!(missing(laxt.line) || is.snum(laxt.line) || is.na(laxt.line)))
-    stop("'laxt.line' must be a numeric vector of length 1 or 'NA'")
+  if (!(missing(laxt.line) || is.snum(laxt.line) || 
+        is.na(laxt.line) || is.null(laxt.line)))
+    stop("'laxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
-  if (!(missing(legend.tick.size) || is.snum(legend.tick.size) || is.na(legend.tick.size)))
-    stop("'legend.tick.size' must be a numeric vector of length 1 or 'NA'")
+  if (!(missing(legend.tick.size) || is.snum(legend.tick.size) || 
+        is.na(legend.tick.size) || is.null(legend.tick.size)))
+    stop("'legend.tick.size' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
   if (!(missing(plotLegend) || is.slog(plotLegend)))
     stop("'plotLegend' must be on of 'TRUE' or 'FALSE'")
   
-  if (!(missing(legend.position) || is.snum(legend.position) || is.na(legend.position)))
-    stop("'legend.position' must be a numeric vector of length 1 or 'NA'")
+  if (!(missing(legend.position) || is.snum(legend.position) 
+        || is.na(legend.position) || is.null(legend.position)))
+    stop("'legend.position' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
-  if (!(missing(legend.main) || is.schar(legend.main) || is.na(legend.main) || is.null(legend.main)))
+  if (!(missing(legend.main) || is.schar(legend.main) || is.na(legend.main) 
+        || is.null(legend.main)))
     stop("'legend.main' must be a character vector of length 1")
   
-  if (!(missing(palette) || is.null(palette) || (is.vector(palette) & is.character(palette))))
+  if (!(missing(palette) || is.null(palette) || 
+        (is.vector(palette) && is.character(palette))))
     stop("'palette' must be a character vector")
   if (!missing(palette) && !all(areColors(palette)))
     stop("invalid colors found in 'palette':", 
          paste(paste0('"', palette[!areColors(palette)], '"'), collapse=","))
+  
+  if (!(missing(symmetric) || is.slog(symmetric)))
+    stop("'symmetric' must be one of 'TRUE' or 'FALSE'")
   
 }

@@ -15,22 +15,22 @@
 \usage{
 plotData(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames, main = "",
-  palette = data.palette(), border.width = 2, plotLegend = TRUE,
+  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
+  orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
+  plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
+  palette = NULL, border.width = 2, plotLegend = TRUE,
   legend.main = "Data", gaxt.line = -0.5, saxt.line = -0.5,
   maxt.line = 3, legend.position = 0.15, legend.tick.size = 0.03,
   laxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
-  plotModuleNames, main = "", palette = correlation.palette(),
-  border.width = 2, plotLegend = TRUE, legend.main = "Correlation",
-  gaxt.line = -0.5, maxt.line = 3, legend.position, legend.tick.size,
-  laxt.line, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", palette = NULL, border.width = 2, plotLegend = TRUE,
+  legend.main = "Correlation", gaxt.line = -0.5, maxt.line = 3,
+  legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,

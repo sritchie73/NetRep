@@ -259,6 +259,10 @@ plotModule <- function(
     gaxt.line=gaxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
     legend.tick.size=legend.tick.size, laxt.line=laxt.line)
   
+  # Handle variants that will not work for this plot function
+  if (is.null(legend.tick.size))
+    stop("'legend.tick.size' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
@@ -341,13 +345,9 @@ plotModule <- function(
   plotDatasets <- list(unique(na.omit(c(ti, orderSamplesBy, orderNodesBy))))
   names(plotDatasets) <- datasetNames[di]
   
-  # Convert to name so that it matches 'plotDatasets'
-  if (is.numeric(discovery))
-    discovery <- datasetNames[[di]]
-  
   # Calculate the network properties for all datasets required
   plotProps <- netPropsInternal(
-    scaledData, correlation, network, moduleAssignments, modules, discovery,
+    scaledData, correlation, network, moduleAssignments, modules, di,
     plotDatasets, nDatasets, datasetNames, FALSE
   )
   
