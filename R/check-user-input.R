@@ -666,6 +666,12 @@ processInput <- function(
     datasetNames <- names(network)
   } else {
     datasetNames <- paste0("Dataset", seq_len(nDatasets))
+    names(data) <- datasetNames
+    names(scaledData) <- datasetNames
+    names(modules) <- datasetNames
+    names(correlation) <- datasetNames
+    names(network) <- datasetNames
+    names(moduleAssignments) <- datasetNames
   }
   names(datasetNames) <- datasetNames
   
