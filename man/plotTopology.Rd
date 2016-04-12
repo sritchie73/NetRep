@@ -43,11 +43,11 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames, main = "",
-  border.width = 2, palette = c("#313695", "#a50026"),
-  drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", border.width = 2, palette = NULL, drawBorders = FALSE,
+  gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -466,17 +466,24 @@ plotDegree(
   test="test"
 )
 
-# Alternatively nodes can be order on the plot by degree in the test dataset
+# Alternatively nodes can be ordered on the plot by degree in the test dataset
 plotDegree(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test", orderNodesBy="test"
 )
 
+# Or by averaging the degree across datasets for a more robust ordering  
+plotDegree(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
+  test="test", orderNodesBy=c("discovery", "test")
+)
+
 # Arbitrary subsets can be plotted:
 plotContribution(
   data=data_list[[1]][, 1:10], correlation=correlation_list[[1]][1:10, 1:10], 
-  network=network_list[[1]][1:10, 1:10], orderNodesBy="none" 
+  network=network_list[[1]][1:10, 1:10], orderNodesBy=NA
 )
 
 # Plot the module summary vectors for multiple modules:
