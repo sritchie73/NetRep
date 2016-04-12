@@ -530,7 +530,6 @@ plotData <- function(
     }
   }
   
-  
   #-----------------------------------------------------------------------------
   # Plot the data matrix
   #-----------------------------------------------------------------------------
@@ -1668,13 +1667,14 @@ plotSummary <- function(
 plotDataLegend <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE, 
-  palette=data.palette(), border.width=2, horizontal=TRUE, legend.main="Data", 
+  palette=NULL, border.width=2, horizontal=TRUE, legend.main="Data", 
   legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
-  # Set graphical parameters
+  # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
   par(cex.axis=cex.axis)
   par(cex.lab=cex.lab)
   par(cex.main=cex.main)
@@ -1683,7 +1683,10 @@ plotDataLegend <- function(
     par(cex.axis=old.par[[1]])
     par(cex.lab=old.par[[2]])
     par(cex.main=old.par[[3]])
-  })
+    par(mar=old.par[[4]])
+    par(oma=old.par[[5]])
+    try(layout(1))
+  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
@@ -1697,14 +1700,9 @@ plotDataLegend <- function(
     stop("Cannot plot data legend without 'data'")
   
   # Check plot-specific arguments
-  if (class(legend.main) != "character")
-    stop("'legend.main' must be a characer vector")
-  
-  # At this time, we can only plot within one dataset.
-  if ((!is.null(discovery) && (!is.vector(discovery) || length(discovery) > 1)) ||
-      (!is.null(test) && (!is.vector(test) || length(test) > 1))) {
-    stop("only 1 'discovery' and 'test' dataset can be specified when plotting")
-  }
+  checkPlotArgs(border.width=border.width, laxt.line=laxt.line, 
+    legend.tick.size=legend.tick.size, palette=palette, 
+    legend.main=legend.main, horizontal=horizontal)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
@@ -1726,24 +1724,46 @@ plotDataLegend <- function(
   ti <- finput$test[[di]]
   mods <- modules[[di]]
 
+  # Convert dataset indices to dataset names
+  if (is.numeric(di))
+    di <- datasetNames[di]
+  if (is.numeric(ti))
+    ti <- datasetNames[ti]
+  
   on.exit({
     vCat(verbose, 0, "Cleaning up temporary objects...")
     unlink(tmp.dir, recursive = TRUE)
   }, add = TRUE)
-  
-  if (is.null(data[[ti]]))
-    stop("Cannot plot data legend without 'data'")
-  
+
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
   # Get the range of data matrix for the modules in the test dataset 
   #-----------------------------------------------------------------------------
-  modNodes <- getModuleVarsUnsorted(moduleAssignments, mods, di)
+  modNodes <- names(moduleAssignments[[di]][moduleAssignments[[di]] %in% mods])
   modNodes <- modNodes %sub_in% colnames(data[[ti]])
   if (length(modNodes) == 0)
     stop("None of the variables composing the module are present in the test dataset")
-  rg <- range(data[[ti]][,modNodes])
+  
+  #-----------------------------------------------------------------------------
+  # Set default values for 'NULL' arguments
+  #-----------------------------------------------------------------------------
+  
+  # Set up the color palette for the data if unspecified
+  if (is.null(palette)) {
+    range.dat <- range(data[[ti]][,modNodes])
+    # Different automatic color palettes depending on the range of the data
+    if (all(range.dat > 0)) {
+      palette <- tail(data.palette(), length(data.palette())/2)
+      range.pal <- range.dat
+    } else if (all(range.dat < 0)) {
+      palette <- head(data.palette(), length(data.palette())/2)
+      range.pal <- range.dat
+    } else {
+      palette <- data.palette()
+      range.pal <- c(-max(abs(range.dat)), max(abs(range.dat)))
+    }
+  }
   
   #-----------------------------------------------------------------------------
   # Plot the legend
@@ -1751,25 +1771,12 @@ plotDataLegend <- function(
   vCat(verbose, 0, "rendering plot components...")
   
   emptyPlot(c(0,1), c(0,1), bty="n")
-  if (all(rg < 0)) {
-    addGradientLegend(
-      head(palette, length(palette)/2), rg, rg, horizontal, legend.main, 
-      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line,
-      border.width=border.width
-    )
-  } else if (all(rg > 0)) {
-    addGradientLegend(
-      tail(palette, length(palette)/2), rg, rg, horizontal, legend.main, 
-      xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line,
-      border.width=border.width
-    )
-  } else {
-    plim <- c(-max(abs(rg)), max(abs(rg)))
-    addGradientLegend(
-      palette, plim, rg, horizontal, legend.main, xlim=c(0,1), ylim=c(0,1), 
-      tick.size=legend.tick.size, axis.line=laxt.line, border.width=border.width
-    )
-  }
+  addGradientLegend(
+    palette, range.pal, range.pal, horizontal, legend.main, 
+    xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line,
+    border.width=border.width
+  )
+  
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
@@ -1779,14 +1786,15 @@ plotDataLegend <- function(
 #' @rdname plotTopology
 #' @export
 plotCorrelationLegend <- function(
-  palette=correlation.palette(), border.width=2, horizontal=TRUE, 
+  palette=NULL, border.width=2, horizontal=TRUE, 
   legend.main="correlation", legend.tick.size=0.03, laxt.line=2.5, 
   cex.axis=0.8, cex.lab=1, cex.main=1.2, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
-  # Set graphical parameters
+  # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
   par(cex.axis=cex.axis)
   par(cex.lab=cex.lab)
   par(cex.main=cex.main)
@@ -1795,7 +1803,27 @@ plotCorrelationLegend <- function(
     par(cex.axis=old.par[[1]])
     par(cex.lab=old.par[[2]])
     par(cex.main=old.par[[3]])
-  })
+    par(mar=old.par[[4]])
+    par(oma=old.par[[5]])
+    try(layout(1))
+  }, add=TRUE)
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input
+  #-----------------------------------------------------------------------------
+  # Check plot-specific arguments
+  checkPlotArgs(border.width=border.width, laxt.line=laxt.line, 
+    legend.tick.size=legend.tick.size, palette=palette, 
+    legend.main=legend.main, horizontal=horizontal)
+  
+  #-----------------------------------------------------------------------------
+  # Set default values for 'NULL' arguments
+  #-----------------------------------------------------------------------------
+  
+  # Set up the color palette for the data if unspecified
+  if (is.null(palette)) {
+    palette <- correlation.palette()
+  }
   
   #-----------------------------------------------------------------------------
   # Render legend
@@ -1819,9 +1847,10 @@ plotNetworkLegend <- function(
   cex.axis=0.8, cex.lab=1, cex.main=1.2, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
-  # Set graphical parameters
+  # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main"))
+  
+  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
   par(cex.axis=cex.axis)
   par(cex.lab=cex.lab)
   par(cex.main=cex.main)
@@ -1830,7 +1859,27 @@ plotNetworkLegend <- function(
     par(cex.axis=old.par[[1]])
     par(cex.lab=old.par[[2]])
     par(cex.main=old.par[[3]])
-  })
+    par(mar=old.par[[4]])
+    par(oma=old.par[[5]])
+    try(layout(1))
+  }, add=TRUE)
+  
+  #-----------------------------------------------------------------------------
+  # Validate user input
+  #-----------------------------------------------------------------------------
+  # Check plot-specific arguments
+  checkPlotArgs(border.width=border.width, laxt.line=laxt.line, 
+                legend.tick.size=legend.tick.size, palette=palette, 
+                legend.main=legend.main, horizontal=horizontal)
+  
+  #-----------------------------------------------------------------------------
+  # Set default values for 'NULL' arguments
+  #-----------------------------------------------------------------------------
+  
+  # Set up the color palette for the data if unspecified
+  if (is.null(palette)) {
+    palette <- network.palette()
+  }
   
   #-----------------------------------------------------------------------------
   # Render legend

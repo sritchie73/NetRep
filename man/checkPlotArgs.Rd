@@ -7,7 +7,7 @@
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
   main, drawBorders, border.width, gaxt.line, saxt.line, maxt.line,
   legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
-  palette, symmetric)
+  palette, symmetric, horizontal)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
@@ -41,6 +41,8 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \item{palette}{user input for the corresponding argument in the plot functions.}
 
 \item{symmetric}{user input for the corresponding argument in the plot functions.}
+
+\item{horizontal}{user input for the corresponding argument in the plot functions.}
 
 \item{plotNodesNames}{user input for the corresponding argument in the plot functions.}
 }

@@ -67,14 +67,13 @@ plotSummary(data, correlation, network, moduleAssignments = NULL,
 
 plotDataLegend(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, palette = data.palette(), border.width = 2,
-  horizontal = TRUE, legend.main = "Data", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  verbose = TRUE, palette = NULL, border.width = 2, horizontal = TRUE,
+  legend.main = "Data", legend.tick.size = 0.03, laxt.line = 2.5,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
-plotCorrelationLegend(palette = correlation.palette(), border.width = 2,
-  horizontal = TRUE, legend.main = "correlation", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  verbose = TRUE)
+plotCorrelationLegend(palette = NULL, border.width = 2, horizontal = TRUE,
+  legend.main = "correlation", legend.tick.size = 0.03, laxt.line = 2.5,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2, verbose = TRUE)
 
 plotNetworkLegend(palette = network.palette(), border.width = 2,
   horizontal = TRUE, legend.main = "network", legend.tick.size = 0.03,

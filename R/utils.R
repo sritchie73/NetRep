@@ -283,27 +283,6 @@ orderAsNumeric <- function(vec) {
   })
 }
 
-#' Get variables composing a module
-#' 
-#' Get the variables composing the user specified modules in the order they 
-#' appear in the 'moduleAssignments' vector for the discovery dataset.
-#' 
-#' @param moduleAssignments a vector of the module assignment for each variable
-#'  in the discovery dataset. If there are multiple discovery datasets 
-#' then this argument should be a list of such vectors.  
-#' @param modules a vector of modules to apply the function to.
-#' @param discovery name or index denoting which dataset the module of
-#'  interest was discovered in.
-#'  
-#' @rdname getModuleVarsUnsorted
-getModuleVarsUnsorted <- function(
-  moduleAssignments, modules, discovery=1
-) {
-  foreach(mi = modules, .combine=c) %do% {
-    names(moduleAssignments[[discovery]] %sub_in% modules)
-  }
-}
-
 #' Set up a parallel backend
 #'
 #' Set up a backend with the requested number of cores, or use existing backend

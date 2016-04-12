@@ -780,11 +780,13 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param legend.main user input for the corresponding argument in the plot functions.
 #' @param palette user input for the corresponding argument in the plot functions.
 #' @param symmetric user input for the corresponding argument in the plot functions.
+#' @param horizontal user input for the corresponding argument in the plot functions.
 #' 
 checkPlotArgs <- function(
-  orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main, 
+  orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, border.width, gaxt.line, saxt.line, maxt.line, legend.tick.size, 
-  laxt.line, plotLegend, legend.position, legend.main, palette, symmetric
+  laxt.line, plotLegend, legend.position, legend.main, palette, symmetric,
+  horizontal
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -875,5 +877,8 @@ checkPlotArgs <- function(
   
   if (!(missing(symmetric) || is.slog(symmetric)))
     stop("'symmetric' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!(missing(horizontal) || is.slog(horizontal)))
+    stop("'horizontal' must be one of 'TRUE' or 'FALSE'")
   
 }
