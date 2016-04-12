@@ -6,12 +6,13 @@
 \usage{
 plotModule(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames, main = "Module Topology",
-  drawBorders = FALSE, border.width = 2, gaxt.line = -0.5,
-  saxt.line = -0.5, maxt.line, legend.tick.size = 0.04, laxt.line = 2.5,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
+  orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
+  plotSampleNames = TRUE, plotModuleNames = NULL,
+  main = "Module Topology", drawBorders = FALSE, border.width = 2,
+  gaxt.line = -0.5, saxt.line = -0.5, maxt.line = NULL,
+  legend.tick.size = 0.04, laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -212,15 +213,14 @@ Individual components of the module plot can be plotted using
   \code{network} arguments.
   
   When multiple modules are drawn, modules are ordered by the similarity
-  of their summary vectors in the drawn dataset (specified by the \code{test} 
-  argument) \code{test} dataset. If \code{orderModules} is \code{FALSE} then
-  modules will be drawn in the order specified in the \code{modules} 
-  argument.
+  of their summary vectors in the dataset(s) specified in \code{orderNodesBy}
+  argument. If multiple datasets are provided to the \code{orderNodesBy}
+  argument then the module summary vectors are concatenated across datasets.
   
-  By default, samples in the data heatmap and accompanying module summary 
-  bar plot are ordered in descending order of \emph{module summary} in the drawn
-  dataset (specified by the \code{test} argument). If multiple modules are
-  drawn, samples are ordered as per the left-most module on the plot. 
+  By default, samples in the data heatmap and accompanying module summary bar
+  plot are ordered in descending order of \emph{module summary} in the drawn 
+  dataset (specified by the \code{test} argument). If multiple modules are 
+  drawn, samples are ordered as per the left-most module on the plot.
   
   Alternatively, a vector containing the name or index of another dataset may
   be provided to the \code{orderSamplesBy} argument. In this case, samples
@@ -267,7 +267,8 @@ Individual components of the module plot can be plotted using
 }
 \examples{
 \dontrun{
-# load in example data, correlation, and network matrices for a discovery and test dataset:
+# load in example data, correlation, and network matrices for a discovery 
+# and test dataset:
 data("NetRep")
 
 # Convert them to the 'bigMatrix' format:
@@ -284,7 +285,7 @@ correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
-# Plot module 1, 2 and 4in the discovery dataset
+# Plot module 1, 2 and 4 in the discovery dataset
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4)
@@ -295,6 +296,14 @@ plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test"
+)
+
+# Plot modules 1 and 4, which replicate, in the test datset ordering nodes
+# by weighted degree averaged across the two datasets
+plotModule(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=labels_list, modules=c(1, 4), discovery="discovery",
+  test="test", orderNodesBy=c("discovery", "test")
 )
 }
 

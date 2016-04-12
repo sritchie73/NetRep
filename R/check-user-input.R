@@ -758,3 +758,91 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
   } 
   stop("unable to load object of type ", class(object), " as a bigMatrix!")
 }
+
+#' Validate plot function arguments
+#' 
+#' Simple typechecking for the extensive plot arguments
+#' 
+#' @param orderModules user input for the corresponding argument in the plot functions.
+#' @param plotNodesNames user input for the corresponding argument in the plot functions.
+#' @param plotSampleNames user input for the corresponding argument in the plot functions.
+#' @param plotModuleNames user input for the corresponding argument in the plot functions.
+#' @param main user input for the corresponding argument in the plot functions.
+#' @param drawBorders user input for the corresponding argument in the plot functions.
+#' @param border.width user input for the corresponding argument in the plot functions.
+#' @param gaxt.line user input for the corresponding argument in the plot functions.
+#' @param saxt.line user input for the corresponding argument in the plot functions.
+#' @param maxt.line user input for the corresponding argument in the plot functions.
+#' @param legend.tick.size user input for the corresponding argument in the plot functions.
+#' @param laxt.line user input for the corresponding argument in the plot functions.
+#' 
+checkPlotArgs <- function(
+  orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main, 
+  drawBorders, border.width, gaxt.line, saxt.line, maxt.line, legend.tick.size, 
+  laxt.line
+) {
+  # Return TRUE only if a an object is a vector, not a list.
+  is.vector <- function(obj) {
+    base::is.vector(obj) && !is.list(obj)
+  }
+  
+  # Makes sure the check does not throw a warning if the vector has length > 1.
+  is.na <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && base::is.na(obj) 
+  }
+  
+  # Return TRUE if an argument is a numeric vector of length 1.
+  is.snum <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && is.numeric(obj) && !is.na(obj)
+  }
+  
+  # Return TRUE if an argument is a character vector of length 1.
+  is.schar <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && is.character(obj) && !is.na(obj)
+  }
+  
+  # Return TRUE if an argument is a logical vector of length 1 
+  is.slog <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && is.logical(obj) && !is.na(obj)
+  }
+  
+  if (!is.slog(orderModules))
+    stop("'orderModules' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!is.slog(plotNodeNames)) 
+    stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!is.slog(plotSampleNames)) 
+    stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!(is.null(plotModuleNames) || is.slog(plotModuleNames)))
+    stop("'plotModuleNames' must be one of 'TRUE', 'FALSE', or 'NULL'")
+  
+  if (!(is.null(main) || is.schar(main) || is.na(main)))
+    stop("'main' must be 'NULL' or a character vector of length 1")
+  
+  if (!(is.slog(drawBorders)))
+    stop("'drawBorders' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!is.snum(border.width))
+    stop("'border.width' must be a numeric vector of length 1")
+  if (border.width < 0)
+    stop("'border.width' must be greater than 0")
+  
+  if (!(is.snum(gaxt.line) || is.na(gaxt.line)))
+    stop("'gaxt.line' must be a numeric vector of length 1 or 'NA'")
+  
+  if (!(is.snum(saxt.line) || is.na(saxt.line)))
+    stop("'saxt.line' must be a numeric vector of length 1 or 'NA'")
+  
+  if (!(is.null(maxt.line) || is.snum(maxt.line) || is.na(maxt.line)))
+    stop("'maxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  
+  if (!is.snum(laxt.line) || is.na(laxt.line))
+    stop("'laxt.line' must be a numeric vector of length 1 or 'NA'")
+  
+  if (!(is.snum(legend.tick.size) || is.na(legend.tick.size)))
+    stop("'legend.tick.size' must be a numeric vector of length 1 or 'NA'")
+  
+  
+}

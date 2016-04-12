@@ -971,3 +971,41 @@ sampleOrderInternal <- function(props, verbose, na.rm) {
   }
   return(props)
 }
+
+#' Filter structure returned by 'netPropsInternal' to specified test datasets
+#' 
+#' Used in the plot functions to filter the structure to the 
+#' \code{'orderNodesBy'} and \code{'orderSamplesBy'} \emph{test} datasets.
+#' 
+#' @param props nested list returned by \code{\link{'netPropsInternal'}}.
+#' @param test a vector of datasets to filter to.
+#' @param discovery a vector containing a single discovery dataset specified in
+#'   the parent plot function. 
+#' @param modules a vector of modules from the specified \code{discovery} 
+#'   dataset to filter to. If \code{NULL}, then all modules are kept.
+#'   
+#' @return 
+#'  a nested list structure identical to that returned by 
+#'  \code{'netPropsInternal'}, but where only the entries for test datasets
+#'  specified by the \code{test} argument and modules specified by the 
+#'  \code{modules} argument contain non-\code{NULL} entries.
+filterInternalProps <- function(props, test, discovery, modules=NULL) {
+  fProps <- foreach(ii = seq_along(props)) %do% {
+    fProps2 <- foreach(jj = seq_along(props[[ii]])) %do% {
+      if (names(props)[ii] == discovery) {
+        fProps3 <- foreach(mi = seq_along(props[[ii]][[jj]])) %do% {
+          if (names(props[[ii]])[jj] %in% test && 
+              (is.null(modules) || names(props[[ii]][[jj]])[mi] %in% modules)) {
+            return(props[[ii]][[jj]][[mi]])
+          }
+        }
+        names(fProps3) <- names(props[[ii]][[jj]])
+        return(fProps3)
+      }
+    }
+    names(fProps2) <- names(props[[ii]])
+    return(fProps2)
+  }
+  names(fProps) <- names(props)
+  return(fProps)
+}
