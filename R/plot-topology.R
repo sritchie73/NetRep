@@ -152,7 +152,7 @@
 #' \subsection{Customising plot layout:}{
 #'   Although reasonable default values for most parameters have been provided,
 #'   the rendering of axes and titles may need adjusting depending on the size
-#'   of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
+#'   of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
 #'   \code{maxt.line}, and \code{laxt.line} control the distance from each plot
 #'   window that the node labels, sample labels, module labels, and legend 
 #'   labels are rendered. 
@@ -314,7 +314,7 @@ plotData <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="", palette=NULL, 
-  border.width=2, plotLegend=TRUE, legend.main="Data", gaxt.line=-0.5, 
+  border.width=2, plotLegend=TRUE, legend.main="Data", naxt.line=-0.5, 
   saxt.line=-0.5, maxt.line=3, legend.position=0.15, legend.tick.size=0.03, 
   laxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -350,7 +350,7 @@ plotData <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
-    main=main, border.width=border.width, gaxt.line=gaxt.line, 
+    main=main, border.width=border.width, naxt.line=naxt.line, 
     saxt.line=saxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     legend.tick.size=legend.tick.size, palette=palette, 
     plotLegend=plotLegend, legend.main=legend.main,
@@ -559,7 +559,7 @@ plotData <- function(
     moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
     xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
-    xaxt.line=gaxt.line, yaxt.line=saxt.line, legend.tick.size=legend.tick.size,
+    xaxt.line=naxt.line, yaxt.line=saxt.line, legend.tick.size=legend.tick.size,
     laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line,
     border.width=border.width
   )
@@ -576,7 +576,7 @@ plotCorrelation <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", palette=NULL, border.width=2, plotLegend=TRUE, 
-  legend.main="Correlation", gaxt.line=-0.5, maxt.line=3, legend.position=NULL, 
+  legend.main="Correlation", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
   legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -608,7 +608,7 @@ plotCorrelation <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
-    gaxt.line=gaxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
+    naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     legend.tick.size=legend.tick.size, palette=palette, plotLegend=plotLegend, 
     legend.main=legend.main, legend.position=legend.position, 
     symmetric=symmetric)
@@ -766,9 +766,9 @@ plotCorrelation <- function(
   vCat(verbose, 0, "rendering plot components...")
   
   # Plot axis tick labels?
-  gaxt <- NULL
+  naxt <- NULL
   if (plotNodeNames)
-    gaxt <- nodeOrder
+    naxt <- nodeOrder
   
   if (symmetric) {
     # Add space for the legend
@@ -783,18 +783,18 @@ plotCorrelation <- function(
     plotSquareHeatmap(
       correlation[[ti]][presentNodes, presentNodes], palette, c(-1, 1), 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
-      xaxt=gaxt, yaxt=gaxt, plotLegend=plotLegend, main=main,
+      xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, yaxt.line=gaxt.line, border.width=border.width,
+      xaxt.line=naxt.line, yaxt.line=naxt.line, border.width=border.width,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line
     )
   } else {
     plotTriangleHeatmap(
       correlation[[ti]][presentNodes, presentNodes], palette, c(-1, 1),
-      moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=gaxt, 
+      moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
-      plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
+      plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line, 
       border.width=border.width
@@ -813,7 +813,7 @@ plotNetwork <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", palette=NULL, border.width=2, plotLegend=TRUE, 
-  legend.main="Edge weight", gaxt.line=-0.5, maxt.line=3, legend.position=NULL, 
+  legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
   legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -845,7 +845,7 @@ plotNetwork <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
-    gaxt.line=gaxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
+    naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     legend.tick.size=legend.tick.size, palette=palette, plotLegend=plotLegend, 
     legend.main=legend.main, legend.position=legend.position, 
     symmetric=symmetric)
@@ -1003,9 +1003,9 @@ plotNetwork <- function(
   vCat(verbose, 0, "rendering plot components...")
   
   # Plot axis tick labels?
-  gaxt <- NULL
+  naxt <- NULL
   if (plotNodeNames)
-    gaxt <- nodeOrder
+    naxt <- nodeOrder
   
   if (symmetric) {
     # Add space for the legend
@@ -1020,9 +1020,9 @@ plotNetwork <- function(
     plotSquareHeatmap(
       network[[ti]][presentNodes, presentNodes], palette, c(0, 1), 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
-      xaxt=gaxt, yaxt=gaxt, plotLegend=plotLegend, main=main,
+      xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, yaxt.line=gaxt.line, 
+      xaxt.line=naxt.line, yaxt.line=naxt.line, 
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line,
       border.width=border.width
@@ -1030,9 +1030,9 @@ plotNetwork <- function(
   } else {
     plotTriangleHeatmap(
       network[[ti]][presentNodes, presentNodes], palette, c(0, 1), 
-      moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=gaxt, 
+      moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
-      plotModuleNames=plotModuleNames, xaxt.line=gaxt.line,
+      plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line, 
       border.width=border.width
@@ -1051,7 +1051,7 @@ plotContribution <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", border.width=2, palette=NULL, 
-  drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
+  drawBorders=FALSE, naxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
   cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1086,7 +1086,7 @@ plotContribution <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
-    drawBorders=drawBorders, gaxt.line=gaxt.line, maxt.line=maxt.line, 
+    drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
     palette=palette)
   
   # Register parallel backend. 
@@ -1230,7 +1230,7 @@ plotContribution <- function(
     nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder],
     ifelse(nodeContribVec > 0, palette[2], palette[1]), drawBorders=drawBorders,
     xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
-    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
+    xaxt.line=naxt.line, maxt.line=maxt.line, main=main,
     ylab="Node contribution", border.width=border.width
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
@@ -1246,7 +1246,7 @@ plotDegree <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", palette=NULL, border.width=2, 
-  drawBorders=FALSE, gaxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
+  drawBorders=FALSE, naxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
   cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
@@ -1278,7 +1278,7 @@ plotDegree <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
-    drawBorders=drawBorders, gaxt.line=gaxt.line, maxt.line=maxt.line, 
+    drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
     palette=palette)
   
   # Register parallel backend. 
@@ -1422,7 +1422,7 @@ plotDegree <- function(
     wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder],
     palette, drawBorders=drawBorders,
     xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
-    xaxt.line=gaxt.line, maxt.line=maxt.line, main=main,
+    xaxt.line=naxt.line, maxt.line=maxt.line, main=main,
     ylab="Weighted degree", border.width=border.width
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)

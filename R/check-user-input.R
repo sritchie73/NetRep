@@ -776,7 +776,7 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param main user input for the corresponding argument in the plot functions.
 #' @param drawBorders user input for the corresponding argument in the plot functions.
 #' @param border.width user input for the corresponding argument in the plot functions.
-#' @param gaxt.line user input for the corresponding argument in the plot functions.
+#' @param naxt.line user input for the corresponding argument in the plot functions.
 #' @param saxt.line user input for the corresponding argument in the plot functions.
 #' @param maxt.line user input for the corresponding argument in the plot functions.
 #' @param legend.tick.size user input for the corresponding argument in the plot functions.
@@ -790,7 +790,7 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
-  drawBorders, border.width, gaxt.line, saxt.line, maxt.line, legend.tick.size, 
+  drawBorders, border.width, naxt.line, saxt.line, maxt.line, legend.tick.size, 
   laxt.line, plotLegend, legend.position, legend.main, palette, symmetric,
   horizontal
 ) {
@@ -843,9 +843,9 @@ checkPlotArgs <- function(
   if (!missing(border.width) && border.width < 0)
     stop("'border.width' must be greater than 0")
   
-  if (!(missing(gaxt.line) || is.snum(gaxt.line) || 
-        is.na(gaxt.line) || is.null(gaxt.line)))
-    stop("'gaxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!(missing(naxt.line) || is.snum(naxt.line) || 
+        is.na(naxt.line) || is.null(naxt.line)))
+    stop("'naxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
   
   if (!(missing(saxt.line) || is.snum(saxt.line) || 
         is.na(saxt.line) || is.null(saxt.line)))

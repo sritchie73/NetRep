@@ -5,7 +5,7 @@
 \title{Validate plot function arguments}
 \usage{
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
-  main, drawBorders, border.width, gaxt.line, saxt.line, maxt.line,
+  main, drawBorders, border.width, naxt.line, saxt.line, maxt.line,
   legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
   palette, symmetric, horizontal)
 }
@@ -22,7 +22,7 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 
 \item{border.width}{user input for the corresponding argument in the plot functions.}
 
-\item{gaxt.line}{user input for the corresponding argument in the plot functions.}
+\item{naxt.line}{user input for the corresponding argument in the plot functions.}
 
 \item{saxt.line}{user input for the corresponding argument in the plot functions.}
 

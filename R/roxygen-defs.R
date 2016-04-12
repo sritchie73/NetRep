@@ -91,7 +91,7 @@ NULL
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the 
 #'  connectivity, module membership, and module summary bar plots.
 #' @param border.width line width for borders.
-#' @param gaxt.line the number of lines into the bottom margin at which the node
+#' @param naxt.line the number of lines into the bottom margin at which the node
 #'  names will be drawn.
 #' @param saxt.line the number of lines into the left margin at which the sample
 #'  names will be drawn.

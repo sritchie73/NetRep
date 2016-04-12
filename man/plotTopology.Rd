@@ -19,7 +19,7 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
   palette = NULL, border.width = 2, plotLegend = TRUE,
-  legend.main = "Data", gaxt.line = -0.5, saxt.line = -0.5,
+  legend.main = "Data", naxt.line = -0.5, saxt.line = -0.5,
   maxt.line = 3, legend.position = 0.15, legend.tick.size = 0.03,
   laxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
@@ -28,7 +28,7 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", palette = NULL, border.width = 2, plotLegend = TRUE,
-  legend.main = "Correlation", gaxt.line = -0.5, maxt.line = 3,
+  legend.main = "Correlation", naxt.line = -0.5, maxt.line = 3,
   legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
@@ -37,7 +37,7 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", palette = NULL, border.width = 2, plotLegend = TRUE,
-  legend.main = "Edge weight", gaxt.line = -0.5, maxt.line = 3,
+  legend.main = "Edge weight", naxt.line = -0.5, maxt.line = 3,
   legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
@@ -46,7 +46,7 @@ plotContribution(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", border.width = 2, palette = NULL, drawBorders = FALSE,
-  gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  naxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
   cex.main = 1.2)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
@@ -54,7 +54,7 @@ plotDegree(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", palette = NULL, border.width = 2, drawBorders = FALSE,
-  gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  naxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
   cex.main = 1.2)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
@@ -155,7 +155,7 @@ are drawn.}
 
 \item{legend.main}{title for the legend.}
 
-\item{gaxt.line}{the number of lines into the bottom margin at which the node
+\item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
 
 \item{saxt.line}{the number of lines into the left margin at which the sample
@@ -348,7 +348,7 @@ heatmap.
 \subsection{Customising plot layout:}{
   Although reasonable default values for most parameters have been provided,
   the rendering of axes and titles may need adjusting depending on the size
-  of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
+  of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
   \code{maxt.line}, and \code{laxt.line} control the distance from each plot
   window that the node labels, sample labels, module labels, and legend 
   labels are rendered. 

@@ -10,7 +10,7 @@ plotModule(data, correlation, network, moduleAssignments = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames = NULL,
   main = "Module Topology", drawBorders = FALSE, border.width = 2,
-  gaxt.line = -0.5, saxt.line = -0.5, maxt.line = NULL,
+  naxt.line = -0.5, saxt.line = -0.5, maxt.line = NULL,
   legend.tick.size = 0.04, laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1,
   cex.main = 1.2)
 }
@@ -85,7 +85,7 @@ connectivity, module membership, and module summary bar plots.}
 
 \item{border.width}{line width for borders.}
 
-\item{gaxt.line}{the number of lines into the bottom margin at which the node
+\item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
 
 \item{saxt.line}{the number of lines into the left margin at which the sample
@@ -242,7 +242,7 @@ Individual components of the module plot can be plotted using
 \subsection{Plot customisation:}{
   Although reasonable default values for most parameters have been provided,
   the rendering of axes and titles may need adjusting depending on the size
-  of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
+  of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
   \code{maxt.line}, and \code{laxt.line} control the distance from each plot
   window that the node labels, sample labels, module labels, and legend 
   labels are rendered. 

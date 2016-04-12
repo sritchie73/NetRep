@@ -26,7 +26,7 @@ connectivity, module membership, and module summary bar plots.}
 
 \item{border.width}{line width for borders.}
 
-\item{gaxt.line}{the number of lines into the bottom margin at which the node
+\item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
 
 \item{saxt.line}{the number of lines into the left margin at which the sample

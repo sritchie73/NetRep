@@ -143,7 +143,7 @@
 #' \subsection{Plot customisation:}{
 #'   Although reasonable default values for most parameters have been provided,
 #'   the rendering of axes and titles may need adjusting depending on the size
-#'   of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
+#'   of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
 #'   \code{maxt.line}, and \code{laxt.line} control the distance from each plot
 #'   window that the node labels, sample labels, module labels, and legend 
 #'   labels are rendered. 
@@ -223,7 +223,7 @@ plotModule <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
-  drawBorders=FALSE, border.width=2, gaxt.line=-0.5, 
+  drawBorders=FALSE, border.width=2, naxt.line=-0.5, 
   saxt.line=-0.5, maxt.line=NULL, legend.tick.size=0.04, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -256,7 +256,7 @@ plotModule <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
     main=main, drawBorders=drawBorders, border.width=border.width, 
-    gaxt.line=gaxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
+    naxt.line=naxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
     legend.tick.size=legend.tick.size, laxt.line=laxt.line)
   
   # Handle variants that will not work for this plot function
@@ -465,9 +465,9 @@ plotModule <- function(
   #-----------------------------------------------------------------------------
   # Set up plotting region
   #-----------------------------------------------------------------------------
-  gaxt <- NULL
+  naxt <- NULL
   if (plotNodeNames)
-    gaxt <- nodeOrder
+    naxt <- nodeOrder
   
   if (is.null(scaledData[[ti]])) {
     # set up plot layout
@@ -518,7 +518,7 @@ plotModule <- function(
     plotBar(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], "#feb24c", 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
-      xaxt=plotNodeNames, xaxt.line=gaxt.line, main="",
+      xaxt=plotNodeNames, xaxt.line=naxt.line, main="",
       ylab="Weighted\ndegree", maxt.line=maxt.line, 
       border.width=border.width
     )
@@ -565,9 +565,9 @@ plotModule <- function(
     plotSquareHeatmap(
       dat, palette, vlim=range.pal, legend.lim=range.dat,
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
-      xaxt=gaxt, yaxt=NULL, plotLegend=FALSE, main="",
+      xaxt=naxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
-      xaxt.line=gaxt.line, maxt.line=maxt.line, border.width=border.width
+      xaxt.line=naxt.line, maxt.line=maxt.line, border.width=border.width
     )
     
     # Plot data legend
