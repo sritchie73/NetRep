@@ -51,9 +51,9 @@ plotContribution(data, correlation, network, moduleAssignments = NULL,
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames, main = "",
-  palette = "#feb24c", border.width = 2, drawBorders = FALSE,
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", palette = NULL, border.width = 2, drawBorders = FALSE,
   gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
   cex.main = 1.2)
 
@@ -208,8 +208,8 @@ network modules.
 \code{plotContribution}: Plot a bar chart of the module membership for
 one or more network modules.
 
-\code{plotDegree:} Plot a bar chart of the normalised intramodular 
-connectivity (see details) for one or more network modules.
+\code{plotDegree:} Plot a bar chart of the scaled weighted degree 
+(see details) for one or more network modules.
 
 \code{plotSummary}: Plot bar charts of the module summary vectors of 
 one or more network modules.
