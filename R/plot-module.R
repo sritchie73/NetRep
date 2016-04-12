@@ -367,10 +367,22 @@ plotModule <- function(
       orderProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE, mean
     )
     nodeOrder <- simplifyList(nodeOrder, depth=3)
-    moduleOrder <- names(nodeOrder)
+    
+    # The module order will be the names of the simplified list iff there are
+    # multiple modules to render
+    if (!is.list(nodeOrder)) {
+      moduleOrder <- mods
+      if (is.numeric(moduleOrder))
+        moduleOrder <- as.character(moduleOrder)
+    } else {
+      moduleOrder <- names(nodeOrder)
+    }
+    
+    # Now flatten the node order list
     nodeOrder <- unlist(nodeOrder)
   } else {
-    moduleOrder <- names(simplifyList(plotProps[[di]][[ti]], depth=1))
+    hasProps <- !sapply(plotProps[[di]][[ti]], is.null) 
+    moduleOrder <- names(plotProps[[di]][[ti]])[hasProps]
     nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
       names(plotProps[[di]][[ti]][[mi]]$degree)
     }
@@ -413,16 +425,20 @@ plotModule <- function(
   #-----------------------------------------------------------------------------
   
   testProps <- simplifyList(plotProps[[di]][[ti]], 1)
+  if (length(moduleOrder) == 1) {
+    testProps <- list(testProps)
+    names(testProps) <- moduleOrder
+  }
 
   # (Normalised) weighted degree vector
-  wDegreeVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
+  wDegreeVec <- foreach(mi = moduleOrder, .combine=c) %do% {
     testProps[[mi]]$degree/max(na.omit(testProps[[mi]]$degree))
   }
   wDegreeVec <- wDegreeVec[nodeOrder]
   
   if (!is.null(scaledData[[ti]])) {
     # node contribution
-    nodeContribVec <- foreach(mi = seq_along(testProps), .combine=c) %do% {
+    nodeContribVec <- foreach(mi = moduleOrder, .combine=c) %do% {
       testProps[[mi]]$contribution
     }
     nodeContribVec <- nodeContribVec[nodeOrder]
