@@ -839,37 +839,75 @@ checkPlotArgs <- function(
   if (!(missing(drawBorders) || is.slog(drawBorders)))
     stop("'drawBorders' must be one of 'TRUE' or 'FALSE'")
   
-  if (!(missing(border.width) || is.snum(border.width))) 
-    stop("'border.width' must be a numeric vector of length 1")
-  if (!missing(border.width) && border.width < 0)
-    stop("'border.width' must be greater than 0")
+  if (!missing(border.width)) {
+    if (!is.snum(border.width)) {
+      stop("'border.width' must be a numeric vector of length 1")
+    }
+    if (border.width < 0) {
+      stop("'border.width' must be greater than 0")
+    }
+    if (is.infinite(border.width)) {
+      stop("'border.width' must be finite")
+    }
+  }
   
-  if (!(missing(naxt.line) || is.snum(naxt.line) || 
-        is.na(naxt.line) || is.null(naxt.line)))
-    stop("'naxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!missing(naxt.line)) {
+    if (!(is.snum(naxt.line) || is.na(naxt.line) || is.null(naxt.line))) {
+      stop("'naxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(naxt.line) && is.infinite(naxt.line)) {
+      stop("'naxt.line' must be finite")
+    }
+  }
   
-  if (!(missing(saxt.line) || is.snum(saxt.line) || 
-        is.na(saxt.line) || is.null(saxt.line)))
-    stop("'saxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!missing(saxt.line)) {
+    if (!(is.snum(saxt.line) || is.na(saxt.line) || is.null(saxt.line))) {
+      stop("'saxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(saxt.line) && is.infinite(saxt.line)) {
+      stop("'saxt.line' must be finite")
+    }
+  }
   
-  if (!(missing(maxt.line) ||  is.snum(maxt.line) || 
-        is.na(maxt.line) || is.null(maxt.line)))
-    stop("'maxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!missing(maxt.line)) {
+    if (!(is.snum(maxt.line) || is.na(maxt.line) || is.null(maxt.line))) {
+      stop("'maxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(maxt.line) && is.infinite(maxt.line)) {
+      stop("'maxt.line' must be finite")
+    }
+  }
   
-  if (!(missing(laxt.line) || is.snum(laxt.line) || 
-        is.na(laxt.line) || is.null(laxt.line)))
-    stop("'laxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!missing(laxt.line)) {
+    if (!(is.snum(laxt.line) || is.na(laxt.line) || is.null(laxt.line))) {
+      stop("'laxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(laxt.line) && is.infinite(laxt.line)) {
+      stop("'laxt.line' must be finite")
+    }
+  }
   
-  if (!(missing(legend.tick.size) || is.snum(legend.tick.size) || 
-        is.na(legend.tick.size) || is.null(legend.tick.size)))
-    stop("'legend.tick.size' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!missing(legend.tick.size)) {
+    if (!(is.snum(legend.tick.size) || is.na(legend.tick.size) || 
+          is.null(legend.tick.size))) {
+      stop("'legend.tick.size' must be a numeric vector of length 1, or 'NA'")
+    }
+    if (is.snum(legend.tick.size) && is.infinite(legend.tick.size)) {
+      stop("'legend.tick.size' must be finite")
+    }
+  }
   
   if (!(missing(plotLegend) || is.slog(plotLegend)))
     stop("'plotLegend' must be on of 'TRUE' or 'FALSE'")
   
-  if (!(missing(legend.position) || is.snum(legend.position) 
-        || is.na(legend.position) || is.null(legend.position)))
-    stop("'legend.position' must be a numeric vector of length 1, 'NA', or 'NULL'")
+  if (!missing(legend.position)) {
+    if (!(is.snum(legend.position) || is.na(legend.position) || is.null(legend.position))) {
+      stop("'legend.position' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(legend.position) && is.infinite(legend.position)) {
+      stop("'legend.position' must be finite")
+    }
+  }
   
   if (!(missing(legend.main) || is.schar(legend.main) || is.na(legend.main) 
         || is.null(legend.main)))

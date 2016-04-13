@@ -358,7 +358,7 @@ plotData <- function(
   
   # Handle variants that will not work for this plot function
   if (is.null(legend.tick.size))
-    stop("'legend.tick.size' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    stop("'legend.tick.size' must be a numeric vector of length 1 or 'NA'")
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
