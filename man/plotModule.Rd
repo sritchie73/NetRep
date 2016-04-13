@@ -9,10 +9,14 @@ plotModule(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames = NULL,
-  main = "Module Topology", maxEdgeWeight = 1, drawBorders = FALSE,
-  border.width = 2, naxt.line = -0.5, saxt.line = -0.5,
-  maxt.line = NULL, legend.tick.size = 0.04, laxt.line = 2.5,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  main = "Module Topology", drawBorders = FALSE, border.width = 2,
+  naxt.line = -0.5, saxt.line = -0.5, maxt.line = NULL,
+  legend.tick.size = 0.04, laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2, dataCols = NULL, dataRange = NULL,
+  corCols = correlation.palette(), corRange = c(-1, 1),
+  netCols = network.palette(), netRange = c(0, 1), degreeCol = "#feb24c",
+  contribCols = c("#A50026", "#313695"), summaryCols = c("#1B7837",
+  "#762A83"), naCol = "#bdbdbd")
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -80,10 +84,6 @@ are drawn.}
 
 \item{main}{title for the plot.}
 
-\item{maxEdgeWeight}{controls the range of the color palette on the network
-edge weight heatmap (see details). If \code{NA} then the maximum
-edge weight in the rendered network will be used.}
-
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
 connectivity, module membership, and module summary bar plots.}
 
@@ -109,6 +109,36 @@ labels, as multiple of \code{legend.tick.size}.}
 \item{cex.lab}{relative size of the module names and legend titles.}
 
 \item{cex.main}{relative size of the plot titles.}
+
+\item{dataCols}{a character vector of colors to create a gradient from for
+the data heatmap (see details). Automatically determined if \code{NA} or 
+\code{NULL}.}
+
+\item{dataRange}{the range of values to map to the \code{dataCols} gradient
+(see details). Automatically determined if \code{NA} or \code{NULL}.}
+
+\item{corCols}{a character vector of colors to create a gradient from for
+the correlation structure heatmap (see details).}
+
+\item{corRange}{the range of values to map to the \code{corCols} gradient
+(see details).}
+
+\item{netCols}{a character vector of colors to create a gradient from for
+the network edge weight heatmap (see details).}
+
+\item{netRange}{the range of values to map to the \code{corCols} gradient
+(see details). Automatically determined if \code{NA} or \code{NULL}.}
+
+\item{degreeCol}{color to use for the weighted degree bar plot.}
+
+\item{contribCols}{color(s) to use for the node contribution bar plot 
+(see details).}
+
+\item{summaryCols}{color(s) to use for the node contribution bar plot 
+(see details).}
+
+\item{naCol}{color to use for missing nodes and samples on the data, 
+correlation structure, and network edge weight heat maps.}
 }
 \description{
 Plot the correlation structure, network edges, (normalised) connectivity, 
@@ -242,6 +272,64 @@ Individual components of the module plot can be plotted using
   The weighted degree is normalised by the maximum weighted degree in
   any given module when rendered on the bar plot. This facilitates visual 
   comparison of multiple modules with differing sizes or densities.
+}
+\subsection{Modifying the color palettes:}{
+  The \code{dataCols} and \code{dataRange} arguments control the appearance 
+  of the data heatmap (see \code{\link{plotData}}). The gradient of colors 
+  used on the heatmap can be changed by specifying a vector of colors to 
+  interpolate between in \code{dataCols} and \code{dataRange} specifies the 
+  range of values that maps to this gradient. Values outside of the 
+  specified \code{dataRange} will be rendered with the colors used at either
+  extreme of the gradient. The default gradient is determined based on the 
+  \code{data} shown on the plot. If all values in the \code{data} matrix are
+  positive, then the gradient is interpolated between white and green, where
+  white is used for the smallest value and green for the largest. If all
+  values are negative, then the gradient is interpolated between purple and
+  white, where purple is used for the smallest value and white for the value
+  closest to zero. If the data contains both positive and negative values, 
+  then the gradient is interpolated between purple, white, and green, where 
+  white is used for values of zero. In this case the range shown is always 
+  centered at zero, with the values at either extreme determined by the 
+  value in the rendered \code{data} with the strongest magnitude (the 
+  maximum of the absolute value).
+  
+  The \code{corCols} and \code{corRange} arguments control the appearance of
+  the correlation structure heatmap (see \code{\link{plotCorrelation}}). The
+  gradient of colors used on the heatmap can be changed by specifying a
+  vector of colors to interpolate between in \code{corCols}. By default,
+  strong negative correlations are shown in blue, and strong positive
+  correlations in red, and weak correlations as white. \code{corRange} 
+  controls the range of values that this gradient maps to, by default, -1 to
+  1. Changing this may be useful for showing differences where range of 
+  correlation coefficients is small.
+  
+  The \code{netCols} and \code{netRange} arguments control the appearance of
+  the network edge weight heatmap (see \code{\link{plotNetwork}}). The
+  gradient of colors used on the heatmap can be changed by specifying a
+  vector of colors to interpolate between in \code{netCols}. By default,
+  weak or non-edges are shown in white, while strong edges are shown in red.
+  The \code{netRange} controls the range of values this gradient maps to, 
+  by default, 0 to 1. If \code{netRange} is set to \code{NA}, then the 
+  gradient will be mapped to values between 0 and the maximum edge weight of
+  the shown network.
+  
+  The \code{degreeCol} argument controls the color of the weighted degree
+  bar plot (see \code{\link{plotDegree}}).
+  
+  The \code{contribCols} argument controls the color of the node 
+  contribution bar plot (see \code{\link{plotContribution}}. This can be 
+  specified as single value to be used for all nodes, or as two colors: one
+  to use for nodes with positive contributions and one to use for nodes with
+  negative contributions.
+  
+  The \code{summaryCols} argument controls the color of the module summary 
+  bar plot (see \code{\link{plotSummary}}. This can be specified as single
+  value to be used for all samples, or as two colors: one to use for samples
+  with a positive module summary value and one fpr samples with a negative
+  module summary value.
+  
+  The \code{naCol} argument controls the color of missing nodes and samples
+  on the data, correlaton structure, and network edge weight heatmaps.
 }
 \subsection{Plot customisation:}{
   Although reasonable default values for most parameters have been provided,

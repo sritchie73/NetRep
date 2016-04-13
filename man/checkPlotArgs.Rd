@@ -7,7 +7,8 @@
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
   main, drawBorders, border.width, naxt.line, saxt.line, maxt.line,
   legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
-  palette, symmetric, horizontal, maxEdgeWeight)
+  palette, symmetric, horizontal, dataCols, dataRange, corCols, corRange,
+  netCols, netRange, degreeCol, contribCols, summaryCols, naCol)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
@@ -38,13 +39,29 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 
 \item{legend.main}{user input for the corresponding argument in the plot functions.}
 
-\item{palette}{user input for the corresponding argument in the plot functions.}
-
 \item{symmetric}{user input for the corresponding argument in the plot functions.}
 
 \item{horizontal}{user input for the corresponding argument in the plot functions.}
 
-\item{maxEdgeWeight}{user input for the corresponding argument in the plot functions.}
+\item{dataCols}{user input for the corresponding argument in the plot functions.}
+
+\item{dataRange}{user input for the corresponding argument in the plot functions.}
+
+\item{corCols}{user input for the corresponding argument in the plot functions.}
+
+\item{corRange}{user input for the corresponding argument in the plot functions.}
+
+\item{netCols}{user input for the corresponding argument in the plot functions.}
+
+\item{netRange}{user input for the corresponding argument in the plot functions.}
+
+\item{degreeCol}{user input for the corresponding argument in the plot functions.}
+
+\item{contribCols}{user input for the corresponding argument in the plot functions.}
+
+\item{summaryCols}{user input for the corresponding argument in the plot functions.}
+
+\item{naCol}{user input for the corresponding argument in the plot functions.}
 
 \item{plotNodesNames}{user input for the corresponding argument in the plot functions.}
 }

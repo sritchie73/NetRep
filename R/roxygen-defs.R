@@ -88,9 +88,6 @@ NULL
 #' @param plotModuleNames logical; controls whether module names are rendered.
 #'  The default is for module names to be rendered when multiple \code{modules} 
 #'  are drawn.
-#' @param maxEdgeWeight controls the range of the color palette on the network
-#'  edge weight heatmap (see details). If \code{NA} then the maximum
-#'  edge weight in the rendered network will be used.
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the 
 #'  connectivity, module membership, and module summary bar plots.
 #' @param border.width line width for borders.
@@ -107,7 +104,26 @@ NULL
 #' @param cex.axis relative size of the node and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.
-#' 
+#' @param dataCols a character vector of colors to create a gradient from for
+#'  the data heatmap (see details). Automatically determined if \code{NA} or 
+#'  \code{NULL}.
+#' @param dataRange the range of values to map to the \code{dataCols} gradient
+#'  (see details). Automatically determined if \code{NA} or \code{NULL}.
+#' @param corCols a character vector of colors to create a gradient from for
+#'  the correlation structure heatmap (see details).
+#' @param corRange the range of values to map to the \code{corCols} gradient
+#'  (see details).
+#' @param netCols a character vector of colors to create a gradient from for
+#'  the network edge weight heatmap (see details).
+#' @param netRange the range of values to map to the \code{corCols} gradient
+#'  (see details). Automatically determined if \code{NA} or \code{NULL}.
+#' @param degreeCol color to use for the weighted degree bar plot.
+#' @param contribCols color(s) to use for the node contribution bar plot 
+#'  (see details).
+#' @param summaryCols color(s) to use for the node contribution bar plot 
+#'  (see details).
+#' @param naCol color to use for missing nodes and samples on the data, 
+#'  correlation structure, and network edge weight heat maps.
 #' 
 #' @name plot_params
 NULL

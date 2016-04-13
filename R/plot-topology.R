@@ -11,7 +11,6 @@
 #'  heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
 #'  heatmaps. If symmetric, then the node and module names will also be rendered
 #'  on the left axis.
-#' @param palette a vector of colors to use for each plot (see details).
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
 #'  in \code{plotContribution}, \code{plotDegree}, and
 #'  \code{plotSummary}.
@@ -184,42 +183,63 @@
 #'   the bars in \code{plotDegree}, \code{plotContribution}, and 
 #'   \code{plotSummary}.
 #' }
-#' \subsection{Customising the color palette:}{
-#'   \code{plotCorrelation} and \code{plotCorrelationLegend} expect the
-#'   \code{palette} argument to be a vector of colors to interpolate over when
-#'   plotting the correlation. They expect the first element of the 
-#'   \code{palette} vector to be the color used for correlation values of -1,
-#'   and the last element of the \code{palette} vector to be the color used for 
-#'   correlation values of 1.
+#' \subsection{Modifying the color palettes:}{
+#'   The \code{dataCols} and \code{dataRange} arguments control the appearance 
+#'   of the data heatmap (see \code{\link{plotData}}). The gradient of colors 
+#'   used on the heatmap can be changed by specifying a vector of colors to 
+#'   interpolate between in \code{dataCols} and \code{dataRange} specifies the 
+#'   range of values that maps to this gradient. Values outside of the 
+#'   specified \code{dataRange} will be rendered with the colors used at either
+#'   extreme of the gradient. The default gradient is determined based on the 
+#'   \code{data} shown on the plot. If all values in the \code{data} matrix are
+#'   positive, then the gradient is interpolated between white and green, where
+#'   white is used for the smallest value and green for the largest. If all
+#'   values are negative, then the gradient is interpolated between purple and
+#'   white, where purple is used for the smallest value and white for the value
+#'   closest to zero. If the data contains both positive and negative values, 
+#'   then the gradient is interpolated between purple, white, and green, where 
+#'   white is used for values of zero. In this case the range shown is always 
+#'   centered at zero, with the values at either extreme determined by the 
+#'   value in the rendered \code{data} with the strongest magnitude (the 
+#'   maximum of the absolute value).
 #'   
-#'   \code{plotNetwork} and \code{plotNetworkLegend} expect the
-#'   \code{palette} argument to be a vector of colors to interpolate over when
-#'   plotting the edge weights. They expect the first element of the 
-#'   \code{palette} vector to be the color used for edge weights of 0,
-#'   and the last element of the \code{palette} vector to be the color used for 
-#'   correlation values of 1.
+#'   The \code{corCols} and \code{corRange} arguments control the appearance of
+#'   the correlation structure heatmap (see \code{\link{plotCorrelation}}). The
+#'   gradient of colors used on the heatmap can be changed by specifying a
+#'   vector of colors to interpolate between in \code{corCols}. By default,
+#'   strong negative correlations are shown in blue, and strong positive
+#'   correlations in red, and weak correlations as white. \code{corRange} 
+#'   controls the range of values that this gradient maps to, by default, -1 to
+#'   1. Changing this may be useful for showing differences where range of 
+#'   correlation coefficients is small.
 #'   
-#'   \code{plotDegree} expects \code{palette} to be a single color, a 
-#'   vector of colors, one for each node, or a vector of colors to be repeated.
+#'   The \code{netCols} and \code{netRange} arguments control the appearance of
+#'   the network edge weight heatmap (see \code{\link{plotNetwork}}). The
+#'   gradient of colors used on the heatmap can be changed by specifying a
+#'   vector of colors to interpolate between in \code{netCols}. By default,
+#'   weak or non-edges are shown in white, while strong edges are shown in red.
+#'   The \code{netRange} controls the range of values this gradient maps to, 
+#'   by default, 0 to 1. If \code{netRange} is set to \code{NA}, then the 
+#'   gradient will be mapped to values between 0 and the maximum edge weight of
+#'   the shown network.
 #'   
-#'   \code{plotContribution} expects \code{palette} to be a vector 
-#'   containing two colors, the first to be used for nodes with negative node
-#'   contribution values, and the second to be used for nodes with positive node
-#'   contribution values. 
+#'   The \code{degreeCol} argument controls the color of the weighted degree
+#'   bar plot (see \code{\link{plotDegree}}).
 #'   
-#'   \code{plotData} and \code{plotDataLegend} expect the \code{palette}
-#'   argument to be a vector of colors to interpolate over when plotting the
-#'   'data.' In order to accomodate data matrices with different ranges,
-#'   these functions expect the palette to be a diverging set of colors with a
-#'   centre value of 0 (e.g. white). The colors drawn are balanced around 0: 
-#'   i.e. positive and negative values of data will have the same intensity on a 
-#'   diverging color palette regardless of the actual range of the data.
+#'   The \code{contribCols} argument controls the color of the node 
+#'   contribution bar plot (see \code{\link{plotContribution}}. This can be 
+#'   specified as single value to be used for all nodes, or as two colors: one
+#'   to use for nodes with positive contributions and one to use for nodes with
+#'   negative contributions.
 #'   
-#'   \code{plotSummary} expects \code{palette} to be a vector 
-#'   containing two colors, the first to be used for nodes with a negative 
-#'   module summary measurement, and the second to be used for genes with a 
-#'   positive module summary measurment, regardless of whether the data matrix
-#'   is centred around 0.
+#'   The \code{summaryCols} argument controls the color of the module summary 
+#'   bar plot (see \code{\link{plotSummary}}. This can be specified as single
+#'   value to be used for all samples, or as two colors: one to use for samples
+#'   with a positive module summary value and one fpr samples with a negative
+#'   module summary value.
+#'   
+#'   The \code{naCol} argument controls the color of missing nodes and samples
+#'   on the data, correlaton structure, and network edge weight heatmaps.
 #' }
 #' 
 #' @seealso
@@ -313,10 +333,11 @@ plotData <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotSampleNames=TRUE, plotModuleNames=NULL, main="", palette=NULL, 
-  border.width=2, plotLegend=TRUE, legend.main="Data", naxt.line=-0.5, 
-  saxt.line=-0.5, maxt.line=3, legend.position=0.15, legend.tick.size=0.03, 
-  laxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  plotSampleNames=TRUE, plotModuleNames=NULL, main="", border.width=2, 
+  plotLegend=TRUE, legend.main="Data", naxt.line=-0.5, saxt.line=-0.5, 
+  maxt.line=3, legend.position=0.15, legend.tick.size=0.03, laxt.line=3, 
+  cex.axis=0.8, cex.lab=1, cex.main=1.2, dataCols=NULL, dataRange=NULL, 
+  naCol="#bdbdbd"
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -352,9 +373,9 @@ plotData <- function(
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
     main=main, border.width=border.width, naxt.line=naxt.line, 
     saxt.line=saxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
-    legend.tick.size=legend.tick.size, palette=palette, 
-    plotLegend=plotLegend, legend.main=legend.main,
-    legend.position=legend.position)
+    legend.tick.size=legend.tick.size,plotLegend=plotLegend, dataCols=dataCols,
+    legend.main=legend.main, naCol=naCol, legend.position=legend.position, 
+    dataRange=dataRange)
   
   # Handle variants that will not work for this plot function
   if (is.null(legend.tick.size))
@@ -513,20 +534,23 @@ plotData <- function(
     plotModuleNames <- length(mods) > 1
   }
   
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette)) {
-    dat <- data[[ti]][presentSamples, presentNodes]
-    range.dat <- range(dat)
-    # Different automatic color palettes depending on the range of the data
-    if (all(range.dat > 0)) {
-      palette <- tail(data.palette(), length(data.palette())/2)
-      range.pal <- range.dat
-    } else if (all(range.dat < 0)) {
-      palette <- head(data.palette(), length(data.palette())/2)
-      range.pal <- range.dat
+  # Set default color palettes for the data heatmap
+  dat <- data[[ti]][presentSamples, presentNodes] # also used for actual plot
+  if (is.null(dataRange)) {
+    dataRange <- range(dat)
+    # Make sure the gradient is balanced around 0 if the default colors are
+    # requested
+    if (is.null(dataCols) && dataRange[1] < 0 && dataRange[2] > 0) {
+      dataRange <- c(-1*max(abs(dataRange)), max(abs(dataRange)))
+    }
+  }
+  if (is.null(dataCols)) {
+    if (all(dataRange >= 0)) {
+      dataCols <- c("#FFFFFF", "#1B7837")
+    } else if (all(dataRange <= 0)) {
+      dataCols <- c("#762A83", "#FFFFFF")
     } else {
-      palette <- data.palette()
-      range.pal <- c(-max(abs(range.dat)), max(abs(range.dat)))
+      dataCols <- c("#762A83", "#FFFFFF", "#1B7837")
     }
   }
   
@@ -555,13 +579,13 @@ plotData <- function(
     
   # Plot
   plotSquareHeatmap(
-    dat, palette, vlim=range.pal, legend.lim=range.dat,
+    dat, dataCols, vlim=dataRange, legend.lim=dataRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
     xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
     xaxt.line=naxt.line, yaxt.line=saxt.line, legend.tick.size=legend.tick.size,
     laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line,
-    border.width=border.width
+    border.width=border.width, na.col=naCol
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
@@ -575,9 +599,10 @@ plotCorrelation <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", palette=NULL, border.width=2, plotLegend=TRUE, 
+  plotModuleNames=NULL, main="",border.width=2, plotLegend=TRUE, 
   legend.main="Correlation", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
-  legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
+  corCols=correlation.palette(), corRange=c(-1,1), naCol="#bdbdbd"
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -609,9 +634,9 @@ plotCorrelation <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
-    legend.tick.size=legend.tick.size, palette=palette, plotLegend=plotLegend, 
-    legend.main=legend.main, legend.position=legend.position, 
-    symmetric=symmetric)
+    legend.tick.size=legend.tick.size, plotLegend=plotLegend, naCol=naCol,
+    legend.main=legend.main, legend.position=legend.position, corCols=corCols, 
+    corRange=corRange, symmetric=symmetric)
 
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -737,10 +762,6 @@ plotCorrelation <- function(
   if (is.null(plotModuleNames)) {
     plotModuleNames <- length(mods) > 1
   }
-  
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette))
-    palette <- correlation.palette()
   
   # Default legend parameters depend on whether the heatmap is square or
   # triangular
@@ -781,23 +802,23 @@ plotCorrelation <- function(
     }
     
     plotSquareHeatmap(
-      correlation[[ti]][presentNodes, presentNodes], palette, c(-1, 1), 
+      correlation[[ti]][presentNodes, presentNodes], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=naxt.line, yaxt.line=naxt.line, border.width=border.width,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
-      legend.line=legend.position, maxt.line=maxt.line
+      legend.line=legend.position, maxt.line=maxt.line, na.col=naCol
     )
   } else {
     plotTriangleHeatmap(
-      correlation[[ti]][presentNodes, presentNodes], palette, c(-1, 1),
+      correlation[[ti]][presentNodes, presentNodes], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line, 
-      border.width=border.width
+      border.width=border.width, na.col=naCol
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
@@ -812,10 +833,10 @@ plotNetwork <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", palette=NULL, maxEdgeWeight=1, border.width=2, 
-  plotLegend=TRUE, legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, 
-  legend.position=NULL, legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, 
-  cex.lab=1, cex.main=1.2
+  plotModuleNames=NULL, main="", border.width=2, plotLegend=TRUE, 
+  legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
+  legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
+  netCols=network.palette(), netRange=c(0,1), naCol="#bdbdbd"
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -847,9 +868,9 @@ plotNetwork <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
-    legend.tick.size=legend.tick.size, palette=palette, plotLegend=plotLegend, 
+    legend.tick.size=legend.tick.size, plotLegend=plotLegend, naCol=naCol,
     legend.main=legend.main, legend.position=legend.position, 
-    symmetric=symmetric, maxEdgeWeight=maxEdgeWeight)
+    symmetric=symmetric, netCols=netCols, netRange=netRange)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -976,10 +997,6 @@ plotNetwork <- function(
     plotModuleNames <- length(mods) > 1
   }
   
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette))
-    palette <- network.palette()
-  
   # Default legend parameters depend on whether the heatmap is square or
   # triangular
   if (symmetric) {
@@ -1019,24 +1036,24 @@ plotNetwork <- function(
     }
     
     plotSquareHeatmap(
-      network[[ti]][presentNodes, presentNodes], palette, c(0, maxEdgeWeight), 
+      network[[ti]][presentNodes, presentNodes], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=naxt.line, yaxt.line=naxt.line, 
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line,
-      border.width=border.width
+      border.width=border.width, na.col=naCol
     )
   } else {
     plotTriangleHeatmap(
-      network[[ti]][presentNodes, presentNodes], palette, c(0, maxEdgeWeight), 
+      network[[ti]][presentNodes, presentNodes], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
       legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
       legend.line=legend.position, maxt.line=maxt.line, 
-      border.width=border.width
+      border.width=border.width, na.col=naCol
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
@@ -1051,9 +1068,9 @@ plotContribution <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", border.width=2, palette=NULL, 
-  drawBorders=FALSE, naxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
-  cex.main=1.2
+  plotModuleNames=NULL, main="", border.width=2, drawBorders=FALSE, 
+  naxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
+  contribCols=c("#A50026", "#313695"), naCol="#bdbdbd"  
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -1088,7 +1105,7 @@ plotContribution <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
     drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
-    palette=palette)
+    contribCols=contribCols, naCol=naCol)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1101,7 +1118,7 @@ plotContribution <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules)
+                         orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -1203,11 +1220,7 @@ plotContribution <- function(
   if (is.null(plotModuleNames)) {
     plotModuleNames <- length(mods) > 1
   }
-  
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette))
-    palette <- c("#313695", "#a50026")
-  
+
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
@@ -1229,10 +1242,10 @@ plotContribution <- function(
   # Plot bar chart
   plotBar(
     nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder],
-    ifelse(nodeContribVec > 0, palette[2], palette[1]), drawBorders=drawBorders,
+    contribCols, drawBorders=drawBorders,
     xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
     xaxt.line=naxt.line, maxt.line=maxt.line, main=main,
-    ylab="Node contribution", border.width=border.width
+    ylab="Node contribution", border.width=border.width, na.col=naCol
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
@@ -1246,9 +1259,9 @@ plotDegree <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", palette=NULL, border.width=2, 
-  drawBorders=FALSE, naxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, 
-  cex.main=1.2
+  plotModuleNames=NULL, main="", border.width=2, drawBorders=FALSE, 
+  naxt.line=-0.5, maxt.line=3, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
+  degreeCol="#feb24c", naCol="#bdbdbd"
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -1280,7 +1293,7 @@ plotDegree <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
     drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
-    palette=palette)
+    degreeCol=degreeCol, naCol=naCol)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1293,7 +1306,7 @@ plotDegree <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules)
+                         orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -1396,10 +1409,6 @@ plotDegree <- function(
     plotModuleNames <- length(mods) > 1
   }
   
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette))
-    palette <- "#feb24c"
-  
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
@@ -1421,10 +1430,10 @@ plotDegree <- function(
   # Plot bar chart
   plotBar(
     wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder],
-    palette, drawBorders=drawBorders,
+    degreeCol, drawBorders=drawBorders,
     xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
     xaxt.line=naxt.line, maxt.line=maxt.line, main=main,
-    ylab="Weighted degree", border.width=border.width
+    ylab="Weighted degree", border.width=border.width, na.col=naCol
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
@@ -1438,9 +1447,9 @@ plotSummary <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, 
-  plotSampleNames=TRUE, plotModuleNames=NULL, main="", 
-  palette=c("#762a83", "#1b7837"), border.width=2, drawBorders=FALSE, 
-  saxt.line=-0.5, maxt.line=0, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  plotSampleNames=TRUE, plotModuleNames=NULL, main="", border.width=2, 
+  drawBorders=FALSE, saxt.line=-0.5, maxt.line=0, cex.axis=0.8, cex.lab=1, 
+  cex.main=1.2, summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd"
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -1474,7 +1483,8 @@ plotSummary <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotSampleNames=plotSampleNames, 
     plotModuleNames=plotModuleNames, main=main, border.width=border.width, 
-    saxt.line=saxt.line, maxt.line=maxt.line, palette=palette)
+    saxt.line=saxt.line, maxt.line=maxt.line, summaryCols=summaryCols, 
+    naCol=naCol)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1619,11 +1629,6 @@ plotSummary <- function(
     plotModuleNames <- length(mods) > 1
   }
   
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette)) {
-    palette <- c("#762a83", "#1b7837")
-  }
-  
   #-----------------------------------------------------------------------------
   # Plot the Node contribution
   #-----------------------------------------------------------------------------
@@ -1646,250 +1651,13 @@ plotSummary <- function(
   colnames(summaries) <- moduleOrder
   rownames(summaries) <- sampleOrder
   
-  # and respective colors
-  summaries.cols <- matrix(palette[1], nrow(summaries), ncol(summaries))
-  summaries.cols[summaries > 0] <- palette[2]
-  
   # Plot bar chart
   plotMultiBar(
     summaries, rep(list(range(summaries, na.rm=TRUE)), ncol(summaries)),
-    cols=summaries.cols, drawBorders=drawBorders, main=main, 
+    cols=summaryCols, drawBorders=drawBorders, main=main, 
     yaxt=plotSampleNames, plotModuleNames=plotModuleNames, yaxt.line=saxt.line, 
-    maxt.line=maxt.line, xlab="Module summary", border.width=border.width
-  )
-  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
-}
-
-#' \code{plotDataLegend}: Plot a legend for the data matrix heatmap
-#' for one or more network modules.
-#' 
-#' @rdname plotTopology
-#' @export
-plotDataLegend <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE, 
-  palette=NULL, border.width=2, horizontal=TRUE, legend.main="Data", 
-  legend.tick.size=0.03, laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
-) {
-  #-----------------------------------------------------------------------------
-  # Set graphical parameters to catch errors prior to computation
-  #-----------------------------------------------------------------------------
-  
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
-  par(cex.axis=cex.axis)
-  par(cex.lab=cex.lab)
-  par(cex.main=cex.main)
-  # make sure to restore old values once finishing the plot
-  on.exit({
-    par(cex.axis=old.par[[1]])
-    par(cex.lab=old.par[[2]])
-    par(cex.main=old.par[[3]])
-    par(mar=old.par[[4]])
-    par(oma=old.par[[5]])
-    try(layout(1))
-  }, add=TRUE)
-  
-  #-----------------------------------------------------------------------------
-  # Validate user input and unify data structures
-  #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
-  vCat(verbose, 0, "Validating user input...")
-  
-  if (is.null(data))
-    stop("Cannot plot data legend without 'data'")
-  
-  # Check plot-specific arguments
-  checkPlotArgs(border.width=border.width, laxt.line=laxt.line, 
-    legend.tick.size=legend.tick.size, palette=palette, 
-    legend.main=legend.main, horizontal=horizontal)
-  
-  # Now try to make sense of the rest of the input
-  finput <- processInput(discovery, test, network, correlation, data, 
-                         moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir)
-  discovery <- finput$discovery
-  test <- finput$test
-  data <- finput$data
-  correlation <- finput$correlation
-  network <- finput$network
-  moduleAssignments <- finput$moduleAssignments
-  modules <- finput$modules
-  nDatasets <- finput$nDatasets
-  datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
-  
-  # Indexes for this function
-  di <- finput$discovery
-  ti <- finput$test[[di]]
-  mods <- modules[[di]]
-
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
-
-  vCat(verbose, 0, "User input ok!")
-  
-  #-----------------------------------------------------------------------------
-  # Get the range of data matrix for the modules in the test dataset 
-  #-----------------------------------------------------------------------------
-  modNodes <- names(moduleAssignments[[di]][moduleAssignments[[di]] %in% mods])
-  modNodes <- modNodes %sub_in% colnames(data[[ti]])
-  if (length(modNodes) == 0)
-    stop("None of the variables composing the module are present in the test dataset")
-  
-  #-----------------------------------------------------------------------------
-  # Set default values for 'NULL' arguments
-  #-----------------------------------------------------------------------------
-  
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette)) {
-    range.dat <- range(data[[ti]][,modNodes])
-    # Different automatic color palettes depending on the range of the data
-    if (all(range.dat > 0)) {
-      palette <- tail(data.palette(), length(data.palette())/2)
-      range.pal <- range.dat
-    } else if (all(range.dat < 0)) {
-      palette <- head(data.palette(), length(data.palette())/2)
-      range.pal <- range.dat
-    } else {
-      palette <- data.palette()
-      range.pal <- c(-max(abs(range.dat)), max(abs(range.dat)))
-    }
-  }
-  
-  #-----------------------------------------------------------------------------
-  # Plot the legend
-  #-----------------------------------------------------------------------------
-  vCat(verbose, 0, "rendering plot components...")
-  
-  emptyPlot(c(0,1), c(0,1), bty="n")
-  addGradientLegend(
-    palette, range.pal, range.pal, horizontal, legend.main, 
-    xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size, axis.line=laxt.line,
-    border.width=border.width
-  )
-  
-  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
-}
-
-#' \code{plotCorrelationLegend}: Plot a legend for the correlation structure 
-#' heatmap.
-#' 
-#' @rdname plotTopology
-#' @export
-plotCorrelationLegend <- function(
-  palette=NULL, border.width=2, horizontal=TRUE, 
-  legend.main="correlation", legend.tick.size=0.03, laxt.line=2.5, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2, verbose=TRUE
-) {
-  #-----------------------------------------------------------------------------
-  # Set graphical parameters to catch errors prior to computation
-  #-----------------------------------------------------------------------------
-  
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
-  par(cex.axis=cex.axis)
-  par(cex.lab=cex.lab)
-  par(cex.main=cex.main)
-  # make sure to restore old values once finishing the plot
-  on.exit({
-    par(cex.axis=old.par[[1]])
-    par(cex.lab=old.par[[2]])
-    par(cex.main=old.par[[3]])
-    par(mar=old.par[[4]])
-    par(oma=old.par[[5]])
-    try(layout(1))
-  }, add=TRUE)
-  
-  #-----------------------------------------------------------------------------
-  # Validate user input
-  #-----------------------------------------------------------------------------
-  # Check plot-specific arguments
-  checkPlotArgs(border.width=border.width, laxt.line=laxt.line, 
-    legend.tick.size=legend.tick.size, palette=palette, 
-    legend.main=legend.main, horizontal=horizontal)
-  
-  #-----------------------------------------------------------------------------
-  # Set default values for 'NULL' arguments
-  #-----------------------------------------------------------------------------
-  
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette)) {
-    palette <- correlation.palette()
-  }
-  
-  #-----------------------------------------------------------------------------
-  # Render legend
-  #-----------------------------------------------------------------------------
-  emptyPlot(c(0,1), c(0,1), bty="n")
-  addGradientLegend(
-    palette, c(-1,1), c(-1,1), horizontal, legend.main,
-    xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
-    axis.line=laxt.line, border.width=border.width
-  )
-  on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
-}
-
-#' \code{plotNetworkLegend}: Plot a legend for the network edge weights heatmap.
-#' 
-#' @rdname plotTopology
-#' @export
-plotNetworkLegend <- function(
-  palette=network.palette(), border.width=2, horizontal=TRUE, 
-  legend.main="network", legend.tick.size=0.03, laxt.line=2.5, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2, verbose=TRUE
-) {
-  #-----------------------------------------------------------------------------
-  # Set graphical parameters to catch errors prior to computation
-  #-----------------------------------------------------------------------------
-  
-  old.par <- par(c("cex.axis", "cex.lab", "cex.main", "mar", "oma"))
-  par(cex.axis=cex.axis)
-  par(cex.lab=cex.lab)
-  par(cex.main=cex.main)
-  # make sure to restore old values once finishing the plot
-  on.exit({
-    par(cex.axis=old.par[[1]])
-    par(cex.lab=old.par[[2]])
-    par(cex.main=old.par[[3]])
-    par(mar=old.par[[4]])
-    par(oma=old.par[[5]])
-    try(layout(1))
-  }, add=TRUE)
-  
-  #-----------------------------------------------------------------------------
-  # Validate user input
-  #-----------------------------------------------------------------------------
-  # Check plot-specific arguments
-  checkPlotArgs(border.width=border.width, laxt.line=laxt.line, 
-                legend.tick.size=legend.tick.size, palette=palette, 
-                legend.main=legend.main, horizontal=horizontal)
-  
-  #-----------------------------------------------------------------------------
-  # Set default values for 'NULL' arguments
-  #-----------------------------------------------------------------------------
-  
-  # Set up the color palette for the data if unspecified
-  if (is.null(palette)) {
-    palette <- network.palette()
-  }
-  
-  #-----------------------------------------------------------------------------
-  # Render legend
-  #-----------------------------------------------------------------------------
-  emptyPlot(c(0,1), c(0,1), bty="n")
-  addGradientLegend(
-    palette, c(0,1), c(0,1), horizontal, legend.main,
-    xlim=c(0,1), ylim=c(0,1), tick.size=legend.tick.size,
-    axis.line=laxt.line, border.width=border.width
+    maxt.line=maxt.line, xlab="Module summary", border.width=border.width,
+    na.col=naCol
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }

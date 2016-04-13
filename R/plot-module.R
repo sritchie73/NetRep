@@ -140,6 +140,64 @@
 #'   any given module when rendered on the bar plot. This facilitates visual 
 #'   comparison of multiple modules with differing sizes or densities.
 #' }
+#' \subsection{Modifying the color palettes:}{
+#'   The \code{dataCols} and \code{dataRange} arguments control the appearance 
+#'   of the data heatmap (see \code{\link{plotData}}). The gradient of colors 
+#'   used on the heatmap can be changed by specifying a vector of colors to 
+#'   interpolate between in \code{dataCols} and \code{dataRange} specifies the 
+#'   range of values that maps to this gradient. Values outside of the 
+#'   specified \code{dataRange} will be rendered with the colors used at either
+#'   extreme of the gradient. The default gradient is determined based on the 
+#'   \code{data} shown on the plot. If all values in the \code{data} matrix are
+#'   positive, then the gradient is interpolated between white and green, where
+#'   white is used for the smallest value and green for the largest. If all
+#'   values are negative, then the gradient is interpolated between purple and
+#'   white, where purple is used for the smallest value and white for the value
+#'   closest to zero. If the data contains both positive and negative values, 
+#'   then the gradient is interpolated between purple, white, and green, where 
+#'   white is used for values of zero. In this case the range shown is always 
+#'   centered at zero, with the values at either extreme determined by the 
+#'   value in the rendered \code{data} with the strongest magnitude (the 
+#'   maximum of the absolute value).
+#'   
+#'   The \code{corCols} and \code{corRange} arguments control the appearance of
+#'   the correlation structure heatmap (see \code{\link{plotCorrelation}}). The
+#'   gradient of colors used on the heatmap can be changed by specifying a
+#'   vector of colors to interpolate between in \code{corCols}. By default,
+#'   strong negative correlations are shown in blue, and strong positive
+#'   correlations in red, and weak correlations as white. \code{corRange} 
+#'   controls the range of values that this gradient maps to, by default, -1 to
+#'   1. Changing this may be useful for showing differences where range of 
+#'   correlation coefficients is small.
+#'   
+#'   The \code{netCols} and \code{netRange} arguments control the appearance of
+#'   the network edge weight heatmap (see \code{\link{plotNetwork}}). The
+#'   gradient of colors used on the heatmap can be changed by specifying a
+#'   vector of colors to interpolate between in \code{netCols}. By default,
+#'   weak or non-edges are shown in white, while strong edges are shown in red.
+#'   The \code{netRange} controls the range of values this gradient maps to, 
+#'   by default, 0 to 1. If \code{netRange} is set to \code{NA}, then the 
+#'   gradient will be mapped to values between 0 and the maximum edge weight of
+#'   the shown network.
+#'   
+#'   The \code{degreeCol} argument controls the color of the weighted degree
+#'   bar plot (see \code{\link{plotDegree}}).
+#'   
+#'   The \code{contribCols} argument controls the color of the node 
+#'   contribution bar plot (see \code{\link{plotContribution}}. This can be 
+#'   specified as single value to be used for all nodes, or as two colors: one
+#'   to use for nodes with positive contributions and one to use for nodes with
+#'   negative contributions.
+#'   
+#'   The \code{summaryCols} argument controls the color of the module summary 
+#'   bar plot (see \code{\link{plotSummary}}. This can be specified as single
+#'   value to be used for all samples, or as two colors: one to use for samples
+#'   with a positive module summary value and one fpr samples with a negative
+#'   module summary value.
+#'   
+#'   The \code{naCol} argument controls the color of missing nodes and samples
+#'   on the data, correlaton structure, and network edge weight heatmaps.
+#' }
 #' \subsection{Plot customisation:}{
 #'   Although reasonable default values for most parameters have been provided,
 #'   the rendering of axes and titles may need adjusting depending on the size
@@ -223,9 +281,13 @@ plotModule <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
-  maxEdgeWeight=1, drawBorders=FALSE, border.width=2, naxt.line=-0.5, 
+  drawBorders=FALSE, border.width=2, naxt.line=-0.5, 
   saxt.line=-0.5, maxt.line=NULL, legend.tick.size=0.04, 
-  laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2,
+  dataCols=NULL, dataRange=NULL, corCols=correlation.palette(), 
+  corRange=c(-1,1), netCols=network.palette(), netRange=c(0,1), 
+  degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
+  summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd"
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -257,8 +319,10 @@ plotModule <- function(
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
     main=main, drawBorders=drawBorders, border.width=border.width, 
     naxt.line=naxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
-    legend.tick.size=legend.tick.size, laxt.line=laxt.line,
-    maxEdgeWeight=maxEdgeWeight)
+    legend.tick.size=legend.tick.size, laxt.line=laxt.line, dataCols=dataCols, 
+    dataRange=dataRange, corCols=corCols, corRange=corRange, netCols=netCols, 
+    netRange=netRange, degreeCol=degreeCol, contribCols=contribCols, 
+    summaryCols=summaryCols, naCol=naCol)
   
   # Handle variants that will not work for this plot function
   if (is.null(legend.tick.size))
@@ -307,23 +371,6 @@ plotModule <- function(
   }, add = TRUE)
   
   vCat(verbose, 0, "User input ok!")
-  
-  #-----------------------------------------------------------------------------
-  # Set default values for 'NULL' arguments
-  #-----------------------------------------------------------------------------
-  
-  # Plot module names only if drawing more than one module
-  if (is.null(plotModuleNames)) {
-    plotModuleNames <- length(mods) > 1
-  }
-  
-  # Set the location of module names in the margin based on whether or not 
-  # we're plotting the node names
-  if (is.null(maxt.line) && !plotNodeNames) {
-    maxt.line <- -0.5
-  } else if (is.null(maxt.line) && plotNodeNames) {
-    maxt.line <- 3
-  }
   
   #-----------------------------------------------------------------------------
   # Get ordering of nodes and samples as specified in 'orderNodesBy' and 
@@ -444,10 +491,6 @@ plotModule <- function(
     }
     nodeContribVec <- nodeContribVec[nodeOrder]
     
-    # and respective colors
-    nodeContribCols <- rep(correlation.palette()[1], length(nodeContribVec))
-    nodeContribCols[nodeContribVec > 0] <- tail(correlation.palette(), 1)
-    
     # Summary profile matrix
     summaries <- foreach(mi = moduleOrder, .combine=cbind) %do% {
       matrix(
@@ -457,10 +500,43 @@ plotModule <- function(
     }
     colnames(summaries) <- moduleOrder
     rownames(summaries) <- sampleOrder
-    
-    # and respective colors
-    summaries.cols <- matrix(data.palette()[1], nrow(summaries), ncol(summaries))
-    summaries.cols[summaries > 0] <- tail(data.palette(), 1)
+  }
+  
+  #-----------------------------------------------------------------------------
+  # Set default values for 'NULL' arguments
+  #-----------------------------------------------------------------------------
+  
+  # Plot module names only if drawing more than one module
+  if (is.null(plotModuleNames)) {
+    plotModuleNames <- length(mods) > 1
+  }
+  
+  # Set the location of module names in the margin based on whether or not 
+  # we're plotting the node names
+  if (is.null(maxt.line) && !plotNodeNames) {
+    maxt.line <- -0.5
+  } else if (is.null(maxt.line) && plotNodeNames) {
+    maxt.line <- 3
+  }
+  
+  # Set default color palettes for the data heatmap
+  dat <- data[[ti]][presentSamples, presentNodes] # also used for actual plot
+  if (is.null(dataRange)) {
+    dataRange <- range(dat)
+    # Make sure the gradient is balanced around 0 if the default colors are
+    # requested
+    if (is.null(dataCols) && dataRange[1] < 0 && dataRange[2] > 0) {
+      dataRange <- c(-1*max(abs(dataRange)), max(abs(dataRange)))
+    }
+  }
+  if (is.null(dataCols)) {
+    if (all(dataRange >= 0)) {
+      dataCols <- c("#FFFFFF", "#1B7837")
+    } else if (all(dataRange <= 0)) {
+      dataCols <- c("#762A83", "#FFFFFF")
+    } else {
+      dataCols <- c("#762A83", "#FFFFFF", "#1B7837")
+    }
   }
 
   #-----------------------------------------------------------------------------
@@ -494,10 +570,9 @@ plotModule <- function(
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
     correlation[[ti]][presentNodes, presentNodes], 
-    correlation.palette(), c(-1, 1), 
-    moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, 
-    main="", legend.main="Correlation", plotModuleNames=FALSE, 
-    legend.tick.size=legend.tick.size, laxt.line=laxt.line, 
+    corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
+    plotLegend=TRUE, main="", legend.main="Correlation", plotModuleNames=FALSE, 
+    legend.tick.size=legend.tick.size, laxt.line=laxt.line, na.col=naCol,
     legend.line=0.1, maxt.line=maxt.line, border.width=border.width
   )
   mtext(main, side=3, line=1, cex=par('cex.main'), font=2, xpd=NA)
@@ -505,10 +580,10 @@ plotModule <- function(
   # Plot network
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    network[[ti]][presentNodes, presentNodes], network.palette(), 
-    c(0, maxEdgeWeight), moduleAssignments[[di]][nodeOrder], na.pos.x, 
-    plotLegend=TRUE, main="", legend.main="Edge weights", 
-    plotModuleNames=FALSE, legend.tick.size=legend.tick.size, 
+    network[[ti]][presentNodes, presentNodes], netCols, netRange,
+    moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, main="", 
+    legend.main="Edge weights", plotModuleNames=FALSE, 
+    legend.tick.size=legend.tick.size, na.col=naCol,
     laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,
     border.width=border.width
   )
@@ -517,17 +592,17 @@ plotModule <- function(
   par(mar=c(1,1,1,1))
   if (is.null(scaledData[[ti]])) {
     plotBar(
-      wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], "#feb24c", 
+      wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
       xaxt=plotNodeNames, xaxt.line=naxt.line, main="",
       ylab="Weighted\ndegree", maxt.line=maxt.line, 
-      border.width=border.width
+      border.width=border.width, na.col=naCol
     )
   } else {
     plotBar(
-      wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], "#feb24c", 
+      wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
-      ylab="Weighted\ndegree", maxt.line=maxt.line, 
+      ylab="Weighted\ndegree", maxt.line=maxt.line, na.col=naCol,
       border.width=border.width
     )
   }
@@ -537,25 +612,12 @@ plotModule <- function(
     par(mar=c(1, 1, 1, 1))
     plotBar(
       nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder], 
-      nodeContribCols, drawBorders=drawBorders, plotModuleNames=FALSE, main="", 
-      xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, 
+      contribCols, drawBorders=drawBorders, plotModuleNames=FALSE, main="", 
+      xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, na.col=naCol,
       border.width=border.width
     )
     
     # Plot the data matrix
-    dat <- data[[ti]][presentSamples, presentNodes]
-    range.dat <- range(dat)
-    if (all(range.dat > 0)) {
-      palette <- tail(data.palette(), length(data.palette())/2)
-      range.pal <- range.dat
-    } else if (all(range.dat < 0)) {
-      palette <- head(data.palette(), length(data.palette())/2)
-      range.pal <- range.dat
-    } else {
-      palette <- data.palette()
-      range.pal <- c(-max(abs(range.dat)), max(abs(range.dat)))
-    }
-    
     par(mar=c(1,1,1,1))
     emptyPlot(c(0,1), c(0,1), bty="n")
 
@@ -564,7 +626,7 @@ plotModule <- function(
       yaxt <- sampleOrder
     par(mar=c(1, 1, 1, 1))
     plotSquareHeatmap(
-      dat, palette, vlim=range.pal, legend.lim=range.dat,
+      dat, dataCols, vlim=dataRange, legend.lim=dataRange,
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
       xaxt=naxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
@@ -574,32 +636,13 @@ plotModule <- function(
     # Plot data legend
     nNodes <- ncol(dat) + length(na.pos.x)
     nSamples <- nrow(dat) + length(na.pos.y)
-    if (all(range.dat < 0)) {
-      addGradientLegend(
-        head(palette, length(palette)/2), range.dat, range.dat, TRUE, 
-        xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
-        ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3), 
-        tick.size=legend.tick.size, border.width=border.width,
-        main="Module data", axis.line=laxt.line, srt=0
-      )
-    } else if (all(range.dat > 0)) {
-      addGradientLegend(
-        tail(palette, length(palette)/2), range.dat, range.dat, TRUE, 
-        xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
-        ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3), 
-        tick.size=legend.tick.size, border.width=border.width,
-        main="Module data", axis.line=laxt.line, srt=0
-      )
-    } else {
-      plim <- c(-max(abs(range.dat)), max(abs(range.dat)))
-      addGradientLegend(
-        palette, plim, range.dat, TRUE, main="Module data",
-        xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
-        ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3),  
-        tick.size=legend.tick.size, border.width=border.width,
-        axis.line=laxt.line, srt=0
-      )
-    }
+    addGradientLegend(
+      dataCols, dataRange, dataRange, TRUE, main="Module data",
+      xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
+      ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3),  
+      tick.size=legend.tick.size, border.width=border.width,
+      axis.line=laxt.line, srt=0
+    )
     
     # Plot bar chart
     xlab <- "Module summary"
@@ -608,10 +651,10 @@ plotModule <- function(
     par(mar=c(1, 1, 1, 1))
     plotMultiBar(
       summaries, rep(list(range(summaries, na.rm=TRUE)), ncol(summaries)),
-      cols=summaries.cols , drawBorders=drawBorders, border.width=border.width,
+      cols=summaryCols , drawBorders=drawBorders, border.width=border.width,
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
       yaxt.line=saxt.line, maxt.line=0, xlab=xlab, 
-      cex.modules=par("cex.lab")*0.7
+      cex.modules=par("cex.lab")*0.7, na.col=naCol
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)

@@ -36,8 +36,8 @@ plotTriangleHeatmap <- function(
   emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
   palette <- colorRampPalette(palette)(255)
   
-  if ((is.na(vlim[2]) || is.null(vlim[2]))) {
-    vlim[2] <- max(values[lower.tri(values)])
+  if (length(vlim) == 1) {
+    vlim <- c(0, max(values[lower.tri(values)]))
   }
   
   # render triangles row by row
@@ -172,10 +172,10 @@ plotSquareHeatmap <- function(
   emptyPlot(xlim=c(0.5, nX+0.5), ylim=c(0.5, nY+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
   
-  if (is.na(vlim[2]) || is.null(vlim[2])) {
-    vlim[2] <- max(c(values[lower.tri(values)], values[upper.tri(values)]))
+  if (length(vlim) < 2) {
+    vlim <- c(0, max(c(values[lower.tri(values)], values[upper.tri(values)])))
   }
-  
+    
   # render squares
   cj <- 1
   for (jj in 1:nX) {
@@ -458,10 +458,16 @@ plotBar <- function(
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
   maxt.line=3, ylab="", border.width=2
 ) {
-  if (length(cols) == 1)
-    cols <- rep(cols, length(heights))
-  if (length(cols) < length(heights))
-    cols <- rep(cols, ceiling(length(heights))/length(cols))[1:length(heights)]
+  # Create vector of colors, one for each bar
+  if (length(cols) == 1) {
+    colvec <- rep(cols, length(heights))
+  } else if (length(cols) == 2) { # Assume positive and negative
+    colvec <- character(length=length(heights))
+    colvec[heights > 0] <- cols[1]
+    colvec[heights <= 0] <- cols[2]
+  } else {
+    stop("invalid length for 'cols'")
+  }
 
   ylim <- heights.lim
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1])*0.01
@@ -490,7 +496,7 @@ plotBar <- function(
       xright=ii+bar.width/2,
       ybottom=0,
       ytop=heights[ii],
-      col=cols[ii],
+      col=colvec[ii],
       border=ifelse(drawBorders, "black", NA),
       lwd=border.width
     ) 
@@ -562,8 +568,17 @@ plotMultiBar <- function(
   }
   if (!is.list(lengths.lim))
     lengths.lim <- list(lengths.lim)
-  if (length(cols) == 1) 
-    cols <- matrix(cols, nrow=nrow(lengths), ncol=ncol(lengths))
+  
+  # Create vector of colors, one for each bar
+  if (length(cols) == 1) {
+    colmat <- matrix(cols, nrow=nrow(lengths), ncol=ncol(lengths))
+  } else if (length(cols) == 2) { # Assume positive and negative
+    colmat <- matrix("", nrow=nrow(lengths), ncol=ncol(lengths))
+    colmat[lengths > 0] <- cols[1]
+    colmat[lengths <= 0] <- cols[2]
+  } else {
+    stop("invalid length for 'cols'")
+  }
   
   pw <- 0.7 # width of each plot within the 0-1 space
   
@@ -609,7 +624,7 @@ plotMultiBar <- function(
         xright=getX(lengths[jj,ii]),
         ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
         ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
-        col=cols[jj, ii],
+        col=colmat[jj, ii],
         border=ifelse(drawBorders, "black", NA),
         lwd=border.width
       ) 

@@ -784,16 +784,25 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param plotLegend user input for the corresponding argument in the plot functions.
 #' @param legend.position user input for the corresponding argument in the plot functions.
 #' @param legend.main user input for the corresponding argument in the plot functions.
-#' @param palette user input for the corresponding argument in the plot functions.
 #' @param symmetric user input for the corresponding argument in the plot functions.
 #' @param horizontal user input for the corresponding argument in the plot functions.
-#' @param maxEdgeWeight user input for the corresponding argument in the plot functions.
+#' @param dataCols user input for the corresponding argument in the plot functions.
+#' @param dataRange user input for the corresponding argument in the plot functions.
+#' @param corCols user input for the corresponding argument in the plot functions.
+#' @param corRange user input for the corresponding argument in the plot functions.
+#' @param netCols user input for the corresponding argument in the plot functions.
+#' @param netRange user input for the corresponding argument in the plot functions.
+#' @param degreeCol user input for the corresponding argument in the plot functions.
+#' @param contribCols user input for the corresponding argument in the plot functions.
+#' @param summaryCols user input for the corresponding argument in the plot functions.
+#' @param naCol user input for the corresponding argument in the plot functions.
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, border.width, naxt.line, saxt.line, maxt.line, legend.tick.size, 
   laxt.line, plotLegend, legend.position, legend.main, palette, symmetric,
-  horizontal, maxEdgeWeight
+  horizontal, dataCols, dataRange, corCols, corRange, netCols, netRange, 
+  degreeCol, contribCols, summaryCols, naCol
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -913,30 +922,100 @@ checkPlotArgs <- function(
         || is.null(legend.main)))
     stop("'legend.main' must be a character vector of length 1")
   
-  if (!(missing(palette) || is.null(palette) || 
-        (is.vector(palette) && is.character(palette))))
-    stop("'palette' must be a character vector")
-  if (!missing(palette) && !all(areColors(palette)))
-    stop("invalid colors found in 'palette':", 
-         paste(paste0('"', palette[!areColors(palette)], '"'), collapse=","))
-  
   if (!(missing(symmetric) || is.slog(symmetric)))
     stop("'symmetric' must be one of 'TRUE' or 'FALSE'")
   
   if (!(missing(horizontal) || is.slog(horizontal)))
     stop("'horizontal' must be one of 'TRUE' or 'FALSE'")
   
+  if (!missing(dataCols)) {
+    if (!(is.na(dataCols) || is.null(dataCols) || is.character(dataCols))) {
+      stop("'dataCols' must be a character vector")
+    } else if (any(!areColors(dataCols))) {
+      stop("invalid colors found in 'dataCols':",  
+        paste(paste0('"', dataCols[!areColors(dataCols)], '"'), collapse=", "))
+    }
+  }
   
-  if (!missing(border.width)) {
-    if (!(is.snum(maxEdgeWeight) || is.na(maxEdgeWeight) || 
-          is.null(maxEdgeWeight))) {
-      stop("'maxEdgeWeight' must be a numeric vector of length 1 or 'NA'")
+  if (!missing(corCols)) {
+    if (!(is.na(corCols) || is.null(corCols) || is.character(corCols))) {
+      stop("'corCols' must be a character vector")
+    } else if (any(!areColors(corCols))) {
+      stop("invalid colors found in 'corCols':",  
+           paste(paste0('"', corCols[!areColors(corCols)], '"'), collapse=", "))
     }
-    if (is.snum(maxEdgeWeight) && maxEdgeWeight <= 0) {
-      stop("'maxEdgeWeight' must be greater than 0")
+  }
+  
+  if (!missing(netCols)) {
+    if (!(is.na(netCols) || is.null(netCols) || is.character(netCols))) {
+      stop("'netCols' must be a character vector")
+    } else if (any(!areColors(netCols))) {
+      stop("invalid colors found in 'netCols':",  
+           paste(paste0('"', netCols[!areColors(netCols)], '"'), collapse=", "))
     }
-    if (is.snum(maxEdgeWeight) && is.infinite(maxEdgeWeight)) {
-      stop("'maxEdgeWeight' must be finite")
+  }
+  
+  if (!missing(degreeCol)) {
+    if (!(is.na(degreeCol) || is.null(degreeCol) || is.schar(degreeCol))) {
+      stop("'degreeCol' must be a character vector of length 1")
+    } else if (!areColors(degreeCol)) {
+      stop('invalid color, "', degreeCol, '" for', " 'degreeCol'", sep="")  
+    }
+  }
+  
+  if (!missing(contribCols)) {
+    if (!(is.na(contribCols) || is.null(contribCols) || is.character(contribCols))) {
+      stop("'contribCols' must be a character vector")
+    } else if  (is.character(contribCols) && length(contribCols) %nin% 1:2) {
+      stop("'contribCols' must be of length 1 or 2")
+    } else if (any(!areColors(contribCols))) {
+      stop("invalid colors found in 'contribCols':",  
+           paste(paste0('"', contribCols[!areColors(contribCols)], '"'), collapse=", "))
+    }
+  }
+  
+  if (!missing(summaryCols)) {
+    if (!(is.na(summaryCols) || is.null(summaryCols) || is.character(summaryCols))) {
+      stop("'summaryCols' must be a character vector")
+    } else if  (is.character(summaryCols) && length(summaryCols) %nin% 1:2) {
+      stop("'summaryCols' must be of length 1 or 2")
+    } else if (any(!areColors(summaryCols))) {
+      stop("invalid colors found in 'summaryCols':",  
+           paste(paste0('"', summaryCols[!areColors(summaryCols)], '"'), collapse=", "))
+    }
+  }
+
+  if (!missing(naCol)) {
+    if (!(is.na(naCol) || is.null(naCol) || is.schar(naCol))) {
+      stop("'naCol' must be a character vector of length 1")
+    } else if (!areColors(naCol)) {
+      stop('invalid color, "', naCol, '" for', " 'naCol'", sep="")  
+    }
+  }
+  
+  if (!missing(dataRange)) {
+    if (!(missing(dataRange) || is.na(dataRange) || is.null(dataRange) || 
+          (is.numeric(dataRange) && length(dataRange) == 2))) {
+      stop("'dataRange' must be a numeric vector of length 2")
+    } else if (is.numeric(dataRange) && any(is.infinite(dataRange))) {
+      stop("infinite values found in 'dataRange'")
+    }
+  }
+  
+  if (!missing(corRange)) {
+    if (!(missing(corRange) || (is.numeric(corRange) && length(corRange) == 2))) {
+      stop("'corRange' must be a numeric vector of length 2")
+    } else if (is.numeric(corRange) && any(is.infinite(corRange))) {
+      stop("infinite values found in 'corRange'")
+    }
+  }
+  
+  if (!missing(netRange)) {
+    if (!(missing(netRange) || is.na(netRange) || is.null(netRange) || 
+          (is.numeric(netRange) && length(netRange) == 2))) {
+      stop("'netRange' must be a numeric vector of length 2 or 'NA'")
+    } else if (is.numeric(netRange) && any(is.infinite(netRange))) {
+      stop("infinite values found in 'netRange'")
     }
   }
   

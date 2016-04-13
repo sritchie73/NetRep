@@ -107,6 +107,8 @@ addAlpha <- function(col, alpha) {
 #'
 #' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
 #' This gives a nicer contrast than the "RdBu" palette
+#' 
+#' @import RColorBrewer
 correlation.palette <- function() {
   cols <- rev(brewer.pal(11, "RdYlBu"))
   cols[6] <- "#FFFFFF"
@@ -118,17 +120,6 @@ correlation.palette <- function() {
 #' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
 network.palette <- function() {
   correlation.palette()[6:11]
-}
-
-#' Color palette for data heatmaps and module summary vector plots
-#'
-#' RColorBrewer palette "PRGn" with a white middle color.
-#'
-#' @import RColorBrewer
-data.palette <- function() {
-  cols <- brewer.pal(9, "PRGn")
-  cols[5] <- "#FFFFFF"
-  cols
 }
 
 #' Get module break points on the x-axis
