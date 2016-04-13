@@ -787,12 +787,13 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param palette user input for the corresponding argument in the plot functions.
 #' @param symmetric user input for the corresponding argument in the plot functions.
 #' @param horizontal user input for the corresponding argument in the plot functions.
+#' @param maxEdgeWeight user input for the corresponding argument in the plot functions.
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, border.width, naxt.line, saxt.line, maxt.line, legend.tick.size, 
   laxt.line, plotLegend, legend.position, legend.main, palette, symmetric,
-  horizontal
+  horizontal, maxEdgeWeight
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -886,5 +887,19 @@ checkPlotArgs <- function(
   
   if (!(missing(horizontal) || is.slog(horizontal)))
     stop("'horizontal' must be one of 'TRUE' or 'FALSE'")
+  
+  
+  if (!missing(border.width)) {
+    if (!(is.snum(maxEdgeWeight) || is.na(maxEdgeWeight) || 
+          is.null(maxEdgeWeight))) {
+      stop("'maxEdgeWeight' must be a numeric vector of length 1 or 'NA'")
+    }
+    if (is.snum(maxEdgeWeight) && maxEdgeWeight <= 0) {
+      stop("'maxEdgeWeight' must be greater than 0")
+    }
+    if (is.snum(maxEdgeWeight) && is.infinite(maxEdgeWeight)) {
+      stop("'maxEdgeWeight' must be finite")
+    }
+  }
   
 }

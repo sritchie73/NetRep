@@ -7,7 +7,7 @@
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
   main, drawBorders, border.width, naxt.line, saxt.line, maxt.line,
   legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
-  palette, symmetric, horizontal)
+  palette, symmetric, horizontal, maxEdgeWeight)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
@@ -43,6 +43,8 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \item{symmetric}{user input for the corresponding argument in the plot functions.}
 
 \item{horizontal}{user input for the corresponding argument in the plot functions.}
+
+\item{maxEdgeWeight}{user input for the corresponding argument in the plot functions.}
 
 \item{plotNodesNames}{user input for the corresponding argument in the plot functions.}
 }

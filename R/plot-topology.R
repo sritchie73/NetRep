@@ -812,9 +812,10 @@ plotNetwork <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", palette=NULL, border.width=2, plotLegend=TRUE, 
-  legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
-  legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2
+  plotModuleNames=NULL, main="", palette=NULL, maxEdgeWeight=1, border.width=2, 
+  plotLegend=TRUE, legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, 
+  legend.position=NULL, legend.tick.size=NULL, laxt.line=NULL, cex.axis=0.8, 
+  cex.lab=1, cex.main=1.2
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -848,7 +849,7 @@ plotNetwork <- function(
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     legend.tick.size=legend.tick.size, palette=palette, plotLegend=plotLegend, 
     legend.main=legend.main, legend.position=legend.position, 
-    symmetric=symmetric)
+    symmetric=symmetric, maxEdgeWeight=maxEdgeWeight)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1018,7 +1019,7 @@ plotNetwork <- function(
     }
     
     plotSquareHeatmap(
-      network[[ti]][presentNodes, presentNodes], palette, c(0, 1), 
+      network[[ti]][presentNodes, presentNodes], palette, c(0, maxEdgeWeight), 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -1029,7 +1030,7 @@ plotNetwork <- function(
     )
   } else {
     plotTriangleHeatmap(
-      network[[ti]][presentNodes, presentNodes], palette, c(0, 1), 
+      network[[ti]][presentNodes, presentNodes], palette, c(0, maxEdgeWeight), 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,

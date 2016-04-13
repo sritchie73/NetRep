@@ -21,6 +21,10 @@ rendered on the left axis.}
 The default is for module names to be rendered when multiple \code{modules} 
 are drawn.}
 
+\item{maxEdgeWeight}{controls the range of the color palette on the network
+edge weight heatmap (see details). If \code{NA} then the maximum
+edge weight in the rendered network will be used.}
+
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
 connectivity, module membership, and module summary bar plots.}
 

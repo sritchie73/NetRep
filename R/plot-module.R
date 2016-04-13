@@ -223,7 +223,7 @@ plotModule <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
-  drawBorders=FALSE, border.width=2, naxt.line=-0.5, 
+  maxEdgeWeight=1, drawBorders=FALSE, border.width=2, naxt.line=-0.5, 
   saxt.line=-0.5, maxt.line=NULL, legend.tick.size=0.04, 
   laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2
 ) {
@@ -257,7 +257,8 @@ plotModule <- function(
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
     main=main, drawBorders=drawBorders, border.width=border.width, 
     naxt.line=naxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
-    legend.tick.size=legend.tick.size, laxt.line=laxt.line)
+    legend.tick.size=legend.tick.size, laxt.line=laxt.line,
+    maxEdgeWeight=maxEdgeWeight)
   
   # Handle variants that will not work for this plot function
   if (is.null(legend.tick.size))
@@ -505,7 +506,7 @@ plotModule <- function(
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
     network[[ti]][presentNodes, presentNodes], network.palette(), 
-    c(0, 1), moduleAssignments[[di]][nodeOrder], na.pos.x, 
+    c(0, maxEdgeWeight), moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main="", legend.main="Edge weights", 
     plotModuleNames=FALSE, legend.tick.size=legend.tick.size, 
     laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,

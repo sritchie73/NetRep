@@ -88,6 +88,9 @@ NULL
 #' @param plotModuleNames logical; controls whether module names are rendered.
 #'  The default is for module names to be rendered when multiple \code{modules} 
 #'  are drawn.
+#' @param maxEdgeWeight controls the range of the color palette on the network
+#'  edge weight heatmap (see details). If \code{NA} then the maximum
+#'  edge weight in the rendered network will be used.
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the 
 #'  connectivity, module membership, and module summary bar plots.
 #' @param border.width line width for borders.
@@ -104,6 +107,7 @@ NULL
 #' @param cex.axis relative size of the node and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.
+#' 
 #' 
 #' @name plot_params
 NULL

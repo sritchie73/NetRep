@@ -36,6 +36,10 @@ plotTriangleHeatmap <- function(
   emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
   palette <- colorRampPalette(palette)(255)
   
+  if ((is.na(vlim[2]) || is.null(vlim[2]))) {
+    vlim[2] <- max(values[lower.tri(values)])
+  }
+  
   # render triangles row by row
   for (plotRow in 1:nGenes) {
     startCol <- nGenes - (plotRow - 1)
@@ -167,6 +171,10 @@ plotSquareHeatmap <- function(
   nY <- nrow(values) + length(na.indices.y)
   emptyPlot(xlim=c(0.5, nX+0.5), ylim=c(0.5, nY+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
+  
+  if (is.na(vlim[2]) || is.null(vlim[2])) {
+    vlim[2] <- max(c(values[lower.tri(values)], values[upper.tri(values)]))
+  }
   
   # render squares
   cj <- 1

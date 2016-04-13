@@ -36,10 +36,10 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", palette = NULL, border.width = 2, plotLegend = TRUE,
-  legend.main = "Edge weight", naxt.line = -0.5, maxt.line = 3,
-  legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  main = "", palette = NULL, maxEdgeWeight = 1, border.width = 2,
+  plotLegend = TRUE, legend.main = "Edge weight", naxt.line = -0.5,
+  maxt.line = 3, legend.position = NULL, legend.tick.size = NULL,
+  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -183,6 +183,10 @@ labels, as multiple of \code{legend.tick.size}.}
 heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
 heatmaps. If symmetric, then the node and module names will also be rendered
 on the left axis.}
+
+\item{maxEdgeWeight}{controls the range of the color palette on the network
+edge weight heatmap (see details). If \code{NA} then the maximum
+edge weight in the rendered network will be used.}
 
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the bars
 in \code{plotContribution}, \code{plotDegree}, and
