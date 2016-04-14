@@ -7,9 +7,9 @@
 plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
   na.indices.y = NULL, na.col = "#bdbdbd", xaxt = NULL, yaxt = NULL,
   plotModuleNames = TRUE, main = "", plotLegend = TRUE,
-  legend.main = "", legend.lim, xaxt.line = -0.5, yaxt.line = -0.5,
-  maxt.line = 3, legend.tick.size = 0.04, laxt.line = 2.5,
-  legend.line = 0.1, border.width = 2)
+  legend.main = "", xaxt.line = -0.5, yaxt.line = -0.5, maxt.line = 3,
+  legend.tick.size = 0.04, laxt.line = 2.5, legend.line = 0.1,
+  border.width = 2)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -40,8 +40,6 @@ axes if \code{values} is symettric.}
 the plot.}
 
 \item{legend.main}{title for the legend.}
-
-\item{legend.lim}{range of values to show on the legend.}
 
 \item{xaxt.line}{the number of lines into the margin at which the x axis 
 labels will be drawn.}

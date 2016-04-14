@@ -626,7 +626,7 @@ plotModule <- function(
       yaxt <- sampleOrder
     par(mar=c(1, 1, 1, 1))
     plotSquareHeatmap(
-      dat, dataCols, vlim=dataRange, legend.lim=dataRange,
+      dat, dataCols, vlim=dataRange,
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
       xaxt=naxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
@@ -637,7 +637,7 @@ plotModule <- function(
     nNodes <- ncol(dat) + length(na.pos.x)
     nSamples <- nrow(dat) + length(na.pos.y)
     addGradientLegend(
-      dataCols, dataRange, dataRange, TRUE, main="Module data",
+      dataCols, dataRange, TRUE, main="Module data",
       xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
       ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3),  
       tick.size=legend.tick.size, border.width=border.width,

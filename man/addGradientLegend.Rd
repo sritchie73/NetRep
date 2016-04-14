@@ -4,14 +4,11 @@
 \alias{addGradientLegend}
 \title{Plot a color palette legend}
 \usage{
-addGradientLegend(palette, palette.vlim, legend.vlim, horizontal, main, xlim,
-  ylim, tick.size = 0.04, axis.line = 3, border.width = 2, srt)
+addGradientLegend(palette, legend.vlim, horizontal, main, xlim, ylim,
+  tick.size = 0.04, axis.line = 3, border.width = 2, srt)
 }
 \arguments{
 \item{palette}{color palette.}
-
-\item{palette.vlim}{limits of the values mapping to the extremities of the 
-color palette.}
 
 \item{legend.vlim}{limits of the values to display on the legend}
 

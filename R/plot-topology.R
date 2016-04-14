@@ -579,7 +579,7 @@ plotData <- function(
     
   # Plot
   plotSquareHeatmap(
-    dat, dataCols, vlim=dataRange, legend.lim=dataRange,
+    dat, dataCols, vlim=dataRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
     xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
