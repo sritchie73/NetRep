@@ -649,7 +649,7 @@ nodeOrderInternal <- function(
         if(is.null(dim(degreeMat))) {
           degreeMat <- matrix(degreeMat, nrow=1)
         }
-        avgDegree <- colMeans(degreeMat)
+        avgDegree <- colMeans(degreeMat, na.rm=TRUE)
         names(avgDegree) <- nodeNames
         
         pooledSummary <- foreach(jj = seq_along(props[[ii]]), .combine=c) %do% {
