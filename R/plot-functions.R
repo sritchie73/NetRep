@@ -31,8 +31,8 @@ plotTriangleHeatmap <- function(
   xaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
   legend.line=0.1, border.width=2
 ) {
-  nGenes <- ncol(values) + length(na.indices)
-  emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
+  nNodes <- ncol(values) + length(na.indices)
+  emptyPlot(xlim=c(0.5, nNodes + 0.5), ylim=c(0, nNodes/2), bty="n")
   palette <- colorRampPalette(palette)(255)
   
   if (length(vlim) == 1) {
@@ -40,22 +40,22 @@ plotTriangleHeatmap <- function(
   }
   
   # render triangles row by row
-  for (plotRow in 1:nGenes) {
-    startCol <- nGenes - (plotRow - 1)
+  for (plotRow in 1:nNodes) {
+    startCol <- nNodes - (plotRow - 1)
     for (ii in 1:plotRow) {
       jj <- startCol + (ii - 1)
       ci <- ii
       cj <- jj
       
-      topy <- (nGenes - (plotRow - 1))/2
+      topy <- (nNodes - (plotRow - 1))/2
       # If we're on the diagonal, plot a triangle, otherwise a diamond
-      if (plotRow == nGenes) {
+      if (plotRow == nNodes) {
         boty <- 0
       } else {
         boty <- topy - 1
       }
       
-      xOffset <- (nGenes - (plotRow - 1))/2 
+      xOffset <- (nNodes - (plotRow - 1))/2 
       rightx <- ii + xOffset
       leftx <- rightx - 1
       
@@ -98,7 +98,7 @@ plotTriangleHeatmap <- function(
   
   # render border of plot
   polygon(
-    x=c(0.5, nGenes+0.5, nGenes/2+0.5, 0.5), y=c(0, 0, nGenes/2, 0),
+    x=c(0.5, nNodes+0.5, nNodes/2+0.5, 0.5), y=c(0, 0, nNodes/2, 0),
     lwd=border.width, xpd=NA
   )
   
@@ -106,15 +106,15 @@ plotTriangleHeatmap <- function(
   if (!is.null(xaxt)) {
     axis(
       side=1, las=2, tick=FALSE, line=xaxt.line,
-      at=1:nGenes, labels=xaxt
+      at=1:nNodes, labels=xaxt
     )
   }
   mtext(main, side=3, cex=par("cex.main"), font=2)
   
   # Add legend if specified
   if (plotLegend) {
-    ph <- nGenes/2
-    pw <- nGenes
+    ph <- nNodes/2
+    pw <- nNodes
     addGradientLegend(
       palette, vlim, TRUE, legend.main,
       xlim=c(0.5 - pw*legend.line, pw*0.25), 
