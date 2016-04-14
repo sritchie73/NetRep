@@ -331,29 +331,35 @@ Individual components of the module plot can be plotted using
   The \code{naCol} argument controls the color of missing nodes and samples
   on the data, correlaton structure, and network edge weight heatmaps.
 }
-\subsection{Plot customisation:}{
-  Although reasonable default values for most parameters have been provided,
-  the rendering of axes and titles may need adjusting depending on the size
-  of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
-  \code{maxt.line}, and \code{laxt.line} control the distance from each plot
-  window that the node labels, sample labels, module labels, and legend 
-  labels are rendered. 
+\subsection{Plot layout and device size}{
+  For optimal results we recommend viewing single modules on a PNG device
+  with a width of 1500, a height of 2700 and a nominal resolution of 300 
+  (\code{png(filename, width=5*300, height=9*300, res=300))}). PDF and other
+  vectorized devices should not be used for modules with more than a hundred
+  nodes.
   
-  \code{legend.tick.size} controls the length of the 
-  axis ticks on each of the legends relative to the correlation, edge weight,
-  and data matrix heatmap plot windows. 
+  When changing the device size the spacing of axes, titles, and legends may 
+  need adjusting.
   
-  \code{cex.main} controls the relative text size of the plot title
-  (specified by the \code{main} argument). \code{cex.axis} controls the
-  relative text size of the node and sample labels. \code{cex.lab} controls
+  The parameters \code{naxt.line}, \code{saxt.line}, \code{maxt.line}, and
+  \code{laxt.line} control the distance from each plot window that the node
+  labels, sample labels, module labels, and legend labels are rendered.
+  
+  \code{legend.tick.size} controls the length of the axis ticks on each of
+  the legends relative to the correlation, edge weight, and data matrix
+  heatmap plot windows.
+  
+  \code{cex.main} controls the relative text size of the plot title 
+  (specified by the \code{main} argument). \code{cex.axis} controls the 
+  relative text size of the node and sample labels. \code{cex.lab} controls 
   the relative text size of the bar plot axis labels, module labels, and the
   legend titles.
   
   The rendering of node, sample, and module names can be disabled by setting
-  \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
-  \code{FALSE}.
+  \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames}
+  to \code{FALSE}.
   
-  The \code{drawBorders} argument controls whether borders are drawn around
+  The \code{drawBorders} argument controls whether borders are drawn around 
   the connectivity, module membership, or module summary bar plots.
 }
 }

@@ -351,7 +351,7 @@ one or more network modules.
   any given module when rendered on the bar plot. This facilitates visual 
   comparison of multiple modules with differing sizes or densities.
 }
-\subsection{Customising plot layout:}{
+\subsection{Plot layout and device size:}{
   Although reasonable default values for most parameters have been provided,
   the rendering of axes and titles may need adjusting depending on the size
   of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
