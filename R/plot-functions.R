@@ -29,7 +29,7 @@ plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
   plotModuleNames=TRUE, main="", plotLegend=TRUE, legend.main="",
   xaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1, border.width=2
+  legend.line=0.1, border.width=2, dryRun=FALSE
 ) {
   nNodes <- ncol(values) + length(na.indices)
   palette <- colorRampPalette(palette)(255)
@@ -49,44 +49,46 @@ plotTriangleHeatmap <- function(
   emptyPlot(xlim=c(halfUnit, pw + halfUnit), ylim=c(0, ph), bty="n")
   
   # render triangles row by row
-  for (plotRow in 1:nNodes) {
-    startCol <- nNodes - (plotRow - 1)
-    for (ii in 1:plotRow) {
-      jj <- startCol + (ii - 1)
-      ci <- ii
-      cj <- jj
-      
-      topy <- (nNodes - (plotRow - 1))/2
-      # If we're on the diagonal, plot a triangle, otherwise a diamond
-      if (plotRow == nNodes) {
-        boty <- 0 
-      } else {
-        boty <- topy - 1
+  if (!dryRun) {
+    for (plotRow in 1:nNodes) {
+      startCol <- nNodes - (plotRow - 1)
+      for (ii in 1:plotRow) {
+        jj <- startCol + (ii - 1)
+        ci <- ii
+        cj <- jj
+        
+        topy <- (nNodes - (plotRow - 1))/2
+        # If we're on the diagonal, plot a triangle, otherwise a diamond
+        if (plotRow == nNodes) {
+          boty <- 0 
+        } else {
+          boty <- topy - 1
+        }
+        
+        xOffset <- (nNodes - (plotRow - 1))/2 
+        rightx <- ii + xOffset
+        leftx <- rightx - 1
+        
+        if (ii %nin% na.indices && jj %nin% na.indices) {
+          col <- getColFromPalette(values[ci, cj], palette, vlim)
+          cj <- cj + 1
+          ci <- ci + 1
+        } else {
+          col <- na.col
+        }
+        
+        leftx <- leftx * unitSize
+        rightx <- rightx * unitSize
+        boty <- boty * unitSize
+        topy <- topy * unitSize
+        
+        polygon(
+          x=c(leftx, leftx+halfUnit, rightx, leftx+halfUnit, leftx),
+          y=c(topy-halfUnit, topy, topy-halfUnit, boty, topy-halfUnit),
+          col=col, border=col
+        )
       }
-      
-      xOffset <- (nNodes - (plotRow - 1))/2 
-      rightx <- ii + xOffset
-      leftx <- rightx - 1
-      
-      if (ii %nin% na.indices && jj %nin% na.indices) {
-        col <- getColFromPalette(values[ci, cj], palette, vlim)
-        cj <- cj + 1
-        ci <- ci + 1
-      } else {
-        col <- na.col
-      }
-      
-      leftx <- leftx * unitSize
-      rightx <- rightx * unitSize
-      boty <- boty * unitSize
-      topy <- topy * unitSize
-      
-      polygon(
-        x=c(leftx, leftx+halfUnit, rightx, leftx+halfUnit, leftx),
-        y=c(topy-halfUnit, topy, topy-halfUnit, boty, topy-halfUnit),
-        col=col, border=col
-      )
-    }
+    } 
   }
   
   # render module boundaries
@@ -177,7 +179,7 @@ plotSquareHeatmap <- function(
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
   main="", plotLegend=TRUE, legend.main="", xaxt.line=-0.5, 
   yaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1, border.width=2
+  legend.line=0.1, border.width=2, dryRun=FALSE
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
@@ -203,28 +205,30 @@ plotSquareHeatmap <- function(
             bty="n")
   
   # render squares
-  cj <- 1
-  for (jj in 1:nX) {
-    ci <- 1
-    for (ii in 1:nY) {
-      if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
-        col <- getColFromPalette(values[ci, cj], palette, vlim)
-        ci <- ci + 1
-      } else {
-        col <- na.col
+  if (!dryRun) {
+    cj <- 1
+    for (jj in 1:nX) {
+      ci <- 1
+      for (ii in 1:nY) {
+        if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
+          col <- getColFromPalette(values[ci, cj], palette, vlim)
+          ci <- ci + 1
+        } else {
+          col <- na.col
+        }
+        
+        xleft <- jj * xUnitSize - xHalfUnit
+        xright <- jj * xUnitSize + xHalfUnit
+        ybottom <- (nY - (ii - 1)) * yUnitSize - yHalfUnit
+        ytop <- (nY - (ii - 1)) * yUnitSize + yHalfUnit
+        
+        rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, col=col, 
+             border=col)
       }
-      
-      xleft <- jj * xUnitSize - xHalfUnit
-      xright <- jj * xUnitSize + xHalfUnit
-      ybottom <- (nY - (ii - 1)) * yUnitSize - yHalfUnit
-      ytop <- (nY - (ii - 1)) * yUnitSize + yHalfUnit
-      
-      rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, col=col, 
-           border=col)
-    }
-    if (jj %nin% na.indices.x) {
-      cj <- cj + 1
-    }
+      if (jj %nin% na.indices.x) {
+        cj <- cj + 1
+      }
+    }    
   }
   
   # render module boundaries

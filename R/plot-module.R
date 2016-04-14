@@ -293,7 +293,7 @@ plotModule <- function(
   dataCols=NULL, dataRange=NULL, corCols=correlation.palette(), 
   corRange=c(-1,1), netCols=network.palette(), netRange=c(0,1), 
   degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
-  summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd"
+  summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -597,7 +597,8 @@ plotModule <- function(
     corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main="", legend.main="Correlation", plotModuleNames=FALSE, 
     legend.tick.size=legend.tick.size, laxt.line=laxt.line, na.col=naCol,
-    legend.line=0.1, maxt.line=maxt.line, border.width=border.width
+    legend.line=0.1, maxt.line=maxt.line, border.width=border.width, 
+    dryRun=dryRun
   )
   mtext(main, side=3, line=1, cex=par('cex.main'), font=2, xpd=NA)
   
@@ -609,7 +610,7 @@ plotModule <- function(
     legend.main="Edge weights", plotModuleNames=FALSE, 
     legend.tick.size=legend.tick.size, na.col=naCol,
     laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,
-    border.width=border.width
+    border.width=border.width, dryRun=dryRun
   )
   
   # Plot weighted degree
@@ -654,7 +655,8 @@ plotModule <- function(
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
       xaxt=naxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
-      xaxt.line=naxt.line, maxt.line=maxt.line, border.width=border.width
+      xaxt.line=naxt.line, maxt.line=maxt.line, border.width=border.width,
+      dryRun=dryRun
     )
     
     # Plot data legend

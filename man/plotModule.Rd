@@ -16,7 +16,7 @@ plotModule(data, correlation, network, moduleAssignments = NULL,
   corCols = correlation.palette(), corRange = c(-1, 1),
   netCols = network.palette(), netRange = c(0, 1), degreeCol = "#feb24c",
   contribCols = c("#A50026", "#313695"), summaryCols = c("#1B7837",
-  "#762A83"), naCol = "#bdbdbd")
+  "#762A83"), naCol = "#bdbdbd", dryRun = FALSE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 

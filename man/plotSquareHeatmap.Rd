@@ -9,7 +9,7 @@ plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
   plotModuleNames = TRUE, main = "", plotLegend = TRUE,
   legend.main = "", xaxt.line = -0.5, yaxt.line = -0.5, maxt.line = 3,
   legend.tick.size = 0.04, laxt.line = 2.5, legend.line = 0.1,
-  border.width = 2)
+  border.width = 2, dryRun = FALSE)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
