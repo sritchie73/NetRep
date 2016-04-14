@@ -482,8 +482,13 @@ processInput <- function(
     
     if (is.null(orderNodesBy))
       orderNodesBy <- discovery
-    if (is.null(orderSamplesBy))
-      orderSamplesBy <- test[[discovery]]
+    if (is.null(orderSamplesBy)) {
+      if (is.null(data[[discovery]])) {
+        orderSamplesBy <- NA
+      } else {
+        orderSamplesBy <- test[[discovery]]
+      }
+    }
   }
 
   # ----------------------------------------------------------------------------
