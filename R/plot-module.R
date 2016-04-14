@@ -634,12 +634,12 @@ plotModule <- function(
     )
     
     # Plot data legend
-    nNodes <- ncol(dat) + length(na.pos.x)
-    nSamples <- nrow(dat) + length(na.pos.y)
+    xHalfUnit <- (1/(ncol(dat) + length(na.pos.x)))/2
+    yHalfUnit <- (1/(nrow(dat) + length(na.pos.y)))/2
     addGradientLegend(
       dataCols, dataRange, TRUE, main="Module data",
-      xlim=c(0.5+nNodes*0.1,nNodes+0.5-nNodes*0.1), 
-      ylim=c(nSamples+0.5+nSamples*0.2,nSamples+0.5+nSamples*0.3),  
+      xlim=c(xHalfUnit + 0.1, 1 - xHalfUnit - 0.1), 
+      ylim=c(1 + yHalfUnit + 0.2, 1 + yHalfUnit + 0.3),  
       tick.size=legend.tick.size, border.width=border.width,
       axis.line=laxt.line, srt=0
     )

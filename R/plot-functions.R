@@ -32,12 +32,21 @@ plotTriangleHeatmap <- function(
   legend.line=0.1, border.width=2
 ) {
   nNodes <- ncol(values) + length(na.indices)
-  emptyPlot(xlim=c(0.5, nNodes + 0.5), ylim=c(0, nNodes/2), bty="n")
   palette <- colorRampPalette(palette)(255)
   
   if (length(vlim) == 1) {
     vlim <- c(0, max(values[lower.tri(values)]))
   }
+  
+  # Use a fixed width/height for all plots so that offsets and margin lines
+  # are the same regardless of the number of nodes shown
+  unitSize <- 1/nNodes
+  halfUnit <- unitSize/2
+  ph <- (nNodes * unitSize)/2
+  pw <- nNodes * unitSize
+  
+  # Create empty plot
+  emptyPlot(xlim=c(halfUnit, pw + halfUnit), ylim=c(0, ph), bty="n")
   
   # render triangles row by row
   for (plotRow in 1:nNodes) {
@@ -50,7 +59,7 @@ plotTriangleHeatmap <- function(
       topy <- (nNodes - (plotRow - 1))/2
       # If we're on the diagonal, plot a triangle, otherwise a diamond
       if (plotRow == nNodes) {
-        boty <- 0
+        boty <- 0 
       } else {
         boty <- topy - 1
       }
@@ -67,9 +76,14 @@ plotTriangleHeatmap <- function(
         col <- na.col
       }
       
+      leftx <- leftx * unitSize
+      rightx <- rightx * unitSize
+      boty <- boty * unitSize
+      topy <- topy * unitSize
+      
       polygon(
-        x=c(leftx, leftx+0.5, rightx, leftx+0.5, leftx),
-        y=c(topy-0.5, topy, topy-0.5, boty, topy-0.5),
+        x=c(leftx, leftx+halfUnit, rightx, leftx+halfUnit, leftx),
+        y=c(topy-halfUnit, topy, topy-halfUnit, boty, topy-halfUnit),
         col=col, border=col
       )
     }
@@ -80,9 +94,12 @@ plotTriangleHeatmap <- function(
     breaks <- getModuleBreaks(mas)
     mids <- getModuleMidPoints(mas)
     for (mi in seq_along(mids)) {
-      height <- breaks[mi + 1] - mids[mi]
+      height <- (breaks[mi + 1] - mids[mi]) * unitSize
+      leftx <- breaks[mi] * unitSize
+      rightx <- breaks[mi+1] * unitSize
+      midx <- mids[mi] * unitSize
       polygon(
-        x=c(breaks[mi], breaks[mi+1], mids[mi], breaks[mi]),
+        x=c(leftx, rightx, midx, leftx),
         y=c(0, 0, height, 0), lwd=border.width
       )
     }
@@ -90,7 +107,7 @@ plotTriangleHeatmap <- function(
   if (plotModuleNames) {
     axis(
       side=1, las=1, 
-      at=getModuleMidPoints(mas),
+      at=getModuleMidPoints(mas)*unitSize,
       labels=unique(mas), line=maxt.line, tick=FALSE,
       cex.axis=par("cex.lab"), font=2
     )
@@ -98,7 +115,8 @@ plotTriangleHeatmap <- function(
   
   # render border of plot
   polygon(
-    x=c(0.5, nNodes+0.5, nNodes/2+0.5, 0.5), y=c(0, 0, nNodes/2, 0),
+    x=c(halfUnit, pw + halfUnit, ph + halfUnit, halfUnit), 
+    y=c(0, 0, ph, 0),
     lwd=border.width, xpd=NA
   )
   
@@ -106,18 +124,16 @@ plotTriangleHeatmap <- function(
   if (!is.null(xaxt)) {
     axis(
       side=1, las=2, tick=FALSE, line=xaxt.line,
-      at=1:nNodes, labels=xaxt
+      at=(1:nNodes) * unitSize, labels=xaxt
     )
   }
   mtext(main, side=3, cex=par("cex.main"), font=2)
   
   # Add legend if specified
   if (plotLegend) {
-    ph <- nNodes/2
-    pw <- nNodes
     addGradientLegend(
       palette, vlim, TRUE, legend.main,
-      xlim=c(0.5 - pw*legend.line, pw*0.25), 
+      xlim=c(halfUnit - pw*legend.line, pw*0.25), 
       ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tick.size=legend.tick.size,
       axis.line=laxt.line, border.width=border.width
     )
@@ -165,13 +181,27 @@ plotSquareHeatmap <- function(
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
-  emptyPlot(xlim=c(0.5, nX+0.5), ylim=c(0.5, nY+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
   
   if (length(vlim) < 2) {
     vlim <- c(0, max(c(values[lower.tri(values)], values[upper.tri(values)])))
   }
     
+  # Use a fixed width/height for all plots so that offsets and margin lines
+  # are the same regardless of the number of nodes shown
+  xUnitSize <- 1/nX
+  xHalfUnit <- xUnitSize/2
+  yUnitSize <- 1/nY
+  yHalfUnit <- yUnitSize/2
+  
+  pw <- nX * xUnitSize
+  ph <- nY * yUnitSize
+  
+  # Create empty plot
+  emptyPlot(xlim=c(xHalfUnit, pw + xHalfUnit), 
+            ylim=c(yHalfUnit, ph + yHalfUnit), 
+            bty="n")
+  
   # render squares
   cj <- 1
   for (jj in 1:nX) {
@@ -183,13 +213,14 @@ plotSquareHeatmap <- function(
       } else {
         col <- na.col
       }
-      rect(
-        xleft = jj - 0.5,
-        xright = jj + 0.5,
-        ybottom = (nY - (ii - 1)) - 0.5,
-        ytop = (nY- (ii - 1)) + 0.5,
-        col=col, border=col
-      )
+      
+      xleft <- jj * xUnitSize - xHalfUnit
+      xright <- jj * xUnitSize + xHalfUnit
+      ybottom <- (nY - (ii - 1)) * yUnitSize - yHalfUnit
+      ytop <- (nY - (ii - 1)) * yUnitSize + yHalfUnit
+      
+      rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, col=col, 
+           border=col)
     }
     if (jj %nin% na.indices.x) {
       cj <- cj + 1
@@ -200,30 +231,25 @@ plotSquareHeatmap <- function(
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
     for (mi in seq_along(breaks)[-1]) {
+      xleft <- breaks[mi - 1] * xUnitSize
+      xright <- breaks[mi] * xUnitSize
+      
       if (nX != nY) {
-        rect(
-          xleft = breaks[mi - 1],
-          xright = breaks[mi],
-          ybottom = 0.5,
-          ytop = nY + 0.5,
-          border="black", lwd=border.width
-        )
+        ybottom <- yHalfUnit
+        ytop <-  ph + yHalfUnit
       } else {
-        rect(
-          xleft = breaks[mi - 1],
-          xright = breaks[mi],
-          ybottom = (nX + 0.5) - (breaks[mi] - 0.5),
-          ytop = (nX + 0.5) - (breaks[mi - 1] - 0.5),
-          border="black", lwd=border.width
-        )
+        ybottom <- (pw + xHalfUnit) - (breaks[mi] * yUnitSize - yHalfUnit)
+        ytop <- (pw + xHalfUnit) - (breaks[mi - 1] * yUnitSize - yHalfUnit)
       }
+      rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, 
+           border="black", lwd=border.width)
     }
   }
   if (plotModuleNames) {
     if(!(nX == nY && is.null(xaxt) && !is.null(yaxt))) {
       axis(
         side=1, las=1, 
-        at=getModuleMidPoints(mas),
+        at=getModuleMidPoints(mas) * xUnitSize,
         labels=unique(mas), line=maxt.line, tick=FALSE,
         cex.axis=par("cex.lab"), font=2
       )
@@ -231,7 +257,7 @@ plotSquareHeatmap <- function(
     if (nX == nY) {
       axis(
         side=2, las=2,
-        at=nY + 0.5 - getModuleMidPoints(mas),
+        at=ph + yHalfUnit - getModuleMidPoints(mas) * yUnitSize,
         labels=unique(mas), line=maxt.line, tick=FALSE,
         cex.axis=par("cex.lab"), font=2
       )
@@ -253,25 +279,23 @@ plotSquareHeatmap <- function(
   if (!is.null(xaxt)) {
     axis(
       side=1, las=2, tick=FALSE, line=xaxt.line,
-      at=1:nX, labels=xaxt
+      at=(1:nX)*xUnitSize, labels=xaxt
     )
   }
   if (!is.null(yaxt)) {
     axis(
       side=2, las=2, tick=FALSE, line=yaxt.line,
-      at=nY:1, labels=yaxt
+      at=(nY:1)*yUnitSize, labels=yaxt
     )
   }
   mtext(main, side=3, cex=par("cex.main"), font=2)
   
   # Add legend if specified
   if (plotLegend) {
-    pw <- nX + 1
-    ph <- nY + 1
     addGradientLegend(
       palette, vlim, FALSE, legend.main,
-      xlim=c(pw - 0.5 + pw*legend.line, pw - 0.5 + pw*(legend.line+0.05)), 
-      ylim=c(ph/3, ph - 0.5 - ph*0.1), tick.size=legend.tick.size,
+      xlim=c(pw - xHalfUnit + pw*legend.line, pw - xHalfUnit + pw*(legend.line+0.05)), 
+      ylim=c(ph/3, ph - yHalfUnit - ph*0.1), tick.size=legend.tick.size,
       axis.line=laxt.line, border.width=border.width
     )
   }
