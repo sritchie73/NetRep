@@ -376,6 +376,43 @@ plotModule <- function(
     unlink(tmp.dir, recursive = TRUE)
   }, add = TRUE)
   
+  # Create empty plot windows so that we fail quickly if the margins are too
+  # large
+  if (is.null(scaledData[[ti]])) {
+    layout(mat=matrix(1:3, ncol=1), heights=c(0.4, 0.4, 0.2))
+  } else {
+    summary.window <- min(0.2 + (length(mods) - 1)* 0.1, 0.5) 
+    layout(
+      mat=matrix(c(rep(8, 5), 7, 1:6), ncol=2), 
+      heights=c(0.7/3, 0.7/3, 0.12, 0.12, 0.06, 0.7/3),
+      widths=c(summary.window, 1-summary.window)
+    )
+  }
+  par(oma=old.par[["mar"]]+old.par[["oma"]])
+  
+  tryCatch({
+    par(mar=c(1, 1, 1, 1))
+    emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Correlation heatmap plot
+    par(mar=c(1, 1, 1, 1))
+    emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Network heatmap
+    par(mar=c(1, 1, 1, 1))
+    emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Degree barplot
+    if (!is.null(scaledData[[ti]])) {
+      par(mar=c(1, 1, 1, 1))
+      emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Contribution barplot
+      par(mar=c(1,1,1,1))
+      emptyPlot(c(0,1), c(0,1), bty="n") # Empty space for data heatmap legend
+      par(mar=c(1, 1, 1, 1))
+      emptyPlot(c(0,1), c(0,1), bty="n") # Data heatmap
+      par(mar=c(1, 1, 1, 1))
+      emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Summary bar plots
+      par(mar=c(0, 0, 0, 0))
+      emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Empty region layout
+    }
+  }, error=function(e) {
+    stop("graphics device too small to render plot")
+  })
+
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
@@ -544,29 +581,10 @@ plotModule <- function(
       dataCols <- c("#762A83", "#FFFFFF", "#1B7837")
     }
   }
-
-  #-----------------------------------------------------------------------------
-  # Set up plotting region
-  #-----------------------------------------------------------------------------
+  
   naxt <- NULL
   if (plotNodeNames)
     naxt <- nodeOrder
-  
-  if (is.null(scaledData[[ti]])) {
-    # set up plot layout
-    layout(
-      mat=matrix(1:3, ncol=1), heights=c(0.4, 0.4, 0.2)
-    )
-  } else {
-    # set up plot layout
-    summary.window <- min(0.2 + (length(mods) - 1)* 0.1, 0.5) 
-    layout(
-      mat=matrix(c(rep(8, 5), 7, 1:6), ncol=2), 
-      heights=c(0.7/3, 0.7/3, 0.12, 0.12, 0.06, 0.7/3),
-      widths=c(summary.window, 1-summary.window)
-    )
-  }
-  par(oma=old.par[["mar"]]+old.par[["oma"]])
   
   #-----------------------------------------------------------------------------
   # Plot topology components
