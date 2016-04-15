@@ -7,7 +7,7 @@
 filterInternalProps(props, test, discovery, modules = NULL)
 }
 \arguments{
-\item{props}{nested list returned by \code{\link{'netPropsInternal'}}.}
+\item{props}{nested list returned by \code{\link{netPropsInternal}}.}
 
 \item{test}{a vector of datasets to filter to.}
 

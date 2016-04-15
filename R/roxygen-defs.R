@@ -90,17 +90,26 @@ NULL
 #'  are drawn.
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the 
 #'  connectivity, module membership, and module summary bar plots.
-#' @param border.width line width for borders.
+#' @param lwd line width for borders and axes.
 #' @param naxt.line the number of lines into the bottom margin at which the node
 #'  names will be drawn.
 #' @param saxt.line the number of lines into the left margin at which the sample
 #'  names will be drawn.
 #' @param maxt.line the number of lines into the bottom margin at which the 
 #'  module names will be drawn.
-#' @param legend.tick.size size of the ticks on each axis legend relative to the
-#'  size of the correlation, edge weights, and data matrix heatmaps.
+#' @param xaxt.line the number of lines into the bottom margin at which the 
+#'  x-axis tick labels will be drawn on the module summary bar plot.
+#' @param xaxt.tck the size of the x-axis ticks for the module summary bar 
+#'  plot.
+#' @param yaxt.line the number of lines into the left margin at which the 
+#'  y-axis tick labels will be drawn on the weighted degree and node 
+#'  contribution bar plots. 
+#' @param yaxt.tck the size of the y-axis ticks for the weighted degree and 
+#'  node contribution bar plots.
 #' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{legend.tick.size}.
+#'  labels, as multiple of \code{laxt.tck}.
+#' @param laxt.tck size of the ticks on each axis legend relative to the
+#'  size of the correlation, edge weights, and data matrix heatmaps.
 #' @param cex.axis relative size of the node and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.

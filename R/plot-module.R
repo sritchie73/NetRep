@@ -140,6 +140,53 @@
 #'   any given module when rendered on the bar plot. This facilitates visual 
 #'   comparison of multiple modules with differing sizes or densities.
 #' }
+#' \subsection{Plot layout and device size}{
+#'   For optimal results we recommend viewing single modules on a PNG device
+#'   with a width of 1500, a height of 2700 and a nominal resolution of 300 
+#'   (\code{png(filename, width=5*300, height=9*300, res=300))}). PDF and other
+#'   vectorized devices should not be used for modules with more than a hundred
+#'   nodes. When changing the device size the spacing of axes, titles, and 
+#'   legends may need adjusting.
+#'   
+#'   When \code{dryRun} is \code{TRUE} only the axes, legends, labels, and
+#'   title will be drawn, allowing for quick iteration of customisable
+#'   parameters to get the plot layout correct.
+#'   
+#'   The arguments \code{naxt.line}, \code{saxt.line}, and \code{maxt.line} 
+#'   control the position of the node, sample, and module labels on the plot. 
+#'   Increasing \code{naxt.line} and \code{maxt.line} will increase the 
+#'   distance from the bottom of the data heatmap that the node and module 
+#'   labels will be drawn. Increasing \code{saxt.line} will increase the
+#'   distance from the left of the module summary bar plot(s) the sample labels
+#'   will be drawn.
+#'   
+#'   The arguments \code{xaxt.line}, \code{xaxt.tck}, \code{yaxt.line}, and
+#'   \code{yaxt.tck} control the appearance of the bar plot axes. 
+#'   \code{xaxt.tck} and \code{yaxt.txt} control the size of the axis ticks on
+#'   the weighted degree, node contribution, and module summary bar plots.
+#'   \code{xaxt.line} and \code{yaxt.line} control the distance from the axis
+#'   the axis tick labels are drawn. 
+#'   
+#'   The arguments \code{laxt.line} and \code{laxt.tck} control the appearance
+#'   of the heatmap legends. \code{laxt.tck} controls the size of the axis 
+#'   ticks on the legend gradients while \code{laxt.line} controls the distance
+#'   from the legend the axis tick labels are drawn.
+#'   
+#'   \code{cex.main} controls the relative text size of the plot title 
+#'   (specified by the \code{main} argument). \code{cex.axis} controls the 
+#'   relative text size of the axis tick, node, and sample labels. 
+#'   \code{cex.lab} controls the relative text size of the bar plot axis labels, 
+#'   module labels, and legend titles.
+#'   
+#'   The rendering of node, sample, and module names can be disabled by setting
+#'   \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames}
+#'   to \code{FALSE}.
+#'   
+#'   The \code{drawBorders} argument controls whether borders are drawn around 
+#'   the weighted degree, node contribution, or module summary bar plots. The 
+#'   \code{lwd} argument controls the thickness of these borders, as well as 
+#'   the thickness of axes and axis ticks.
+#' }
 #' \subsection{Modifying the color palettes:}{
 #'   The \code{dataCols} and \code{dataRange} arguments control the appearance 
 #'   of the data heatmap (see \code{\link{plotData}}). The gradient of colors 
@@ -197,39 +244,6 @@
 #'   
 #'   The \code{naCol} argument controls the color of missing nodes and samples
 #'   on the data, correlaton structure, and network edge weight heatmaps.
-#' }
-#' \subsection{Plot layout and device size}{
-#'   For optimal results we recommend viewing single modules on a PNG device
-#'   with a width of 1500, a height of 2700 and a nominal resolution of 300 
-#'   (\code{png(filename, width=5*300, height=9*300, res=300))}). PDF and other
-#'   vectorized devices should not be used for modules with more than a hundred
-#'   nodes. When changing the device size the spacing of axes, titles, and 
-#'   legends may need adjusting.
-#'   
-#'   When \code{dryRun} is \code{TRUE} only the axes, legends, labels, and
-#'   title will be drawn, allowing for quick iteration of customisable
-#'   parameters to get the plot layout correct.
-#'   
-#'   The parameters \code{naxt.line}, \code{saxt.line}, \code{maxt.line}, and
-#'   \code{laxt.line} control the distance from each plot window that the node
-#'   labels, sample labels, module labels, and legend labels are rendered.
-#'   
-#'   \code{legend.tick.size} controls the length of the axis ticks on each of
-#'   the legends relative to the correlation, edge weight, and data matrix
-#'   heatmap plot windows.
-#'   
-#'   \code{cex.main} controls the relative text size of the plot title 
-#'   (specified by the \code{main} argument). \code{cex.axis} controls the 
-#'   relative text size of the node and sample labels. \code{cex.lab} controls 
-#'   the relative text size of the bar plot axis labels, module labels, and the
-#'   legend titles.
-#'   
-#'   The rendering of node, sample, and module names can be disabled by setting
-#'   \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames}
-#'   to \code{FALSE}.
-#'   
-#'   The \code{drawBorders} argument controls whether borders are drawn around 
-#'   the connectivity, module membership, or module summary bar plots.
 #' }
 #' 
 #' @seealso
@@ -289,9 +303,9 @@ plotModule <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
-  drawBorders=FALSE, border.width=2, naxt.line=-0.5, 
-  saxt.line=-0.5, maxt.line=NULL, legend.tick.size=0.04, 
-  laxt.line=2.5, cex.axis=0.8, cex.lab=1, cex.main=1.2,
+  drawBorders=FALSE, lwd=1, naxt.line=-0.5, saxt.line=-0.5, 
+  maxt.line=NULL, xaxt.line=-0.5, xaxt.tck=-0.025, yaxt.line=0, yaxt.tck=-0.15, 
+  laxt.line=2.5, laxt.tck=0.04, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
   dataCols=NULL, dataRange=NULL, corCols=correlation.palette(), 
   corRange=c(-1,1), netCols=network.palette(), netRange=c(0,1), 
   degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
@@ -325,16 +339,18 @@ plotModule <- function(
   
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
-    main=main, drawBorders=drawBorders, border.width=border.width, 
+    main=main, drawBorders=drawBorders, lwd=lwd, 
     naxt.line=naxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
-    legend.tick.size=legend.tick.size, laxt.line=laxt.line, dataCols=dataCols, 
-    dataRange=dataRange, corCols=corCols, corRange=corRange, netCols=netCols, 
-    netRange=netRange, degreeCol=degreeCol, contribCols=contribCols, 
-    summaryCols=summaryCols, naCol=naCol, dryRun=dryRun)
+    xaxt.line=xaxt.line, xaxt.tck=xaxt.tck, yaxt.line=yaxt.line, 
+    yaxt.tck=yaxt.tck, laxt.tck=laxt.tck, laxt.line=laxt.line, 
+    dataCols=dataCols, dataRange=dataRange, corCols=corCols, corRange=corRange, 
+    netCols=netCols, netRange=netRange, degreeCol=degreeCol, 
+    contribCols=contribCols, summaryCols=summaryCols, naCol=naCol, 
+    dryRun=dryRun)
   
   # Handle variants that will not work for this plot function
-  if (is.null(legend.tick.size))
-    stop("'legend.tick.size' must be a numeric vector of length 1 or 'NA'")
+  if (is.null(laxt.tck))
+    stop("'laxt.tck' must be a numeric vector of length 1 or 'NA'")
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -540,8 +556,8 @@ plotModule <- function(
     correlation[[ti]][presentNodes, presentNodes], 
     corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main="", legend.main="Correlation", plotModuleNames=FALSE, 
-    legend.tick.size=legend.tick.size, laxt.line=laxt.line, na.col=naCol,
-    legend.line=0.1, maxt.line=maxt.line, border.width=border.width, 
+    laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
+    legend.line=0.1, maxt.line=maxt.line, lwd=lwd, 
     dryRun=dryRun
   )
   mtext(main, side=3, line=1, cex=par('cex.main'), font=2, xpd=NA)
@@ -552,9 +568,9 @@ plotModule <- function(
     network[[ti]][presentNodes, presentNodes], netCols, netRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, main="", 
     legend.main="Edge weights", plotModuleNames=FALSE, 
-    legend.tick.size=legend.tick.size, na.col=naCol,
+    laxt.tck=laxt.tck, na.col=naCol,
     laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,
-    border.width=border.width, dryRun=dryRun
+    lwd=lwd, dryRun=dryRun
   )
   
   # Plot weighted degree
@@ -564,15 +580,15 @@ plotModule <- function(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
       xaxt=plotNodeNames, xaxt.line=naxt.line, main="",
-      ylab="Weighted\ndegree", maxt.line=maxt.line, 
-      border.width=border.width, na.col=naCol, dryRun=dryRun
+      ylab="Weighted\ndegree", maxt.line=maxt.line, yaxt.line=yaxt.line,
+      yaxt.tck=yaxt.tck, lwd=lwd, na.col=naCol, dryRun=dryRun
     )
   } else {
     plotBar(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
-      ylab="Weighted\ndegree", maxt.line=maxt.line, na.col=naCol,
-      border.width=border.width, dryRun=dryRun
+      ylab="Weighted\ndegree", maxt.line=maxt.line, yaxt.line=yaxt.line,
+      yaxt.tck=yaxt.tck, na.col=naCol, lwd=lwd, dryRun=dryRun
     )
   }
   
@@ -582,8 +598,9 @@ plotModule <- function(
     plotBar(
       nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder], 
       contribCols, drawBorders=drawBorders, plotModuleNames=FALSE, main="", 
-      xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, na.col=naCol,
-      border.width=border.width, dryRun=dryRun
+      xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, 
+      yaxt.line=yaxt.line, yaxt.tck=yaxt.tck, na.col=naCol,
+      lwd=lwd, dryRun=dryRun
     )
     
     # Plot the data matrix
@@ -599,7 +616,7 @@ plotModule <- function(
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
       xaxt=naxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
-      xaxt.line=naxt.line, maxt.line=maxt.line, border.width=border.width,
+      xaxt.line=naxt.line, maxt.line=maxt.line, lwd=lwd,
       dryRun=dryRun
     )
     
@@ -610,7 +627,7 @@ plotModule <- function(
       dataCols, dataRange, TRUE, main="Module data",
       xlim=c(xHalfUnit + 0.1, 1 - xHalfUnit - 0.1), 
       ylim=c(1 + yHalfUnit + 0.2, 1 + yHalfUnit + 0.3),  
-      tick.size=legend.tick.size, border.width=border.width,
+      tck=laxt.tck, lwd=lwd,
       axis.line=laxt.line, srt=0
     )
     
@@ -621,10 +638,11 @@ plotModule <- function(
     par(mar=c(1, 1, 1, 1))
     plotMultiBar(
       summaries, summaries.range,
-      cols=summaryCols , drawBorders=drawBorders, border.width=border.width,
+      cols=summaryCols , drawBorders=drawBorders, lwd=lwd,
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
-      yaxt.line=saxt.line, maxt.line=0, xlab=xlab, 
-      cex.modules=par("cex.lab")*0.7, na.col=naCol, dryRun=dryRun
+      yaxt.line=saxt.line, maxt.line=0, xlab=xlab, xaxt.line=xaxt.line, 
+      xaxt.tck=xaxt.tck, cex.modules=par("cex.lab")*0.7, na.col=naCol, 
+      dryRun=dryRun
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)

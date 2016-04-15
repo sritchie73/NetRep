@@ -977,7 +977,7 @@ sampleOrderInternal <- function(props, verbose, na.rm) {
 #' Used in the plot functions to filter the structure to the 
 #' \code{'orderNodesBy'} and \code{'orderSamplesBy'} \emph{test} datasets.
 #' 
-#' @param props nested list returned by \code{\link{'netPropsInternal'}}.
+#' @param props nested list returned by \code{\link{netPropsInternal}}.
 #' @param test a vector of datasets to filter to.
 #' @param discovery a vector containing a single discovery dataset specified in
 #'   the parent plot function. 
@@ -990,6 +990,7 @@ sampleOrderInternal <- function(props, verbose, na.rm) {
 #'  specified by the \code{test} argument and modules specified by the 
 #'  \code{modules} argument contain non-\code{NULL} entries.
 filterInternalProps <- function(props, test, discovery, modules=NULL) {
+  ii <- NULL; jj <- NULL; mi <- NULL # suppress CRAN note
   fProps <- foreach(ii = seq_along(props)) %do% {
     fProps2 <- foreach(jj = seq_along(props[[ii]])) %do% {
       if (names(props)[ii] == discovery) {

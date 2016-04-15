@@ -17,21 +17,21 @@
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
-#' @param legend.tick.size size of the ticks on the axis legend as a proportion
+#' @param laxt.tck size of the ticks on the axis legend as a proportion
 #'  of the horizontal size of the plot window.
 #' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{legend.tick.size}.
+#'  labels, as multiple of \code{laxt.tck}.
 #' @param legend.line the distance from the left of the plot to render the 
 #'  legend as a proportion of the horizontal size of the plot window.
-#' @param border.width line width for borders.
+#' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
 #' 
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
   plotModuleNames=TRUE, main="", plotLegend=TRUE, legend.main="",
-  xaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1, border.width=2, dryRun=FALSE
+  xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
+  legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nNodes <- ncol(values) + length(na.indices)
   palette <- colorRampPalette(palette)(255)
@@ -104,7 +104,7 @@ plotTriangleHeatmap <- function(
       midx <- mids[mi] * unitSize
       polygon(
         x=c(leftx, rightx, midx, leftx),
-        y=c(0, 0, height, 0), lwd=border.width
+        y=c(0, 0, height, 0), lwd=lwd
       )
     }
   }
@@ -121,7 +121,7 @@ plotTriangleHeatmap <- function(
   polygon(
     x=c(halfUnit, pw + halfUnit, ph + halfUnit, halfUnit), 
     y=c(0, 0, ph, 0),
-    lwd=border.width, xpd=NA
+    lwd=lwd, xpd=NA
   )
   
   # Render axes
@@ -138,8 +138,8 @@ plotTriangleHeatmap <- function(
     addGradientLegend(
       palette, vlim, TRUE, legend.main,
       xlim=c(halfUnit - pw*legend.line, pw*0.25), 
-      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tick.size=legend.tick.size,
-      axis.line=laxt.line, border.width=border.width
+      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tck=laxt.tck,
+      axis.line=laxt.line, lwd=lwd
     )
   }
 }
@@ -168,13 +168,13 @@ plotTriangleHeatmap <- function(
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
-#' @param legend.tick.size size of the ticks on the axis legend as a proportion
+#' @param laxt.tck size of the ticks on the axis legend as a proportion
 #'  of the horizontal size of the plot window.
 #' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{legend.tick.size}.
+#'  labels, as multiple of \code{laxt.tck}.
 #' @param legend.line the distance from the plot to render the legend as a 
 #'  proportion of the horizontal size of the plot window.
-#' @param border.width line width for borders.
+#' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
 #'  
@@ -182,8 +182,8 @@ plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
   main="", plotLegend=TRUE, legend.main="", xaxt.line=-0.5, 
-  yaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1, border.width=2, dryRun=FALSE
+  yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
+  legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
@@ -250,7 +250,7 @@ plotSquareHeatmap <- function(
         ytop <- (pw + xHalfUnit) - (breaks[mi - 1] * yUnitSize - yHalfUnit)
       }
       rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, 
-           border="black", lwd=border.width)
+           border="black", lwd=lwd)
     }
   }
   if (plotModuleNames) {
@@ -280,7 +280,7 @@ plotSquareHeatmap <- function(
     ytop=par("usr")[4],
     border="black",
     xpd=NA,
-    lwd=border.width
+    lwd=lwd
   )
   
   # Render axes
@@ -303,8 +303,8 @@ plotSquareHeatmap <- function(
     addGradientLegend(
       palette, vlim, FALSE, legend.main,
       xlim=c(pw - xHalfUnit + pw*legend.line, pw - xHalfUnit + pw*(legend.line+0.05)), 
-      ylim=c(ph/3, ph - yHalfUnit - ph*0.1), tick.size=legend.tick.size,
-      axis.line=laxt.line, border.width=border.width
+      ylim=c(ph/3, ph - yHalfUnit - ph*0.1), tck=laxt.tck,
+      axis.line=laxt.line, lwd=lwd
     )
   }
 }
@@ -320,16 +320,16 @@ plotSquareHeatmap <- function(
 #' @param main title of the legend.
 #' @param xlim xlim relative to the plotting region of the rest of the plot.
 #' @param ylim ylim relative to the plotting region of the rest of the plot.
-#' @param tick.size size of the legend axis ticks relative to the size of the 
+#' @param tck size of the legend axis ticks relative to the size of the 
 #'  plot window.
 #' @param axis.line distance from the axis to render the axis labels as a 
-#'  multiple of \code{tick.size}.
-#' @param border.width line width for borders.
+#'  multiple of \code{tck}.
+#' @param lwd line width for borders.
 #' @param srt angle of text labels
 #' 
 addGradientLegend <- function(
   palette, legend.vlim, horizontal, main, xlim, ylim, 
-  tick.size=0.04, axis.line=3, border.width=2, srt
+  tck=0.04, axis.line=3, lwd=2, srt
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -382,14 +382,14 @@ addGradientLegend <- function(
   # Render bounding box
   rect(
     xleft=xlim[1], xright=xlim[2], ybottom=ylim[1], ytop=ylim[2],
-    border="black", lwd=border.width, xpd=NA
+    border="black", lwd=lwd, xpd=NA
   )
   
   # Make sure axis ticks are centred at 0 if within the range of legend.vlim
   labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
   labels <- format(labels, digits=2)
   if (horizontal) {
-    tck <- (par("usr")[4] - par("usr")[3])*tick.size
+    tck <- (par("usr")[4] - par("usr")[3])*tck
     
     # for mapping from vlim to plot space
     v.per.x <- (xlim[2] - xlim[1])/(legend.vlim[2] - legend.vlim[1])
@@ -399,7 +399,7 @@ addGradientLegend <- function(
     
     # Now plot the lines and text
     sapply(at, function(aa) {
-      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=border.width, xpd=NA)
+      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=lwd, xpd=NA)
     })
     
     if (missing(srt))
@@ -408,7 +408,7 @@ addGradientLegend <- function(
     text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA, 
          srt=srt, adj=1)
   } else {
-    tck <- (par("usr")[2] - par("usr")[1])*tick.size
+    tck <- (par("usr")[2] - par("usr")[1])*tck
     
     # for mapping from vlim to plot space
     v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
@@ -417,7 +417,7 @@ addGradientLegend <- function(
     
     # draw axis ticks
     sapply(at, function(aa) {
-      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=border.width, xpd=NA)
+      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=lwd, xpd=NA)
     })
     if (missing(srt))
       srt <- 0
@@ -451,17 +451,20 @@ addGradientLegend <- function(
 #' @param main title for the plot.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
+#' @param yaxt.line the number of lines into the margin at which the y axis
+#'  tick labels will be drawn.
+#' @param yaxt.tck the size of the y-axis tick marks.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
 #' @param ylab label for the yaxis
-#' @param border.width line width for borders.
+#' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
 #'  
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
-  maxt.line=3, ylab="", border.width=2, dryRun=FALSE
+  yaxt.line=0, yaxt.tck=-0.15, maxt.line=3, ylab="", lwd=2, dryRun=FALSE
 ) {
   # Create vector of colors, one for each bar
   if (length(cols) == 1) {
@@ -504,18 +507,23 @@ plotBar <- function(
         ytop=heights[ii],
         col=colvec[ii],
         border=ifelse(drawBorders, "black", NA),
-        lwd=border.width
+        lwd=lwd
       ) 
     }
   }
-  abline(h=0, col="black", lwd=border.width)
-  axis(side=2, las=2, lwd=border.width)
+  abline(h=0, col="black", lwd=lwd)
+  
+  
+  # draw axis
+  axis(side=2, labels=FALSE, tck=yaxt.tck, lwd=lwd, at=axTicks(side=2))
+  axis(side=2, tick=FALSE, line=yaxt.line, las=2, at=axTicks(side=2), 
+       labels=axTicks(side=2))
   
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
     for (bi in head(breaks[-1], -1)) {
-      lines(x=rep(bi, 2), y=heights.lim, lwd=border.width)
+      lines(x=rep(bi, 2), y=heights.lim, lwd=lwd)
     }
   }
   
@@ -557,16 +565,20 @@ plotBar <- function(
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  labels will be drawn.
+#' @param xaxt.line the number of lines into the margin at which the x axis
+#'  labels will be drawn
+#' @param xaxt.tck the size of the x-axis ticks.
 #' @param xlab x axis label
 #' @param cex.modules relative size of module names.
-#' @param border.width line width for borders.
+#' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
 #'  
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="",
   na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5,
-  xlab="", cex.modules=0.7, border.width=2, dryRun=FALSE
+  xaxt.line=0, xaxt.tck=-0.025, xlab="", cex.modules=0.7, lwd=2, 
+  dryRun=FALSE
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -640,21 +652,21 @@ plotMultiBar <- function(
           ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
           col=colmat[jj, ii],
           border=ifelse(drawBorders, "black", NA),
-          lwd=border.width
+          lwd=lwd
         ) 
       }
     }
     
     # draw 0 axis
-    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=border.width)
+    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=lwd)
     
     # draw axis
     axis(
-      side=1, labels=FALSE, tck=-0.025, lwd=border.width,
+      side=1, labels=FALSE, tck=xaxt.tck, lwd=lwd,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
     )
     axis(
-      side=1, tick=FALSE, line=-0.6, las=2,
+      side=1, tick=FALSE, line=xaxt.line, las=2,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2]))), 
       labels=prettyNum(unique(c(rr[1], ax, rr[2])), digits=2)
     )

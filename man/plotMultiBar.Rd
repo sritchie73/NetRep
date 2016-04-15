@@ -6,8 +6,8 @@
 \usage{
 plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorders = FALSE,
   main = "", na.col = "#bdbdbd", yaxt = TRUE, plotModuleNames = TRUE,
-  yaxt.line = 0, maxt.line = 2.5, xlab = "", cex.modules = 0.7,
-  border.width = 2, dryRun = FALSE)
+  yaxt.line = 0, maxt.line = 2.5, xaxt.line = 0, xaxt.tck = -0.025,
+  xlab = "", cex.modules = 0.7, lwd = 2, dryRun = FALSE)
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for 
@@ -38,11 +38,16 @@ labels will be drawn.}
 \item{maxt.line}{the number of lines into the margin at which the module 
 labels will be drawn.}
 
+\item{xaxt.line}{the number of lines into the margin at which the x axis
+labels will be drawn}
+
+\item{xaxt.tck}{the size of the x-axis ticks.}
+
 \item{xlab}{x axis label}
 
 \item{cex.modules}{relative size of module names.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders.}
 
 \item{dryRun}{logical; if \code{TRUE} only the axes and borders will be 
 drawn.}

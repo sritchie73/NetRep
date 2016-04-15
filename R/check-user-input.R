@@ -17,6 +17,8 @@
 #'  plotting functions.
 #' @param orderSamplesBy user input for the 'orderSamplesBy' argument in the 
 #'  plotting functions.
+#' @param orderModules user input for the 'orderModules' argument in the 
+#'  plotting functions.
 #' @param dryRun logical; if \code{TRUE} computationally intense operations are
 #'  skipped (checking for non-finite values and data scaling).
 #'  
@@ -785,17 +787,21 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' Simple typechecking for the extensive plot arguments
 #' 
 #' @param orderModules user input for the corresponding argument in the plot functions.
-#' @param plotNodesNames user input for the corresponding argument in the plot functions.
+#' @param plotNodeNames user input for the corresponding argument in the plot functions.
 #' @param plotSampleNames user input for the corresponding argument in the plot functions.
 #' @param plotModuleNames user input for the corresponding argument in the plot functions.
 #' @param main user input for the corresponding argument in the plot functions.
 #' @param drawBorders user input for the corresponding argument in the plot functions.
-#' @param border.width user input for the corresponding argument in the plot functions.
+#' @param lwd user input for the corresponding argument in the plot functions.
 #' @param naxt.line user input for the corresponding argument in the plot functions.
 #' @param saxt.line user input for the corresponding argument in the plot functions.
 #' @param maxt.line user input for the corresponding argument in the plot functions.
-#' @param legend.tick.size user input for the corresponding argument in the plot functions.
+#' @param xaxt.line user input for the corresponding argument in the plot functions.
+#' @param yaxt.line user input for the corresponding argument in the plot functions.
 #' @param laxt.line user input for the corresponding argument in the plot functions.
+#' @param xaxt.tck user input for the corresponding argument in the plot functions.
+#' @param yaxt.tck user input for the corresponding argument in the plot functions.
+#' @param laxt.tck user input for the corresponding argument in the plot functions.
 #' @param plotLegend user input for the corresponding argument in the plot functions.
 #' @param legend.position user input for the corresponding argument in the plot functions.
 #' @param legend.main user input for the corresponding argument in the plot functions.
@@ -815,10 +821,11 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
-  drawBorders, border.width, naxt.line, saxt.line, maxt.line, legend.tick.size, 
-  laxt.line, plotLegend, legend.position, legend.main, palette, symmetric,
-  horizontal, dataCols, dataRange, corCols, corRange, netCols, netRange, 
-  degreeCol, contribCols, summaryCols, naCol, dryRun
+  drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, 
+  yaxt.line, laxt.line, xaxt.tck, yaxt.tck, laxt.tck, 
+  plotLegend, legend.position, legend.main, palette, symmetric, horizontal, 
+  dataCols, dataRange, corCols, corRange, netCols, netRange, degreeCol, 
+  contribCols, summaryCols, naCol, dryRun
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -864,15 +871,15 @@ checkPlotArgs <- function(
   if (!(missing(drawBorders) || is.slog(drawBorders)))
     stop("'drawBorders' must be one of 'TRUE' or 'FALSE'")
   
-  if (!missing(border.width)) {
-    if (!is.snum(border.width)) {
-      stop("'border.width' must be a numeric vector of length 1")
+  if (!missing(lwd)) {
+    if (!is.snum(lwd)) {
+      stop("'lwd' must be a numeric vector of length 1")
     }
-    if (border.width < 0) {
-      stop("'border.width' must be greater than 0")
+    if (lwd < 0) {
+      stop("'lwd' must be greater than 0")
     }
-    if (is.infinite(border.width)) {
-      stop("'border.width' must be finite")
+    if (is.infinite(lwd)) {
+      stop("'lwd' must be finite")
     }
   }
   
@@ -903,6 +910,24 @@ checkPlotArgs <- function(
     }
   }
   
+  if (!missing(xaxt.line)) {
+    if (!(is.snum(xaxt.line) || is.na(xaxt.line) || is.null(xaxt.line))) {
+      stop("'xaxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(xaxt.line) && is.infinite(xaxt.line)) {
+      stop("'xaxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(yaxt.line)) {
+    if (!(is.snum(yaxt.line) || is.na(yaxt.line) || is.null(yaxt.line))) {
+      stop("'yaxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(yaxt.line) && is.infinite(yaxt.line)) {
+      stop("'yaxt.line' must be finite")
+    }
+  }
+  
   if (!missing(laxt.line)) {
     if (!(is.snum(laxt.line) || is.na(laxt.line) || is.null(laxt.line))) {
       stop("'laxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
@@ -912,13 +937,30 @@ checkPlotArgs <- function(
     }
   }
   
-  if (!missing(legend.tick.size)) {
-    if (!(is.snum(legend.tick.size) || is.na(legend.tick.size) || 
-          is.null(legend.tick.size))) {
-      stop("'legend.tick.size' must be a numeric vector of length 1, or 'NA'")
+  if (!missing(xaxt.tck)) {
+    if (!(is.snum(xaxt.tck) || is.na(xaxt.tck) || is.null(xaxt.tck))) {
+      stop("'xaxt.tck' must be a numeric vector of length 1, or 'NA'")
     }
-    if (is.snum(legend.tick.size) && is.infinite(legend.tick.size)) {
-      stop("'legend.tick.size' must be finite")
+    if (is.snum(xaxt.tck) && is.infinite(xaxt.tck)) {
+      stop("'xaxt.tck' must be finite")
+    }
+  }
+  
+  if (!missing(yaxt.tck)) {
+    if (!(is.snum(yaxt.tck) || is.na(yaxt.tck) || is.null(yaxt.tck))) {
+      stop("'yaxt.tck' must be a numeric vector of length 1, or 'NA'")
+    }
+    if (is.snum(yaxt.tck) && is.infinite(yaxt.tck)) {
+      stop("'yaxt.tck' must be finite")
+    }
+  }
+  
+  if (!missing(laxt.tck)) {
+    if (!(is.snum(laxt.tck) || is.na(laxt.tck) || is.null(laxt.tck))) {
+      stop("'laxt.tck' must be a numeric vector of length 1, or 'NA'")
+    }
+    if (is.snum(laxt.tck) && is.infinite(laxt.tck)) {
+      stop("'laxt.tck' must be finite")
     }
   }
   

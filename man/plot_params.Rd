@@ -24,7 +24,7 @@ are drawn.}
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
 connectivity, module membership, and module summary bar plots.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders and axes.}
 
 \item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
@@ -35,11 +35,24 @@ names will be drawn.}
 \item{maxt.line}{the number of lines into the bottom margin at which the 
 module names will be drawn.}
 
-\item{legend.tick.size}{size of the ticks on each axis legend relative to the
-size of the correlation, edge weights, and data matrix heatmaps.}
+\item{xaxt.line}{the number of lines into the bottom margin at which the 
+x-axis tick labels will be drawn on the module summary bar plot.}
+
+\item{xaxt.tck}{the size of the x-axis ticks for the module summary bar 
+plot.}
+
+\item{yaxt.line}{the number of lines into the left margin at which the 
+y-axis tick labels will be drawn on the weighted degree and node 
+contribution bar plots.}
+
+\item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
+node contribution bar plots.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis 
-labels, as multiple of \code{legend.tick.size}.}
+labels, as multiple of \code{laxt.tck}.}
+
+\item{laxt.tck}{size of the ticks on each axis legend relative to the
+size of the correlation, edge weights, and data matrix heatmaps.}
 
 \item{cex.axis}{relative size of the node and sample names.}
 

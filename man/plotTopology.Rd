@@ -14,60 +14,60 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
-  border.width = 2, plotLegend = TRUE, legend.main = "Data",
-  naxt.line = -0.5, saxt.line = -0.5, maxt.line = 3,
-  legend.position = 0.15, legend.tick.size = 0.03, laxt.line = 3,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2, dataCols = NULL,
-  dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
+  plotSampleNames = TRUE, plotModuleNames = NULL, main = "", lwd = 2,
+  plotLegend = TRUE, legend.main = "Data", naxt.line = -0.5,
+  saxt.line = -0.5, maxt.line = 3, legend.position = 0.15,
+  laxt.tck = 0.03, laxt.line = 3, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2, dataCols = NULL, dataRange = NULL, naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", border.width = 2, plotLegend = TRUE,
-  legend.main = "Correlation", naxt.line = -0.5, maxt.line = 3,
-  legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
-  dryRun = FALSE)
+  main = "", lwd = 2, plotLegend = TRUE, legend.main = "Correlation",
+  naxt.line = -0.5, maxt.line = 3, legend.position = NULL,
+  laxt.tck = NULL, laxt.line = NULL, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2, corCols = correlation.palette(), corRange = c(-1, 1),
+  naCol = "#bdbdbd", dryRun = FALSE)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", border.width = 2, plotLegend = TRUE,
-  legend.main = "Edge weight", naxt.line = -0.5, maxt.line = 3,
-  legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
-  dryRun = FALSE)
+  main = "", lwd = 2, plotLegend = TRUE, legend.main = "Edge weight",
+  naxt.line = -0.5, maxt.line = 3, legend.position = NULL,
+  laxt.tck = NULL, laxt.line = NULL, cex.axis = 0.8, cex.lab = 1,
+  cex.main = 1.2, netCols = network.palette(), netRange = c(0, 1),
+  naCol = "#bdbdbd", dryRun = FALSE)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", border.width = 2, drawBorders = FALSE, naxt.line = -0.5,
-  maxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
-  dryRun = FALSE)
+  main = "", lwd = 2, drawBorders = FALSE, naxt.line = -0.5,
+  maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035, cex.axis = 0.8,
+  cex.lab = 1, cex.main = 1.2, contribCols = c("#A50026", "#313695"),
+  naCol = "#bdbdbd", dryRun = FALSE)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", border.width = 2, drawBorders = FALSE, naxt.line = -0.5,
-  maxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  degreeCol = "#feb24c", naCol = "#bdbdbd", dryRun = FALSE)
+  main = "", lwd = 2, drawBorders = FALSE, naxt.line = -0.5,
+  maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035, cex.axis = 0.8,
+  cex.lab = 1, cex.main = 1.2, degreeCol = "#feb24c", naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotSampleNames = TRUE,
-  plotModuleNames = NULL, main = "", border.width = 2,
-  drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2, summaryCols = c("#1B7837", "#762A83"),
-  naCol = "#bdbdbd", dryRun = FALSE)
+  plotModuleNames = NULL, main = "", lwd = 2, drawBorders = FALSE,
+  saxt.line = -0.5, maxt.line = 0, xaxt.line = 0, xaxt.tck = -0.025,
+  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
+  summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
+  dryRun = FALSE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -135,7 +135,7 @@ are drawn.}
 
 \item{main}{title for each plot.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders and axes.}
 
 \item{plotLegend}{logical; controls whether a legend is drawn when using
 \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.}
@@ -154,11 +154,11 @@ module names will be drawn.}
 \item{legend.position}{the distance from the plot to start the legend, as a
 proportion of the plot width.}
 
-\item{legend.tick.size}{size of the ticks on each axis legend relative to the
+\item{laxt.tck}{size of the ticks on each axis legend relative to the
 size of the correlation, edge weights, and data matrix heatmaps.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis 
-labels, as multiple of \code{legend.tick.size}.}
+labels, as multiple of \code{laxt.tck}.}
 
 \item{cex.axis}{relative size of the node and sample names.}
 
@@ -200,17 +200,26 @@ the network edge weight heatmap (see details).}
 in \code{plotContribution}, \code{plotDegree}, and
 \code{plotSummary}.}
 
+\item{yaxt.line}{the number of lines into the left margin at which the 
+y-axis tick labels will be drawn on the weighted degree and node 
+contribution bar plots.}
+
+\item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
+node contribution bar plots.}
+
 \item{contribCols}{color(s) to use for the node contribution bar plot 
 (see details).}
 
 \item{degreeCol}{color to use for the weighted degree bar plot.}
 
+\item{xaxt.line}{the number of lines into the bottom margin at which the 
+x-axis tick labels will be drawn on the module summary bar plot.}
+
+\item{xaxt.tck}{the size of the x-axis ticks for the module summary bar 
+plot.}
+
 \item{summaryCols}{color(s) to use for the node contribution bar plot 
 (see details).}
-
-\item{horizontal}{logical; controls whether the legend is rendered 
-horizontally or vertically when using \code{plotDataLegend},
-\code{plotCorrelationLegend} or \code{plotNetworkLegend}.}
 }
 \description{
 Functions for plotting the topology of a network module.
@@ -366,13 +375,20 @@ one or more network modules.
   allowing for quick iteration of customisable parameters to get the plot 
   layout correct.
   
-  The parameters \code{naxt.line}, \code{saxt.line}, \code{maxt.line}, and
-  \code{laxt.line} control the distance from each plot window that the node
-  labels, sample labels, module labels, and legend labels are rendered.
+  The arguments \code{naxt.line}, \code{saxt.line}, and \code{maxt.line} 
+  control the position of the node, sample, and module labels on the plot.
+   
+  The arguments \code{xaxt.line}, \code{xaxt.tck}, \code{yaxt.line}, and
+  \code{yaxt.tck} control the appearance of the axis ticks and labels on the
+  \code{plotDegree}, \code{plotContribution}, and \code{plotSummary} bar 
+  plots. \code{xaxt.tck} and \code{yaxt.txt} control the size of the axis 
+  ticks. \code{xaxt.line} and \code{yaxt.line} control the distance 
+  from the axis the axis tick labels are drawn. 
   
-  \code{legend.tick.size} controls the length of the 
-  axis ticks on each of the legends relative to the correlation, network,
-  and data plot windows. 
+  The arguments \code{laxt.line} and \code{laxt.tck} control the appearance
+  of the heatmap legends. \code{laxt.tck} controls the size of the axis 
+  ticks on the legend gradients while \code{laxt.line} controls the distance
+  from the legend the axis tick labels are drawn.
   
   \code{legend.position} controls the horizontal offset of the legend 
   relative to the plot. For the triangle heatmaps, (\code{symmetric=FALSE} in
@@ -384,9 +400,9 @@ one or more network modules.
   
   \code{cex.main} controls the relative text size of the plot title
   (specified by the \code{main} argument). \code{cex.axis} controls the
-  relative text size of the node and sample labels. \code{cex.lab} controls
-  the relative text size of the bar plot axis labels, module labels, and the
-  legend titles.
+  relative text size of the axis tick, node, and sample labels. 
+  \code{cex.lab} controls the relative text size of the bar plot axis labels, 
+  module labels, and the legend titles.
   
   The rendering of node, sample, and module names can be disabled by setting
   \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
@@ -395,7 +411,8 @@ one or more network modules.
   
   The \code{drawBorders} argument controls whether borders are drawn around
   the bars in \code{plotDegree}, \code{plotContribution}, and 
-  \code{plotSummary}.
+  \code{plotSummary}. The \code{lwd} argument controls the thickness of 
+  these borders, as well as the thickness of axes and axis ticks.
 }
 \subsection{Modifying the color palettes:}{
   The \code{dataCols} and \code{dataRange} arguments control the appearance 

@@ -38,6 +38,9 @@ plotting functions.}
 \item{orderSamplesBy}{user input for the 'orderSamplesBy' argument in the 
 plotting functions.}
 
+\item{orderModules}{user input for the 'orderModules' argument in the 
+plotting functions.}
+
 \item{dryRun}{logical; if \code{TRUE} computationally intense operations are
 skipped (checking for non-finite values and data scaling).}
 }

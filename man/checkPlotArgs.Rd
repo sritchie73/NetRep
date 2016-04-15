@@ -5,13 +5,16 @@
 \title{Validate plot function arguments}
 \usage{
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
-  main, drawBorders, border.width, naxt.line, saxt.line, maxt.line,
-  legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
-  palette, symmetric, horizontal, dataCols, dataRange, corCols, corRange,
-  netCols, netRange, degreeCol, contribCols, summaryCols, naCol, dryRun)
+  main, drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, yaxt.line,
+  laxt.line, xaxt.tck, yaxt.tck, laxt.tck, plotLegend, legend.position,
+  legend.main, palette, symmetric, horizontal, dataCols, dataRange, corCols,
+  corRange, netCols, netRange, degreeCol, contribCols, summaryCols, naCol,
+  dryRun)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
+
+\item{plotNodeNames}{user input for the corresponding argument in the plot functions.}
 
 \item{plotSampleNames}{user input for the corresponding argument in the plot functions.}
 
@@ -21,7 +24,7 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 
 \item{drawBorders}{user input for the corresponding argument in the plot functions.}
 
-\item{border.width}{user input for the corresponding argument in the plot functions.}
+\item{lwd}{user input for the corresponding argument in the plot functions.}
 
 \item{naxt.line}{user input for the corresponding argument in the plot functions.}
 
@@ -29,9 +32,17 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 
 \item{maxt.line}{user input for the corresponding argument in the plot functions.}
 
-\item{legend.tick.size}{user input for the corresponding argument in the plot functions.}
+\item{xaxt.line}{user input for the corresponding argument in the plot functions.}
+
+\item{yaxt.line}{user input for the corresponding argument in the plot functions.}
 
 \item{laxt.line}{user input for the corresponding argument in the plot functions.}
+
+\item{xaxt.tck}{user input for the corresponding argument in the plot functions.}
+
+\item{yaxt.tck}{user input for the corresponding argument in the plot functions.}
+
+\item{laxt.tck}{user input for the corresponding argument in the plot functions.}
 
 \item{plotLegend}{user input for the corresponding argument in the plot functions.}
 
@@ -64,8 +75,6 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \item{naCol}{user input for the corresponding argument in the plot functions.}
 
 \item{dryRun}{user input for the corresponding argument in the plot functions.}
-
-\item{plotNodesNames}{user input for the corresponding argument in the plot functions.}
 }
 \description{
 Simple typechecking for the extensive plot arguments

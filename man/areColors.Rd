@@ -11,6 +11,6 @@ areColors(colvec)
 }
 \description{
 Courtesy of Josh O'Brien's stackoverflow answer at
-\link{http://stackoverflow.com/a/13290832/2341679}
+\url{http://stackoverflow.com/a/13290832/2341679}
 }
 

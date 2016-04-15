@@ -8,8 +8,8 @@ plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
   na.indices.y = NULL, na.col = "#bdbdbd", xaxt = NULL, yaxt = NULL,
   plotModuleNames = TRUE, main = "", plotLegend = TRUE,
   legend.main = "", xaxt.line = -0.5, yaxt.line = -0.5, maxt.line = 3,
-  legend.tick.size = 0.04, laxt.line = 2.5, legend.line = 0.1,
-  border.width = 2, dryRun = FALSE)
+  laxt.tck = 0.04, laxt.line = 2.5, legend.line = 0.1, lwd = 2,
+  dryRun = FALSE)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -50,16 +50,16 @@ labels will be drawn.}
 \item{maxt.line}{the number of lines into the margin at which the module 
 names will be drawn.}
 
-\item{legend.tick.size}{size of the ticks on the axis legend as a proportion
+\item{laxt.tck}{size of the ticks on the axis legend as a proportion
 of the horizontal size of the plot window.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis 
-labels, as multiple of \code{legend.tick.size}.}
+labels, as multiple of \code{laxt.tck}.}
 
 \item{legend.line}{the distance from the plot to render the legend as a 
 proportion of the horizontal size of the plot window.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders.}
 
 \item{dryRun}{logical; if \code{TRUE} only the axes and borders will be 
 drawn.}
