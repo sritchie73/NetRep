@@ -19,7 +19,7 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   naxt.line = -0.5, saxt.line = -0.5, maxt.line = 3,
   legend.position = 0.15, legend.tick.size = 0.03, laxt.line = 3,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2, dataCols = NULL,
-  dataRange = NULL, naCol = "#bdbdbd")
+  dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -29,7 +29,8 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   legend.main = "Correlation", naxt.line = -0.5, maxt.line = 3,
   legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd")
+  corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -39,7 +40,8 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   legend.main = "Edge weight", naxt.line = -0.5, maxt.line = 3,
   legend.position = NULL, legend.tick.size = NULL, laxt.line = NULL,
   cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd")
+  netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -47,7 +49,8 @@ plotContribution(data, correlation, network, moduleAssignments = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", border.width = 2, drawBorders = FALSE, naxt.line = -0.5,
   maxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd")
+  contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -55,7 +58,7 @@ plotDegree(data, correlation, network, moduleAssignments = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", border.width = 2, drawBorders = FALSE, naxt.line = -0.5,
   maxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  degreeCol = "#feb24c", naCol = "#bdbdbd")
+  degreeCol = "#feb24c", naCol = "#bdbdbd", dryRun = FALSE)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
@@ -64,7 +67,7 @@ plotSummary(data, correlation, network, moduleAssignments = NULL,
   plotModuleNames = NULL, main = "", border.width = 2,
   drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0, cex.axis = 0.8,
   cex.lab = 1, cex.main = 1.2, summaryCols = c("#1B7837", "#762A83"),
-  naCol = "#bdbdbd")
+  naCol = "#bdbdbd", dryRun = FALSE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -172,6 +175,9 @@ the data heatmap (see details). Automatically determined if \code{NA} or
 
 \item{naCol}{color to use for missing nodes and samples on the data, 
 correlation structure, and network edge weight heat maps.}
+
+\item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
+rendered.}
 
 \item{symmetric}{logical; controls whether the correlation and network 
 heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
@@ -354,10 +360,15 @@ one or more network modules.
 \subsection{Plot layout and device size:}{
   Although reasonable default values for most parameters have been provided,
   the rendering of axes and titles may need adjusting depending on the size
-  of the plot window. The parameters \code{naxt.line}, \code{saxt.line}, 
-  \code{maxt.line}, and \code{laxt.line} control the distance from each plot
-  window that the node labels, sample labels, module labels, and legend 
-  labels are rendered. 
+  of the plot window. The \code{dryRun} argument is useful for quickly 
+  determining whether the plot will render correctly. When \code{dryRun} 
+  is \code{TRUE} only the axes, legends, labels, and title will be drawn, 
+  allowing for quick iteration of customisable parameters to get the plot 
+  layout correct.
+  
+  The parameters \code{naxt.line}, \code{saxt.line}, \code{maxt.line}, and
+  \code{laxt.line} control the distance from each plot window that the node
+  labels, sample labels, module labels, and legend labels are rendered.
   
   \code{legend.tick.size} controls the length of the 
   axis ticks on each of the legends relative to the correlation, network,

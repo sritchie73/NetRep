@@ -51,6 +51,9 @@ labels, as multiple of \code{legend.tick.size}.}
 legend as a proportion of the horizontal size of the plot window.}
 
 \item{border.width}{line width for borders.}
+
+\item{dryRun}{logical; if \code{TRUE} only the axes and borders will be 
+drawn.}
 }
 \description{
 Plot a symmetric heatmap as a triangle

@@ -6,7 +6,8 @@
 \usage{
 processInput(discovery, test, network, correlation, data, moduleAssignments,
   modules, backgroundLabel, verbose, tempdir, plotFunction = FALSE,
-  orderNodesBy = NA, orderSamplesBy = NA, orderModules = NULL)
+  orderNodesBy = NA, orderSamplesBy = NA, orderModules = NULL,
+  dryRun = FALSE)
 }
 \arguments{
 \item{discovery}{user input for the 'discovery' argument.}
@@ -31,11 +32,14 @@ processInput(discovery, test, network, correlation, data, moduleAssignments,
 
 \item{plotFunction}{logical; are we checking for a plot function?}
 
-\item{orderNodesBy}{use input for the 'orderNodesBy' argument in the 
+\item{orderNodesBy}{user input for the 'orderNodesBy' argument in the 
 plotting functions.}
 
-\item{orderSamplesBy}{use input for the 'orderSamplesBy' argument in the 
+\item{orderSamplesBy}{user input for the 'orderSamplesBy' argument in the 
 plotting functions.}
+
+\item{dryRun}{logical; if \code{TRUE} computationally intense operations are
+skipped (checking for non-finite values and data scaling).}
 }
 \value{
 a list of containing the formatted user input

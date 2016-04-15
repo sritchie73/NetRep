@@ -139,6 +139,9 @@ the network edge weight heatmap (see details).}
 
 \item{naCol}{color to use for missing nodes and samples on the data, 
 correlation structure, and network edge weight heat maps.}
+
+\item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
+rendered.}
 }
 \description{
 Plot the correlation structure, network edges, (normalised) connectivity, 
@@ -336,10 +339,12 @@ Individual components of the module plot can be plotted using
   with a width of 1500, a height of 2700 and a nominal resolution of 300 
   (\code{png(filename, width=5*300, height=9*300, res=300))}). PDF and other
   vectorized devices should not be used for modules with more than a hundred
-  nodes.
+  nodes. When changing the device size the spacing of axes, titles, and 
+  legends may need adjusting.
   
-  When changing the device size the spacing of axes, titles, and legends may 
-  need adjusting.
+  When \code{dryRun} is \code{TRUE} only the axes, legends, labels, and
+  title will be drawn, allowing for quick iteration of customisable
+  parameters to get the plot layout correct.
   
   The parameters \code{naxt.line}, \code{saxt.line}, \code{maxt.line}, and
   \code{laxt.line} control the distance from each plot window that the node

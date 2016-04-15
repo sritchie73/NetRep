@@ -7,7 +7,7 @@
 plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorders = FALSE,
   main = "", na.col = "#bdbdbd", yaxt = TRUE, plotModuleNames = TRUE,
   yaxt.line = 0, maxt.line = 2.5, xlab = "", cex.modules = 0.7,
-  border.width = 2)
+  border.width = 2, dryRun = FALSE)
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for 
@@ -43,6 +43,9 @@ labels will be drawn.}
 \item{cex.modules}{relative size of module names.}
 
 \item{border.width}{line width for borders.}
+
+\item{dryRun}{logical; if \code{TRUE} only the axes and borders will be 
+drawn.}
 }
 \description{
 Plot multiple horizontal bar plots

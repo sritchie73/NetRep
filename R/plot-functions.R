@@ -24,6 +24,8 @@
 #' @param legend.line the distance from the left of the plot to render the 
 #'  legend as a proportion of the horizontal size of the plot window.
 #' @param border.width line width for borders.
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
 #' 
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
@@ -173,7 +175,9 @@ plotTriangleHeatmap <- function(
 #' @param legend.line the distance from the plot to render the legend as a 
 #'  proportion of the horizontal size of the plot window.
 #' @param border.width line width for borders.
-#' 
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
+#'  
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
@@ -451,11 +455,13 @@ addGradientLegend <- function(
 #'  names will be drawn.
 #' @param ylab label for the yaxis
 #' @param border.width line width for borders.
-#' 
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
+#'  
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
-  maxt.line=3, ylab="", border.width=2
+  maxt.line=3, ylab="", border.width=2, dryRun=FALSE
 ) {
   # Create vector of colors, one for each bar
   if (length(cols) == 1) {
@@ -476,29 +482,31 @@ plotBar <- function(
   )
   
   # draw NAs
-  for (ii in seq_along(heights)) {
-    if (is.na(heights[ii])) {
+  if (!dryRun) {
+    for (ii in seq_along(heights)) {
+      if (is.na(heights[ii])) {
+        rect(
+          xleft=ii - 0.5,
+          xright=ii + 0.5,
+          ybottom=heights.lim[1],
+          ytop=heights.lim[2],
+          col=na.col,
+          border=NA
+        ) 
+      }
+    }
+    
+    for (ii in seq_along(heights)) {
       rect(
-        xleft=ii - 0.5,
-        xright=ii + 0.5,
-        ybottom=heights.lim[1],
-        ytop=heights.lim[2],
-        col=na.col,
-        border=NA
+        xleft=ii-bar.width/2,
+        xright=ii+bar.width/2,
+        ybottom=0,
+        ytop=heights[ii],
+        col=colvec[ii],
+        border=ifelse(drawBorders, "black", NA),
+        lwd=border.width
       ) 
     }
-  }
-  
-  for (ii in seq_along(heights)) {
-    rect(
-      xleft=ii-bar.width/2,
-      xright=ii+bar.width/2,
-      ybottom=0,
-      ytop=heights[ii],
-      col=colvec[ii],
-      border=ifelse(drawBorders, "black", NA),
-      lwd=border.width
-    ) 
   }
   abline(h=0, col="black", lwd=border.width)
   axis(side=2, las=2, lwd=border.width)
@@ -552,11 +560,13 @@ plotBar <- function(
 #' @param xlab x axis label
 #' @param cex.modules relative size of module names.
 #' @param border.width line width for borders.
-#'
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
+#'  
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="",
   na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5,
-  xlab="", cex.modules=0.7, border.width=2
+  xlab="", cex.modules=0.7, border.width=2, dryRun=FALSE
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -587,16 +597,18 @@ plotMultiBar <- function(
   )
   
   # draw NAs
-  for (jj in seq_len(nrow(lengths))) {
-    if (all(is.na(lengths[jj,]))) {
-      rect(
-        xleft=0,
-        xright=ncol(lengths),
-        ybottom=nrow(lengths) - jj,
-        ytop=nrow(lengths) - (jj - 1),
-        col=na.col,
-        border=NA
-      ) 
+  if (!dryRun) {
+    for (jj in seq_len(nrow(lengths))) {
+      if (all(is.na(lengths[jj,]))) {
+        rect(
+          xleft=0,
+          xright=ncol(lengths),
+          ybottom=nrow(lengths) - jj,
+          ytop=nrow(lengths) - (jj - 1),
+          col=na.col,
+          border=NA
+        ) 
+      }
     }
   }
   
@@ -617,16 +629,20 @@ plotMultiBar <- function(
     getX <- function(val) {
       (ii - 1) + (1-pw)/2 + pw/rr.size * (val - rr[1])
     }
-    for (jj in seq_len(nrow(lengths))) {
-      rect(
-        xleft=getX(ax),
-        xright=getX(lengths[jj,ii]),
-        ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
-        ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
-        col=colmat[jj, ii],
-        border=ifelse(drawBorders, "black", NA),
-        lwd=border.width
-      ) 
+    
+    # Only draw bars if dryRun is FALSE
+    if (!dryRun) {
+      for (jj in seq_len(nrow(lengths))) {
+        rect(
+          xleft=getX(ax),
+          xright=getX(lengths[jj,ii]),
+          ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
+          ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
+          col=colmat[jj, ii],
+          border=ifelse(drawBorders, "black", NA),
+          lwd=border.width
+        ) 
+      }
     }
     
     # draw 0 axis

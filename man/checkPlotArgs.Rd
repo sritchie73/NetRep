@@ -8,7 +8,7 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
   main, drawBorders, border.width, naxt.line, saxt.line, maxt.line,
   legend.tick.size, laxt.line, plotLegend, legend.position, legend.main,
   palette, symmetric, horizontal, dataCols, dataRange, corCols, corRange,
-  netCols, netRange, degreeCol, contribCols, summaryCols, naCol)
+  netCols, netRange, degreeCol, contribCols, summaryCols, naCol, dryRun)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
@@ -62,6 +62,8 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \item{summaryCols}{user input for the corresponding argument in the plot functions.}
 
 \item{naCol}{user input for the corresponding argument in the plot functions.}
+
+\item{dryRun}{user input for the corresponding argument in the plot functions.}
 
 \item{plotNodesNames}{user input for the corresponding argument in the plot functions.}
 }

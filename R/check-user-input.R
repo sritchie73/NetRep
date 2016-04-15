@@ -13,10 +13,13 @@
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' @param tempdir temporary directory to save new objects in.
 #' @param plotFunction logical; are we checking for a plot function?
-#' @param orderNodesBy use input for the 'orderNodesBy' argument in the 
+#' @param orderNodesBy user input for the 'orderNodesBy' argument in the 
 #'  plotting functions.
-#' @param orderSamplesBy use input for the 'orderSamplesBy' argument in the 
+#' @param orderSamplesBy user input for the 'orderSamplesBy' argument in the 
 #'  plotting functions.
+#' @param dryRun logical; if \code{TRUE} computationally intense operations are
+#'  skipped (checking for non-finite values and data scaling).
+#'  
 #' 
 #' @seealso
 #' \code{\link{modulePreservation}}
@@ -27,7 +30,7 @@
 processInput <- function(
   discovery, test, network, correlation, data, moduleAssignments, modules, 
   backgroundLabel, verbose, tempdir, plotFunction=FALSE, orderNodesBy=NA, 
-  orderSamplesBy=NA, orderModules=NULL
+  orderSamplesBy=NA, orderModules=NULL, dryRun=FALSE
 ) {
   # Where do we want to get:
   #   Each "argument" has a list of lists: at the top level, each element 
@@ -648,24 +651,31 @@ processInput <- function(
   }
   iterator <- unique(iterator)
 
-  # Now check finite
-  for (ii in iterator) {
-    if (!is.null(data[[ii]])) 
-      checkFinite(data[[ii]])
-    checkFinite(correlation[[ii]])
-    checkFinite(network[[ii]])
+  # Now check finite, but skip for dry runs of plots
+  if (!dryRun) {
+    for (ii in iterator) {
+      if (!is.null(data[[ii]])) 
+        checkFinite(data[[ii]])
+      checkFinite(correlation[[ii]])
+      checkFinite(network[[ii]])
+    }    
   }
-  
-  # Temporarily create scaled data set for the calculation of the
-  # summary expression profile. Again, to save space and time, only do this for
-  # datasets we're analysing
-  scaledData <- rep(list(NULL), length(data))
-  names(scaledData) <- names(data)
-  for (ii in iterator) {
-    if (!is.null(data[[ii]])) {
-      scaledData[[ii]] <- scaleBigMatrix(data[[ii]], tempdir)
+
+  if (!dryRun) {
+    # Temporarily create scaled data set for the calculation of the
+    # summary expression profile. Again, to save space and time, only do this for
+    # datasets we're analysing
+    scaledData <- rep(list(NULL), length(data))
+    names(scaledData) <- names(data)
+    for (ii in iterator) {
+      if (!is.null(data[[ii]])) {
+        scaledData[[ii]] <- scaleBigMatrix(data[[ii]], tempdir)
+      }
     }
+  } else {
+    scaledData <- data # we just need to be able to get the row + column names
   }
+
   
   if (!is.null(names(network))) {
     datasetNames <- names(network)
@@ -801,13 +811,14 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param contribCols user input for the corresponding argument in the plot functions.
 #' @param summaryCols user input for the corresponding argument in the plot functions.
 #' @param naCol user input for the corresponding argument in the plot functions.
+#' @param dryRun user input for the corresponding argument in the plot functions.
 #' 
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, border.width, naxt.line, saxt.line, maxt.line, legend.tick.size, 
   laxt.line, plotLegend, legend.position, legend.main, palette, symmetric,
   horizontal, dataCols, dataRange, corCols, corRange, netCols, netRange, 
-  degreeCol, contribCols, summaryCols, naCol
+  degreeCol, contribCols, summaryCols, naCol, dryRun
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -1023,5 +1034,8 @@ checkPlotArgs <- function(
       stop("infinite values found in 'netRange'")
     }
   }
+  
+  if (!(missing(dryRun) || is.slog(dryRun)))
+    stop("'dryRun' must be one of 'TRUE' or 'FALSE'")
   
 }

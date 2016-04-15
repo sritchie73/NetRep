@@ -203,10 +203,12 @@
 #'   with a width of 1500, a height of 2700 and a nominal resolution of 300 
 #'   (\code{png(filename, width=5*300, height=9*300, res=300))}). PDF and other
 #'   vectorized devices should not be used for modules with more than a hundred
-#'   nodes.
+#'   nodes. When changing the device size the spacing of axes, titles, and 
+#'   legends may need adjusting.
 #'   
-#'   When changing the device size the spacing of axes, titles, and legends may 
-#'   need adjusting.
+#'   When \code{dryRun} is \code{TRUE} only the axes, legends, labels, and
+#'   title will be drawn, allowing for quick iteration of customisable
+#'   parameters to get the plot layout correct.
 #'   
 #'   The parameters \code{naxt.line}, \code{saxt.line}, \code{maxt.line}, and
 #'   \code{laxt.line} control the distance from each plot window that the node
@@ -328,7 +330,7 @@ plotModule <- function(
     legend.tick.size=legend.tick.size, laxt.line=laxt.line, dataCols=dataCols, 
     dataRange=dataRange, corCols=corCols, corRange=corRange, netCols=netCols, 
     netRange=netRange, degreeCol=degreeCol, contribCols=contribCols, 
-    summaryCols=summaryCols, naCol=naCol)
+    summaryCols=summaryCols, naCol=naCol, dryRun=dryRun)
   
   # Handle variants that will not work for this plot function
   if (is.null(legend.tick.size))
@@ -345,7 +347,7 @@ plotModule <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules)
+                         orderSamplesBy, orderModules, dryRun)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -359,7 +361,7 @@ plotModule <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   
-  # Indexes for this function
+  # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
@@ -416,135 +418,69 @@ plotModule <- function(
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
-  # Get ordering of nodes and samples as specified in 'orderNodesBy' and 
-  # 'orderSamplesBy'.
+  # Get ordering of nodes, modules, and samples, identifying missing nodes and
+  # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
+  
+  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+    modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
+    nDatasets, dryRun, verbose)
+  testProps <- plotProps$testProps
+  nodeOrder <- plotProps$nodeOrder
+  moduleOrder <- plotProps$moduleOrder
+  sampleOrder <- plotProps$sampleOrder
+  na.pos.x <- plotProps$na.pos.x
+  na.pos.y <- plotProps$na.pos.y
+  presentNodes <- plotProps$presentNodes
+  presentSamples <- plotProps$presentSamples
 
-  # Scenarios:
-  # - No ordering of nodes + samples. We only need to calculate the network 
-  #   properties for the 'test' dataset.
-  # - Ordering of nodes only. We need to calculate the network properties in
-  #   all datasets specified in 'orderNodesBy' (may be one or more) and in the
-  #   'test' dataset (may or may not be specified in 'orderNodesBy').
-  # - Ordering of samples only. We need to calculate the network properties in
-  #   the 'orderSamplesBy' dataset, and in the 'test' dataset (which may or 
-  #   may not be the same as 'orderSamplesBy').
-  # - Ordering of both. We need to calculate the network properties in the
-  #   'orderSamplesBy', 'orderNodesBy', and 'test' datasets.
-  
-  # this vector contains all datasets required for plotting
-  plotDatasets <- list(unique(na.omit(c(ti, orderSamplesBy, orderNodesBy))))
-  names(plotDatasets) <- datasetNames[di]
-  
-  # Calculate the network properties for all datasets required
-  plotProps <- netPropsInternal(
-    scaledData, correlation, network, moduleAssignments, modules, di,
-    plotDatasets, nDatasets, datasetNames, FALSE
-  )
-  
-  # Order nodes based on degree
-  if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
-    if (length(orderNodesBy) > 1) {
-      mean <- TRUE
-    } else {
-      mean <- FALSE
-    }
-    
-    # nodeOrderInternal will average acros all test datasets, so we need to 
-    # filter just to those specified in 'orderNodesBy' while preserving the
-    # structure of 'plotProps'
-    orderProps <- filterInternalProps(plotProps, orderNodesBy, di)
-    nodeOrder <- nodeOrderInternal(
-      orderProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE, mean
-    )
-    nodeOrder <- simplifyList(nodeOrder, depth=3)
-    
-    # The module order will be the names of the simplified list iff there are
-    # multiple modules to render
-    if (!is.list(nodeOrder)) {
-      moduleOrder <- mods
-      if (is.numeric(moduleOrder))
-        moduleOrder <- as.character(moduleOrder)
-    } else {
-      moduleOrder <- names(nodeOrder)
-    }
-    
-    # Now flatten the node order list
-    nodeOrder <- unlist(nodeOrder)
-  } else {
-    hasProps <- !sapply(plotProps[[di]][[ti]], is.null) 
-    moduleOrder <- names(plotProps[[di]][[ti]])[hasProps]
-    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-      names(plotProps[[di]][[ti]][[mi]]$degree)
-    }
-  }
-
-  if (!is.na(orderSamplesBy)) {
-    orderProps <- filterInternalProps(plotProps, orderSamplesBy, di, moduleOrder[1])
-    sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
-    sampleOrder <- simplifyList(sampleOrder, depth=3)
-  } else {
-    sampleOrder <- rownames(data[[ti]])
-  }
-  
   #-----------------------------------------------------------------------------
-  # Identify nodes and samples from the 'discovery' dataset not present in the 
-  # 'test' dataset.
+  # Get the data to be shown on the plot
   #-----------------------------------------------------------------------------
   
-  na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
-  if (length(na.pos.x) > 0) {
-    presentNodes <- nodeOrder[-na.pos.x]
-  } else {
-    presentNodes <- nodeOrder
-  }
-  
-  if (!is.numeric(sampleOrder)) {
-    na.pos.y <- which(sampleOrder %nin% rownames(data[[ti]]))
-    if (length(na.pos.y) > 0) {
-      presentSamples <- sampleOrder[-na.pos.y]
-    } else {
-      presentSamples <- sampleOrder
+  if (dryRun) {
+    # In this case these properties have not been calculated, so just make some
+    # placehold vectors so that the plot functions work
+    wDegreeVec <- rep(0, length(nodeOrder))
+    names(wDegreeVec) <- nodeOrder
+    if (!is.null(scaledData[[ti]])) {
+      nodeContribVec <- rep(0, length(nodeOrder))
+      names(nodeContribVec) <- nodeOrder
+      
+      summaries=matrix(0, ncol=length(mods), nrow=length(sampleOrder))
+      dimnames(summaries) <- list(sampleOrder, mods)
+      summaries.range <- rep(list(c(-1, 1)), length(mods))
+      names(summaries.range) <- mods
     }
   } else {
-    na.pos.y <- vector()
-    presentSamples <- sampleOrder
-  }
-  
-  #-----------------------------------------------------------------------------
-  # Set up other property vectors and datasets
-  #-----------------------------------------------------------------------------
-  
-  testProps <- simplifyList(plotProps[[di]][[ti]], 1)
-  if (length(moduleOrder) == 1) {
-    testProps <- list(testProps)
-    names(testProps) <- moduleOrder
-  }
-
-  # (Normalised) weighted degree vector
-  wDegreeVec <- foreach(mi = moduleOrder, .combine=c) %do% {
-    testProps[[mi]]$degree/max(na.omit(testProps[[mi]]$degree))
-  }
-  wDegreeVec <- wDegreeVec[nodeOrder]
-  
-  if (!is.null(scaledData[[ti]])) {
-    # node contribution
-    nodeContribVec <- foreach(mi = moduleOrder, .combine=c) %do% {
-      testProps[[mi]]$contribution
+    # (Normalised) weighted degree vector
+    wDegreeVec <- foreach(mi = moduleOrder, .combine=c) %do% {
+      testProps[[mi]]$degree/max(na.omit(testProps[[mi]]$degree))
     }
-    nodeContribVec <- nodeContribVec[nodeOrder]
+    wDegreeVec <- wDegreeVec[nodeOrder]
     
-    # Summary profile matrix
-    summaries <- foreach(mi = moduleOrder, .combine=cbind) %do% {
-      matrix(
-        insert.nas(testProps[[mi]]$summary[presentSamples], na.pos.y),
-        ncol=1
-      )
+    if (!is.null(scaledData[[ti]])) {
+      # node contribution
+      nodeContribVec <- foreach(mi = moduleOrder, .combine=c) %do% {
+        testProps[[mi]]$contribution
+      }
+      nodeContribVec <- nodeContribVec[nodeOrder]
+      
+      # Summary profile matrix
+      summaries <- foreach(mi = moduleOrder, .combine=cbind) %do% {
+        matrix(
+          insert.nas(testProps[[mi]]$summary[presentSamples], na.pos.y),
+          ncol=1
+        )
+      }
+      colnames(summaries) <- moduleOrder
+      rownames(summaries) <- sampleOrder
+      summaries.range <- lapply(1:ncol(summaries), function(ii) { 
+        range(summaries[,ii])
+      })
     }
-    colnames(summaries) <- moduleOrder
-    rownames(summaries) <- sampleOrder
   }
-  
+    
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
   #-----------------------------------------------------------------------------
@@ -563,13 +499,21 @@ plotModule <- function(
   }
   
   # Set default color palettes for the data heatmap
-  dat <- data[[ti]][presentSamples, presentNodes] # also used for actual plot
-  if (is.null(dataRange)) {
-    dataRange <- range(dat)
-    # Make sure the gradient is balanced around 0 if the default colors are
-    # requested
-    if (is.null(dataCols) && dataRange[1] < 0 && dataRange[2] > 0) {
-      dataRange <- c(-1*max(abs(dataRange)), max(abs(dataRange)))
+  if (dryRun) {
+    dat <- matrix(0, nrow=length(presentSamples), ncol=length(presentNodes))
+    dimnames(dat) <- list(presentSamples, presentNodes)
+    if (is.null(dataRange)) {
+      dataRange <- c(-1, 1)
+    }
+  } else {
+    dat <- data[[ti]][presentSamples, presentNodes] # also used for actual plot
+    if (is.null(dataRange)) {
+      dataRange <- range(dat)
+      # Make sure the gradient is balanced around 0 if the default colors are
+      # requested
+      if (is.null(dataCols) && dataRange[1] < 0 && dataRange[2] > 0) {
+        dataRange <- c(-1*max(abs(dataRange)), max(abs(dataRange)))
+      }
     }
   }
   if (is.null(dataCols)) {
@@ -621,14 +565,14 @@ plotModule <- function(
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
       xaxt=plotNodeNames, xaxt.line=naxt.line, main="",
       ylab="Weighted\ndegree", maxt.line=maxt.line, 
-      border.width=border.width, na.col=naCol
+      border.width=border.width, na.col=naCol, dryRun=dryRun
     )
   } else {
     plotBar(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
       ylab="Weighted\ndegree", maxt.line=maxt.line, na.col=naCol,
-      border.width=border.width
+      border.width=border.width, dryRun=dryRun
     )
   }
   
@@ -639,7 +583,7 @@ plotModule <- function(
       nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder], 
       contribCols, drawBorders=drawBorders, plotModuleNames=FALSE, main="", 
       xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, na.col=naCol,
-      border.width=border.width
+      border.width=border.width, dryRun=dryRun
     )
     
     # Plot the data matrix
@@ -676,11 +620,11 @@ plotModule <- function(
       xlab <- gsub(" ", "\n", xlab)
     par(mar=c(1, 1, 1, 1))
     plotMultiBar(
-      summaries, rep(list(range(summaries, na.rm=TRUE)), ncol(summaries)),
+      summaries, summaries.range,
       cols=summaryCols , drawBorders=drawBorders, border.width=border.width,
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
       yaxt.line=saxt.line, maxt.line=0, xlab=xlab, 
-      cex.modules=par("cex.lab")*0.7, na.col=naCol
+      cex.modules=par("cex.lab")*0.7, na.col=naCol, dryRun=dryRun
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)

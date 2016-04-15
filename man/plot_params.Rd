@@ -76,6 +76,9 @@ the network edge weight heatmap (see details).}
 
 \item{naCol}{color to use for missing nodes and samples on the data, 
 correlation structure, and network edge weight heat maps.}
+
+\item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
+rendered.}
 }
 \description{
 Template parameters to be imported into other function documentation. This 

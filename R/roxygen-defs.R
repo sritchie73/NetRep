@@ -124,6 +124,8 @@ NULL
 #'  (see details).
 #' @param naCol color to use for missing nodes and samples on the data, 
 #'  correlation structure, and network edge weight heat maps.
+#' @param dryRun logical; if \code{TRUE}, only the axes and labels will be 
+#'  rendered.
 #' 
 #' @name plot_params
 NULL
