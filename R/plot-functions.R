@@ -348,8 +348,6 @@ addGradientLegend <- function(
     ylim <- par("usr")[3:4]
 
   # Handle legends where the range of values doesn't map to the palette range 
-  # (i.e. drawing a legend for the adjacency plot using the correlation 
-  # palette)
   plim <- c(
     head(which(palette == getColFromPalette(
       legend.vlim[1], palette, legend.vlim

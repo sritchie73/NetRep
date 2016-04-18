@@ -918,7 +918,7 @@ plotNetwork <- function(
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
 
-#' \code{plotContribution}: Plot a bar chart of the module membership for
+#' \code{plotContribution}: Plot a bar chart of the node contribution for
 #' one or more network modules.
 #' 
 #' @rdname plotTopology

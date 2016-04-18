@@ -249,7 +249,7 @@ or more network modules.
 \code{plotNetwork}: Plot a heatmap of the edge weights for one or more
 network modules.
 
-\code{plotContribution}: Plot a bar chart of the module membership for
+\code{plotContribution}: Plot a bar chart of the node contribution for
 one or more network modules.
 
 \code{plotDegree:} Plot a bar chart of the scaled weighted degree 

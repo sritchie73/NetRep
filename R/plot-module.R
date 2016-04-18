@@ -1,8 +1,8 @@
 #' Plot the topology of a network module
 #' 
 #' @description 
-#' Plot the correlation structure, network edges, (normalised) connectivity, 
-#' module membership, underlying data, and module summary vector of one or
+#' Plot the correlation structure, network edges, scaled weighted degree, 
+#' node contribtuion, module data, and module summary vectors of one or
 #' more network modules.
 #' 
 #' Individual components of the module plot can be plotted using 
