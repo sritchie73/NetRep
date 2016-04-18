@@ -6,9 +6,10 @@
 \usage{
 plotTriangleHeatmap(values, palette, vlim, mas, na.indices = NULL,
   na.col = "#bdbdbd", xaxt = NULL, plotModuleNames = TRUE, main = "",
-  plotLegend = TRUE, legend.main = "", legend.lim, xaxt.line = -0.5,
-  maxt.line = 3, legend.tick.size = 0.04, laxt.line = 2.5,
-  legend.line = 0.1, border.width = 2)
+  main.line = 0, plotLegend = TRUE, legend.main = "",
+  legend.main.line = 1, xaxt.line = -0.5, maxt.line = 3,
+  laxt.tck = 0.04, laxt.line = 2.5, legend.line = 0.1, lwd = 2,
+  dryRun = FALSE)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -30,12 +31,16 @@ plotted along the x axis.}
 
 \item{main}{title for the plot.}
 
-\item{plotLegend}{logical; if \code{TRUE} a legend is added to the right side of
-the plot.}
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
+
+\item{plotLegend}{logical; if \code{TRUE} a legend is added to the right 
+side of the plot.}
 
 \item{legend.main}{title for the legend.}
 
-\item{legend.lim}{range of values to show on the legend.}
+\item{legend.main.line}{distance from the legend to render the legend 
+title.}
 
 \item{xaxt.line}{the number of lines into the margin at which the x axis 
 labels will be drawn.}
@@ -43,16 +48,19 @@ labels will be drawn.}
 \item{maxt.line}{the number of lines into the margin at which the module 
 names will be drawn.}
 
-\item{legend.tick.size}{size of the ticks on the axis legend as a proportion
+\item{laxt.tck}{size of the ticks on the axis legend as a proportion
 of the horizontal size of the plot window.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis 
-labels, as multiple of \code{legend.tick.size}.}
+labels, as multiple of \code{laxt.tck}.}
 
 \item{legend.line}{the distance from the left of the plot to render the 
 legend as a proportion of the horizontal size of the plot window.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders.}
+
+\item{dryRun}{logical; if \code{TRUE} only the axes and borders will be 
+drawn.}
 }
 \description{
 Plot a symmetric heatmap as a triangle

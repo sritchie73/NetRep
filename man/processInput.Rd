@@ -5,7 +5,9 @@
 \title{Process, check, and format input}
 \usage{
 processInput(discovery, test, network, correlation, data, moduleAssignments,
-  modules, backgroundLabel, verbose, tempdir)
+  modules, backgroundLabel, verbose, tempdir, plotFunction = FALSE,
+  orderNodesBy = NA, orderSamplesBy = NA, orderModules = NULL,
+  dryRun = FALSE)
 }
 \arguments{
 \item{discovery}{user input for the 'discovery' argument.}
@@ -26,7 +28,21 @@ processInput(discovery, test, network, correlation, data, moduleAssignments,
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 
-\item{tempdir}{temporary directory to save new objects in}
+\item{tempdir}{temporary directory to save new objects in.}
+
+\item{plotFunction}{logical; are we checking for a plot function?}
+
+\item{orderNodesBy}{user input for the 'orderNodesBy' argument in the 
+plotting functions.}
+
+\item{orderSamplesBy}{user input for the 'orderSamplesBy' argument in the 
+plotting functions.}
+
+\item{orderModules}{user input for the 'orderModules' argument in the 
+plotting functions.}
+
+\item{dryRun}{logical; if \code{TRUE} computationally intense operations are
+skipped (checking for non-finite values and data scaling).}
 }
 \value{
 a list of containing the formatted user input

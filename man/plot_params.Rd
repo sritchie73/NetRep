@@ -4,28 +4,35 @@
 \alias{plot_params}
 \title{Template parameters}
 \arguments{
-\item{orderNodesBy}{one of "discovery", "test" or "none". Controls how nodes
-are ordered on the plot (see details).}
+\item{orderNodesBy}{\code{NULL} (default), \code{NA}, or a vector of dataset
+names or indices. Controls how nodes are ordered on the plot (see details).}
 
-\item{orderSamplesBy}{one of "discovery", "test" or "none". Controls how 
-samples are ordered on the plot (see details).}
+\item{orderSamplesBy}{\code{NULL} (default), \code{NA}, or a vector 
+containing a single dataset name or index. Controls how samples are ordered 
+on the plot (see details).}
 
 \item{plotNodeNames}{logical; controls whether the node names are 
-rendered on the bottom axis.}
+drawed on the bottom axis.}
 
 \item{plotSampleNames}{logical; controls whether the sample names are 
-rendered on the left axis.}
+drawed on the left axis.}
 
-\item{plotModuleNames}{logical; controls whether module names are rendered.
-The default is for module names to be rendered when multiple \code{modules} 
+\item{plotModuleNames}{logical; controls whether module names are drawed.
+The default is for module names to be drawed when multiple \code{modules} 
 are drawn.}
 
+\item{main}{title for the plot.}
+
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
+
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
-connectivity, module membership, and module summary bar plots.}
+\emph{weighted degree}, \emph{node conribution}, and \emph{module summary}
+bar plots.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders and axes.}
 
-\item{gaxt.line}{the number of lines into the bottom margin at which the node
+\item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
 
 \item{saxt.line}{the number of lines into the left margin at which the sample
@@ -34,17 +41,73 @@ names will be drawn.}
 \item{maxt.line}{the number of lines into the bottom margin at which the 
 module names will be drawn.}
 
-\item{legend.tick.size}{size of the ticks on each axis legend relative to the
+\item{xaxt.line}{the number of lines into the bottom margin at which the 
+x-axis tick labels will be drawn on the module summary bar plot.}
+
+\item{xaxt.tck}{the size of the x-axis ticks for the module summary bar 
+plot.}
+
+\item{xlab.line}{the number of lines into the bottom margin at which the 
+x axis label on the \emph{module summary} bar plot(s) will be drawn.}
+
+\item{yaxt.line}{the number of lines into the left margin at which the 
+y-axis tick labels will be drawn on the weighted degree and node 
+contribution bar plots.}
+
+\item{ylab.line}{the number of lines into the left margin at which the 
+y axis labels on the \emph{weighted degree} and \emph{node contribution} 
+bar plots will be drawn.}
+
+\item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
+node contribution bar plots.}
+
+\item{laxt.line}{the distance from the legend to draw the legend axis 
+labels, as multiple of \code{laxt.tck}.}
+
+\item{laxt.tck}{size of the ticks on each axis legend relative to the
 size of the correlation, edge weights, and data matrix heatmaps.}
 
-\item{laxt.line}{the distance from the legend to render the legend axis 
-labels, as multiple of \code{legend.tick.size}.}
+\item{legend.main.line}{the distance from the legend to draw the legend 
+title.}
 
 \item{cex.axis}{relative size of the node and sample names.}
 
 \item{cex.lab}{relative size of the module names and legend titles.}
 
 \item{cex.main}{relative size of the plot titles.}
+
+\item{dataCols}{a character vector of colors to create a gradient from for
+the data heatmap (see details). Automatically determined if \code{NA} or 
+\code{NULL}.}
+
+\item{dataRange}{the range of values to map to the \code{dataCols} gradient
+(see details). Automatically determined if \code{NA} or \code{NULL}.}
+
+\item{corCols}{a character vector of colors to create a gradient from for
+the correlation structure heatmap (see details).}
+
+\item{corRange}{the range of values to map to the \code{corCols} gradient
+(see details).}
+
+\item{netCols}{a character vector of colors to create a gradient from for
+the network edge weight heatmap (see details).}
+
+\item{netRange}{the range of values to map to the \code{corCols} gradient
+(see details). Automatically determined if \code{NA} or \code{NULL}.}
+
+\item{degreeCol}{color to use for the weighted degree bar plot.}
+
+\item{contribCols}{color(s) to use for the node contribution bar plot 
+(see details).}
+
+\item{summaryCols}{color(s) to use for the node contribution bar plot 
+(see details).}
+
+\item{naCol}{color to use for missing nodes and samples on the data, 
+correlation structure, and network edge weight heat maps.}
+
+\item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
+drawed.}
 }
 \description{
 Template parameters to be imported into other function documentation. This 

@@ -4,7 +4,7 @@
 \alias{nodeOrderInternal}
 \title{Internal use function for calculating node order}
 \usage{
-nodeOrderInternal(props, orderModules, simplify, verbose, na.rm)
+nodeOrderInternal(props, orderModules, simplify, verbose, na.rm, mean)
 }
 \arguments{
 \item{props}{network properties to calculate order from.}
@@ -16,6 +16,9 @@ nodeOrderInternal(props, orderModules, simplify, verbose, na.rm)
 \item{verbose}{logical; is verbose printing turned on?}
 
 \item{na.rm}{logical; remove missing nodes?}
+
+\item{mean}{logical; should the node order be calculated by averaging across
+test datasets?}
 }
 \value{
 list structure of ordered nodes.

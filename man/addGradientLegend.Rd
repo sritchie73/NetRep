@@ -4,14 +4,11 @@
 \alias{addGradientLegend}
 \title{Plot a color palette legend}
 \usage{
-addGradientLegend(palette, palette.vlim, legend.vlim, horizontal, main, xlim,
-  ylim, tick.size = 0.04, axis.line = 3, border.width = 2, srt)
+addGradientLegend(palette, legend.vlim, horizontal, main, xlim, ylim,
+  tck = 0.04, axis.line = 3, legend.main.line = 1, lwd = 2, srt)
 }
 \arguments{
 \item{palette}{color palette.}
-
-\item{palette.vlim}{limits of the values mapping to the extremities of the 
-color palette.}
 
 \item{legend.vlim}{limits of the values to display on the legend}
 
@@ -24,13 +21,15 @@ otherwise vertically.}
 
 \item{ylim}{ylim relative to the plotting region of the rest of the plot.}
 
-\item{tick.size}{size of the legend axis ticks relative to the size of the 
+\item{tck}{size of the legend axis ticks relative to the size of the 
 plot window.}
 
 \item{axis.line}{distance from the axis to render the axis labels as a 
-multiple of \code{tick.size}.}
+multiple of \code{tck}.}
 
-\item{border.width}{line width for borders.}
+\item{legend.main.line}{distance from the plot to render the legend title.}
+
+\item{lwd}{line width for borders.}
 
 \item{srt}{angle of text labels}
 }

@@ -11,7 +11,17 @@
 #' @param modules user input for the 'modules' argument.
 #' @param backgroundLabel user input for the 'backgroundLabel' argument.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param tempdir temporary directory to save new objects in
+#' @param tempdir temporary directory to save new objects in.
+#' @param plotFunction logical; are we checking for a plot function?
+#' @param orderNodesBy user input for the 'orderNodesBy' argument in the 
+#'  plotting functions.
+#' @param orderSamplesBy user input for the 'orderSamplesBy' argument in the 
+#'  plotting functions.
+#' @param orderModules user input for the 'orderModules' argument in the 
+#'  plotting functions.
+#' @param dryRun logical; if \code{TRUE} computationally intense operations are
+#'  skipped (checking for non-finite values and data scaling).
+#'  
 #' 
 #' @seealso
 #' \code{\link{modulePreservation}}
@@ -19,9 +29,11 @@
 #' \code{\link{plotTopology}}
 #' 
 #' @return a list of containing the formatted user input
-processInput <- function(discovery, test, network, correlation, data, 
-                         moduleAssignments, modules, backgroundLabel, 
-                         verbose, tempdir) {
+processInput <- function(
+  discovery, test, network, correlation, data, moduleAssignments, modules, 
+  backgroundLabel, verbose, tempdir, plotFunction=FALSE, orderNodesBy=NA, 
+  orderSamplesBy=NA, orderModules=NULL, dryRun=FALSE
+) {
   # Where do we want to get:
   #   Each "argument" has a list of lists: at the top level, each element 
   #   corresponds to a "discovery" dataset, containing a list, where each element
@@ -154,6 +166,15 @@ processInput <- function(discovery, test, network, correlation, data,
   if (!is.null(names(discovery)))
     test <- test[names(discovery)]
   
+  # Plots can only be generated within a single dataset at a time
+  if (plotFunction) { 
+    if ((!is.vector(discovery) || length(discovery) > 1) ||
+        (!is.vector(test[[discovery]]) || length(test[[discovery]]) > 1)) {
+      stop("only one 'discovery' and 'test' dataset can be specified when plotting")
+    }
+  }
+
+  
   # ----------------------------------------------------------------------------
   # Next, process the 'correlation' and 'network' arguments
   # ----------------------------------------------------------------------------
@@ -172,7 +193,7 @@ processInput <- function(discovery, test, network, correlation, data,
   dataNames <- c(dataNames, names(network))
   dataNames <- unique(dataNames)
   
-  nDatasets <- max(nDatasets, length(dataNames))
+  nDatasets <- max(c(nDatasets, length(dataNames), length(network)))
   
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
   correlation <- verifyDatasetOrder(correlation, "correlation", dataNames, nDatasets)
@@ -441,6 +462,41 @@ processInput <- function(discovery, test, network, correlation, data,
   }
   
   # ----------------------------------------------------------------------------
+  # Next, process the plot function arguments
+  # ----------------------------------------------------------------------------
+  
+  if (plotFunction) {
+    if (!(
+      is.null(orderNodesBy) ||
+      is.vector(orderNodesBy) && is.numeric(orderNodesBy) ||
+      is.vector(orderNodesBy) && is.character(orderNodesBy) ||
+      is.vector(orderNodesBy) && length(orderNodesBy) == 1 && is.na(orderNodesBy)
+    )) {
+      stop("'orderNodesBy' must be a vector of dataset names or indices, 'NA' or",
+           " 'NULL'")
+    }
+    
+    if (!(
+      is.null(orderSamplesBy) ||
+      is.vector(orderSamplesBy) && length(orderSamplesBy) == 1 && 
+      (is.numeric(orderSamplesBy) || is.character(orderSamplesBy) || is.na(orderSamplesBy))
+    )) {
+      stop("'orderSamplesBy' must be a vector containing a single dataset name, ",
+           "or index, 'NA' or 'NULL'")
+    }
+    
+    if (is.null(orderNodesBy))
+      orderNodesBy <- discovery
+    if (is.null(orderSamplesBy)) {
+      if (is.null(data[[discovery]])) {
+        orderSamplesBy <- NA
+      } else {
+        orderSamplesBy <- test[[discovery]]
+      }
+    }
+  }
+
+  # ----------------------------------------------------------------------------
   # Check for data consistency
   # ----------------------------------------------------------------------------
   # Now that we have made sure the input data can be sensibly accessed using the
@@ -473,7 +529,6 @@ processInput <- function(discovery, test, network, correlation, data,
   } else {
     iterator <- names(network)
   }
-  
   
   for (ii in iterator) {
     # Make sure the 'correlation' and 'network' matrices are square
@@ -523,15 +578,57 @@ processInput <- function(discovery, test, network, correlation, data,
     }
   }
   
+  if (plotFunction) {
+    ti <- test[[discovery]]
+    # Are the datasets specified in 'orderNodesBy' and 'orderSamplesBy' valid?
+    if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
+      if (is.character(orderNodesBy) && any(orderNodesBy %nin% names(network))) {
+        stop("unable to match datasets in 'orderNodesBy' to provided datasets")
+      } else if (is.numeric(orderNodesBy) && any(orderNodesBy > nDatasets) || 
+                 any(orderNodesBy < 1)) {
+        stop("unable to match datasets in 'orderNodesBy' to provided datasets")
+      }
+    }
+    if (!is.na(orderSamplesBy)) {
+      if (is.character(orderSamplesBy) && any(orderSamplesBy %nin% names(network))) {
+        stop("unable to match datasets in 'orderSamplesBy' to provided datasets")
+      } else if (is.numeric(orderSamplesBy) && (orderSamplesBy > nDatasets || orderSamplesBy < 1)) {
+        stop("unable to match datasets in 'orderSamplesBy' to provided datasets")
+      }
+    }
+    
+    # Check that samples from the 'orderSamplesBy' dataset are present in the 
+    # 'test' dataset to be drawn and that data for that dataset is present
+    if (!is.na(orderSamplesBy) && is.null(data[[orderSamplesBy]])) {
+      stop("'data' not provided for 'orderSamplesBy' dataset") 
+    }
+    
+    if (!is.na(orderSamplesBy) && 
+        sum(rownames(data[[orderSamplesBy]]) %in% rownames(data[[ti]])) == 0) {
+      stop("no samples in the dataset specified by 'orderSamplesBy' are in the", 
+           " 'test' dataset to be drawn.")
+    }
+    
+    # Check that data is provided for the 'orderNodesBy' dataset(s) if 
+    # 'orderModules' is true.
+    if ((orderModules && length(modules) > 1) && 
+        (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) && 
+        any(sapply(data[orderNodesBy], is.null))) {
+      stop("'data' not provided for 'orderNodesBy' dataset(s) and ",
+           "'orderModules' = 'TRUE'") 
+    }
+  }
+  
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang. This can take a while, so 
   # we only want to check datasets that we're analysing (especially for plotting)
   vCat(verbose, 1, "Checking matrices for non-finite values...")
   
-  # Construct an iterator that includes only the datasets we're analysing
-  iterator <- discovery
+  # Construct an iterator that includes only the datasets we're analysing:
   if (is.character(discovery)) {
     iterator <- match(discovery, names(network))
+  } else {
+    iterator <- discovery
   }
   for (tv in test) {
     if (is.character(tv)) {
@@ -540,37 +637,76 @@ processInput <- function(discovery, test, network, correlation, data,
       iterator <- c(iterator, tv)
     }
   }
-  iterator <- unique(iterator)
-
-  # Now check finite
-  for (ii in iterator) {
-    if (!is.null(data[[ii]])) 
-      checkFinite(data[[ii]])
-    checkFinite(correlation[[ii]])
-    checkFinite(network[[ii]])
-  }
-  
-  # Temporarily create scaled data set for the calculation of the
-  # summary expression profile. Again, to save space and time, only do this for
-  # datasets we're analysing
-  scaledData <- rep(list(NULL), length(data))
-  names(scaledData) <- names(data)
-  for (ii in iterator) {
-    if (!is.null(data[[ii]])) {
-      scaledData[[ii]] <- scaleBigMatrix(data[[ii]], tempdir)
+  if (plotFunction) {
+    if (orderModules) {
+      if (is.character(orderNodesBy)) {
+        iterator <- c(iterator, match(orderNodesBy, names(network)))
+      } else if (is.numeric(orderNodesBy)) {
+        iterator <- c(iterator, orderNodesBy)
+      }
+    }
+    if (is.character(orderSamplesBy)) {
+      iterator <- c(iterator, match(orderSamplesBy, names(network)))
+    } else if (is.numeric(orderSamplesBy)) {
+      iterator <- c(iterator, orderSamplesBy)
     }
   }
+  iterator <- unique(iterator)
+
+  # Now check finite, but skip for dry runs of plots
+  if (!dryRun) {
+    for (ii in iterator) {
+      if (!is.null(data[[ii]])) 
+        checkFinite(data[[ii]])
+      checkFinite(correlation[[ii]])
+      checkFinite(network[[ii]])
+    }    
+  }
+
+  if (!dryRun) {
+    # Temporarily create scaled data set for the calculation of the
+    # summary expression profile. Again, to save space and time, only do this for
+    # datasets we're analysing
+    scaledData <- rep(list(NULL), length(data))
+    names(scaledData) <- names(data)
+    for (ii in iterator) {
+      if (!is.null(data[[ii]])) {
+        scaledData[[ii]] <- scaleBigMatrix(data[[ii]], tempdir)
+      }
+    }
+  } else {
+    scaledData <- data # we just need to be able to get the row + column names
+  }
+
   
   if (!is.null(names(network))) {
-    datasetNames <- structure(names(network), names=names(network))
+    datasetNames <- names(network)
   } else {
-    datasetNames <- NULL
+    datasetNames <- paste0("Dataset", seq_len(nDatasets))
+    names(data) <- datasetNames
+    names(scaledData) <- datasetNames
+    names(modules) <- datasetNames
+    names(correlation) <- datasetNames
+    names(network) <- datasetNames
+    names(moduleAssignments) <- datasetNames
+  }
+  names(datasetNames) <- datasetNames
+  
+  # Convert indices to dataset names for the plot functions
+  if (plotFunction) {
+    if (is.numeric(orderNodesBy)) {
+      orderNodesBy <- datasetNames[orderNodesBy]
+    }
+    if (is.numeric(orderSamplesBy)) {
+      orderSamplesBy <- datasetNames[orderSamplesBy]
+    }
   }
 
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
-    nDatasets=nDatasets, datasetNames=datasetNames, scaledData=scaledData
+    nDatasets=nDatasets, datasetNames=datasetNames, scaledData=scaledData,
+    orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy
   ))
 }
 
@@ -644,4 +780,346 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
     return(as.bigMatrix(object, backingfile=backingfile, ...))
   } 
   stop("unable to load object of type ", class(object), " as a bigMatrix!")
+}
+
+#' Validate plot function arguments
+#' 
+#' Simple typechecking for the extensive plot arguments
+#' 
+#' @param orderModules user input for the corresponding argument in the plot functions.
+#' @param plotNodeNames user input for the corresponding argument in the plot functions.
+#' @param plotSampleNames user input for the corresponding argument in the plot functions.
+#' @param plotModuleNames user input for the corresponding argument in the plot functions.
+#' @param main user input for the corresponding argument in the plot functions.
+#' @param drawBorders user input for the corresponding argument in the plot functions.
+#' @param lwd user input for the corresponding argument in the plot functions.
+#' @param naxt.line user input for the corresponding argument in the plot functions.
+#' @param saxt.line user input for the corresponding argument in the plot functions.
+#' @param maxt.line user input for the corresponding argument in the plot functions.
+#' @param xaxt.line user input for the corresponding argument in the plot functions.
+#' @param yaxt.line user input for the corresponding argument in the plot functions.
+#' @param laxt.line user input for the corresponding argument in the plot functions.
+#' @param xlab.line user input for the corresponding argument in the plot functions.
+#' @param ylab.line user input for the corresponding argument in the plot functions.
+#' @param main.line user input for the corresponding argument in the plot functions.
+#' @param xaxt.tck user input for the corresponding argument in the plot functions.
+#' @param yaxt.tck user input for the corresponding argument in the plot functions.
+#' @param laxt.tck user input for the corresponding argument in the plot functions.
+#' @param plotLegend user input for the corresponding argument in the plot functions.
+#' @param legend.position user input for the corresponding argument in the plot functions.
+#' @param legend.main user input for the corresponding argument in the plot functions.
+#' @param legend.main.line input for the corresponding argument in the plot functions.
+#' @param symmetric user input for the corresponding argument in the plot functions.
+#' @param horizontal user input for the corresponding argument in the plot functions.
+#' @param dataCols user input for the corresponding argument in the plot functions.
+#' @param dataRange user input for the corresponding argument in the plot functions.
+#' @param corCols user input for the corresponding argument in the plot functions.
+#' @param corRange user input for the corresponding argument in the plot functions.
+#' @param netCols user input for the corresponding argument in the plot functions.
+#' @param netRange user input for the corresponding argument in the plot functions.
+#' @param degreeCol user input for the corresponding argument in the plot functions.
+#' @param contribCols user input for the corresponding argument in the plot functions.
+#' @param summaryCols user input for the corresponding argument in the plot functions.
+#' @param naCol user input for the corresponding argument in the plot functions.
+#' @param dryRun user input for the corresponding argument in the plot functions.
+#' 
+checkPlotArgs <- function(
+  orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
+  drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, 
+  yaxt.line, laxt.line, xaxt.tck, yaxt.tck, laxt.tck, xlab.line, ylab.line,
+  main.line, plotLegend, legend.position, legend.main, legend.main.line, 
+  symmetric, horizontal, dataCols, dataRange, corCols, corRange, netCols, 
+  netRange, degreeCol, contribCols, summaryCols, naCol, dryRun
+) {
+  # Return TRUE only if a an object is a vector, not a list.
+  is.vector <- function(obj) {
+    base::is.vector(obj) && !is.list(obj)
+  }
+  
+  # Makes sure the check does not throw a warning if the vector has length > 1.
+  is.na <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && base::is.na(obj) 
+  }
+  
+  # Return TRUE if an argument is a numeric vector of length 1.
+  is.snum <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && is.numeric(obj) && !is.na(obj)
+  }
+  
+  # Return TRUE if an argument is a character vector of length 1.
+  is.schar <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && is.character(obj) && !is.na(obj)
+  }
+  
+  # Return TRUE if an argument is a logical vector of length 1 
+  is.slog <- function(obj) {
+    is.vector(obj) && length(obj) == 1 && is.logical(obj) && !is.na(obj)
+  }
+  
+  if (!(missing(orderModules) || is.slog(orderModules)))
+    stop("'orderModules' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!(missing(plotNodeNames) || is.slog(plotNodeNames)))
+    stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!(missing(plotSampleNames) || is.slog(plotSampleNames)))
+    stop("'plotNodeNames' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!(missing(plotModuleNames) || is.null(plotModuleNames) 
+        || is.slog(plotModuleNames)))
+    stop("'plotModuleNames' must be one of 'TRUE', 'FALSE', or 'NULL'")
+  
+  if (!(missing(main) || is.null(main) || is.schar(main) || is.na(main)))
+    stop("'main' must be 'NULL' or a character vector of length 1")
+  
+  if (!(missing(drawBorders) || is.slog(drawBorders)))
+    stop("'drawBorders' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!missing(lwd)) {
+    if (!is.snum(lwd)) {
+      stop("'lwd' must be a numeric vector of length 1")
+    }
+    if (lwd < 0) {
+      stop("'lwd' must be greater than 0")
+    }
+    if (is.infinite(lwd)) {
+      stop("'lwd' must be finite")
+    }
+  }
+  
+  if (!missing(naxt.line)) {
+    if (!(is.snum(naxt.line) || is.na(naxt.line) || is.null(naxt.line))) {
+      stop("'naxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(naxt.line) && is.infinite(naxt.line)) {
+      stop("'naxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(saxt.line)) {
+    if (!(is.snum(saxt.line) || is.na(saxt.line) || is.null(saxt.line))) {
+      stop("'saxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(saxt.line) && is.infinite(saxt.line)) {
+      stop("'saxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(maxt.line)) {
+    if (!(is.snum(maxt.line) || is.na(maxt.line) || is.null(maxt.line))) {
+      stop("'maxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(maxt.line) && is.infinite(maxt.line)) {
+      stop("'maxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(xaxt.line)) {
+    if (!(is.snum(xaxt.line) || is.na(xaxt.line) || is.null(xaxt.line))) {
+      stop("'xaxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(xaxt.line) && is.infinite(xaxt.line)) {
+      stop("'xaxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(yaxt.line)) {
+    if (!(is.snum(yaxt.line) || is.na(yaxt.line) || is.null(yaxt.line))) {
+      stop("'yaxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(yaxt.line) && is.infinite(yaxt.line)) {
+      stop("'yaxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(laxt.line)) {
+    if (!(is.snum(laxt.line) || is.na(laxt.line) || is.null(laxt.line))) {
+      stop("'laxt.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(laxt.line) && is.infinite(laxt.line)) {
+      stop("'laxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(xlab.line)) {
+    if (!(is.snum(xlab.line) || is.na(xlab.line) || is.null(xlab.line))) {
+      stop("'xlab.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(xlab.line) && is.infinite(xlab.line)) {
+      stop("'xlab.line' must be finite")
+    }
+  }
+  
+  if (!missing(ylab.line)) {
+    if (!(is.snum(ylab.line) || is.na(ylab.line) || is.null(ylab.line))) {
+      stop("'ylab.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(ylab.line) && is.infinite(ylab.line)) {
+      stop("'ylab.line' must be finite")
+    }
+  }
+  
+  if (!missing(main.line)) {
+    if (!(is.snum(main.line) || is.na(main.line) || is.null(main.line))) {
+      stop("'main.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(main.line) && is.infinite(main.line)) {
+      stop("'main.line' must be finite")
+    }
+  }
+  
+  if (!missing(legend.main.line)) {
+    if (!(is.snum(legend.main.line) || is.na(legend.main.line) || 
+          is.null(legend.main.line))) {
+      stop("'legend.main.line' must be a numeric vector of length 1, 'NA', or 
+           'NULL'")
+    }
+    if (is.snum(legend.main.line) && is.infinite(legend.main.line)) {
+      stop("'legend.main.line' must be finite")
+    }
+  }
+  
+  if (!missing(xaxt.tck)) {
+    if (!(is.snum(xaxt.tck) || is.na(xaxt.tck) || is.null(xaxt.tck))) {
+      stop("'xaxt.tck' must be a numeric vector of length 1, or 'NA'")
+    }
+    if (is.snum(xaxt.tck) && is.infinite(xaxt.tck)) {
+      stop("'xaxt.tck' must be finite")
+    }
+  }
+  
+  if (!missing(yaxt.tck)) {
+    if (!(is.snum(yaxt.tck) || is.na(yaxt.tck) || is.null(yaxt.tck))) {
+      stop("'yaxt.tck' must be a numeric vector of length 1, or 'NA'")
+    }
+    if (is.snum(yaxt.tck) && is.infinite(yaxt.tck)) {
+      stop("'yaxt.tck' must be finite")
+    }
+  }
+  
+  if (!missing(laxt.tck)) {
+    if (!(is.snum(laxt.tck) || is.na(laxt.tck) || is.null(laxt.tck))) {
+      stop("'laxt.tck' must be a numeric vector of length 1, or 'NA'")
+    }
+    if (is.snum(laxt.tck) && is.infinite(laxt.tck)) {
+      stop("'laxt.tck' must be finite")
+    }
+  }
+  
+  if (!(missing(plotLegend) || is.slog(plotLegend)))
+    stop("'plotLegend' must be on of 'TRUE' or 'FALSE'")
+  
+  if (!missing(legend.position)) {
+    if (!(is.snum(legend.position) || is.na(legend.position) || is.null(legend.position))) {
+      stop("'legend.position' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(legend.position) && is.infinite(legend.position)) {
+      stop("'legend.position' must be finite")
+    }
+  }
+  
+  if (!(missing(legend.main) || is.schar(legend.main) || is.na(legend.main) 
+        || is.null(legend.main)))
+    stop("'legend.main' must be a character vector of length 1")
+  
+  if (!(missing(symmetric) || is.slog(symmetric)))
+    stop("'symmetric' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!(missing(horizontal) || is.slog(horizontal)))
+    stop("'horizontal' must be one of 'TRUE' or 'FALSE'")
+  
+  if (!missing(dataCols)) {
+    if (!(is.na(dataCols) || is.null(dataCols) || is.character(dataCols))) {
+      stop("'dataCols' must be a character vector")
+    } else if (any(!areColors(dataCols))) {
+      stop("invalid colors found in 'dataCols':",  
+        paste(paste0('"', dataCols[!areColors(dataCols)], '"'), collapse=", "))
+    }
+  }
+  
+  if (!missing(corCols)) {
+    if (!(is.na(corCols) || is.null(corCols) || is.character(corCols))) {
+      stop("'corCols' must be a character vector")
+    } else if (any(!areColors(corCols))) {
+      stop("invalid colors found in 'corCols':",  
+           paste(paste0('"', corCols[!areColors(corCols)], '"'), collapse=", "))
+    }
+  }
+  
+  if (!missing(netCols)) {
+    if (!(is.na(netCols) || is.null(netCols) || is.character(netCols))) {
+      stop("'netCols' must be a character vector")
+    } else if (any(!areColors(netCols))) {
+      stop("invalid colors found in 'netCols':",  
+           paste(paste0('"', netCols[!areColors(netCols)], '"'), collapse=", "))
+    }
+  }
+  
+  if (!missing(degreeCol)) {
+    if (!(is.na(degreeCol) || is.null(degreeCol) || is.schar(degreeCol))) {
+      stop("'degreeCol' must be a character vector of length 1")
+    } else if (!areColors(degreeCol)) {
+      stop('invalid color, "', degreeCol, '" for', " 'degreeCol'", sep="")  
+    }
+  }
+  
+  if (!missing(contribCols)) {
+    if (!(is.na(contribCols) || is.null(contribCols) || is.character(contribCols))) {
+      stop("'contribCols' must be a character vector")
+    } else if  (is.character(contribCols) && length(contribCols) %nin% 1:2) {
+      stop("'contribCols' must be of length 1 or 2")
+    } else if (any(!areColors(contribCols))) {
+      stop("invalid colors found in 'contribCols':",  
+           paste(paste0('"', contribCols[!areColors(contribCols)], '"'), collapse=", "))
+    }
+  }
+  
+  if (!missing(summaryCols)) {
+    if (!(is.na(summaryCols) || is.null(summaryCols) || is.character(summaryCols))) {
+      stop("'summaryCols' must be a character vector")
+    } else if  (is.character(summaryCols) && length(summaryCols) %nin% 1:2) {
+      stop("'summaryCols' must be of length 1 or 2")
+    } else if (any(!areColors(summaryCols))) {
+      stop("invalid colors found in 'summaryCols':",  
+           paste(paste0('"', summaryCols[!areColors(summaryCols)], '"'), collapse=", "))
+    }
+  }
+
+  if (!missing(naCol)) {
+    if (!(is.na(naCol) || is.null(naCol) || is.schar(naCol))) {
+      stop("'naCol' must be a character vector of length 1")
+    } else if (!areColors(naCol)) {
+      stop('invalid color, "', naCol, '" for', " 'naCol'", sep="")  
+    }
+  }
+  
+  if (!missing(dataRange)) {
+    if (!(missing(dataRange) || is.na(dataRange) || is.null(dataRange) || 
+          (is.numeric(dataRange) && length(dataRange) == 2))) {
+      stop("'dataRange' must be a numeric vector of length 2")
+    } else if (is.numeric(dataRange) && any(is.infinite(dataRange))) {
+      stop("infinite values found in 'dataRange'")
+    }
+  }
+  
+  if (!missing(corRange)) {
+    if (!(missing(corRange) || (is.numeric(corRange) && length(corRange) == 2))) {
+      stop("'corRange' must be a numeric vector of length 2")
+    } else if (is.numeric(corRange) && any(is.infinite(corRange))) {
+      stop("infinite values found in 'corRange'")
+    }
+  }
+  
+  if (!missing(netRange)) {
+    if (!(missing(netRange) || is.na(netRange) || is.null(netRange) || 
+          (is.numeric(netRange) && length(netRange) == 2))) {
+      stop("'netRange' must be a numeric vector of length 2 or 'NA'")
+    } else if (is.numeric(netRange) && any(is.infinite(netRange))) {
+      stop("infinite values found in 'netRange'")
+    }
+  }
+  
+  if (!(missing(dryRun) || is.slog(dryRun)))
+    stop("'dryRun' must be one of 'TRUE' or 'FALSE'")
+  
 }

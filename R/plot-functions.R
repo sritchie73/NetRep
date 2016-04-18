@@ -10,66 +10,91 @@
 #' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
 #'  plotted along the x axis.
 #' @param main title for the plot.
-#' @param plotLegend logical; if \code{TRUE} a legend is added to the right side of
-#'  the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.
+#' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
+#'  side of the plot.
 #' @param legend.main title for the legend.
-#' @param legend.lim range of values to show on the legend.
+#' @param legend.main.line distance from the legend to render the legend 
+#'  title.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
-#' @param legend.tick.size size of the ticks on the axis legend as a proportion
+#' @param laxt.tck size of the ticks on the axis legend as a proportion
 #'  of the horizontal size of the plot window.
 #' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{legend.tick.size}.
+#'  labels, as multiple of \code{laxt.tck}.
 #' @param legend.line the distance from the left of the plot to render the 
 #'  legend as a proportion of the horizontal size of the plot window.
-#' @param border.width line width for borders.
+#' @param lwd line width for borders.
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
 #' 
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
-  plotModuleNames=TRUE, main="", plotLegend=TRUE, legend.main="", legend.lim, 
-  xaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1, border.width=2
+  plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.main="",
+  legend.main.line=1, xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, 
+  laxt.line=2.5, legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
-  nGenes <- ncol(values) + length(na.indices)
-  emptyPlot(xlim=c(0.5, nGenes + 0.5), ylim=c(0, nGenes/2), bty="n")
+  nNodes <- ncol(values) + length(na.indices)
   palette <- colorRampPalette(palette)(255)
   
+  if (length(vlim) == 1) {
+    vlim <- c(0, max(values[lower.tri(values)]))
+  }
+  
+  # Use a fixed width/height for all plots so that offsets and margin lines
+  # are the same regardless of the number of nodes shown
+  unitSize <- 1/nNodes
+  halfUnit <- unitSize/2
+  ph <- (nNodes * unitSize)/2
+  pw <- nNodes * unitSize
+  
+  # Create empty plot
+  emptyPlot(xlim=c(halfUnit, pw + halfUnit), ylim=c(0, ph), bty="n")
+  
   # render triangles row by row
-  for (plotRow in 1:nGenes) {
-    startCol <- nGenes - (plotRow - 1)
-    for (ii in 1:plotRow) {
-      jj <- startCol + (ii - 1)
-      ci <- ii
-      cj <- jj
-      
-      topy <- (nGenes - (plotRow - 1))/2
-      # If we're on the diagonal, plot a triangle, otherwise a diamond
-      if (plotRow == nGenes) {
-        boty <- 0
-      } else {
-        boty <- topy - 1
+  if (!dryRun) {
+    for (plotRow in 1:nNodes) {
+      startCol <- nNodes - (plotRow - 1)
+      for (ii in 1:plotRow) {
+        jj <- startCol + (ii - 1)
+        ci <- ii
+        cj <- jj
+        
+        topy <- (nNodes - (plotRow - 1))/2
+        # If we're on the diagonal, plot a triangle, otherwise a diamond
+        if (plotRow == nNodes) {
+          boty <- 0 
+        } else {
+          boty <- topy - 1
+        }
+        
+        xOffset <- (nNodes - (plotRow - 1))/2 
+        rightx <- ii + xOffset
+        leftx <- rightx - 1
+        
+        if (ii %nin% na.indices && jj %nin% na.indices) {
+          col <- getColFromPalette(values[ci, cj], palette, vlim)
+          cj <- cj + 1
+          ci <- ci + 1
+        } else {
+          col <- na.col
+        }
+        
+        leftx <- leftx * unitSize
+        rightx <- rightx * unitSize
+        boty <- boty * unitSize
+        topy <- topy * unitSize
+        
+        polygon(
+          x=c(leftx, leftx+halfUnit, rightx, leftx+halfUnit, leftx),
+          y=c(topy-halfUnit, topy, topy-halfUnit, boty, topy-halfUnit),
+          col=col, border=col
+        )
       }
-      
-      xOffset <- (nGenes - (plotRow - 1))/2 
-      rightx <- ii + xOffset
-      leftx <- rightx - 1
-      
-      if (ii %nin% na.indices && jj %nin% na.indices) {
-        col <- getColFromPalette(values[ci, cj], palette, vlim)
-        cj <- cj + 1
-        ci <- ci + 1
-      } else {
-        col <- na.col
-      }
-      
-      polygon(
-        x=c(leftx, leftx+0.5, rightx, leftx+0.5, leftx),
-        y=c(topy-0.5, topy, topy-0.5, boty, topy-0.5),
-        col=col, border=col
-      )
-    }
+    } 
   }
   
   # render module boundaries
@@ -77,17 +102,20 @@ plotTriangleHeatmap <- function(
     breaks <- getModuleBreaks(mas)
     mids <- getModuleMidPoints(mas)
     for (mi in seq_along(mids)) {
-      height <- breaks[mi + 1] - mids[mi]
+      height <- (breaks[mi + 1] - mids[mi]) * unitSize
+      leftx <- breaks[mi] * unitSize
+      rightx <- breaks[mi+1] * unitSize
+      midx <- mids[mi] * unitSize
       polygon(
-        x=c(breaks[mi], breaks[mi+1], mids[mi], breaks[mi]),
-        y=c(0, 0, height, 0), lwd=border.width
+        x=c(leftx, rightx, midx, leftx),
+        y=c(0, 0, height, 0), lwd=lwd
       )
     }
   }
   if (plotModuleNames) {
     axis(
       side=1, las=1, 
-      at=getModuleMidPoints(mas),
+      at=getModuleMidPoints(mas)*unitSize,
       labels=unique(mas), line=maxt.line, tick=FALSE,
       cex.axis=par("cex.lab"), font=2
     )
@@ -95,30 +123,27 @@ plotTriangleHeatmap <- function(
   
   # render border of plot
   polygon(
-    x=c(0.5, nGenes+0.5, nGenes/2+0.5, 0.5), y=c(0, 0, nGenes/2, 0),
-    lwd=border.width, xpd=NA
+    x=c(halfUnit, pw + halfUnit, ph + halfUnit, halfUnit), 
+    y=c(0, 0, ph, 0),
+    lwd=lwd, xpd=NA
   )
   
   # Render axes
   if (!is.null(xaxt)) {
     axis(
       side=1, las=2, tick=FALSE, line=xaxt.line,
-      at=1:nGenes, labels=xaxt
+      at=(1:nNodes) * unitSize, labels=xaxt
     )
   }
-  mtext(main, side=3, cex=par("cex.main"), font=2)
+  mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
   
   # Add legend if specified
   if (plotLegend) {
-    if (missing(legend.lim))
-      legend.lim <- vlim
-    ph <- nGenes/2
-    pw <- nGenes
     addGradientLegend(
-      palette, vlim, legend.lim, TRUE, legend.main,
-      xlim=c(0.5 - pw*legend.line, pw*0.25), 
-      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tick.size=legend.tick.size,
-      axis.line=laxt.line, border.width=border.width
+      palette, vlim, TRUE, legend.main, legend.main.line=legend.main.line,
+      xlim=c(halfUnit - pw*legend.line, pw*0.25), 
+      ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tck=laxt.tck,
+      axis.line=laxt.line, lwd=lwd
     )
   }
 }
@@ -138,88 +163,109 @@ plotTriangleHeatmap <- function(
 #'  plotted along the x axis if \code{values} is not symmetric, and along both
 #'  axes if \code{values} is symettric.
 #' @param main title for the plot.
-#' @param plotLegend logical; if \code{TRUE} a legend is added to the right side of
-#'  the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.
+#' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
+#'  side of the plot.
 #' @param legend.main title for the legend.
-#' @param legend.lim range of values to show on the legend.
+#' @param legend.main.line distance from the legend to render the legend 
+#'  title.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
 #' @param yaxt.line the number of lines into the margin at which the y axis 
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
-#' @param legend.tick.size size of the ticks on the axis legend as a proportion
+#' @param laxt.tck size of the ticks on the axis legend as a proportion
 #'  of the horizontal size of the plot window.
 #' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{legend.tick.size}.
+#'  labels, as multiple of \code{laxt.tck}.
 #' @param legend.line the distance from the plot to render the legend as a 
 #'  proportion of the horizontal size of the plot window.
-#' @param border.width line width for borders.
-#' 
+#' @param lwd line width for borders.
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
+#'  
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
-  main="", plotLegend=TRUE, legend.main="", legend.lim, xaxt.line=-0.5, 
-  yaxt.line=-0.5, maxt.line=3, legend.tick.size=0.04, laxt.line=2.5, 
-  legend.line=0.1, border.width=2
+  main="", main.line=0, plotLegend=TRUE, legend.main="", legend.main.line=1,
+  xaxt.line=-0.5, yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
+  legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
-  emptyPlot(xlim=c(0.5, nX+0.5), ylim=c(0.5, nY+0.5), bty="n")
   palette <- colorRampPalette(palette)(255)
   
+  if (length(vlim) < 2) {
+    vlim <- c(0, max(c(values[lower.tri(values)], values[upper.tri(values)])))
+  }
+    
+  # Use a fixed width/height for all plots so that offsets and margin lines
+  # are the same regardless of the number of nodes shown
+  xUnitSize <- 1/nX
+  xHalfUnit <- xUnitSize/2
+  yUnitSize <- 1/nY
+  yHalfUnit <- yUnitSize/2
+  
+  pw <- nX * xUnitSize
+  ph <- nY * yUnitSize
+  
+  # Create empty plot
+  emptyPlot(xlim=c(xHalfUnit, pw + xHalfUnit), 
+            ylim=c(yHalfUnit, ph + yHalfUnit), 
+            bty="n")
+  
   # render squares
-  cj <- 1
-  for (jj in 1:nX) {
-    ci <- 1
-    for (ii in 1:nY) {
-      if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
-        col <- getColFromPalette(values[ci, cj], palette, vlim)
-        ci <- ci + 1
-      } else {
-        col <- na.col
+  if (!dryRun) {
+    cj <- 1
+    for (jj in 1:nX) {
+      ci <- 1
+      for (ii in 1:nY) {
+        if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
+          col <- getColFromPalette(values[ci, cj], palette, vlim)
+          ci <- ci + 1
+        } else {
+          col <- na.col
+        }
+        
+        xleft <- jj * xUnitSize - xHalfUnit
+        xright <- jj * xUnitSize + xHalfUnit
+        ybottom <- (nY - (ii - 1)) * yUnitSize - yHalfUnit
+        ytop <- (nY - (ii - 1)) * yUnitSize + yHalfUnit
+        
+        rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, col=col, 
+             border=col)
       }
-      rect(
-        xleft = jj - 0.5,
-        xright = jj + 0.5,
-        ybottom = (nY - (ii - 1)) - 0.5,
-        ytop = (nY- (ii - 1)) + 0.5,
-        col=col, border=col
-      )
-    }
-    if (jj %nin% na.indices.x) {
-      cj <- cj + 1
-    }
+      if (jj %nin% na.indices.x) {
+        cj <- cj + 1
+      }
+    }    
   }
   
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
     for (mi in seq_along(breaks)[-1]) {
+      xleft <- breaks[mi - 1] * xUnitSize
+      xright <- breaks[mi] * xUnitSize
+      
       if (nX != nY) {
-        rect(
-          xleft = breaks[mi - 1],
-          xright = breaks[mi],
-          ybottom = 0.5,
-          ytop = nY + 0.5,
-          border="black", lwd=border.width
-        )
+        ybottom <- yHalfUnit
+        ytop <-  ph + yHalfUnit
       } else {
-        rect(
-          xleft = breaks[mi - 1],
-          xright = breaks[mi],
-          ybottom = (nX + 0.5) - (breaks[mi] - 0.5),
-          ytop = (nX + 0.5) - (breaks[mi - 1] - 0.5),
-          border="black", lwd=border.width
-        )
+        ybottom <- (pw + xHalfUnit) - (breaks[mi] * yUnitSize - yHalfUnit)
+        ytop <- (pw + xHalfUnit) - (breaks[mi - 1] * yUnitSize - yHalfUnit)
       }
+      rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, 
+           border="black", lwd=lwd)
     }
   }
   if (plotModuleNames) {
     if(!(nX == nY && is.null(xaxt) && !is.null(yaxt))) {
       axis(
         side=1, las=1, 
-        at=getModuleMidPoints(mas),
+        at=getModuleMidPoints(mas) * xUnitSize,
         labels=unique(mas), line=maxt.line, tick=FALSE,
         cex.axis=par("cex.lab"), font=2
       )
@@ -227,7 +273,7 @@ plotSquareHeatmap <- function(
     if (nX == nY) {
       axis(
         side=2, las=2,
-        at=nY + 0.5 - getModuleMidPoints(mas),
+        at=ph + yHalfUnit - getModuleMidPoints(mas) * yUnitSize,
         labels=unique(mas), line=maxt.line, tick=FALSE,
         cex.axis=par("cex.lab"), font=2
       )
@@ -242,35 +288,31 @@ plotSquareHeatmap <- function(
     ytop=par("usr")[4],
     border="black",
     xpd=NA,
-    lwd=border.width
+    lwd=lwd
   )
   
   # Render axes
   if (!is.null(xaxt)) {
     axis(
       side=1, las=2, tick=FALSE, line=xaxt.line,
-      at=1:nX, labels=xaxt
+      at=(1:nX)*xUnitSize, labels=xaxt
     )
   }
   if (!is.null(yaxt)) {
     axis(
       side=2, las=2, tick=FALSE, line=yaxt.line,
-      at=nY:1, labels=yaxt
+      at=(nY:1)*yUnitSize, labels=yaxt
     )
   }
-  mtext(main, side=3, cex=par("cex.main"), font=2)
+  mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
   
   # Add legend if specified
   if (plotLegend) {
-    if (missing(legend.lim))
-      legend.lim <- vlim
-    pw <- nX + 1
-    ph <- nY + 1
     addGradientLegend(
-      palette, vlim, legend.lim, FALSE, legend.main,
-      xlim=c(pw - 0.5 + pw*legend.line, pw - 0.5 + pw*(legend.line+0.05)), 
-      ylim=c(ph/3, ph - 0.5 - ph*0.1), tick.size=legend.tick.size,
-      axis.line=laxt.line, border.width=border.width
+      palette, vlim, FALSE, legend.main, legend.main.line=legend.main.line,
+      xlim=c(pw - xHalfUnit + pw*legend.line, pw - xHalfUnit + pw*(legend.line+0.05)), 
+      ylim=c(ph/3, ph - yHalfUnit - ph*0.1), tck=laxt.tck,
+      axis.line=laxt.line, lwd=lwd
     )
   }
 }
@@ -280,24 +322,23 @@ plotSquareHeatmap <- function(
 #' Add a legend to a plot window.
 #' 
 #' @param palette color palette.
-#' @param palette.vlim limits of the values mapping to the extremities of the 
-#'  color palette.
 #' @param legend.vlim limits of the values to display on the legend
 #' @param horizontal logical; if \code{TRUE} the legend is plotted horizontally,
 #'   otherwise vertically.
 #' @param main title of the legend.
 #' @param xlim xlim relative to the plotting region of the rest of the plot.
 #' @param ylim ylim relative to the plotting region of the rest of the plot.
-#' @param tick.size size of the legend axis ticks relative to the size of the 
+#' @param tck size of the legend axis ticks relative to the size of the 
 #'  plot window.
 #' @param axis.line distance from the axis to render the axis labels as a 
-#'  multiple of \code{tick.size}.
-#' @param border.width line width for borders.
+#'  multiple of \code{tck}.
+#' @param legend.main.line distance from the plot to render the legend title.
+#' @param lwd line width for borders.
 #' @param srt angle of text labels
 #' 
 addGradientLegend <- function(
-  palette, palette.vlim, legend.vlim, horizontal, main, xlim, ylim, 
-  tick.size=0.04, axis.line=3, border.width=2, srt
+  palette, legend.vlim, horizontal, main, xlim, ylim, 
+  tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -311,10 +352,10 @@ addGradientLegend <- function(
   # palette)
   plim <- c(
     head(which(palette == getColFromPalette(
-      legend.vlim[1], palette, palette.vlim
+      legend.vlim[1], palette, legend.vlim
     )), 1),
     tail(which(palette == getColFromPalette(
-      legend.vlim[2], palette, palette.vlim
+      legend.vlim[2], palette, legend.vlim
     )), 1)
   )
   palette <- palette[plim[1]:plim[2]]
@@ -350,38 +391,24 @@ addGradientLegend <- function(
   # Render bounding box
   rect(
     xleft=xlim[1], xright=xlim[2], ybottom=ylim[1], ytop=ylim[2],
-    border="black", lwd=border.width, xpd=NA
+    border="black", lwd=lwd, xpd=NA
   )
   
   # Make sure axis ticks are centred at 0 if within the range of legend.vlim
-  if(legend.vlim[1L] < 0 && legend.vlim[2L] > 0) {
-    labels <- c(
-      seq.int(legend.vlim[1L], 0, length.out=3),
-      seq.int(0, legend.vlim[2L], length.out=3)[-1]
-    )
-  } else {
-    labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
-  }
+  labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
   labels <- format(labels, digits=2)
   if (horizontal) {
-    tck <- (par("usr")[4] - par("usr")[3])*tick.size
+    tck <- (par("usr")[4] - par("usr")[3])*tck
     
     # for mapping from vlim to plot space
     v.per.x <- (xlim[2] - xlim[1])/(legend.vlim[2] - legend.vlim[1])
     zero <- xlim[1] +  v.per.x * (0 - legend.vlim[1])
     
-    if(legend.vlim[1L] < 0 && legend.vlim[2L] > 0) {
-      at <- c(
-        seq.int(xlim[1L], zero, length.out=3),
-        seq.int(zero, xlim[2L], length.out=3)[-1]
-      )
-    } else {
-      at <- seq.int(xlim[1L], xlim[2L], length.out=5)
-    }
+    at <- seq.int(xlim[1L], xlim[2L], length.out=5)
     
     # Now plot the lines and text
     sapply(at, function(aa) {
-      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=border.width, xpd=NA)
+      lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=lwd, xpd=NA)
     })
     
     if (missing(srt))
@@ -390,23 +417,16 @@ addGradientLegend <- function(
     text(labels, x=at, y=ylim[1]-tck*axis.line, cex=par("cex.axis"), xpd=NA, 
          srt=srt, adj=1)
   } else {
-    tck <- (par("usr")[2] - par("usr")[1])*tick.size
+    tck <- (par("usr")[2] - par("usr")[1])*tck
     
     # for mapping from vlim to plot space
     v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
     zero <- ylim[1] +  v.per.y * (0 - legend.vlim[1])
-    if(legend.vlim[1L] < 0 && legend.vlim[2L] > 0) {
-      at <- c(
-        seq.int(ylim[1L], zero, length.out=3),
-        seq.int(zero, ylim[2L], length.out=3)[-1]
-      )
-    } else {
-      at <- seq.int(ylim[1L], ylim[2L], length.out=5)
-    }      
+    at <- seq.int(ylim[1L], ylim[2L], length.out=5)
     
     # draw axis ticks
     sapply(at, function(aa) {
-      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=border.width, xpd=NA)
+      lines(x=c(xlim[1], xlim[1]-tck), y=c(aa, aa), lwd=lwd, xpd=NA)
     })
     if (missing(srt))
       srt <- 0
@@ -414,7 +434,7 @@ addGradientLegend <- function(
   }
   
   # Render title
-  offset <- (par("usr")[4] - par("usr")[3]) * 0.07
+  offset <- (par("usr")[4] - par("usr")[3]) * 0.05 * legend.main.line
   text(
     main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=NA,
     cex=par("cex.lab")
@@ -438,63 +458,89 @@ addGradientLegend <- function(
 #' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
 #'  plotted along the x axis.
 #' @param main title for the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
+#' @param yaxt.line the number of lines into the margin at which the y axis
+#'  tick labels will be drawn.
+#' @param yaxt.tck the size of the y-axis tick marks.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
-#' @param ylab label for the yaxis
-#' @param border.width line width for borders.
-#' 
+#' @param ylab label for the y axis
+#' @param ylab.line the number of lines into the left margin at which the 
+#'  y axis label will be drawn. 
+#' @param lwd line width for borders.
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
+#'  
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
-  na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
-  maxt.line=3, ylab="", border.width=2
+  na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", main.line=0,
+  xaxt.line=-0.5, yaxt.line=0, yaxt.tck=-0.15, maxt.line=3, ylab="", 
+  ylab.line=2.5, lwd=2, dryRun=FALSE
 ) {
-  if (length(cols) == 1)
-    cols <- rep(cols, length(heights))
-  if (length(cols) < length(heights))
-    cols <- rep(cols, ceiling(length(heights))/length(cols))[1:length(heights)]
+  # Create vector of colors, one for each bar
+  if (length(cols) == 1) {
+    colvec <- rep(cols, length(heights))
+  } else if (length(cols) == 2) { # Assume positive and negative
+    colvec <- character(length=length(heights))
+    colvec[heights > 0] <- cols[1]
+    colvec[heights <= 0] <- cols[2]
+  } else {
+    stop("invalid length for 'cols'")
+  }
 
   ylim <- heights.lim
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1])*0.01
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1])*0.01
   emptyPlot(
-    xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n", ylab=ylab, xpd=NA
+    xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n", ylab="", xpd=NA
   )
   
+  # Draw y-axis label
+  mtext(ylab, side=2, cex=par("cex")*par("cex.lab"), font=1, line=ylab.line)
+  
   # draw NAs
-  for (ii in seq_along(heights)) {
-    if (is.na(heights[ii])) {
+  if (!dryRun) {
+    for (ii in seq_along(heights)) {
+      if (is.na(heights[ii])) {
+        rect(
+          xleft=ii - 0.5,
+          xright=ii + 0.5,
+          ybottom=heights.lim[1],
+          ytop=heights.lim[2],
+          col=na.col,
+          border=NA
+        ) 
+      }
+    }
+    
+    for (ii in seq_along(heights)) {
       rect(
-        xleft=ii - 0.5,
-        xright=ii + 0.5,
-        ybottom=heights.lim[1],
-        ytop=heights.lim[2],
-        col=na.col,
-        border=NA
+        xleft=ii-bar.width/2,
+        xright=ii+bar.width/2,
+        ybottom=0,
+        ytop=heights[ii],
+        col=colvec[ii],
+        border=ifelse(drawBorders, "black", NA),
+        lwd=lwd
       ) 
     }
   }
+  abline(h=0, col="black", lwd=lwd)
   
-  for (ii in seq_along(heights)) {
-    rect(
-      xleft=ii-bar.width/2,
-      xright=ii+bar.width/2,
-      ybottom=0,
-      ytop=heights[ii],
-      col=cols[ii],
-      border=ifelse(drawBorders, "black", NA),
-      lwd=border.width
-    ) 
-  }
-  abline(h=0, col="black", lwd=border.width)
-  axis(side=2, las=2, lwd=border.width)
+  
+  # draw axis
+  axis(side=2, labels=FALSE, tck=yaxt.tck, lwd=lwd, at=axTicks(side=2))
+  axis(side=2, tick=FALSE, line=yaxt.line, las=2, at=axTicks(side=2), 
+       labels=axTicks(side=2))
   
   # render module boundaries
   if (length(unique(mas)) > 1) {
     breaks <- getModuleBreaks(mas)
     for (bi in head(breaks[-1], -1)) {
-      lines(x=rep(bi, 2), y=heights.lim, lwd=border.width)
+      lines(x=rep(bi, 2), y=heights.lim, lwd=lwd)
     }
   }
   
@@ -514,7 +560,7 @@ plotBar <- function(
       at=1:length(heights), labels=names(heights)
     )
   }
-  mtext(main, side=3, cex=par("cex.main"), font=2)
+  mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
 }
 
 #' Plot multiple horizontal bar plots
@@ -527,6 +573,8 @@ plotBar <- function(
 #'  taken by each bar.
 #' @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
 #' @param main title for the plot
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.  
 #' @param na.col color of missing values to plot.
 #' @param yaxt logical; If \code{TRUE}, the rownames of \code{heights} will be 
 #'  rendered to the left of the bars.
@@ -536,14 +584,22 @@ plotBar <- function(
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  labels will be drawn.
+#' @param xaxt.line the number of lines into the margin at which the x axis
+#'  labels will be drawn
+#' @param xaxt.tck the size of the x-axis ticks.
 #' @param xlab x axis label
+#' @param xlab.line the number of lines into the bottom margin at which the 
+#'  x axis label will be drawn. 
 #' @param cex.modules relative size of module names.
-#' @param border.width line width for borders.
-#'
+#' @param lwd line width for borders.
+#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+#'  drawn.
+#'  
 plotMultiBar <- function(
-  lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="",
-  na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5,
-  xlab="", cex.modules=0.7, border.width=2
+  lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="", 
+  main.line=1, na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, 
+  maxt.line=2.5, xaxt.line=0, xaxt.tck=-0.025, xlab="", xlab.line=2.5, 
+  cex.modules=0.7, lwd=2, dryRun=FALSE
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -554,27 +610,41 @@ plotMultiBar <- function(
   }
   if (!is.list(lengths.lim))
     lengths.lim <- list(lengths.lim)
-  if (length(cols) == 1) 
-    cols <- matrix(cols, nrow=nrow(lengths), ncol=ncol(lengths))
+  
+  # Create vector of colors, one for each bar
+  if (length(cols) == 1) {
+    colmat <- matrix(cols, nrow=nrow(lengths), ncol=ncol(lengths))
+  } else if (length(cols) == 2) { # Assume positive and negative
+    colmat <- matrix("", nrow=nrow(lengths), ncol=ncol(lengths))
+    colmat[lengths > 0] <- cols[1]
+    colmat[lengths <= 0] <- cols[2]
+  } else {
+    stop("invalid length for 'cols'")
+  }
   
   pw <- 0.7 # width of each plot within the 0-1 space
   
   emptyPlot(
-    xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n", xlab=xlab,
+    xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n", xlab="",
     xpd=NA
   )
   
+  # Draw y-axis label
+  mtext(xlab, side=1, cex=par("cex")*par("cex.lab"), font=1, line=xlab.line)
+  
   # draw NAs
-  for (jj in seq_len(nrow(lengths))) {
-    if (all(is.na(lengths[jj,]))) {
-      rect(
-        xleft=0,
-        xright=ncol(lengths),
-        ybottom=nrow(lengths) - jj,
-        ytop=nrow(lengths) - (jj - 1),
-        col=na.col,
-        border=NA
-      ) 
+  if (!dryRun) {
+    for (jj in seq_len(nrow(lengths))) {
+      if (all(is.na(lengths[jj,]))) {
+        rect(
+          xleft=0,
+          xright=ncol(lengths),
+          ybottom=nrow(lengths) - jj,
+          ytop=nrow(lengths) - (jj - 1),
+          col=na.col,
+          border=NA
+        ) 
+      }
     }
   }
   
@@ -595,43 +665,47 @@ plotMultiBar <- function(
     getX <- function(val) {
       (ii - 1) + (1-pw)/2 + pw/rr.size * (val - rr[1])
     }
-    for (jj in seq_len(nrow(lengths))) {
-      rect(
-        xleft=getX(ax),
-        xright=getX(lengths[jj,ii]),
-        ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
-        ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
-        col=cols[jj, ii],
-        border=ifelse(drawBorders, "black", NA),
-        lwd=border.width
-      ) 
+    
+    # Only draw bars if dryRun is FALSE
+    if (!dryRun) {
+      for (jj in seq_len(nrow(lengths))) {
+        rect(
+          xleft=getX(ax),
+          xright=getX(lengths[jj,ii]),
+          ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
+          ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
+          col=colmat[jj, ii],
+          border=ifelse(drawBorders, "black", NA),
+          lwd=lwd
+        ) 
+      }
     }
     
     # draw 0 axis
-    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=border.width)
+    lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=lwd)
     
     # draw axis
     axis(
-      side=1, labels=FALSE, tck=-0.025, lwd=border.width,
+      side=1, labels=FALSE, tck=xaxt.tck, lwd=lwd,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2])))
     )
     axis(
-      side=1, tick=FALSE, line=-0.6, las=2,
+      side=1, tick=FALSE, line=xaxt.line, las=2,
       at=unique(c(getX(rr[1]), getX(ax), getX(rr[2]))), 
       labels=prettyNum(unique(c(rr[1], ax, rr[2])), digits=2)
     )
     if (plotModuleNames) {
       mtext(
-        colnames(lengths)[ii], side=3, at=ii-0.5, cex=cex.modules, font=2,
-        line=maxt.line
+        colnames(lengths)[ii], side=3, at=ii-0.5, cex=par("cex")*cex.modules, 
+        font=2, line=maxt.line
       )
     }
   }
     
   # Draw title
   mtext(
-    main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, adj=0.5,
-    line=1
+    main, side=3, at=ncol(lengths)/2, cex=par("cex")*par("cex.main"), font=2, 
+    adj=0.5, line=main.line
   )
    
   # Draw sample names

@@ -3,83 +3,74 @@
 \name{plotTopology}
 \alias{plotContribution}
 \alias{plotCorrelation}
-\alias{plotCorrelationLegend}
 \alias{plotData}
-\alias{plotDataLegend}
 \alias{plotDegree}
 \alias{plotNetwork}
-\alias{plotNetworkLegend}
 \alias{plotSummary}
 \alias{plotTopology}
 \title{Plot a topological feature of network module}
 \usage{
 plotData(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames, main = "",
-  palette = data.palette(), border.width = 2, plotLegend = TRUE,
-  legend.main = "Data", gaxt.line = -0.5, saxt.line = -0.5,
-  maxt.line = 3, legend.position = 0.15, legend.tick.size = 0.03,
-  laxt.line = 3, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
+  orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
+  plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
+  main.line = 1, lwd = 1, plotLegend = TRUE, legend.main = "Data",
+  legend.main.line = 1, naxt.line = -0.5, saxt.line = -0.5,
+  maxt.line = 3, legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
+  dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
-  plotModuleNames, main = "", palette = correlation.palette(),
-  border.width = 2, plotLegend = TRUE, legend.main = "Correlation",
-  gaxt.line = -0.5, maxt.line = 3, legend.position, legend.tick.size,
-  laxt.line, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
+  legend.main = "Correlation", legend.main.line = 1, naxt.line = -0.5,
+  maxt.line = 3, legend.position = NULL, laxt.tck = NULL,
+  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  symmetric = FALSE, orderModules = TRUE, plotNodeNames = TRUE,
-  plotModuleNames, main = "", palette = network.palette(),
-  border.width = 2, plotLegend = TRUE, legend.main = "Edge weight",
-  gaxt.line = -0.5, maxt.line = 3, legend.position, legend.tick.size,
-  laxt.line, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
+  legend.main = "Edge weight", legend.main.line = 1, naxt.line = -0.5,
+  maxt.line = 3, legend.position = NULL, laxt.tck = NULL,
+  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames, main = "",
-  border.width = 2, palette = c("#313695", "#a50026"),
-  drawBorders = FALSE, gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", main.line = 1, ylab.line = 2.5, lwd = 1,
+  drawBorders = FALSE, naxt.line = -0.5, maxt.line = 3, yaxt.line = 0,
+  yaxt.tck = -0.035, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = "discovery",
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames, main = "",
-  palette = "#feb24c", border.width = 2, drawBorders = FALSE,
-  gaxt.line = -0.5, maxt.line = 3, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2)
+  nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
+  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
+  main = "", main.line = 1, lwd = 1, drawBorders = FALSE,
+  naxt.line = -0.5, maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035,
+  ylab.line = 2.5, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  degreeCol = "#feb24c", naCol = "#bdbdbd", dryRun = FALSE)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = "test",
-  orderNodesBy = "discovery", orderModules = TRUE, plotSampleNames = TRUE,
-  plotModuleNames, main = "", palette = c("#762a83", "#1b7837"),
-  border.width = 2, drawBorders = FALSE, saxt.line = -0.5,
-  maxt.line = 0, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
-
-plotDataLegend(data, correlation, network, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, palette = data.palette(), border.width = 2,
-  horizontal = TRUE, legend.main = "Data", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2)
-
-plotCorrelationLegend(palette = correlation.palette(), border.width = 2,
-  horizontal = TRUE, legend.main = "correlation", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  verbose = TRUE)
-
-plotNetworkLegend(palette = network.palette(), border.width = 2,
-  horizontal = TRUE, legend.main = "network", legend.tick.size = 0.03,
-  laxt.line = 2.5, cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  verbose = TRUE)
+  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
+  orderNodesBy = NULL, orderModules = TRUE, plotSampleNames = TRUE,
+  plotModuleNames = NULL, main = "", main.line = 1, xlab.line = 2.5,
+  lwd = 1, drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0,
+  xaxt.line = 0, xaxt.tck = -0.025, cex.axis = 0.8, cex.lab = 1.2,
+  cex.main = 2, summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
+  dryRun = FALSE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -124,38 +115,43 @@ be used.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 
-\item{orderSamplesBy}{one of "discovery", "test" or "none". Controls how 
-samples are ordered on the plot (see details).}
+\item{orderSamplesBy}{\code{NULL} (default), \code{NA}, or a vector 
+containing a single dataset name or index. Controls how samples are ordered 
+on the plot (see details).}
 
-\item{orderNodesBy}{one of "discovery", "test" or "none". Controls how nodes
-are ordered on the plot (see details).}
+\item{orderNodesBy}{\code{NULL} (default), \code{NA}, or a vector of dataset
+names or indices. Controls how nodes are ordered on the plot (see details).}
 
 \item{orderModules}{logical; if \code{TRUE} modules ordered by clustering 
 their summary vectors. If \code{FALSE} modules are returned in the order
 provided.}
 
 \item{plotNodeNames}{logical; controls whether the node names are 
-rendered on the bottom axis.}
+drawed on the bottom axis.}
 
 \item{plotSampleNames}{logical; controls whether the sample names are 
-rendered on the left axis.}
+drawed on the left axis.}
 
-\item{plotModuleNames}{logical; controls whether module names are rendered.
-The default is for module names to be rendered when multiple \code{modules} 
+\item{plotModuleNames}{logical; controls whether module names are drawed.
+The default is for module names to be drawed when multiple \code{modules} 
 are drawn.}
 
-\item{main}{title for each plot.}
+\item{main}{title for the plot.}
 
-\item{palette}{a vector of colors to use for each plot (see details).}
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
 
-\item{border.width}{line width for borders.}
+\item{lwd}{line width for borders and axes.}
 
 \item{plotLegend}{logical; controls whether a legend is drawn when using
 \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.}
 
 \item{legend.main}{title for the legend.}
 
-\item{gaxt.line}{the number of lines into the bottom margin at which the node
+\item{legend.main.line}{the distance from the legend to draw the legend 
+title.}
+
+\item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
 
 \item{saxt.line}{the number of lines into the left margin at which the sample
@@ -167,11 +163,11 @@ module names will be drawn.}
 \item{legend.position}{the distance from the plot to start the legend, as a
 proportion of the plot width.}
 
-\item{legend.tick.size}{size of the ticks on each axis legend relative to the
+\item{laxt.tck}{size of the ticks on each axis legend relative to the
 size of the correlation, edge weights, and data matrix heatmaps.}
 
-\item{laxt.line}{the distance from the legend to render the legend axis 
-labels, as multiple of \code{legend.tick.size}.}
+\item{laxt.line}{the distance from the legend to draw the legend axis 
+labels, as multiple of \code{laxt.tck}.}
 
 \item{cex.axis}{relative size of the node and sample names.}
 
@@ -179,18 +175,67 @@ labels, as multiple of \code{legend.tick.size}.}
 
 \item{cex.main}{relative size of the plot titles.}
 
+\item{dataCols}{a character vector of colors to create a gradient from for
+the data heatmap (see details). Automatically determined if \code{NA} or 
+\code{NULL}.}
+
+\item{dataRange}{the range of values to map to the \code{dataCols} gradient
+(see details). Automatically determined if \code{NA} or \code{NULL}.}
+
+\item{naCol}{color to use for missing nodes and samples on the data, 
+correlation structure, and network edge weight heat maps.}
+
+\item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
+drawed.}
+
 \item{symmetric}{logical; controls whether the correlation and network 
 heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
 heatmaps. If symmetric, then the node and module names will also be rendered
 on the left axis.}
 
-\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the bars
-in \code{plotContribution}, \code{plotDegree}, and
-\code{plotSummary}.}
+\item{corCols}{a character vector of colors to create a gradient from for
+the correlation structure heatmap (see details).}
 
-\item{horizontal}{logical; controls whether the legend is rendered 
-horizontally or vertically when using \code{plotDataLegend},
-\code{plotCorrelationLegend} or \code{plotNetworkLegend}.}
+\item{corRange}{the range of values to map to the \code{corCols} gradient
+(see details).}
+
+\item{netCols}{a character vector of colors to create a gradient from for
+the network edge weight heatmap (see details).}
+
+\item{netRange}{the range of values to map to the \code{corCols} gradient
+(see details). Automatically determined if \code{NA} or \code{NULL}.}
+
+\item{ylab.line}{the number of lines into the left margin at which the 
+y axis labels on the \emph{weighted degree} and \emph{node contribution} 
+bar plots will be drawn.}
+
+\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
+\emph{weighted degree}, \emph{node conribution}, and \emph{module summary}
+bar plots.}
+
+\item{yaxt.line}{the number of lines into the left margin at which the 
+y-axis tick labels will be drawn on the weighted degree and node 
+contribution bar plots.}
+
+\item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
+node contribution bar plots.}
+
+\item{contribCols}{color(s) to use for the node contribution bar plot 
+(see details).}
+
+\item{degreeCol}{color to use for the weighted degree bar plot.}
+
+\item{xlab.line}{the number of lines into the bottom margin at which the 
+x axis label on the \emph{module summary} bar plot(s) will be drawn.}
+
+\item{xaxt.line}{the number of lines into the bottom margin at which the 
+x-axis tick labels will be drawn on the module summary bar plot.}
+
+\item{xaxt.tck}{the size of the x-axis ticks for the module summary bar 
+plot.}
+
+\item{summaryCols}{color(s) to use for the node contribution bar plot 
+(see details).}
 }
 \description{
 Functions for plotting the topology of a network module.
@@ -207,19 +252,11 @@ network modules.
 \code{plotContribution}: Plot a bar chart of the module membership for
 one or more network modules.
 
-\code{plotDegree:} Plot a bar chart of the normalised intramodular 
-connectivity (see details) for one or more network modules.
+\code{plotDegree:} Plot a bar chart of the scaled weighted degree 
+(see details) for one or more network modules.
 
 \code{plotSummary}: Plot bar charts of the module summary vectors of 
 one or more network modules.
-
-\code{plotDataLegend}: Plot a legend for the data matrix heatmap
-for one or more network modules.
-
-\code{plotCorrelationLegend}: Plot a legend for the correlation structure 
-heatmap.
-
-\code{plotNetworkLegend}: Plot a legend for the network edge weights heatmap.
 }
 \details{
 \subsection{Input data structure:}{
@@ -299,98 +336,198 @@ heatmap.
 }
 \subsection{Node, sample, and module ordering:}{
   By default, nodes are ordered in decreasing order of \emph{weighted degree}
-  in the \code{discovery} dataset (see \code{\link{nodeOrder}}). 
-  This facilitates the visual comparison of modules across datasets, as the 
-  node ordering will be preserved. Missing nodes are colored in grey. If
-  \code{orderNodesBy} is "test" nodes will instead be ordered by 
-  weighted degree in the \code{test} dataset. If "none" nodes are 
-  drawn in the order they are provided in the drawn dataset.
+  in the \code{discovery} dataset (see \code{\link{nodeOrder}}). Missing 
+  nodes are colored in grey. This facilitates the visual comparison of 
+  modules across datasets, as the node ordering will be preserved. 
   
-  When multiple modules are specified, modules are ordered by the similarity
-  of their summary vectors in the drawn dataset. To disable this behaviour, 
-  set \code{orderModules} to \code{FALSE}.
+  Alternatively, a vector containing the names or indices of one or more
+  datasets can be provided to the \code{orderNodesBy} argument. If a single
+  dataset is provided, then nodes will be ordered in decreasing order of
+  \emph{weighted degree} in that dataset. If multiple datasets are provided
+  then the \emph{weighted degree} will be calculated in each dataset and
+  nodes will be ordered in decreasing order of average weighted degree. This
+  is useful for obtaining a robust ordering of nodes by importance across
+  independent datasets where a module is reproducible.
   
-  Sample ordering only applies to \code{plotData} and 
-  \code{plotModuleSummary}. By default, samples are ordered in descending
-  order of the module summary vector in the drawn dataset for the left-most 
-  module appearing on the plot (see \code{\link{sampleOrder}}.
+  Ordering of nodes by \emph{weighted degree} can be suppressed by setting
+  \code{orderNodesBy} to \code{NA}, in which case nodes will be ordered as in
+  the matrices provided in the \code{data}, \code{correlation} and
+  \code{network} arguments.
+  
+  When multiple modules are drawn, modules are ordered by the similarity
+  of their summary vectors in the dataset(s) specified in \code{orderNodesBy}
+  argument. If multiple datasets are provided to the \code{orderNodesBy}
+  argument then the module summary vectors are concatenated across datasets.
+  
+  By default, samples in the data heatmap drawn by \code{plotData} and the 
+  bar plot drawn by \code{plotModuleSummary} are ordered in descending order
+  of \emph{module summary} in the drawn dataset (specified by the \code{test}
+  argument). If multiple modules are drawn, samples are ordered as per the
+  left-most module on the plot.
+  
+  Alternatively, a vector containing the name or index of another dataset may
+  be provided to the \code{orderSamplesBy} argument. In this case, samples
+  will be ordered in descending order of \emph{module summary} in the 
+  specified dataset. This is useful when comparing different measurements 
+  across samples, for example, gene expression data obtained from multiple 
+  tissues samples across the same individuals. Samples that are not present 
+  in the drawn dataset will be colored in grey.
+  
+  Order of samples by \emph{module summary} can be suppressed by setting 
+  \code{orderSamplesBy} to \code{NA}, in which case samples will be order as
+  in the matrix provided to the \code{data} argument for the drawn dataset.
 }
 \subsection{Normalised degree:}{
   The weighted degree is normalised by the maximum weighted degree in
   any given module when rendered on the bar plot. This facilitates visual 
   comparison of multiple modules with differing sizes or densities.
 }
-\subsection{Customising plot layout:}{
+\subsection{Plot layout and device size}{
   Although reasonable default values for most parameters have been provided,
   the rendering of axes and titles may need adjusting depending on the size
-  of the plot window. The parameters \code{gaxt.line}, \code{saxt.line}, 
-  \code{maxt.line}, and \code{laxt.line} control the distance from each plot
-  window that the node labels, sample labels, module labels, and legend 
-  labels are rendered. 
+  of the plot window. The \code{dryRun} argument is useful for quickly 
+  determining whether the plot will render correctly. When \code{dryRun} 
+  is \code{TRUE} only the axes, legends, labels, and title will be drawn, 
+  allowing for quick iteration of customisable parameters to get the plot 
+  layout correct. 
   
-  \code{legend.tick.size} controls the length of the 
-  axis ticks on each of the legends relative to the correlation, network,
-  and data plot windows. 
+  \strong{Warning}: PDF and other vectorized devices should not be used when
+  plotting the heatmaps with more than a hundred nodes. Large files will be
+  generated which may cause image editing programs such as Inkscape or
+  Illustrator to crash when polishing figures for publication.
   
-  \code{legend.position} controls the horizontal offset of the legend 
-  relative to the plot. For the triangle heatmaps, (\code{symmetric=FALSE} in
-  \code{plotCorrelation} and \code{plotNetwork}) this controls how far 
-  left of the plot the legend starts as a proportion of the plot width. For
-  the square heatmaps (\code{plotData}, and \code{symmetric=TRUE} in
-  \code{plotCorrelation} and \code{plotNetwork}) this controls how far 
-  right of the plot the legend starts as a proportion of the plot width.
+  If axis labels or legends are drawn off screen then the margins of the 
+  plot should be adjusted prior to plotting using the 
+  \code{\link[graphics]{par}} command to increase the margin size 
+  (see the "mar" option in the \code{par} help page).
   
-  \code{cex.main} controls the relative text size of the plot title
-  (specified by the \code{main} argument). \code{cex.axis} controls the
-  relative text size of the node and sample labels. \code{cex.lab} controls
-  the relative text size of the bar plot axis labels, module labels, and the
-  legend titles.
+  The size of text labels can be modified by increasing or decreasing the
+  \code{cex.main}, \code{cex.lab}, and \code{cex.axis} arguments:
+  \itemize{
+   \item{\code{cex.main}: }{controls the size of the plot title (specified 
+                           in the \code{main} argument).}
+   \item{\code{cex.lab}: }{controls the size of the axis labels on the
+                          \emph{weighted degree}, \emph{node contribution},
+                          and \emph{module summary} bar plots as well as
+                          the size of the module labels and the heatmap 
+                          legend titles.}
+   \item{\code{cex.axis}: }{contols the size of the axis tick labels, 
+                           including the node and sample labels.}
+  }
+  
+  The position of these labels can be changed through the following 
+  arguments:
+  \itemize{
+   \item{\code{xaxt.line}: }{controls the distance from the plot the x-axis
+         tick labels are drawn on the \emph{module summary} bar plot.}
+   \item{\code{xlab.line}: }{controls the distance from the plot the x-axis 
+         label is drawn on the \emph{module summary} bar plot.}
+   \item{\code{yaxt.line}: }{controls the distance from the plot the y-axis 
+         tick labels are drawn on the \emph{weighted degree} and  
+         \emph{node contribution} bar plots.}
+   \item{\code{ylab.line}: }{controls the distance from the plot the y-axis
+         label is drawn on the \emph{weighted degree} and 
+         \emph{node contribution} bar plots.}
+   \item{\code{main.line}: }{controls the distance from the plot the title is
+         drawn.}
+   \item{\code{naxt.line}: }{controls the distance from the plot the node 
+         labels are drawn.}
+   \item{\code{saxt.line}: }{controls thedistance from the plot the sample 
+         labels are drawn.}
+   \item{\code{maxt.line}: }{controls the distance from the plot the module
+         labels are drawn.}
+   \item{\code{laxt.line}: }{controls the distance from the heatmap legends
+         that the gradient legend labels are drawn.}
+   \item{\code{legend.main.line}: }{controls the distance from the heatmap
+         legends that the legend title is drawn.}
+  }
   
   The rendering of node, sample, and module names can be disabled by setting
-  \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
-  \code{FALSE}, and the rendering of the legend can be disabled by setting
-  \code{plotLegend} to \code{FALSE}
+  \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames}
+  to \code{FALSE}.
   
-  The \code{drawBorders} argument controls whether borders are drawn around
-  the bars in \code{plotDegree}, \code{plotContribution}, and 
-  \code{plotSummary}.
+  The size of the axis ticks can be changed by increasing or decreasing the
+  following arguments:
+  \itemize{
+   \item{\code{xaxt.tck}: }{size of the x-axis tick labels as a multiple of
+         the height of the \emph{module summary} bar plot}
+   \item{\code{yaxt.tck}: }{size of the y-axis tick labels as a multiple of 
+         the width of the \emph{weighted degree} or \emph{node contribution}
+         bar plots.}
+   \item{\code{laxt.tck}: }{size of the heatmap legend axis ticks as a 
+         multiple of the width of the data, correlation structure, or 
+         network edge weight heatmaps.}
+  }
+  
+  The placement of heatmap legends is controlled by the following arguments:
+  \itemize{
+   \item{\code{plotLegend}: }{if \code{FALSE} legend will not be drawn.}
+   \item{\code{legend.position}: }{a multiple of the plot width, controls 
+     the horizontal distance from the plot the legend is drawn.}
+  } 
+  
+  The \code{drawBorders} argument controls whether borders are drawn around 
+  the weighted degree, node contribution, or module summary bar plots. The 
+  \code{lwd} argument controls the thickness of these borders, as well as 
+  the thickness of axes and axis ticks.
 }
-\subsection{Customising the color palette:}{
-  \code{plotCorrelation} and \code{plotCorrelationLegend} expect the
-  \code{palette} argument to be a vector of colors to interpolate over when
-  plotting the correlation. They expect the first element of the 
-  \code{palette} vector to be the color used for correlation values of -1,
-  and the last element of the \code{palette} vector to be the color used for 
-  correlation values of 1.
+\subsection{Modifying the color palettes:}{
+  The \code{dataCols} and \code{dataRange} arguments control the appearance 
+  of the data heatmap (see \code{\link{plotData}}). The gradient of colors 
+  used on the heatmap can be changed by specifying a vector of colors to 
+  interpolate between in \code{dataCols} and \code{dataRange} specifies the 
+  range of values that maps to this gradient. Values outside of the 
+  specified \code{dataRange} will be rendered with the colors used at either
+  extreme of the gradient. The default gradient is determined based on the 
+  \code{data} shown on the plot. If all values in the \code{data} matrix are
+  positive, then the gradient is interpolated between white and green, where
+  white is used for the smallest value and green for the largest. If all
+  values are negative, then the gradient is interpolated between purple and
+  white, where purple is used for the smallest value and white for the value
+  closest to zero. If the data contains both positive and negative values, 
+  then the gradient is interpolated between purple, white, and green, where 
+  white is used for values of zero. In this case the range shown is always 
+  centered at zero, with the values at either extreme determined by the 
+  value in the rendered \code{data} with the strongest magnitude (the 
+  maximum of the absolute value).
   
-  \code{plotNetwork} and \code{plotNetworkLegend} expect the
-  \code{palette} argument to be a vector of colors to interpolate over when
-  plotting the edge weights. They expect the first element of the 
-  \code{palette} vector to be the color used for edge weights of 0,
-  and the last element of the \code{palette} vector to be the color used for 
-  correlation values of 1.
+  The \code{corCols} and \code{corRange} arguments control the appearance of
+  the correlation structure heatmap (see \code{\link{plotCorrelation}}). The
+  gradient of colors used on the heatmap can be changed by specifying a
+  vector of colors to interpolate between in \code{corCols}. By default,
+  strong negative correlations are shown in blue, and strong positive
+  correlations in red, and weak correlations as white. \code{corRange} 
+  controls the range of values that this gradient maps to, by default, -1 to
+  1. Changing this may be useful for showing differences where range of 
+  correlation coefficients is small.
   
-  \code{plotDegree} expects \code{palette} to be a single color, a 
-  vector of colors, one for each node, or a vector of colors to be repeated.
+  The \code{netCols} and \code{netRange} arguments control the appearance of
+  the network edge weight heatmap (see \code{\link{plotNetwork}}). The
+  gradient of colors used on the heatmap can be changed by specifying a
+  vector of colors to interpolate between in \code{netCols}. By default,
+  weak or non-edges are shown in white, while strong edges are shown in red.
+  The \code{netRange} controls the range of values this gradient maps to, 
+  by default, 0 to 1. If \code{netRange} is set to \code{NA}, then the 
+  gradient will be mapped to values between 0 and the maximum edge weight of
+  the shown network.
   
-  \code{plotContribution} expects \code{palette} to be a vector 
-  containing two colors, the first to be used for nodes with negative node
-  contribution values, and the second to be used for nodes with positive node
-  contribution values. 
+  The \code{degreeCol} argument controls the color of the weighted degree
+  bar plot (see \code{\link{plotDegree}}).
   
-  \code{plotData} and \code{plotDataLegend} expect the \code{palette}
-  argument to be a vector of colors to interpolate over when plotting the
-  'data.' In order to accomodate data matrices with different ranges,
-  these functions expect the palette to be a diverging set of colors with a
-  centre value of 0 (e.g. white). The colors drawn are balanced around 0: 
-  i.e. positive and negative values of data will have the same intensity on a 
-  diverging color palette regardless of the actual range of the data.
+  The \code{contribCols} argument controls the color of the node 
+  contribution bar plot (see \code{\link{plotContribution}}. This can be 
+  specified as single value to be used for all nodes, or as two colors: one
+  to use for nodes with positive contributions and one to use for nodes with
+  negative contributions.
   
-  \code{plotSummary} expects \code{palette} to be a vector 
-  containing two colors, the first to be used for nodes with a negative 
-  module summary measurement, and the second to be used for genes with a 
-  positive module summary measurment, regardless of whether the data matrix
-  is centred around 0.
+  The \code{summaryCols} argument controls the color of the module summary 
+  bar plot (see \code{\link{plotSummary}}. This can be specified as single
+  value to be used for all samples, or as two colors: one to use for samples
+  with a positive module summary value and one fpr samples with a negative
+  module summary value.
+  
+  The \code{naCol} argument controls the color of missing nodes and samples
+  on the data, correlaton structure, and network edge weight heatmaps.
 }
 }
 \examples{
@@ -440,17 +577,24 @@ plotDegree(
   test="test"
 )
 
-# Alternatively nodes can be order on the plot by degree in the test dataset
+# Alternatively nodes can be ordered on the plot by degree in the test dataset
 plotDegree(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test", orderNodesBy="test"
 )
 
+# Or by averaging the degree across datasets for a more robust ordering  
+plotDegree(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
+  test="test", orderNodesBy=c("discovery", "test")
+)
+
 # Arbitrary subsets can be plotted:
 plotContribution(
   data=data_list[[1]][, 1:10], correlation=correlation_list[[1]][1:10, 1:10], 
-  network=network_list[[1]][1:10, 1:10], orderNodesBy="none" 
+  network=network_list[[1]][1:10, 1:10], orderNodesBy=NA
 )
 
 # Plot the module summary vectors for multiple modules:

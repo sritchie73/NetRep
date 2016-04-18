@@ -6,8 +6,8 @@
 \usage{
 nodeOrder(data = NULL, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, na.rm = FALSE, orderModules = TRUE, simplify = TRUE,
-  verbose = TRUE)
+  nCores = NULL, na.rm = FALSE, orderModules = TRUE, mean = FALSE,
+  simplify = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -50,13 +50,19 @@ properties over. Ignored if the user has already registered a parallel
 backend. If \code{NULL} (default) the all but one core on the machine will
 be used.}
 
-\item{na.rm}{logical; If \code{TRUE}, nodes and moduels present in the 
+\item{na.rm}{logical; If \code{TRUE}, nodes and modules present in the 
 \code{discovery} dataset but missing from the test dataset are excluded. If
 \code{FALSE}, missing nodes and modules are put last in the ordering.}
 
 \item{orderModules}{logical; if \code{TRUE} modules ordered by clustering 
 their summary vectors. If \code{FALSE} modules are returned in the order
 provided.}
+
+\item{mean}{logical; if \code{TRUE}, node order will be calculated for each
+\code{discovery} dataset by averaging the weighted degree and pooling 
+\emph{module summary} vectors across the specified \code{test} datasets.
+If \code{FALSE}, the node order is calculated separately in each test 
+dataset.}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}
@@ -69,8 +75,20 @@ A nested list structure. At the top level, the list has one element per
  element per \code{'test'} dataset analysed for that \code{'discovery'} 
  dataset. Each of these elements is a list that has one element per 
  \code{'modules'} specified, containing a vector of node names for the
- requested module. If \code{simplify = TRUE}, then there will be a single
- vector of node names for each \code{'test'} dataset.
+ requested module. When \code{simplify = TRUE} then the simplest possible 
+ structure will be returned. E.g. if the node ordering are requested for 
+ module(s) in only one dataset, then a single vector of node labels will
+ be returned. 
+ 
+When \code{simplify = FALSE} then a nested list of datasets will always be 
+returned, i.e. each element at the top level and second level correspond to 
+a dataset, and each element at the third level will correspond to modules 
+discovered in the dataset specified at the top level if module labels are 
+provided in the corresponding \code{moduleAssignments} list element. E.g. 
+\code{results[["Dataset1"]][["Dataset2"]][["module1"]]} will contain the 
+order of nodes calculated in "Dataset2", where "module1" was indentified in
+"Dataset1". Modules and datasets for which calculation of the node order 
+have not been requested will contain \code{NULL}.
 }
 \description{
 Order nodes in descending order of \emph{weighted degree} and order 
@@ -155,7 +173,8 @@ modules by the similarity of their summary vectors.
 }
 \examples{
 \dontrun{
-# load in example data, correlation, and network matrices for a discovery and test dataset:
+# load in example data, correlation, and network matrices for a discovery
+# and test dataset:
 data("NetRep")
 
 # Convert them to the 'bigMatrix' format:

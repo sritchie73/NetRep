@@ -6,7 +6,8 @@
 \usage{
 plotBar(heights, heights.lim, mas, cols, bar.width = 1, drawBorders = FALSE,
   na.col = "#bdbdbd", xaxt = TRUE, plotModuleNames = TRUE, main = "",
-  xaxt.line = -0.5, maxt.line = 3, ylab = "", border.width = 2)
+  main.line = 0, xaxt.line = -0.5, yaxt.line = 0, yaxt.tck = -0.15,
+  maxt.line = 3, ylab = "", ylab.line = 2.5, lwd = 2, dryRun = FALSE)
 }
 \arguments{
 \item{heights}{heights of the bars.}
@@ -32,15 +33,29 @@ plotted along the x axis.}
 
 \item{main}{title for the plot.}
 
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
+
 \item{xaxt.line}{the number of lines into the margin at which the x axis 
 labels will be drawn.}
+
+\item{yaxt.line}{the number of lines into the margin at which the y axis
+tick labels will be drawn.}
+
+\item{yaxt.tck}{the size of the y-axis tick marks.}
 
 \item{maxt.line}{the number of lines into the margin at which the module 
 names will be drawn.}
 
-\item{ylab}{label for the yaxis}
+\item{ylab}{label for the y axis}
 
-\item{border.width}{line width for borders.}
+\item{ylab.line}{the number of lines into the left margin at which the 
+y axis label will be drawn.}
+
+\item{lwd}{line width for borders.}
+
+\item{dryRun}{logical; if \code{TRUE} only the axes and borders will be 
+drawn.}
 }
 \description{
 Plot bars around 0

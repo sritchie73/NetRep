@@ -62,6 +62,11 @@ NULL
 #' @param labels character vector of labels for the lines printed. Ignored if 
 #'   fill is \code{FALSE}.
 vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
+  if (!(is.vector(verbose) && !is.list(verbose) && is.logical(verbose) &&
+        length(verbose) == 1 && !is.na(verbose))) {
+    stop("'verbose' must be one of 'TRUE' or 'FALSE'")
+  }
+  
   if(verbose) {
     # We need to format each line with the indendation level
     if (ind > 0) {
@@ -283,27 +288,6 @@ orderAsNumeric <- function(vec) {
   })
 }
 
-#' Get variables composing a module
-#' 
-#' Get the variables composing the user specified modules in the order they 
-#' appear in the 'moduleAssignments' vector for the discovery dataset.
-#' 
-#' @param moduleAssignments a vector of the module assignment for each variable
-#'  in the discovery dataset. If there are multiple discovery datasets 
-#' then this argument should be a list of such vectors.  
-#' @param modules a vector of modules to apply the function to.
-#' @param discovery name or index denoting which dataset the module of
-#'  interest was discovered in.
-#'  
-#' @rdname getModuleVarsUnsorted
-getModuleVarsUnsorted <- function(
-  moduleAssignments, modules, discovery=1
-) {
-  foreach(mi = modules, .combine=c) %do% {
-    names(moduleAssignments[[discovery]] %sub_in% modules)
-  }
-}
-
 #' Set up a parallel backend
 #'
 #' Set up a backend with the requested number of cores, or use existing backend
@@ -467,23 +451,49 @@ cleanupCluster <- function(cluster, predef) {
 #' 
 #' @return a list
 simplifyList <- function(l, depth) {
-  collapse <- function(l) {
-    if (length(l) == 1)
-      return(l[[1]])
-    return(l)
-  }
-  
-  # Recursively traverse until we hit the depth requested, then filter out NULL
-  # entries and collapse if length == 1.
+  # Recursively traverse until we hit the depth requested or we cant go deeper
   stopifnot(is.numeric(depth) && depth > 0)
   if (depth == 1) {
-    l <- collapse(l)
-    return(l)
-  } else {
-    for (i1 in rev(seq_along(l))) {
-      l[[i1]] <- simplifyList(l[[i1]], depth=depth-1)
-      l <- collapse(l)
+    if (is.null(l)) {
+      return(NULL)
     }
-    return(l)
+    # Delete empty leaf nodes
+    for (ii in rev(seq_along(l))) {
+      if (is.null(l[[ii]]))
+        l[[ii]] <- NULL
+    }
+    if (length(l) == 0) {
+      return(NULL)
+    } else if (length(l) == 1) {
+      return(l[[1]])
+    } else {
+      return(l) 
+    }
+  } else {
+    for (ii in rev(seq_along(l))) {
+      l[[ii]] <- simplifyList(l[[ii]], depth-1)
+    }
+    if (length(l) == 0) {
+      return(NULL)
+    } else if (length(l) == 1) {
+      return(l[[1]])
+    } else {
+      return(l) 
+    }
   }
+}
+
+#' Get a sorted list of module names
+#' 
+#' If module labels are numeric, sorts numerically, otherwise sorts 
+#' alphabetically.
+#' 
+#' @param modules a vector of module labels to sort
+#' @return a sorted vector   
+sortModuleNames <- function(modules) {
+  tryCatch({
+    modules[order(as.numeric(modules))]
+  }, warning=function(w) {
+    sort(modules)
+  })
 }
