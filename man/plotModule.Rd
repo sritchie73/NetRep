@@ -320,9 +320,9 @@ Individual components of the module plot can be plotted using
   parameters to get the plot layout correct.
   
   If axis labels or legends are drawn off screen then the margins of the 
-  plot should be adjusted prior to plotting using the \code{\link{par}}
-  command to increase the margin size (see the "mar" option in the 
-  \code{\link[par]{par help page}}).
+  plot should be adjusted prior to plotting using the 
+  \code{\link[graphics]{par}} command to increase the margin size 
+  (see the "mar" option in the \code{par} help page).
   
   The size of text labels can be modified by increasing or decreasing the
   \code{cex.main}, \code{cex.lab}, and \code{cex.axis} arguments:
