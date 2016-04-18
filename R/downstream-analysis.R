@@ -1034,6 +1034,7 @@ plotProps <- function(
   dryRun, verbose
 ) {
   mods <- modules[[di]]
+  mi <- NULL # suppresses CRAN note
   
   if (dryRun) {
     # If doing a dry run just get the nodes and samples that will be shown on
