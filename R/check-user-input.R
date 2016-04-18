@@ -799,6 +799,9 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param xaxt.line user input for the corresponding argument in the plot functions.
 #' @param yaxt.line user input for the corresponding argument in the plot functions.
 #' @param laxt.line user input for the corresponding argument in the plot functions.
+#' @param xlab.line user input for the corresponding argument in the plot functions.
+#' @param ylab.line user input for the corresponding argument in the plot functions.
+#' @param main.line user input for the corresponding argument in the plot functions.
 #' @param xaxt.tck user input for the corresponding argument in the plot functions.
 #' @param yaxt.tck user input for the corresponding argument in the plot functions.
 #' @param laxt.tck user input for the corresponding argument in the plot functions.
@@ -822,8 +825,8 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, 
-  yaxt.line, laxt.line, xaxt.tck, yaxt.tck, laxt.tck, 
-  plotLegend, legend.position, legend.main, palette, symmetric, horizontal, 
+  yaxt.line, laxt.line, xaxt.tck, yaxt.tck, laxt.tck, xlab.line, ylab.line,
+  main.line, plotLegend, legend.position, legend.main, symmetric, horizontal, 
   dataCols, dataRange, corCols, corRange, netCols, netRange, degreeCol, 
   contribCols, summaryCols, naCol, dryRun
 ) {
@@ -934,6 +937,33 @@ checkPlotArgs <- function(
     }
     if (is.snum(laxt.line) && is.infinite(laxt.line)) {
       stop("'laxt.line' must be finite")
+    }
+  }
+  
+  if (!missing(xlab.line)) {
+    if (!(is.snum(xlab.line) || is.na(xlab.line) || is.null(xlab.line))) {
+      stop("'xlab.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(xlab.line) && is.infinite(xlab.line)) {
+      stop("'xlab.line' must be finite")
+    }
+  }
+  
+  if (!missing(ylab.line)) {
+    if (!(is.snum(ylab.line) || is.na(ylab.line) || is.null(ylab.line))) {
+      stop("'ylab.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(ylab.line) && is.infinite(ylab.line)) {
+      stop("'ylab.line' must be finite")
+    }
+  }
+  
+  if (!missing(main.line)) {
+    if (!(is.snum(main.line) || is.na(main.line) || is.null(main.line))) {
+      stop("'main.line' must be a numeric vector of length 1, 'NA', or 'NULL'")
+    }
+    if (is.snum(main.line) && is.infinite(main.line)) {
+      stop("'main.line' must be finite")
     }
   }
   

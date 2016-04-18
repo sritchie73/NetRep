@@ -6,9 +6,9 @@
 \usage{
 plotTriangleHeatmap(values, palette, vlim, mas, na.indices = NULL,
   na.col = "#bdbdbd", xaxt = NULL, plotModuleNames = TRUE, main = "",
-  plotLegend = TRUE, legend.main = "", xaxt.line = -0.5, maxt.line = 3,
-  laxt.tck = 0.04, laxt.line = 2.5, legend.line = 0.1, lwd = 2,
-  dryRun = FALSE)
+  main.line = 0, plotLegend = TRUE, legend.main = "", xaxt.line = -0.5,
+  maxt.line = 3, laxt.tck = 0.04, laxt.line = 2.5, legend.line = 0.1,
+  lwd = 2, dryRun = FALSE)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -30,8 +30,11 @@ plotted along the x axis.}
 
 \item{main}{title for the plot.}
 
-\item{plotLegend}{logical; if \code{TRUE} a legend is added to the right side of
-the plot.}
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
+
+\item{plotLegend}{logical; if \code{TRUE} a legend is added to the right 
+side of the plot.}
 
 \item{legend.main}{title for the legend.}
 

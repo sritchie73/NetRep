@@ -11,13 +11,9 @@
 #'  heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
 #'  heatmaps. If symmetric, then the node and module names will also be rendered
 #'  on the left axis.
-#' @param drawBorders logical; if \code{TRUE}, borders are drawn around the bars
-#'  in \code{plotContribution}, \code{plotDegree}, and
-#'  \code{plotSummary}.
 #' @param plotLegend logical; controls whether a legend is drawn when using
 #'  \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.
 #' @param legend.main title for the legend.
-#' @param main title for each plot.
 #' @param legend.position the distance from the plot to start the legend, as a
 #'  proportion of the plot width.
 #'
@@ -343,10 +339,10 @@ plotData <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotSampleNames=TRUE, plotModuleNames=NULL, main="", lwd=1, 
+  plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, lwd=1, 
   plotLegend=TRUE, legend.main="Data", naxt.line=-0.5, saxt.line=-0.5, 
   maxt.line=3, legend.position=0.15, laxt.tck=0.03, laxt.line=3, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2, dataCols=NULL, dataRange=NULL, 
+  cex.axis=0.8, cex.lab=1.2, cex.main=2, dataCols=NULL, dataRange=NULL, 
   naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
@@ -381,7 +377,7 @@ plotData <- function(
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
-    main=main, lwd=lwd, naxt.line=naxt.line, 
+    main=main, lwd=lwd, naxt.line=naxt.line, main.line=main.line, 
     saxt.line=saxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     laxt.tck=laxt.tck,plotLegend=plotLegend, dataCols=dataCols,
     legend.main=legend.main, naCol=naCol, legend.position=legend.position, 
@@ -515,8 +511,8 @@ plotData <- function(
   # Plot
   plotSquareHeatmap(
     dat, dataCols, vlim=dataRange,
-    moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, 
-    xaxt=xaxt, yaxt=yaxt, plotLegend=plotLegend, main=main,
+    moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, xaxt=xaxt, 
+    yaxt=yaxt, plotLegend=plotLegend, main=main, main.line=main.line,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
     xaxt.line=naxt.line, yaxt.line=saxt.line, laxt.tck=laxt.tck,
     laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line,
@@ -534,9 +530,9 @@ plotCorrelation <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="",lwd=1, plotLegend=TRUE, 
+  plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
   legend.main="Correlation", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
-  laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
+  laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1.2, cex.main=2, 
   corCols=correlation.palette(), corRange=c(-1,1), naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
@@ -569,7 +565,7 @@ plotCorrelation <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, lwd=lwd, 
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
-    laxt.tck=laxt.tck, plotLegend=plotLegend, naCol=naCol,
+    laxt.tck=laxt.tck, plotLegend=plotLegend, naCol=naCol, main.line=main.line,
     legend.main=legend.main, legend.position=legend.position, corCols=corCols, 
     corRange=corRange, symmetric=symmetric, dryRun=dryRun)
 
@@ -683,7 +679,7 @@ plotCorrelation <- function(
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=naxt.line, yaxt.line=naxt.line, lwd=lwd,
-      laxt.tck=laxt.tck, laxt.line=laxt.line, 
+      laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line,
       legend.line=legend.position, maxt.line=maxt.line, na.col=naCol,
       dryRun=dryRun
     )
@@ -693,7 +689,7 @@ plotCorrelation <- function(
       moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
-      laxt.tck=laxt.tck, laxt.line=laxt.line, 
+      laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line,
       legend.line=legend.position, maxt.line=maxt.line, 
       lwd=lwd, na.col=naCol, dryRun=dryRun
     )
@@ -710,9 +706,9 @@ plotNetwork <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", lwd=1, plotLegend=TRUE, 
+  plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
   legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
-  laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
+  laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1.2, cex.main=2, 
   netCols=network.palette(), netRange=c(0,1), naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
@@ -745,7 +741,7 @@ plotNetwork <- function(
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotModuleNames=plotModuleNames, main=main, lwd=lwd, 
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
-    laxt.tck=laxt.tck, plotLegend=plotLegend, naCol=naCol,
+    laxt.tck=laxt.tck, plotLegend=plotLegend, naCol=naCol, main.line=main.line,
     legend.main=legend.main, legend.position=legend.position, 
     symmetric=symmetric, netCols=netCols, netRange=netRange, dryRun=dryRun)
   
@@ -859,7 +855,7 @@ plotNetwork <- function(
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
       xaxt.line=naxt.line, yaxt.line=naxt.line, 
-      laxt.tck=laxt.tck, laxt.line=laxt.line, 
+      laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line,
       legend.line=legend.position, maxt.line=maxt.line,
       lwd=lwd, na.col=naCol, dryRun=dryRun
     )
@@ -869,7 +865,7 @@ plotNetwork <- function(
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
-      laxt.tck=laxt.tck, laxt.line=laxt.line, 
+      laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line, 
       legend.line=legend.position, maxt.line=maxt.line, 
       lwd=lwd, na.col=naCol, dryRun=dryRun
     )
@@ -886,9 +882,9 @@ plotContribution <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", lwd=1, drawBorders=FALSE, 
-  naxt.line=-0.5, maxt.line=3, yaxt.line=0, yaxt.tck=-0.035, 
-  cex.axis=0.8, cex.lab=1, cex.main=1.2, contribCols=c("#A50026", "#313695"), 
+  plotModuleNames=NULL, main="", main.line=1, ylab.line=2.5, lwd=1, 
+  drawBorders=FALSE, naxt.line=-0.5, maxt.line=3, yaxt.line=0, yaxt.tck=-0.035, 
+  cex.axis=0.8, cex.lab=1.2, cex.main=2, contribCols=c("#A50026", "#313695"), 
   naCol="#bdbdbd", dryRun=FALSE  
 ) {
   #-----------------------------------------------------------------------------
@@ -922,10 +918,10 @@ plotContribution <- function(
   
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
-    plotModuleNames=plotModuleNames, main=main, lwd=lwd, 
-    drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
-    contribCols=contribCols, naCol=naCol, dryRun=dryRun, yaxt.line=yaxt.line, 
-    yaxt.tck=yaxt.tck)
+    plotModuleNames=plotModuleNames, main=main, lwd=lwd, main.line=main.line,
+    ylab.line=ylab.line, drawBorders=drawBorders, naxt.line=naxt.line, 
+    maxt.line=maxt.line, contribCols=contribCols, naCol=naCol, dryRun=dryRun, 
+    yaxt.line=yaxt.line, yaxt.tck=yaxt.tck)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1011,8 +1007,8 @@ plotContribution <- function(
   # Plot bar chart
   plotBar(
     nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder],
-    contribCols, drawBorders=drawBorders,
-    xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
+    contribCols, drawBorders=drawBorders, main.line=main.line, 
+    xaxt=plotNodeNames, plotModuleNames=plotModuleNames, ylab.line=ylab.line,
     xaxt.line=naxt.line, maxt.line=maxt.line, yaxt.line=yaxt.line, 
     yaxt.tck=yaxt.tck, main=main, ylab="Node contribution", 
     lwd=lwd, na.col=naCol, dryRun=dryRun
@@ -1029,9 +1025,10 @@ plotDegree <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
-  plotModuleNames=NULL, main="", lwd=1, drawBorders=FALSE, 
-  naxt.line=-0.5, maxt.line=3, yaxt.line=0, yaxt.tck=-0.035, cex.axis=0.8, 
-  cex.lab=1, cex.main=1.2, degreeCol="#feb24c", naCol="#bdbdbd", dryRun=FALSE
+  plotModuleNames=NULL, main="", main.line=1, lwd=1, drawBorders=FALSE, 
+  naxt.line=-0.5, maxt.line=3, yaxt.line=0, yaxt.tck=-0.035, ylab.line=2.5, 
+  cex.axis=0.8, cex.lab=1.2, cex.main=2, degreeCol="#feb24c", naCol="#bdbdbd", 
+  dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -1061,10 +1058,10 @@ plotDegree <- function(
   
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
-    plotModuleNames=plotModuleNames, main=main, lwd=lwd, 
+    plotModuleNames=plotModuleNames, main=main, lwd=lwd, main.line=main.line,
     drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
     degreeCol=degreeCol, naCol=naCol, dryRun=dryRun, yaxt.line=yaxt.line, 
-    yaxt.tck=yaxt.tck)
+    yaxt.tck=yaxt.tck, ylab.line=ylab.line)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1151,9 +1148,9 @@ plotDegree <- function(
   # Plot bar chart
   plotBar(
     wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder],
-    degreeCol, drawBorders=drawBorders,
+    degreeCol, drawBorders=drawBorders, main.line=main.line, 
     xaxt=plotNodeNames, plotModuleNames=plotModuleNames, 
-    xaxt.line=naxt.line, maxt.line=maxt.line, 
+    xaxt.line=naxt.line, maxt.line=maxt.line, ylab.line=ylab.line,
     yaxt.line=yaxt.line, yaxt.tck=yaxt.tck, main=main,
     ylab="Weighted degree", lwd=lwd, na.col=naCol,
     dryRun=dryRun
@@ -1170,10 +1167,10 @@ plotSummary <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, 
-  plotSampleNames=TRUE, plotModuleNames=NULL, main="", lwd=1, 
-  drawBorders=FALSE, saxt.line=-0.5, maxt.line=0, xaxt.line=0, xaxt.tck=-0.025,
-  cex.axis=0.8, cex.lab=1, cex.main=1.2, summaryCols=c("#1B7837", "#762A83"), 
-  naCol="#bdbdbd", dryRun=FALSE
+  plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, 
+  xlab.line=2.5, lwd=1, drawBorders=FALSE, saxt.line=-0.5, maxt.line=0, 
+  xaxt.line=0, xaxt.tck=-0.025, cex.axis=0.8, cex.lab=1.2, cex.main=2, 
+  summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -1206,9 +1203,10 @@ plotSummary <- function(
   
   # Check plot-specific arguments
   checkPlotArgs(orderModules=orderModules, plotSampleNames=plotSampleNames, 
-    plotModuleNames=plotModuleNames, main=main, lwd=lwd, 
+    plotModuleNames=plotModuleNames, main=main, lwd=lwd, main.line=main.line,
     saxt.line=saxt.line, maxt.line=maxt.line, summaryCols=summaryCols, 
-    naCol=naCol, dryRun=dryRun, xaxt.line=xaxt.line, xaxt.tck=xaxt.tck)
+    naCol=naCol, dryRun=dryRun, xaxt.line=xaxt.line, xaxt.tck=xaxt.tck,
+    xlab.line=xlab.line)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -1307,7 +1305,7 @@ plotSummary <- function(
   
   # Plot bar chart
   plotMultiBar(
-    summaries, summaries.range,
+    summaries, summaries.range, main.line=main.line, xlab.line=xlab.line,
     cols=summaryCols, drawBorders=drawBorders, main=main, 
     yaxt=plotSampleNames, plotModuleNames=plotModuleNames, yaxt.line=saxt.line, 
     xaxt.line=xaxt.line, xaxt.tck=xaxt.tck, maxt.line=maxt.line, 

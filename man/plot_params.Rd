@@ -21,8 +21,14 @@ rendered on the left axis.}
 The default is for module names to be rendered when multiple \code{modules} 
 are drawn.}
 
+\item{main}{title for the plot.}
+
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
+
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
-connectivity, module membership, and module summary bar plots.}
+\emph{weighted degree}, \emph{node conribution}, and \emph{module summary}
+bar plots.}
 
 \item{lwd}{line width for borders and axes.}
 
@@ -41,9 +47,16 @@ x-axis tick labels will be drawn on the module summary bar plot.}
 \item{xaxt.tck}{the size of the x-axis ticks for the module summary bar 
 plot.}
 
+\item{xlab.line}{the number of lines into the bottom margin at which the 
+x axis label on the \emph{module summary} bar plot(s) will be drawn.}
+
 \item{yaxt.line}{the number of lines into the left margin at which the 
 y-axis tick labels will be drawn on the weighted degree and node 
 contribution bar plots.}
+
+\item{ylab.line}{the number of lines into the left margin at which the 
+y axis labels on the \emph{weighted degree} and \emph{node contribution} 
+bar plots will be drawn.}
 
 \item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
 node contribution bar plots.}

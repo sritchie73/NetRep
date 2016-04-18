@@ -6,10 +6,10 @@
 \usage{
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
   main, drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, yaxt.line,
-  laxt.line, xaxt.tck, yaxt.tck, laxt.tck, plotLegend, legend.position,
-  legend.main, palette, symmetric, horizontal, dataCols, dataRange, corCols,
-  corRange, netCols, netRange, degreeCol, contribCols, summaryCols, naCol,
-  dryRun)
+  laxt.line, xaxt.tck, yaxt.tck, laxt.tck, xlab.line, ylab.line, main.line,
+  plotLegend, legend.position, legend.main, symmetric, horizontal, dataCols,
+  dataRange, corCols, corRange, netCols, netRange, degreeCol, contribCols,
+  summaryCols, naCol, dryRun)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
@@ -43,6 +43,12 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \item{yaxt.tck}{user input for the corresponding argument in the plot functions.}
 
 \item{laxt.tck}{user input for the corresponding argument in the plot functions.}
+
+\item{xlab.line}{user input for the corresponding argument in the plot functions.}
+
+\item{ylab.line}{user input for the corresponding argument in the plot functions.}
+
+\item{main.line}{user input for the corresponding argument in the plot functions.}
 
 \item{plotLegend}{user input for the corresponding argument in the plot functions.}
 

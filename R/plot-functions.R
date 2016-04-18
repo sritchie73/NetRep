@@ -10,8 +10,10 @@
 #' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
 #'  plotted along the x axis.
 #' @param main title for the plot.
-#' @param plotLegend logical; if \code{TRUE} a legend is added to the right side of
-#'  the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.
+#' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
+#'  side of the plot.
 #' @param legend.main title for the legend.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
@@ -29,7 +31,7 @@
 #' 
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
-  plotModuleNames=TRUE, main="", plotLegend=TRUE, legend.main="",
+  plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.main="",
   xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
   legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
@@ -131,7 +133,7 @@ plotTriangleHeatmap <- function(
       at=(1:nNodes) * unitSize, labels=xaxt
     )
   }
-  mtext(main, side=3, cex=par("cex.main"), font=2)
+  mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
   
   # Add legend if specified
   if (plotLegend) {
@@ -159,8 +161,10 @@ plotTriangleHeatmap <- function(
 #'  plotted along the x axis if \code{values} is not symmetric, and along both
 #'  axes if \code{values} is symettric.
 #' @param main title for the plot.
-#' @param plotLegend logical; if \code{TRUE} a legend is added to the right side of
-#'  the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.
+#' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
+#'  side of the plot.
 #' @param legend.main title for the legend.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
@@ -181,7 +185,7 @@ plotTriangleHeatmap <- function(
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
-  main="", plotLegend=TRUE, legend.main="", xaxt.line=-0.5, 
+  main="", main.line=0, plotLegend=TRUE, legend.main="", xaxt.line=-0.5, 
   yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
   legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
@@ -296,7 +300,7 @@ plotSquareHeatmap <- function(
       at=(nY:1)*yUnitSize, labels=yaxt
     )
   }
-  mtext(main, side=3, cex=par("cex.main"), font=2)
+  mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
   
   # Add legend if specified
   if (plotLegend) {
@@ -449,6 +453,8 @@ addGradientLegend <- function(
 #' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
 #'  plotted along the x axis.
 #' @param main title for the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
 #' @param yaxt.line the number of lines into the margin at which the y axis
@@ -456,15 +462,18 @@ addGradientLegend <- function(
 #' @param yaxt.tck the size of the y-axis tick marks.
 #' @param maxt.line the number of lines into the margin at which the module 
 #'  names will be drawn.
-#' @param ylab label for the yaxis
+#' @param ylab label for the y axis
+#' @param ylab.line the number of lines into the left margin at which the 
+#'  y axis label will be drawn. 
 #' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
 #'  
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
-  na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", xaxt.line=-0.5,
-  yaxt.line=0, yaxt.tck=-0.15, maxt.line=3, ylab="", lwd=2, dryRun=FALSE
+  na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", main.line=0,
+  xaxt.line=-0.5, yaxt.line=0, yaxt.tck=-0.15, maxt.line=3, ylab="", 
+  ylab.line=2.5, lwd=2, dryRun=FALSE
 ) {
   # Create vector of colors, one for each bar
   if (length(cols) == 1) {
@@ -481,8 +490,11 @@ plotBar <- function(
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1])*0.01
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1])*0.01
   emptyPlot(
-    xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n", ylab=ylab, xpd=NA
+    xlim=c(0.5, length(heights)+0.5), ylim=ylim, bty="n", ylab="", xpd=NA
   )
+  
+  # Draw y-axis label
+  mtext(ylab, side=2, cex=par("cex")*par("cex.lab"), font=1, line=ylab.line)
   
   # draw NAs
   if (!dryRun) {
@@ -543,7 +555,7 @@ plotBar <- function(
       at=1:length(heights), labels=names(heights)
     )
   }
-  mtext(main, side=3, cex=par("cex.main"), font=2)
+  mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
 }
 
 #' Plot multiple horizontal bar plots
@@ -556,6 +568,8 @@ plotBar <- function(
 #'  taken by each bar.
 #' @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
 #' @param main title for the plot
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.  
 #' @param na.col color of missing values to plot.
 #' @param yaxt logical; If \code{TRUE}, the rownames of \code{heights} will be 
 #'  rendered to the left of the bars.
@@ -569,16 +583,18 @@ plotBar <- function(
 #'  labels will be drawn
 #' @param xaxt.tck the size of the x-axis ticks.
 #' @param xlab x axis label
+#' @param xlab.line the number of lines into the bottom margin at which the 
+#'  x axis label will be drawn. 
 #' @param cex.modules relative size of module names.
 #' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
 #'  
 plotMultiBar <- function(
-  lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="",
-  na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, maxt.line=2.5,
-  xaxt.line=0, xaxt.tck=-0.025, xlab="", cex.modules=0.7, lwd=2, 
-  dryRun=FALSE
+  lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="", 
+  main.line=1, na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, 
+  maxt.line=2.5, xaxt.line=0, xaxt.tck=-0.025, xlab="", xlab.line=2.5, 
+  cex.modules=0.7, lwd=2, dryRun=FALSE
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -604,9 +620,12 @@ plotMultiBar <- function(
   pw <- 0.7 # width of each plot within the 0-1 space
   
   emptyPlot(
-    xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n", xlab=xlab,
+    xlim=c(0, ncol(lengths)), ylim=c(0, nrow(lengths)*1.01), bty="n", xlab="",
     xpd=NA
   )
+  
+  # Draw y-axis label
+  mtext(xlab, side=1, cex=par("cex")*par("cex.lab"), font=1, line=xlab.line)
   
   # draw NAs
   if (!dryRun) {
@@ -672,16 +691,16 @@ plotMultiBar <- function(
     )
     if (plotModuleNames) {
       mtext(
-        colnames(lengths)[ii], side=3, at=ii-0.5, cex=cex.modules, font=2,
-        line=maxt.line
+        colnames(lengths)[ii], side=3, at=ii-0.5, cex=par("cex")*cex.modules, 
+        font=2, line=maxt.line
       )
     }
   }
     
   # Draw title
   mtext(
-    main, side=3, at=ncol(lengths)/2, cex=par("cex.main"), font=2, adj=0.5,
-    line=1
+    main, side=3, at=ncol(lengths)/2, cex=par("cex")*par("cex.main"), font=2, 
+    adj=0.5, line=main.line
   )
    
   # Draw sample names

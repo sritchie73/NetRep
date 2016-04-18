@@ -88,8 +88,12 @@ NULL
 #' @param plotModuleNames logical; controls whether module names are rendered.
 #'  The default is for module names to be rendered when multiple \code{modules} 
 #'  are drawn.
+#' @param main title for the plot.
+#' @param main.line the number of lines into the top margin at which the plot
+#'  title will be drawn.  
 #' @param drawBorders logical; if \code{TRUE}, borders are drawn around the 
-#'  connectivity, module membership, and module summary bar plots.
+#'  \emph{weighted degree}, \emph{node conribution}, and \emph{module summary}
+#'  bar plots.
 #' @param lwd line width for borders and axes.
 #' @param naxt.line the number of lines into the bottom margin at which the node
 #'  names will be drawn.
@@ -101,9 +105,14 @@ NULL
 #'  x-axis tick labels will be drawn on the module summary bar plot.
 #' @param xaxt.tck the size of the x-axis ticks for the module summary bar 
 #'  plot.
+#' @param xlab.line the number of lines into the bottom margin at which the 
+#'  x axis label on the \emph{module summary} bar plot(s) will be drawn. 
 #' @param yaxt.line the number of lines into the left margin at which the 
 #'  y-axis tick labels will be drawn on the weighted degree and node 
 #'  contribution bar plots. 
+#' @param ylab.line the number of lines into the left margin at which the 
+#'  y axis labels on the \emph{weighted degree} and \emph{node contribution} 
+#'  bar plots will be drawn. 
 #' @param yaxt.tck the size of the y-axis ticks for the weighted degree and 
 #'  node contribution bar plots.
 #' @param laxt.line the distance from the legend to render the legend axis 

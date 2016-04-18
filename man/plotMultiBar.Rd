@@ -5,9 +5,10 @@
 \title{Plot multiple horizontal bar plots}
 \usage{
 plotMultiBar(lengths, lengths.lim, cols, bar.width = 1, drawBorders = FALSE,
-  main = "", na.col = "#bdbdbd", yaxt = TRUE, plotModuleNames = TRUE,
-  yaxt.line = 0, maxt.line = 2.5, xaxt.line = 0, xaxt.tck = -0.025,
-  xlab = "", cex.modules = 0.7, lwd = 2, dryRun = FALSE)
+  main = "", main.line = 1, na.col = "#bdbdbd", yaxt = TRUE,
+  plotModuleNames = TRUE, yaxt.line = 0, maxt.line = 2.5, xaxt.line = 0,
+  xaxt.tck = -0.025, xlab = "", xlab.line = 2.5, cex.modules = 0.7,
+  lwd = 2, dryRun = FALSE)
 }
 \arguments{
 \item{lengths}{a matrix whose columns contain the lengths of each bar for 
@@ -23,6 +24,9 @@ taken by each bar.}
 \item{drawBorders}{logical; if \code{TRUE} a border is drawn around each bar.}
 
 \item{main}{title for the plot}
+
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
 
 \item{na.col}{color of missing values to plot.}
 
@@ -44,6 +48,9 @@ labels will be drawn}
 \item{xaxt.tck}{the size of the x-axis ticks.}
 
 \item{xlab}{x axis label}
+
+\item{xlab.line}{the number of lines into the bottom margin at which the 
+x axis label will be drawn.}
 
 \item{cex.modules}{relative size of module names.}
 

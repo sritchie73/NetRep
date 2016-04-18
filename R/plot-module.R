@@ -15,8 +15,6 @@
 #' @inheritParams orderModules_param
 #' @inheritParams plot_params
 #' 
-#' @param main title for the plot.
-#' 
 #' @details
 #'  \subsection{Input data structure:}{
 #'   The \link[=modulePreservation]{preservation of network modules} in a second
@@ -303,12 +301,12 @@ plotModule <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
-  drawBorders=FALSE, lwd=1, naxt.line=-0.5, saxt.line=-0.5, 
-  maxt.line=NULL, xaxt.line=-0.5, xaxt.tck=-0.025, yaxt.line=0, yaxt.tck=-0.15, 
-  laxt.line=2.5, laxt.tck=0.04, cex.axis=0.8, cex.lab=1, cex.main=1.2, 
-  dataCols=NULL, dataRange=NULL, corCols=correlation.palette(), 
-  corRange=c(-1,1), netCols=network.palette(), netRange=c(0,1), 
-  degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
+  main.line=1, drawBorders=FALSE, lwd=1, naxt.line=-0.5, saxt.line=-0.5, 
+  maxt.line=NULL, xaxt.line=-0.5, xaxt.tck=-0.025, xlab.line=2.5, yaxt.line=0, 
+  yaxt.tck=-0.15, ylab.line=2.5, laxt.line=2.5, laxt.tck=0.04, cex.axis=0.8, 
+  cex.lab=1.2, cex.main=2, dataCols=NULL, dataRange=NULL, 
+  corCols=correlation.palette(), corRange=c(-1,1), netCols=network.palette(), 
+  netRange=c(0,1), degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
   summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
@@ -343,6 +341,7 @@ plotModule <- function(
     naxt.line=naxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
     xaxt.line=xaxt.line, xaxt.tck=xaxt.tck, yaxt.line=yaxt.line, 
     yaxt.tck=yaxt.tck, laxt.tck=laxt.tck, laxt.line=laxt.line, 
+    ylab.line=ylab.line, xlab.line-xlab.line, main.line=main.line,
     dataCols=dataCols, dataRange=dataRange, corCols=corCols, corRange=corRange, 
     netCols=netCols, netRange=netRange, degreeCol=degreeCol, 
     contribCols=contribCols, summaryCols=summaryCols, naCol=naCol, 
@@ -555,13 +554,12 @@ plotModule <- function(
   plotTriangleHeatmap(
     correlation[[ti]][presentNodes, presentNodes], 
     corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
-    plotLegend=TRUE, main="", legend.main="Correlation", plotModuleNames=FALSE, 
-    laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
+    plotLegend=TRUE, main=main, main.line=main.line, legend.main="Correlation", 
+    plotModuleNames=FALSE, laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
     legend.line=0.1, maxt.line=maxt.line, lwd=lwd, 
     dryRun=dryRun
   )
-  mtext(main, side=3, line=1, cex=par('cex.main'), font=2, xpd=NA)
-  
+
   # Plot network
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
@@ -588,7 +586,8 @@ plotModule <- function(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=FALSE, main="", xaxt=FALSE,
       ylab="Weighted\ndegree", maxt.line=maxt.line, yaxt.line=yaxt.line,
-      yaxt.tck=yaxt.tck, na.col=naCol, lwd=lwd, dryRun=dryRun
+      yaxt.tck=yaxt.tck, ylab.line=ylab.line, na.col=naCol, lwd=lwd, 
+      dryRun=dryRun
     )
   }
   
@@ -599,7 +598,7 @@ plotModule <- function(
       nodeContribVec, c(-1,1), moduleAssignments[[di]][nodeOrder], 
       contribCols, drawBorders=drawBorders, plotModuleNames=FALSE, main="", 
       xaxt=FALSE, ylab="Node\ncontribution", maxt.line=maxt.line, 
-      yaxt.line=yaxt.line, yaxt.tck=yaxt.tck, na.col=naCol,
+      yaxt.line=yaxt.line, yaxt.tck=yaxt.tck, ylab.line=ylab.line, na.col=naCol,
       lwd=lwd, dryRun=dryRun
     )
     
@@ -641,8 +640,8 @@ plotModule <- function(
       cols=summaryCols , drawBorders=drawBorders, lwd=lwd,
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
       yaxt.line=saxt.line, maxt.line=0, xlab=xlab, xaxt.line=xaxt.line, 
-      xaxt.tck=xaxt.tck, cex.modules=par("cex.lab")*0.7, na.col=naCol, 
-      dryRun=dryRun
+      xlab.line=xlab.line, xaxt.tck=xaxt.tck, cex.modules=par("cex.lab"), 
+      na.col=naCol, dryRun=dryRun
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)

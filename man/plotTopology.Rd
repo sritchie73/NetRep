@@ -14,59 +14,62 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames = NULL, main = "", lwd = 2,
-  plotLegend = TRUE, legend.main = "Data", naxt.line = -0.5,
-  saxt.line = -0.5, maxt.line = 3, legend.position = 0.15,
-  laxt.tck = 0.03, laxt.line = 3, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2, dataCols = NULL, dataRange = NULL, naCol = "#bdbdbd",
-  dryRun = FALSE)
+  plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
+  main.line = 1, lwd = 1, plotLegend = TRUE, legend.main = "Data",
+  naxt.line = -0.5, saxt.line = -0.5, maxt.line = 3,
+  legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
+  dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", lwd = 2, plotLegend = TRUE, legend.main = "Correlation",
-  naxt.line = -0.5, maxt.line = 3, legend.position = NULL,
-  laxt.tck = NULL, laxt.line = NULL, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2, corCols = correlation.palette(), corRange = c(-1, 1),
-  naCol = "#bdbdbd", dryRun = FALSE)
+  main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
+  legend.main = "Correlation", naxt.line = -0.5, maxt.line = 3,
+  legend.position = NULL, laxt.tck = NULL, laxt.line = NULL,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", lwd = 2, plotLegend = TRUE, legend.main = "Edge weight",
-  naxt.line = -0.5, maxt.line = 3, legend.position = NULL,
-  laxt.tck = NULL, laxt.line = NULL, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2, netCols = network.palette(), netRange = c(0, 1),
-  naCol = "#bdbdbd", dryRun = FALSE)
+  main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
+  legend.main = "Edge weight", naxt.line = -0.5, maxt.line = 3,
+  legend.position = NULL, laxt.tck = NULL, laxt.line = NULL,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", lwd = 2, drawBorders = FALSE, naxt.line = -0.5,
-  maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2, contribCols = c("#A50026", "#313695"),
-  naCol = "#bdbdbd", dryRun = FALSE)
+  main = "", main.line = 1, ylab.line = 2.5, lwd = 1,
+  drawBorders = FALSE, naxt.line = -0.5, maxt.line = 3, yaxt.line = 0,
+  yaxt.tck = -0.035, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
+  dryRun = FALSE)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", lwd = 2, drawBorders = FALSE, naxt.line = -0.5,
-  maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035, cex.axis = 0.8,
-  cex.lab = 1, cex.main = 1.2, degreeCol = "#feb24c", naCol = "#bdbdbd",
-  dryRun = FALSE)
+  main = "", main.line = 1, lwd = 1, drawBorders = FALSE,
+  naxt.line = -0.5, maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035,
+  ylab.line = 2.5, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  degreeCol = "#feb24c", naCol = "#bdbdbd", dryRun = FALSE)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotSampleNames = TRUE,
-  plotModuleNames = NULL, main = "", lwd = 2, drawBorders = FALSE,
-  saxt.line = -0.5, maxt.line = 0, xaxt.line = 0, xaxt.tck = -0.025,
-  cex.axis = 0.8, cex.lab = 1, cex.main = 1.2,
-  summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
+  plotModuleNames = NULL, main = "", main.line = 1, xlab.line = 2.5,
+  lwd = 1, drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0,
+  xaxt.line = 0, xaxt.tck = -0.025, cex.axis = 0.8, cex.lab = 1.2,
+  cex.main = 2, summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
   dryRun = FALSE)
 }
 \arguments{
@@ -133,7 +136,10 @@ rendered on the left axis.}
 The default is for module names to be rendered when multiple \code{modules} 
 are drawn.}
 
-\item{main}{title for each plot.}
+\item{main}{title for the plot.}
+
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
 
 \item{lwd}{line width for borders and axes.}
 
@@ -196,9 +202,13 @@ the network edge weight heatmap (see details).}
 \item{netRange}{the range of values to map to the \code{corCols} gradient
 (see details). Automatically determined if \code{NA} or \code{NULL}.}
 
-\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the bars
-in \code{plotContribution}, \code{plotDegree}, and
-\code{plotSummary}.}
+\item{ylab.line}{the number of lines into the left margin at which the 
+y axis labels on the \emph{weighted degree} and \emph{node contribution} 
+bar plots will be drawn.}
+
+\item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
+\emph{weighted degree}, \emph{node conribution}, and \emph{module summary}
+bar plots.}
 
 \item{yaxt.line}{the number of lines into the left margin at which the 
 y-axis tick labels will be drawn on the weighted degree and node 
@@ -211,6 +221,9 @@ node contribution bar plots.}
 (see details).}
 
 \item{degreeCol}{color to use for the weighted degree bar plot.}
+
+\item{xlab.line}{the number of lines into the bottom margin at which the 
+x axis label on the \emph{module summary} bar plot(s) will be drawn.}
 
 \item{xaxt.line}{the number of lines into the bottom margin at which the 
 x-axis tick labels will be drawn on the module summary bar plot.}

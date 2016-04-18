@@ -9,12 +9,12 @@ plotModule(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames = NULL,
-  main = "Module Topology", drawBorders = FALSE, lwd = 2,
+  main = "Module Topology", main.line = 1, drawBorders = FALSE, lwd = 1,
   naxt.line = -0.5, saxt.line = -0.5, maxt.line = NULL,
-  xaxt.line = -0.5, xaxt.tck = -0.025, yaxt.line = 0, yaxt.tck = -0.15,
-  laxt.line = 2.5, laxt.tck = 0.04, cex.axis = 0.8, cex.lab = 1,
-  cex.main = 1.2, dataCols = NULL, dataRange = NULL,
-  corCols = correlation.palette(), corRange = c(-1, 1),
+  xaxt.line = -0.5, xaxt.tck = -0.025, xlab.line = 2.5, yaxt.line = 0,
+  yaxt.tck = -0.15, ylab.line = 2.5, laxt.line = 2.5, laxt.tck = 0.04,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
+  dataRange = NULL, corCols = correlation.palette(), corRange = c(-1, 1),
   netCols = network.palette(), netRange = c(0, 1), degreeCol = "#feb24c",
   contribCols = c("#A50026", "#313695"), summaryCols = c("#1B7837",
   "#762A83"), naCol = "#bdbdbd", dryRun = FALSE)
@@ -85,8 +85,12 @@ are drawn.}
 
 \item{main}{title for the plot.}
 
+\item{main.line}{the number of lines into the top margin at which the plot
+title will be drawn.}
+
 \item{drawBorders}{logical; if \code{TRUE}, borders are drawn around the 
-connectivity, module membership, and module summary bar plots.}
+\emph{weighted degree}, \emph{node conribution}, and \emph{module summary}
+bar plots.}
 
 \item{lwd}{line width for borders and axes.}
 
@@ -105,12 +109,19 @@ x-axis tick labels will be drawn on the module summary bar plot.}
 \item{xaxt.tck}{the size of the x-axis ticks for the module summary bar 
 plot.}
 
+\item{xlab.line}{the number of lines into the bottom margin at which the 
+x axis label on the \emph{module summary} bar plot(s) will be drawn.}
+
 \item{yaxt.line}{the number of lines into the left margin at which the 
 y-axis tick labels will be drawn on the weighted degree and node 
 contribution bar plots.}
 
 \item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
 node contribution bar plots.}
+
+\item{ylab.line}{the number of lines into the left margin at which the 
+y axis labels on the \emph{weighted degree} and \emph{node contribution} 
+bar plots will be drawn.}
 
 \item{laxt.line}{the distance from the legend to render the legend axis 
 labels, as multiple of \code{laxt.tck}.}
