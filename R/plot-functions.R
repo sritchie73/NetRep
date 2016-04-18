@@ -15,6 +15,8 @@
 #' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
 #'  side of the plot.
 #' @param legend.main title for the legend.
+#' @param legend.main.line distance from the legend to render the legend 
+#'  title.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
 #' @param maxt.line the number of lines into the margin at which the module 
@@ -32,8 +34,8 @@
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
   plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.main="",
-  xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
-  legend.line=0.1, lwd=2, dryRun=FALSE
+  legend.main.line=1, xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, 
+  laxt.line=2.5, legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nNodes <- ncol(values) + length(na.indices)
   palette <- colorRampPalette(palette)(255)
@@ -138,7 +140,7 @@ plotTriangleHeatmap <- function(
   # Add legend if specified
   if (plotLegend) {
     addGradientLegend(
-      palette, vlim, TRUE, legend.main,
+      palette, vlim, TRUE, legend.main, legend.main.line=legend.main.line,
       xlim=c(halfUnit - pw*legend.line, pw*0.25), 
       ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tck=laxt.tck,
       axis.line=laxt.line, lwd=lwd
@@ -166,6 +168,8 @@ plotTriangleHeatmap <- function(
 #' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
 #'  side of the plot.
 #' @param legend.main title for the legend.
+#' @param legend.main.line distance from the legend to render the legend 
+#'  title.
 #' @param xaxt.line the number of lines into the margin at which the x axis 
 #'  labels will be drawn.
 #' @param yaxt.line the number of lines into the margin at which the y axis 
@@ -185,8 +189,8 @@ plotTriangleHeatmap <- function(
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
-  main="", main.line=0, plotLegend=TRUE, legend.main="", xaxt.line=-0.5, 
-  yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
+  main="", main.line=0, plotLegend=TRUE, legend.main="", legend.main.line=1,
+  xaxt.line=-0.5, yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
   legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nX <- ncol(values) + length(na.indices.x)
@@ -305,7 +309,7 @@ plotSquareHeatmap <- function(
   # Add legend if specified
   if (plotLegend) {
     addGradientLegend(
-      palette, vlim, FALSE, legend.main,
+      palette, vlim, FALSE, legend.main, legend.main.line=legend.main.line,
       xlim=c(pw - xHalfUnit + pw*legend.line, pw - xHalfUnit + pw*(legend.line+0.05)), 
       ylim=c(ph/3, ph - yHalfUnit - ph*0.1), tck=laxt.tck,
       axis.line=laxt.line, lwd=lwd
@@ -328,12 +332,13 @@ plotSquareHeatmap <- function(
 #'  plot window.
 #' @param axis.line distance from the axis to render the axis labels as a 
 #'  multiple of \code{tck}.
+#' @param legend.main.line distance from the plot to render the legend title.
 #' @param lwd line width for borders.
 #' @param srt angle of text labels
 #' 
 addGradientLegend <- function(
   palette, legend.vlim, horizontal, main, xlim, ylim, 
-  tck=0.04, axis.line=3, lwd=2, srt
+  tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -429,7 +434,7 @@ addGradientLegend <- function(
   }
   
   # Render title
-  offset <- (par("usr")[4] - par("usr")[3]) * 0.07
+  offset <- (par("usr")[4] - par("usr")[3]) * 0.05 * legend.main.line
   text(
     main, x=xlim[1]+(xlim[2]-xlim[1])/2, y=ylim[2]+offset, font=2, xpd=NA,
     cex=par("cex.lab")

@@ -7,9 +7,9 @@
 plotSquareHeatmap(values, palette, vlim, mas, na.indices.x = NULL,
   na.indices.y = NULL, na.col = "#bdbdbd", xaxt = NULL, yaxt = NULL,
   plotModuleNames = TRUE, main = "", main.line = 0, plotLegend = TRUE,
-  legend.main = "", xaxt.line = -0.5, yaxt.line = -0.5, maxt.line = 3,
-  laxt.tck = 0.04, laxt.line = 2.5, legend.line = 0.1, lwd = 2,
-  dryRun = FALSE)
+  legend.main = "", legend.main.line = 1, xaxt.line = -0.5,
+  yaxt.line = -0.5, maxt.line = 3, laxt.tck = 0.04, laxt.line = 2.5,
+  legend.line = 0.1, lwd = 2, dryRun = FALSE)
 }
 \arguments{
 \item{values}{values to plot on the heatmap.}
@@ -43,6 +43,9 @@ title will be drawn.}
 side of the plot.}
 
 \item{legend.main}{title for the legend.}
+
+\item{legend.main.line}{distance from the legend to render the legend 
+title.}
 
 \item{xaxt.line}{the number of lines into the margin at which the x axis 
 labels will be drawn.}

@@ -304,7 +304,7 @@ plotModule <- function(
   main.line=1, drawBorders=FALSE, lwd=1, naxt.line=-0.5, saxt.line=-0.5, 
   maxt.line=NULL, xaxt.line=-0.5, xaxt.tck=-0.025, xlab.line=2.5, yaxt.line=0, 
   yaxt.tck=-0.15, ylab.line=2.5, laxt.line=2.5, laxt.tck=0.04, cex.axis=0.8, 
-  cex.lab=1.2, cex.main=2, dataCols=NULL, dataRange=NULL, 
+  legend.main.line=1.5, cex.lab=1.2, cex.main=2, dataCols=NULL, dataRange=NULL, 
   corCols=correlation.palette(), corRange=c(-1,1), netCols=network.palette(), 
   netRange=c(0,1), degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
   summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd", dryRun=FALSE
@@ -337,14 +337,14 @@ plotModule <- function(
   
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
     plotSampleNames=plotSampleNames, plotModuleNames=plotModuleNames, 
-    main=main, drawBorders=drawBorders, lwd=lwd, 
-    naxt.line=naxt.line, saxt.line=saxt.line, maxt.line=maxt.line, 
-    xaxt.line=xaxt.line, xaxt.tck=xaxt.tck, yaxt.line=yaxt.line, 
-    yaxt.tck=yaxt.tck, laxt.tck=laxt.tck, laxt.line=laxt.line, 
-    ylab.line=ylab.line, xlab.line-xlab.line, main.line=main.line,
-    dataCols=dataCols, dataRange=dataRange, corCols=corCols, corRange=corRange, 
-    netCols=netCols, netRange=netRange, degreeCol=degreeCol, 
-    contribCols=contribCols, summaryCols=summaryCols, naCol=naCol, 
+    main=main, drawBorders=drawBorders, lwd=lwd, naxt.line=naxt.line, 
+    saxt.line=saxt.line, maxt.line=maxt.line, xaxt.line=xaxt.line, 
+    xaxt.tck=xaxt.tck, yaxt.line=yaxt.line, yaxt.tck=yaxt.tck, 
+    laxt.tck=laxt.tck, laxt.line=laxt.line, ylab.line=ylab.line, 
+    xlab.line=xlab.line, main.line=main.line, dataCols=dataCols, 
+    dataRange=dataRange, corCols=corCols, corRange=corRange, netCols=netCols, 
+    netRange=netRange, degreeCol=degreeCol, contribCols=contribCols, 
+    summaryCols=summaryCols, naCol=naCol, legend.main.line=legend.main.line, 
     dryRun=dryRun)
   
   # Handle variants that will not work for this plot function
@@ -557,7 +557,7 @@ plotModule <- function(
     plotLegend=TRUE, main=main, main.line=main.line, legend.main="Correlation", 
     plotModuleNames=FALSE, laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
     legend.line=0.1, maxt.line=maxt.line, lwd=lwd, 
-    dryRun=dryRun
+    legend.main.line=legend.main.line, dryRun=dryRun
   )
 
   # Plot network
@@ -566,7 +566,7 @@ plotModule <- function(
     network[[ti]][presentNodes, presentNodes], netCols, netRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, main="", 
     legend.main="Edge weights", plotModuleNames=FALSE, 
-    laxt.tck=laxt.tck, na.col=naCol,
+    laxt.tck=laxt.tck, na.col=naCol, legend.main.line=legend.main.line,
     laxt.line=laxt.line, legend.line=0.1, maxt.line=maxt.line,
     lwd=lwd, dryRun=dryRun
   )
@@ -626,7 +626,7 @@ plotModule <- function(
       dataCols, dataRange, TRUE, main="Module data",
       xlim=c(xHalfUnit + 0.1, 1 - xHalfUnit - 0.1), 
       ylim=c(1 + yHalfUnit + 0.2, 1 + yHalfUnit + 0.3),  
-      tck=laxt.tck, lwd=lwd,
+      tck=laxt.tck, lwd=lwd, legend.main.line=legend.main.line,
       axis.line=laxt.line, srt=0
     )
     

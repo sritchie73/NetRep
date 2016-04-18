@@ -7,9 +7,9 @@
 checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
   main, drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, yaxt.line,
   laxt.line, xaxt.tck, yaxt.tck, laxt.tck, xlab.line, ylab.line, main.line,
-  plotLegend, legend.position, legend.main, symmetric, horizontal, dataCols,
-  dataRange, corCols, corRange, netCols, netRange, degreeCol, contribCols,
-  summaryCols, naCol, dryRun)
+  plotLegend, legend.position, legend.main, legend.main.line, symmetric,
+  horizontal, dataCols, dataRange, corCols, corRange, netCols, netRange,
+  degreeCol, contribCols, summaryCols, naCol, dryRun)
 }
 \arguments{
 \item{orderModules}{user input for the corresponding argument in the plot functions.}
@@ -55,6 +55,8 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \item{legend.position}{user input for the corresponding argument in the plot functions.}
 
 \item{legend.main}{user input for the corresponding argument in the plot functions.}
+
+\item{legend.main.line}{input for the corresponding argument in the plot functions.}
 
 \item{symmetric}{user input for the corresponding argument in the plot functions.}
 

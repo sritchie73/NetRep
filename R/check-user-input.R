@@ -808,6 +808,7 @@ dynamicMatLoad <- function(object, tempdir, verbose, ...) {
 #' @param plotLegend user input for the corresponding argument in the plot functions.
 #' @param legend.position user input for the corresponding argument in the plot functions.
 #' @param legend.main user input for the corresponding argument in the plot functions.
+#' @param legend.main.line input for the corresponding argument in the plot functions.
 #' @param symmetric user input for the corresponding argument in the plot functions.
 #' @param horizontal user input for the corresponding argument in the plot functions.
 #' @param dataCols user input for the corresponding argument in the plot functions.
@@ -826,9 +827,9 @@ checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, 
   yaxt.line, laxt.line, xaxt.tck, yaxt.tck, laxt.tck, xlab.line, ylab.line,
-  main.line, plotLegend, legend.position, legend.main, symmetric, horizontal, 
-  dataCols, dataRange, corCols, corRange, netCols, netRange, degreeCol, 
-  contribCols, summaryCols, naCol, dryRun
+  main.line, plotLegend, legend.position, legend.main, legend.main.line, 
+  symmetric, horizontal, dataCols, dataRange, corCols, corRange, netCols, 
+  netRange, degreeCol, contribCols, summaryCols, naCol, dryRun
 ) {
   # Return TRUE only if a an object is a vector, not a list.
   is.vector <- function(obj) {
@@ -964,6 +965,17 @@ checkPlotArgs <- function(
     }
     if (is.snum(main.line) && is.infinite(main.line)) {
       stop("'main.line' must be finite")
+    }
+  }
+  
+  if (!missing(legend.main.line)) {
+    if (!(is.snum(legend.main.line) || is.na(legend.main.line) || 
+          is.null(legend.main.line))) {
+      stop("'legend.main.line' must be a numeric vector of length 1, 'NA', or 
+           'NULL'")
+    }
+    if (is.snum(legend.main.line) && is.infinite(legend.main.line)) {
+      stop("'legend.main.line' must be finite")
     }
   }
   

@@ -340,8 +340,8 @@ plotData <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, lwd=1, 
-  plotLegend=TRUE, legend.main="Data", naxt.line=-0.5, saxt.line=-0.5, 
-  maxt.line=3, legend.position=0.15, laxt.tck=0.03, laxt.line=3, 
+  plotLegend=TRUE, legend.main="Data", legend.main.line=1, naxt.line=-0.5, 
+  saxt.line=-0.5, maxt.line=3, legend.position=0.15, laxt.tck=0.03, laxt.line=3, 
   cex.axis=0.8, cex.lab=1.2, cex.main=2, dataCols=NULL, dataRange=NULL, 
   naCol="#bdbdbd", dryRun=FALSE
 ) {
@@ -381,7 +381,7 @@ plotData <- function(
     saxt.line=saxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     laxt.tck=laxt.tck,plotLegend=plotLegend, dataCols=dataCols,
     legend.main=legend.main, naCol=naCol, legend.position=legend.position, 
-    dataRange=dataRange, dryRun=dryRun)
+    dataRange=dataRange, dryRun=dryRun, legend.main.line=legend.main.line)
   
   # Handle variants that will not work for this plot function
   if (is.null(laxt.tck))
@@ -510,7 +510,7 @@ plotData <- function(
     
   # Plot
   plotSquareHeatmap(
-    dat, dataCols, vlim=dataRange,
+    dat, dataCols, vlim=dataRange, legend.main.line=legend.main.line,
     moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, xaxt=xaxt, 
     yaxt=yaxt, plotLegend=plotLegend, main=main, main.line=main.line,
     legend.main=legend.main, plotModuleNames=plotModuleNames, 
@@ -531,9 +531,10 @@ plotCorrelation <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
-  legend.main="Correlation", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
-  laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1.2, cex.main=2, 
-  corCols=correlation.palette(), corRange=c(-1,1), naCol="#bdbdbd", dryRun=FALSE
+  legend.main="Correlation", legend.main.line=1, naxt.line=-0.5, maxt.line=3, 
+  legend.position=NULL, laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, 
+  cex.lab=1.2, cex.main=2, corCols=correlation.palette(), corRange=c(-1,1), 
+  naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -567,7 +568,8 @@ plotCorrelation <- function(
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     laxt.tck=laxt.tck, plotLegend=plotLegend, naCol=naCol, main.line=main.line,
     legend.main=legend.main, legend.position=legend.position, corCols=corCols, 
-    corRange=corRange, symmetric=symmetric, dryRun=dryRun)
+    corRange=corRange, symmetric=symmetric, dryRun=dryRun,
+    legend.main.line=legend.main.line)
 
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -681,7 +683,7 @@ plotCorrelation <- function(
       xaxt.line=naxt.line, yaxt.line=naxt.line, lwd=lwd,
       laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line,
       legend.line=legend.position, maxt.line=maxt.line, na.col=naCol,
-      dryRun=dryRun
+      dryRun=dryRun,legend.main.line=legend.main.line
     )
   } else {
     plotTriangleHeatmap(
@@ -691,7 +693,7 @@ plotCorrelation <- function(
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
       laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line,
       legend.line=legend.position, maxt.line=maxt.line, 
-      lwd=lwd, na.col=naCol, dryRun=dryRun
+      lwd=lwd, na.col=naCol, dryRun=dryRun, legend.main.line=legend.main.line
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
@@ -707,9 +709,10 @@ plotNetwork <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
-  legend.main="Edge weight", naxt.line=-0.5, maxt.line=3, legend.position=NULL, 
-  laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, cex.lab=1.2, cex.main=2, 
-  netCols=network.palette(), netRange=c(0,1), naCol="#bdbdbd", dryRun=FALSE
+  legend.main="Edge weight", legend.main.line=1, naxt.line=-0.5, maxt.line=3, 
+  legend.position=NULL, laxt.tck=NULL, laxt.line=NULL, cex.axis=0.8, 
+  cex.lab=1.2, cex.main=2, netCols=network.palette(), netRange=c(0,1), 
+  naCol="#bdbdbd", dryRun=FALSE
 ) {
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
@@ -742,8 +745,9 @@ plotNetwork <- function(
     plotModuleNames=plotModuleNames, main=main, lwd=lwd, 
     naxt.line=naxt.line, maxt.line=maxt.line, laxt.line=laxt.line, 
     laxt.tck=laxt.tck, plotLegend=plotLegend, naCol=naCol, main.line=main.line,
-    legend.main=legend.main, legend.position=legend.position, 
-    symmetric=symmetric, netCols=netCols, netRange=netRange, dryRun=dryRun)
+    legend.main=legend.main, legend.position=legend.position,
+    symmetric=symmetric, netCols=netCols, netRange=netRange, dryRun=dryRun,
+    legend.main.line=legend.main.line)
   
   # Register parallel backend. 
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
@@ -857,7 +861,7 @@ plotNetwork <- function(
       xaxt.line=naxt.line, yaxt.line=naxt.line, 
       laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line,
       legend.line=legend.position, maxt.line=maxt.line,
-      lwd=lwd, na.col=naCol, dryRun=dryRun
+      lwd=lwd, na.col=naCol, dryRun=dryRun, legend.main.line=legend.main.line
     )
   } else {
     plotTriangleHeatmap(
@@ -867,7 +871,7 @@ plotNetwork <- function(
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
       laxt.tck=laxt.tck, laxt.line=laxt.line, main.line=main.line, 
       legend.line=legend.position, maxt.line=maxt.line, 
-      lwd=lwd, na.col=naCol, dryRun=dryRun
+      lwd=lwd, na.col=naCol, dryRun=dryRun, legend.main.line=legend.main.line
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
