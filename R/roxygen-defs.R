@@ -82,11 +82,11 @@ NULL
 #'  containing a single dataset name or index. Controls how samples are ordered 
 #'  on the plot (see details).
 #' @param plotNodeNames logical; controls whether the node names are 
-#'  rendered on the bottom axis.
+#'  drawed on the bottom axis.
 #' @param plotSampleNames logical; controls whether the sample names are 
-#'  rendered on the left axis.
-#' @param plotModuleNames logical; controls whether module names are rendered.
-#'  The default is for module names to be rendered when multiple \code{modules} 
+#'  drawed on the left axis.
+#' @param plotModuleNames logical; controls whether module names are drawed.
+#'  The default is for module names to be drawed when multiple \code{modules} 
 #'  are drawn.
 #' @param main title for the plot.
 #' @param main.line the number of lines into the top margin at which the plot
@@ -115,10 +115,12 @@ NULL
 #'  bar plots will be drawn. 
 #' @param yaxt.tck the size of the y-axis ticks for the weighted degree and 
 #'  node contribution bar plots.
-#' @param laxt.line the distance from the legend to render the legend axis 
+#' @param laxt.line the distance from the legend to draw the legend axis 
 #'  labels, as multiple of \code{laxt.tck}.
 #' @param laxt.tck size of the ticks on each axis legend relative to the
 #'  size of the correlation, edge weights, and data matrix heatmaps.
+#' @param legend.main.line the distance from the legend to draw the legend 
+#'  title.
 #' @param cex.axis relative size of the node and sample names.
 #' @param cex.lab relative size of the module names and legend titles.
 #' @param cex.main relative size of the plot titles.
@@ -143,7 +145,7 @@ NULL
 #' @param naCol color to use for missing nodes and samples on the data, 
 #'  correlation structure, and network edge weight heat maps.
 #' @param dryRun logical; if \code{TRUE}, only the axes and labels will be 
-#'  rendered.
+#'  drawed.
 #' 
 #' @name plot_params
 NULL

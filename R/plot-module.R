@@ -26,30 +26,30 @@
 #'   variables/nodes. Thus, all functions in the \code{NetRep} package have the 
 #'   following arguments: 
 #'   \itemize{
-#'     \item{\code{network}:}{
+#'     \item{\code{network}: }{
 #'       a list of interaction networks, one for each dataset.
 #'     }
-#'     \item{\code{data}:}{
+#'     \item{\code{data}: }{
 #'       a list of data matrices used to infer those networks, one for each 
 #'       dataset.
 #'     }
-#'     \item{\code{correlation}:}{
+#'     \item{\code{correlation}: }{
 #'      a list of matrices containing the pairwise correlation coefficients 
 #'      between variables/nodes in each dataset.
 #'     } 
-#'     \item{\code{moduleAssignments}:}{
+#'     \item{\code{moduleAssignments}: }{
 #'      a list of vectors, one for each \emph{discovery} dataset, containing 
 #'      the module assignments for each node in that dataset.
 #'     }
-#'     \item{\code{modules}:}{
+#'     \item{\code{modules}: }{
 #'      a list of vectors, one for each \emph{discovery} dataset, containing
 #'      the names of the modules from that dataset to analyse.  
 #'     }
-#'     \item{\code{discovery}:}{
+#'     \item{\code{discovery}: }{
 #'       a vector indicating the names or indices of the previous arguments' 
 #'       lists to use as the \emph{discovery} dataset(s) for the analyses.
 #'     }
-#'     \item{\code{test}:}{
+#'     \item{\code{test}: }{
 #'       a list of vectors, one vector for each \emph{discovery} dataset, 
 #'       containing the names or indices of the \code{network}, \code{data}, and 
 #'       \code{correlation} argument lists to use as the \emph{test} dataset(s) 
@@ -141,44 +141,79 @@
 #' \subsection{Plot layout and device size}{
 #'   For optimal results we recommend viewing single modules on a PNG device
 #'   with a width of 1500, a height of 2700 and a nominal resolution of 300 
-#'   (\code{png(filename, width=5*300, height=9*300, res=300))}). PDF and other
-#'   vectorized devices should not be used for modules with more than a hundred
-#'   nodes. When changing the device size the spacing of axes, titles, and 
-#'   legends may need adjusting.
+#'   (\code{png(filename, width=5*300, height=9*300, res=300))}).
+#'   
+#'   \strong{Warning}: PDF and other vectorized devices should not be used when
+#'   plotting more than a hundred nodes. Large files will be generated which
+#'   may cause image editing programs such as Inkscape or Illustrator to crash
+#'   when polishing figures for publication.
 #'   
 #'   When \code{dryRun} is \code{TRUE} only the axes, legends, labels, and
 #'   title will be drawn, allowing for quick iteration of customisable
 #'   parameters to get the plot layout correct.
 #'   
-#'   The arguments \code{naxt.line}, \code{saxt.line}, and \code{maxt.line} 
-#'   control the position of the node, sample, and module labels on the plot. 
-#'   Increasing \code{naxt.line} and \code{maxt.line} will increase the 
-#'   distance from the bottom of the data heatmap that the node and module 
-#'   labels will be drawn. Increasing \code{saxt.line} will increase the
-#'   distance from the left of the module summary bar plot(s) the sample labels
-#'   will be drawn.
+#'   If axis labels or legends are drawn off screen then the margins of the 
+#'   plot should be adjusted prior to plotting using the \code{\link{par}}
+#'   command to increase the margin size (see the "mar" option in the 
+#'   \code{\link[par]{par help page}}).
 #'   
-#'   The arguments \code{xaxt.line}, \code{xaxt.tck}, \code{yaxt.line}, and
-#'   \code{yaxt.tck} control the appearance of the bar plot axes. 
-#'   \code{xaxt.tck} and \code{yaxt.txt} control the size of the axis ticks on
-#'   the weighted degree, node contribution, and module summary bar plots.
-#'   \code{xaxt.line} and \code{yaxt.line} control the distance from the axis
-#'   the axis tick labels are drawn. 
+#'   The size of text labels can be modified by increasing or decreasing the
+#'   \code{cex.main}, \code{cex.lab}, and \code{cex.axis} arguments:
+#'   \itemize{
+#'    \item{\code{cex.main}: }{controls the size of the plot title (specified 
+#'                            in the \code{main} argument).}
+#'    \item{\code{cex.lab}: }{controls the size of the axis labels on the
+#'                           \emph{weighted degree}, \emph{node contribution},
+#'                           and \emph{module summary} bar plots as well as
+#'                           the size of the module labels and the heatmap 
+#'                           legend titles.}
+#'    \item{\code{cex.axis}: }{contols the size of the axis tick labels, 
+#'                            including the node and sample labels.}
+#'   }
 #'   
-#'   The arguments \code{laxt.line} and \code{laxt.tck} control the appearance
-#'   of the heatmap legends. \code{laxt.tck} controls the size of the axis 
-#'   ticks on the legend gradients while \code{laxt.line} controls the distance
-#'   from the legend the axis tick labels are drawn.
-#'   
-#'   \code{cex.main} controls the relative text size of the plot title 
-#'   (specified by the \code{main} argument). \code{cex.axis} controls the 
-#'   relative text size of the axis tick, node, and sample labels. 
-#'   \code{cex.lab} controls the relative text size of the bar plot axis labels, 
-#'   module labels, and legend titles.
+#'   The position of these labels can be changed through the following 
+#'   arguments:
+#'   \itemize{
+#'    \item{\code{xaxt.line}: }{controls the distance from the plot the x-axis
+#'          tick labels are drawn on the \emph{module summary} bar plot.}
+#'    \item{\code{xlab.line}: }{controls the distance from the plot the x-axis 
+#'          label is drawn on the \emph{module summary} bar plot.}
+#'    \item{\code{yaxt.line}: }{controls the distance from the plot the y-axis 
+#'          tick labels are drawn on the \emph{weighted degree} and  
+#'          \emph{node contribution} bar plots.}
+#'    \item{\code{ylab.line}: }{controls the distance from the plot the y-axis
+#'          label is drawn on the \emph{weighted degree} and 
+#'          \emph{node contribution} bar plots.}
+#'    \item{\code{main.line}: }{controls the distance from the plot the title is
+#'          drawn.}
+#'    \item{\code{naxt.line}: }{controls the distance from the plot the node 
+#'          labels are drawn.}
+#'    \item{\code{saxt.line}: }{controls thedistance from the plot the sample 
+#'          labels are drawn.}
+#'    \item{\code{maxt.line}: }{controls the distance from the plot the module
+#'          labels are drawn.}
+#'    \item{\code{laxt.line}: }{controls the distance from the heatmap legends
+#'          that the gradient legend labels are drawn.}
+#'    \item{\code{legend.main.line}: }{controls the distance from the heatmap
+#'          legends that the legend title is drawn.}
+#'   }
 #'   
 #'   The rendering of node, sample, and module names can be disabled by setting
 #'   \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames}
 #'   to \code{FALSE}.
+#'   
+#'   The size of the axis ticks can be changed by increasing or decreasing the
+#'   following arguments:
+#'   \itemize{
+#'    \item{\code{xaxt.tck}: }{size of the x-axis tick labels as a multiple of
+#'          the height of the \emph{module summary} bar plot}
+#'    \item{\code{yaxt.tck}: }{size of the y-axis tick labels as a multiple of 
+#'          the width of the \emph{weighted degree} or \emph{node contribution}
+#'          bar plots.}
+#'    \item{\code{laxt.tck}: }{size of the heatmap legend axis ticks as a 
+#'          multiple of the width of the data, correlation structure, or 
+#'          network edge weight heatmaps.}
+#'   }
 #'   
 #'   The \code{drawBorders} argument controls whether borders are drawn around 
 #'   the weighted degree, node contribution, or module summary bar plots. The 

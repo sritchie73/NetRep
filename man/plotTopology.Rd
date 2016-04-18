@@ -16,8 +16,8 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
   plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
   main.line = 1, lwd = 1, plotLegend = TRUE, legend.main = "Data",
-  naxt.line = -0.5, saxt.line = -0.5, maxt.line = 3,
-  legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
+  legend.main.line = 1, naxt.line = -0.5, saxt.line = -0.5,
+  maxt.line = 3, legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
   cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
   dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
 
@@ -26,9 +26,9 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
-  legend.main = "Correlation", naxt.line = -0.5, maxt.line = 3,
-  legend.position = NULL, laxt.tck = NULL, laxt.line = NULL,
-  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  legend.main = "Correlation", legend.main.line = 1, naxt.line = -0.5,
+  maxt.line = 3, legend.position = NULL, laxt.tck = NULL,
+  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
   corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
   dryRun = FALSE)
 
@@ -37,9 +37,9 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
-  legend.main = "Edge weight", naxt.line = -0.5, maxt.line = 3,
-  legend.position = NULL, laxt.tck = NULL, laxt.line = NULL,
-  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  legend.main = "Edge weight", legend.main.line = 1, naxt.line = -0.5,
+  maxt.line = 3, legend.position = NULL, laxt.tck = NULL,
+  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
   netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
   dryRun = FALSE)
 
@@ -127,13 +127,13 @@ their summary vectors. If \code{FALSE} modules are returned in the order
 provided.}
 
 \item{plotNodeNames}{logical; controls whether the node names are 
-rendered on the bottom axis.}
+drawed on the bottom axis.}
 
 \item{plotSampleNames}{logical; controls whether the sample names are 
-rendered on the left axis.}
+drawed on the left axis.}
 
-\item{plotModuleNames}{logical; controls whether module names are rendered.
-The default is for module names to be rendered when multiple \code{modules} 
+\item{plotModuleNames}{logical; controls whether module names are drawed.
+The default is for module names to be drawed when multiple \code{modules} 
 are drawn.}
 
 \item{main}{title for the plot.}
@@ -147,6 +147,9 @@ title will be drawn.}
 \code{plotCorrelation}, \code{plotNetwork}, or \code{plotData}.}
 
 \item{legend.main}{title for the legend.}
+
+\item{legend.main.line}{the distance from the legend to draw the legend 
+title.}
 
 \item{naxt.line}{the number of lines into the bottom margin at which the node
 names will be drawn.}
@@ -163,7 +166,7 @@ proportion of the plot width.}
 \item{laxt.tck}{size of the ticks on each axis legend relative to the
 size of the correlation, edge weights, and data matrix heatmaps.}
 
-\item{laxt.line}{the distance from the legend to render the legend axis 
+\item{laxt.line}{the distance from the legend to draw the legend axis 
 labels, as multiple of \code{laxt.tck}.}
 
 \item{cex.axis}{relative size of the node and sample names.}
@@ -183,7 +186,7 @@ the data heatmap (see details). Automatically determined if \code{NA} or
 correlation structure, and network edge weight heat maps.}
 
 \item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
-rendered.}
+drawed.}
 
 \item{symmetric}{logical; controls whether the correlation and network 
 heatmaps are drawn as symmetric (square) heatmaps or asymettric triangle 
@@ -379,53 +382,94 @@ one or more network modules.
   any given module when rendered on the bar plot. This facilitates visual 
   comparison of multiple modules with differing sizes or densities.
 }
-\subsection{Plot layout and device size:}{
+\subsection{Plot layout and device size}{
   Although reasonable default values for most parameters have been provided,
   the rendering of axes and titles may need adjusting depending on the size
   of the plot window. The \code{dryRun} argument is useful for quickly 
   determining whether the plot will render correctly. When \code{dryRun} 
   is \code{TRUE} only the axes, legends, labels, and title will be drawn, 
   allowing for quick iteration of customisable parameters to get the plot 
-  layout correct.
+  layout correct. 
   
-  The arguments \code{naxt.line}, \code{saxt.line}, and \code{maxt.line} 
-  control the position of the node, sample, and module labels on the plot.
-   
-  The arguments \code{xaxt.line}, \code{xaxt.tck}, \code{yaxt.line}, and
-  \code{yaxt.tck} control the appearance of the axis ticks and labels on the
-  \code{plotDegree}, \code{plotContribution}, and \code{plotSummary} bar 
-  plots. \code{xaxt.tck} and \code{yaxt.txt} control the size of the axis 
-  ticks. \code{xaxt.line} and \code{yaxt.line} control the distance 
-  from the axis the axis tick labels are drawn. 
+  \strong{Warning}: PDF and other vectorized devices should not be used when
+  plotting the heatmaps with more than a hundred nodes. Large files will be
+  generated which may cause image editing programs such as Inkscape or
+  Illustrator to crash when polishing figures for publication.
   
-  The arguments \code{laxt.line} and \code{laxt.tck} control the appearance
-  of the heatmap legends. \code{laxt.tck} controls the size of the axis 
-  ticks on the legend gradients while \code{laxt.line} controls the distance
-  from the legend the axis tick labels are drawn.
+  If axis labels or legends are drawn off screen then the margins of the 
+  plot should be adjusted prior to plotting using the \code{\link{par}}
+  command to increase the margin size (see the "mar" option in the 
+  \code{\link[par]{par help page}}).
   
-  \code{legend.position} controls the horizontal offset of the legend 
-  relative to the plot. For the triangle heatmaps, (\code{symmetric=FALSE} in
-  \code{plotCorrelation} and \code{plotNetwork}) this controls how far 
-  left of the plot the legend starts as a proportion of the plot width. For
-  the square heatmaps (\code{plotData}, and \code{symmetric=TRUE} in
-  \code{plotCorrelation} and \code{plotNetwork}) this controls how far 
-  right of the plot the legend starts as a proportion of the plot width.
+  The size of text labels can be modified by increasing or decreasing the
+  \code{cex.main}, \code{cex.lab}, and \code{cex.axis} arguments:
+  \itemize{
+   \item{\code{cex.main}: }{controls the size of the plot title (specified 
+                           in the \code{main} argument).}
+   \item{\code{cex.lab}: }{controls the size of the axis labels on the
+                          \emph{weighted degree}, \emph{node contribution},
+                          and \emph{module summary} bar plots as well as
+                          the size of the module labels and the heatmap 
+                          legend titles.}
+   \item{\code{cex.axis}: }{contols the size of the axis tick labels, 
+                           including the node and sample labels.}
+  }
   
-  \code{cex.main} controls the relative text size of the plot title
-  (specified by the \code{main} argument). \code{cex.axis} controls the
-  relative text size of the axis tick, node, and sample labels. 
-  \code{cex.lab} controls the relative text size of the bar plot axis labels, 
-  module labels, and the legend titles.
+  The position of these labels can be changed through the following 
+  arguments:
+  \itemize{
+   \item{\code{xaxt.line}: }{controls the distance from the plot the x-axis
+         tick labels are drawn on the \emph{module summary} bar plot.}
+   \item{\code{xlab.line}: }{controls the distance from the plot the x-axis 
+         label is drawn on the \emph{module summary} bar plot.}
+   \item{\code{yaxt.line}: }{controls the distance from the plot the y-axis 
+         tick labels are drawn on the \emph{weighted degree} and  
+         \emph{node contribution} bar plots.}
+   \item{\code{ylab.line}: }{controls the distance from the plot the y-axis
+         label is drawn on the \emph{weighted degree} and 
+         \emph{node contribution} bar plots.}
+   \item{\code{main.line}: }{controls the distance from the plot the title is
+         drawn.}
+   \item{\code{naxt.line}: }{controls the distance from the plot the node 
+         labels are drawn.}
+   \item{\code{saxt.line}: }{controls thedistance from the plot the sample 
+         labels are drawn.}
+   \item{\code{maxt.line}: }{controls the distance from the plot the module
+         labels are drawn.}
+   \item{\code{laxt.line}: }{controls the distance from the heatmap legends
+         that the gradient legend labels are drawn.}
+   \item{\code{legend.main.line}: }{controls the distance from the heatmap
+         legends that the legend title is drawn.}
+  }
   
   The rendering of node, sample, and module names can be disabled by setting
-  \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames} to
-  \code{FALSE}, and the rendering of the legend can be disabled by setting
-  \code{plotLegend} to \code{FALSE}
+  \code{plotNodeNames}, \code{plotSampleNames}, and \code{plotModuleNames}
+  to \code{FALSE}.
   
-  The \code{drawBorders} argument controls whether borders are drawn around
-  the bars in \code{plotDegree}, \code{plotContribution}, and 
-  \code{plotSummary}. The \code{lwd} argument controls the thickness of 
-  these borders, as well as the thickness of axes and axis ticks.
+  The size of the axis ticks can be changed by increasing or decreasing the
+  following arguments:
+  \itemize{
+   \item{\code{xaxt.tck}: }{size of the x-axis tick labels as a multiple of
+         the height of the \emph{module summary} bar plot}
+   \item{\code{yaxt.tck}: }{size of the y-axis tick labels as a multiple of 
+         the width of the \emph{weighted degree} or \emph{node contribution}
+         bar plots.}
+   \item{\code{laxt.tck}: }{size of the heatmap legend axis ticks as a 
+         multiple of the width of the data, correlation structure, or 
+         network edge weight heatmaps.}
+  }
+  
+  The placement of heatmap legends is controlled by the following arguments:
+  \itemize{
+   \item{\code{plotLegend}: }{if \code{FALSE} legend will not be drawn.}
+   \item{\code{legend.position}: }{a multiple of the plot width, controls 
+     the horizontal distance from the plot the legend is drawn.}
+  } 
+  
+  The \code{drawBorders} argument controls whether borders are drawn around 
+  the weighted degree, node contribution, or module summary bar plots. The 
+  \code{lwd} argument controls the thickness of these borders, as well as 
+  the thickness of axes and axis ticks.
 }
 \subsection{Modifying the color palettes:}{
   The \code{dataCols} and \code{dataRange} arguments control the appearance 

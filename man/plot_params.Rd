@@ -12,13 +12,13 @@ containing a single dataset name or index. Controls how samples are ordered
 on the plot (see details).}
 
 \item{plotNodeNames}{logical; controls whether the node names are 
-rendered on the bottom axis.}
+drawed on the bottom axis.}
 
 \item{plotSampleNames}{logical; controls whether the sample names are 
-rendered on the left axis.}
+drawed on the left axis.}
 
-\item{plotModuleNames}{logical; controls whether module names are rendered.
-The default is for module names to be rendered when multiple \code{modules} 
+\item{plotModuleNames}{logical; controls whether module names are drawed.
+The default is for module names to be drawed when multiple \code{modules} 
 are drawn.}
 
 \item{main}{title for the plot.}
@@ -61,11 +61,14 @@ bar plots will be drawn.}
 \item{yaxt.tck}{the size of the y-axis ticks for the weighted degree and 
 node contribution bar plots.}
 
-\item{laxt.line}{the distance from the legend to render the legend axis 
+\item{laxt.line}{the distance from the legend to draw the legend axis 
 labels, as multiple of \code{laxt.tck}.}
 
 \item{laxt.tck}{size of the ticks on each axis legend relative to the
 size of the correlation, edge weights, and data matrix heatmaps.}
+
+\item{legend.main.line}{the distance from the legend to draw the legend 
+title.}
 
 \item{cex.axis}{relative size of the node and sample names.}
 
@@ -104,7 +107,7 @@ the network edge weight heatmap (see details).}
 correlation structure, and network edge weight heat maps.}
 
 \item{dryRun}{logical; if \code{TRUE}, only the axes and labels will be 
-rendered.}
+drawed.}
 }
 \description{
 Template parameters to be imported into other function documentation. This 
