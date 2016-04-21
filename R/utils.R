@@ -310,7 +310,7 @@ orderAsNumeric <- function(vec) {
 #' @import RhpcBLASctl
 setupParallel <- function(nCores, verbose, reporterCore) {
   if (is.null(nCores)) {
-    if(requireNamespace("parallel")) {
+    if (pkgReqCheck("parallel")) {
       if (parallel::detectCores() > 1) {
         nCores <- parallel::detectCores() - 1
       } else {
@@ -345,7 +345,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
   else if (.Platform$OS.type == "windows") {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
-    if(suppressWarnings(suppressMessages(requireNamespace("doParallel")))) {
+    if(pkgReqCheck("doParallel")) {
       # we need an additional thread to monitor and report progress
       workerCores <- nCores
       if (verbose && reporterCore) {
@@ -375,7 +375,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
   } else if (.Platform$OS.type == "unix" && nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
     # continue
-    if(suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
+    if (pkgReqCheck("doMC")) {
       # we need an additional thread to monitor and report progress
       workerCores <- nCores
       if (verbose && reporterCore) {
@@ -428,7 +428,7 @@ setupParallel <- function(nCores, verbose, reporterCore) {
 #' 
 cleanupCluster <- function(cluster, predef) {
   if (!is.null(cluster)) {
-    if (suppressWarnings(suppressMessages(requireNamespace("parallel")))) {
+    if (pkgReqCheck("parallel")) {
       # Clobber the backend
       parallel::stopCluster(cluster)
       cl <- parallel::makeCluster(1, type="PSOCK")
@@ -436,7 +436,7 @@ cleanupCluster <- function(cluster, predef) {
       closeAllConnections()
     }
   } else if (!predef) {
-    if (suppressWarnings(suppressMessages(requireNamespace("doMC")))) {
+    if (pkgReqCheck("doMC")) {
       doMC::registerDoMC(1)
     }
   }
@@ -496,4 +496,13 @@ sortModuleNames <- function(modules) {
   }, warning=function(w) {
     sort(modules)
   })
+}
+
+#' Silently check and load a package into the namespace
+#' 
+#' @param pkg name of the package to check
+#' 
+#' @return logical; \code{TRUE} if the package is installed and can be loaded.
+pkgReqCheck <- function(pkg) {
+  suppressMessages(suppressWarnings(requireNamespace(pkg, quietly=TRUE)))
 }
