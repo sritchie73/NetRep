@@ -369,8 +369,10 @@ setupParallel <- function(nCores, verbose, reporterCore) {
       # once the analysis has finished.
       vCat(
         TRUE, 1, file=stderr(),
-        "Warning: unable to find 'doParallel' package, running on 1 core." 
+        "Warning: running on 1 core. Please install the 'doParallel' package",
+        "to enable parallel computation"
       )
+      warning("Package required for parallel computation not installed")
     }
   } else if (.Platform$OS.type == "unix" && nCores > 1) {
     # Quietly load parallel backend packages. Throw our own warning and 
@@ -396,8 +398,10 @@ setupParallel <- function(nCores, verbose, reporterCore) {
       # once the analysis has finished.
       vCat(
         TRUE, 1, file=stderr(),
-        "Unable to find 'doMC' package, running on 1 core."
+        "Warning: running on 1 core. Please install the 'doMC' package",
+        "to enable parallel computation"
       )
+      warning("Package required for parallel computation not installed")
     }
   } else {
     vCat(verbose, 1, "Running on 1 cores.")
