@@ -426,16 +426,12 @@ modulePreservation <- function(
   
   # Check for WGCNA if method == "bicor"
   if (statCorMethod == "bicor") {
-    tryCatch({
-      sink(file.path(tmp.dir, "suppressedWGCNAstartupMessage.txt"))
-      suppressMessages(suppressWarnings(requireNamespace("WGCNA")))
+    if (pkgReqCheck("WGCNA")) {
       cor <- function(...) WGCNA::bicor(..., quick=1, nThreads=1)[,]
-    }, error = function(e) {
+    } else {
       stop("'statCorMethod' = 'bicor' requires the 'WGCNA' package to be",
            "installed.")
-    }, finally = { 
-      sink() 
-    })
+    }
   } else {
     cor <- function(...) stats::cor(..., method=statCorMethod)[,]
   }
