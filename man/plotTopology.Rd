@@ -432,7 +432,7 @@ one or more network modules.
          drawn.}
    \item{\code{naxt.line}: }{controls the distance from the plot the node 
          labels are drawn.}
-   \item{\code{saxt.line}: }{controls thedistance from the plot the sample 
+   \item{\code{saxt.line}: }{controls the distance from the plot the sample 
          labels are drawn.}
    \item{\code{maxt.line}: }{controls the distance from the plot the module
          labels are drawn.}
