@@ -15,8 +15,9 @@ setupParallel(nCores, verbose, reporterCore)
 }
 \value{
 A list containing the total number of cores registered, the registered
- cluster if on a Windows machine, and whether an existing parallel backend
- is being used.
+ cluster if on a Windows machine, whether an existing parallel backend
+ is being used, and the number of OMP and BLAS threads set in the current
+ R session.
 }
 \description{
 Set up a backend with the requested number of cores, or use existing backend
