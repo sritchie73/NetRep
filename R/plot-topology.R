@@ -432,7 +432,7 @@ plotData <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # Now try to make sense of the rest of the input
@@ -616,7 +616,7 @@ plotCorrelation <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # Now try to make sense of the rest of the input
@@ -794,7 +794,7 @@ plotNetwork <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # Now try to make sense of the rest of the input
@@ -972,7 +972,7 @@ plotContribution <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # Now try to make sense of the rest of the input
@@ -1112,7 +1112,7 @@ plotDegree <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # Now try to make sense of the rest of the input
@@ -1257,7 +1257,7 @@ plotSummary <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # Now try to make sense of the rest of the input

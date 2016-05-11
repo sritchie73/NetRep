@@ -185,7 +185,7 @@ networkProperties <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
 
   # Now try to make sense of the rest of the input
@@ -517,7 +517,7 @@ nodeOrder <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
@@ -888,7 +888,7 @@ sampleOrder <- function(
   par <- setupParallel(nCores, verbose, reporterCore=FALSE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   vCat(verbose, 0, "Validating user input...")

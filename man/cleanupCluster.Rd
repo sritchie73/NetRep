@@ -4,12 +4,18 @@
 \alias{cleanupCluster}
 \title{De-register a parallel backend}
 \usage{
-cleanupCluster(cluster, predef)
+cleanupCluster(cluster, predef, oldOMPThreads, oldBLASThreads)
 }
 \arguments{
 \item{cluster}{registered cluster on a Windows machine}
 
 \item{predef}{logical; was a pre-existing parallel backend used?}
+
+\item{oldOMPThreads}{the number of threads available to OpenMP in the user's
+R session}
+
+\item{oldBLASThreads}{the number of threads available to BLAS in the user's
+R session}
 }
 \description{
 De-register a parallel backend

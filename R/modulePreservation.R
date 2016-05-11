@@ -446,7 +446,7 @@ modulePreservation <- function(
   par <- setupParallel(nCores, verbose, reporterCore=TRUE)
   nCores <- par$nCores
   on.exit({
-    cleanupCluster(par$cluster, par$predef)
+    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
   }, add=TRUE)
   
   # For the other functions this isn't necessary.

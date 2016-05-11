@@ -304,8 +304,9 @@ orderAsNumeric <- function(vec) {
 #'  
 #' @return
 #'  A list containing the total number of cores registered, the registered
-#'  cluster if on a Windows machine, and whether an existing parallel backend
-#'  is being used. 
+#'  cluster if on a Windows machine, whether an existing parallel backend
+#'  is being used, and the number of OMP and BLAS threads set in the current
+#'  R session.
 #'  
 #' @import RhpcBLASctl
 setupParallel <- function(nCores, verbose, reporterCore) {
@@ -419,18 +420,25 @@ setupParallel <- function(nCores, verbose, reporterCore) {
   # Since we expect the user to explicitly handle the number of parallel threads,
   # we will disable the potential implicit parallelism on systems where R has
   # been compiled against a multithreaded BLAS, e.g. OpenBLAS. 
+  oldOMPThreads <- omp_get_max_threads()
+  oldBLASThreads <- blas_get_num_procs()
+  
   omp_set_num_threads(1)
   blas_set_num_threads(1)
   
-  return(list(nCores=nCores, cluster=cl, predef=predef))
+  return(list(nCores=nCores, cluster=cl, predef=predef,
+              oldOMPThreads=oldOMPThreads, oldBLASThreads=oldBLASThreads))
 }
 
 #' De-register a parallel backend
 #' 
 #' @param cluster registered cluster on a Windows machine
 #' @param predef logical; was a pre-existing parallel backend used?
-#' 
-cleanupCluster <- function(cluster, predef) {
+#' @param oldOMPThreads the number of threads available to OpenMP in the user's
+#'        R session
+#' @param oldBLASThreads the number of threads available to BLAS in the user's
+#'        R session
+cleanupCluster <- function(cluster, predef, oldOMPThreads, oldBLASThreads) {
   if (!is.null(cluster)) {
     if (pkgReqCheck("parallel")) {
       # Clobber the backend
@@ -444,6 +452,9 @@ cleanupCluster <- function(cluster, predef) {
       doMC::registerDoMC(1)
     }
   }
+  # Restore to previous state
+  omp_set_num_threads(oldOMPThreads)
+  blas_set_num_threads(oldBLASThreads)
 }
 
 #' Remove unnecessary list structure 
