@@ -7,6 +7,12 @@
 #' 
 #' @param pres1,pres2 lists returned by \code{\link{modulePreservation}}.
 #' 
+#' @details
+#'  The input arguments must be for a single dataset comparison, i.e. the list
+#'  must contain the elements \code{nulls} for the null distributions. If 
+#'  multiple \code{discovery} or \code{test} datasets have been specified, you
+#'  will need to extract the relevant list elements 
+#' 
 #' @return
 #'  A nested list containing the same elements as 
 #'  \code{\link{modulePreservation}}.

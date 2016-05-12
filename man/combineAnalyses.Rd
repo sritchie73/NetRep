@@ -19,6 +19,12 @@ This function takes the output from multiple runs of
 set of permutation test P-values. This is useful for parallelising 
 calculations across multiple machines.
 }
+\details{
+The input arguments must be for a single dataset comparison, i.e. the list
+ must contain the elements \code{nulls} for the null distributions. If 
+ multiple \code{discovery} or \code{test} datasets have been specified, you
+ will need to extract the relevant list elements
+}
 \examples{
 \dontrun{
 data("NetRep")
