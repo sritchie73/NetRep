@@ -10,7 +10,7 @@
 
 <meta name="author" content="Scott Ritchie" />
 
-<meta name="date" content="2016-05-11" />
+<meta name="date" content="2016-05-12" />
 
 <title>NetRep</title>
 
@@ -64,7 +64,7 @@ img {
 <div id="header">
 <h1 class="title">NetRep</h1>
 <h4 class="author"><em>Scott Ritchie</em></h4>
-<h4 class="date"><em>2016-05-11</em></h4>
+<h4 class="date"><em>2016-05-12</em></h4>
 </div>
 
 
@@ -205,7 +205,7 @@ saveRDS(preservation, &quot;preservation-analysis-results.rds&quot;)</code></pre
 ##  User input ok!
 ##  Calculating preservation of network subsets from dataset &quot;cohort1&quot; in dataset &quot;cohort2&quot;.
 ##    Calculating observed test statistics...
-##    Calculating null distributions with 101 permutations...
+##    Calculating null distributions with 100 permutations...
 ##    Calculating P-values...
 ##    Collating results...
 ##  Cleaning up temporary objects...
@@ -215,18 +215,17 @@ saveRDS(preservation, &quot;preservation-analysis-results.rds&quot;)</code></pre
 
 # The results are stored as a list. The table of permutation test p-values is 
 # stored in the element named &quot;p.value&quot;. 
-preservation$p.value
-
-# Get the maximum permutation test p-value
+preservation$p.value</code></pre>
+<pre><code>##   avg.weight  coherence    cor.cor cor.degree cor.contrib    avg.cor avg.contrib
+## 1 0.00990099 0.00990099 0.00990099 0.00990099  0.00990099 0.00990099  0.00990099
+## 2 0.97029703 0.95049505 0.02970297 0.59405941  0.01980198 0.03960396  0.02970297
+## 3 0.99009901 0.98019802 0.38613861 0.80198020  0.67326733 0.99009901  0.93069307
+## 4 0.00990099 0.00990099 0.00990099 0.00990099  0.00990099 0.00990099  0.00990099</code></pre>
+<pre class="r"><code># Get the maximum permutation test p-value
 max_pval &lt;- apply(preservation$p.value, 1, max)
 max_pval</code></pre>
-<pre><code>##    avg.weight   coherence     cor.cor  cor.degree cor.contrib     avg.cor avg.contrib
-## 1 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922
-## 2 0.980392157 0.990196078 0.019607843 0.607843137 0.009803922 0.039215686 0.009803922
-## 3 0.990196078 0.980392157 0.382352941 0.774509804 0.725490196 1.000000000 0.784313725
-## 4 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922</code></pre>
-<pre><code>##           1           2           3           4 
-## 0.009803922 0.990196078 1.000000000 0.009803922</code></pre>
+<pre><code>##          1          2          3          4 
+## 0.00990099 0.97029703 0.99009901 0.00990099</code></pre>
 <p>Only modules 1 and 4 are reproducible at this significance threshold.</p>
 </div>
 <div id="visualising-network-modules" class="section level2">
@@ -497,7 +496,35 @@ properties[[&quot;cohort2&quot;]][[&quot;1&quot;]][[&quot;summary&quot;]]</code>
 </div>
 <div id="running-netrep-on-a-cluster" class="section level2">
 <h2>Running NetRep on a cluster</h2>
-<p>Estimating runtime and memory usage</p>
+<p>Module preservation analyses are typically too computationally intense to run interactively on the head node of a cluster. As per the tutorial, we recommend splitting your analysis into the following scripts:</p>
+<ol style="list-style-type: decimal">
+<li>A script to save your networks, the data, and the correlation structure in shared memory using the <code>bigMatrix</code> class.</li>
+<li>A script to load in the <code>bigMatrix</code> data and wrap them in lists used by NetRep’s functions. This script will be called from the following scripts, as well as in interactive R sessions.</li>
+<li>A script that runs the <code>modulePreservation</code> analysis for your modules of interest.</li>
+<li>A script that visualises your modules of interest.</li>
+<li>A script that calculates and saves the network properties for your modules of interest.</li>
+</ol>
+<p>We recommend writing the visualisation script with the <code>dryRun</code> parameter set to <code>TRUE</code> at first. This can be run interactively to determine whether modifications need to be made to figures. Once you’re happy with the plot size and layout, you should set <code>dryRun</code> to <code>FALSE</code> and run the script as a batch job.</p>
+<div id="setting-the-number-of-cores" class="section level3">
+<h3>Setting the number of cores</h3>
+<p>NetRep’s functions can only be parallelised over CPUs that share memory. On most clusters, this means that NetRep’s functions can only be parallelised on one physical node when submitting your batch jobs. You should refer to the relevant documentation for your cluster to determine the number of CPUs that exist on a single node of your cluster. Since you must explicitly set the number of CPUs for your job when submitting your job request, you must also set this number in the <code>nCores</code> argument in NetRep’s functions. This includes the <code>modulePreservation</code>, <code>plotModule</code>, <code>networkProperties</code>, and associated functions.</p>
+<p>To parallelise the permutation procedure in <code>modulePreservation</code> across multiple nodes you can use the <code>combineAnalyses</code> function. In this case, you must submit multiple jobs for the module preservation analysis and set the number of permutations (using the <code>nPerm</code> argument) in each job to be the total number of permutations divided by the number of jobs you will submit. The <code>combineAnalyses</code> function will take the output of the <code>modulePreservation</code> function, combine the null distributions, and calculate the permutation test p-values using the combined permutations of each module preservation statistic.</p>
+</div>
+<div id="estimating-memory-usage" class="section level3">
+<h3>Estimating memory usage</h3>
+<p>Provided there are no other R objects in your R session, the memory required for each job can be estimated as the sum of:</p>
+<ul>
+<li>200 MB multiplied by the number of cores (the memory taken by an empty R session)</li>
+<li>The memory taken by the data matrices, correlation matrices, and network matrices for the dataset comparison. This corresponds to the size of their backing file on disk, which has a <code>.bin</code> extension.</li>
+<li>Memory to hold the permutation test results. This is roughly 5 MB for 10 modules and 10,000 permutations, or can be directly estimated by comparing the size of an empty R session before and after creating an array to store the permutations: <code>array(1.0, dim=c(nModules, 7, nPerm))</code>.</li>
+</ul>
+</div>
+<div id="estimating-wall-time" class="section level3">
+<h3>Estimating wall time</h3>
+<p>The required runtime of the permutation procedure will vary depending on the size of the network, the size of the modules, the number of samples in each dataset, the number of modules, and the number of permutations.</p>
+<p>To estimate the wall time required we first recommend wrapping the module preservation script in a call to <code>system.time</code> and running <code>modulePreservation</code> with a small number of permutations (e.g. 100) per core. The “elapsed” time can then be divided by the number of permutations in the trial run, multiplied by the total number of permutations desiered, and then dividing by the number of cores.</p>
+<p>Calculation of the network properties should take no longer than the trial run. Plotting the modules may take longer when rendering of heatmaps for large modules.</p>
+</div>
 </div>
 
 

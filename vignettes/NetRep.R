@@ -34,7 +34,7 @@ test_network <- as.bigMatrix(test_network)
 ## ---- eval=FALSE----------------------------------------------------------------------------------
 #  discovery_network <- load.bigMatrix(backingfile="discovery_network.bm")
 
-## ---- hold=TRUE-----------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 discovery_network[1:5, 1:5]
 
 ## ---- eval=FALSE----------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ network_list <- list(cohort1=discovery_network, cohort2=test_network)
 
 preservation <- modulePreservation(
  data=data_list, correlation=correlation_list, network=network_list,
- moduleAssignments=module_labels, nPerm=101, discovery="cohort1", 
+ moduleAssignments=module_labels, nPerm=100, discovery="cohort1", 
  test="cohort2", verbose=TRUE
 )
 
@@ -96,14 +96,13 @@ preservation <- modulePreservation(
 #  # The results are stored as a list. The table of permutation test p-values is
 #  # stored in the element named "p.value".
 #  preservation$p.value
-#  
-#  # Get the maximum permutation test p-value
-#  max_pval <- apply(preservation$p.value, 1, max)
-#  max_pval
 
-## ---- echo=FALSE, hold=TRUE-----------------------------------------------------------------------
+## ---- echo=FALSE----------------------------------------------------------------------------------
 # This is the code that actually gets run in the Rmarkdown document
 preservation$p.value
+
+## -------------------------------------------------------------------------------------------------
+# Get the maximum permutation test p-value
 max_pval <- apply(preservation$p.value, 1, max)
 max_pval
 
@@ -127,21 +126,21 @@ max_pval
 #  correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
 #  network_list <- list(cohort1=discovery_network, cohort2=test_network)
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----modules_in_discovery, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="cohort1", test="cohort1"
 )
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----modules_in_test, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="cohort1", test="cohort2"
 )
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----mean_degree, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4), # only the preserved modules
@@ -149,7 +148,7 @@ plotModule(
   orderNodesBy=c("cohort1", "cohort2") # this can be any number of datasets
 )
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----dry_run, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4),
@@ -158,7 +157,7 @@ plotModule(
   dryRun=TRUE
 )
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----dry_run_customised, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 # Change the margins so the plot is more compressed. Alternatively we could 
 # change the device window.
 par(mar=c(3,10,3,10)) # bottom, left, top, right margin sizes
@@ -181,7 +180,7 @@ plotModule(
   legend.main.line=2
 )
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----mean_degree_customised, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 par(mar=c(3,10,3,10)) 
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -192,7 +191,7 @@ plotModule(
   maxt.line=0, legend.main.line=2
 )
 
-## ---- dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----correlation_heatmap, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 par(mar=c(5,5,3,3)) 
 plotCorrelation(
   data=data_list, correlation=correlation_list, network=network_list, 

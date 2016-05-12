@@ -284,7 +284,7 @@ saveRDS(preservation, "preservation-analysis-results.rds")
 ##  User input ok!
 ##  Calculating preservation of network subsets from dataset "cohort1" in dataset "cohort2".
 ##    Calculating observed test statistics...
-##    Calculating null distributions with 101 permutations...
+##    Calculating null distributions with 100 permutations...
 ##    Calculating P-values...
 ##    Collating results...
 ##  Cleaning up temporary objects...
@@ -302,26 +302,28 @@ preservation <- readRDS("preservation-analysis-results.rds")
 # The results are stored as a list. The table of permutation test p-values is 
 # stored in the element named "p.value". 
 preservation$p.value
+```
 
+
+```
+##   avg.weight  coherence    cor.cor cor.degree cor.contrib    avg.cor avg.contrib
+## 1 0.00990099 0.00990099 0.00990099 0.00990099  0.00990099 0.00990099  0.00990099
+## 2 0.97029703 0.95049505 0.02970297 0.59405941  0.01980198 0.03960396  0.02970297
+## 3 0.99009901 0.98019802 0.38613861 0.80198020  0.67326733 0.99009901  0.93069307
+## 4 0.00990099 0.00990099 0.00990099 0.00990099  0.00990099 0.00990099  0.00990099
+```
+
+
+```r
 # Get the maximum permutation test p-value
 max_pval <- apply(preservation$p.value, 1, max)
 max_pval
 ```
 
-
 ```
-##    avg.weight   coherence     cor.cor  cor.degree cor.contrib     avg.cor avg.contrib
-## 1 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922
-## 2 0.980392157 0.990196078 0.019607843 0.607843137 0.009803922 0.039215686 0.009803922
-## 3 0.990196078 0.980392157 0.382352941 0.774509804 0.725490196 1.000000000 0.784313725
-## 4 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922 0.009803922
+##          1          2          3          4 
+## 0.00990099 0.97029703 0.99009901 0.00990099
 ```
-
-```
-##           1           2           3           4 
-## 0.009803922 0.990196078 1.000000000 0.009803922
-```
-
 Only modules 1 and 4 are reproducible at this significance threshold.
 
 ## Visualising network modules
@@ -392,7 +394,7 @@ plotModule(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-15-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/modules_in_discovery-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 The plot shows six elements of the network topology for the four modules:
 
@@ -440,7 +442,7 @@ plotModule(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-16-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/modules_in_test-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 Here we can clearly see from the correlation structure and network edge weight
 heatmaps that modules 1 and 4 replicate.
@@ -482,7 +484,7 @@ plotModule(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-17-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/mean_degree-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 When drawing these plots yourself, you may need to tweak the appearance and
 placement of the axis labels and legends, which may change depending on the
@@ -519,7 +521,7 @@ plotModule(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-18-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/dry_run-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 Note, since calculation of the network properties is skipped, the modules are
 ordered as specified in the `modules` argument.
@@ -561,7 +563,7 @@ plotModule(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-19-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/dry_run_customised-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 Once we're happy, we can turn off the `dryRun` parameter:
 
@@ -590,7 +592,7 @@ plotModule(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-20-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/mean_degree_customised-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 
 We can also plot individual components of the plot separately. For example, 
@@ -617,7 +619,7 @@ plotCorrelation(
 ##  Done!
 ```
 
-<img src="NetRep_files/figure-html/unnamed-chunk-21-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="NetRep_files/figure-html/correlation_heatmap-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 A full list of function and arguments for these individual plots can be found
 at `help("plotTopology")`.
@@ -756,14 +758,77 @@ properties[["cohort2"]][["1"]][["coherence"]]
 
 ## Running NetRep on a cluster
 
-Estimating runtime and memory usage
+Module preservation analyses are typically too computationally intense to run
+interactively on the head node of a cluster. As per the tutorial, we recommend 
+splitting your analysis into the following scripts:
 
+ 1. A script to save your networks, the data, and the correlation structure in
+    shared memory using the `bigMatrix` class.
+ 2. A script to load in the `bigMatrix` data and wrap them in lists used by 
+    NetRep's functions. This script will be called from the following scripts,
+    as well as in interactive R sessions.
+ 3. A script that runs the `modulePreservation` analysis for your modules of
+    interest.
+ 4. A script that visualises your modules of interest.
+ 5. A script that calculates and saves the network properties for your modules
+    of interest.
 
+We recommend writing the visualisation script with the `dryRun` parameter set
+to `TRUE` at first. This can be run interactively to determine whether 
+modifications need to be made to figures. Once you're happy with the plot size
+and layout, you should set `dryRun` to `FALSE` and run the script as a batch 
+job.
 
+### Setting the number of cores
 
+NetRep's functions can only be parallelised over CPUs that share memory. On
+most clusters, this means that NetRep's functions can only be parallelised
+on one physical node when submitting your batch jobs. You should refer to the
+relevant documentation for your cluster to determine the number of CPUs that 
+exist on a single node of your cluster. Since you must explicitly set the
+number of CPUs for your job when submitting your job request, you must also 
+set this number in the `nCores` argument in NetRep's functions. This includes
+the `modulePreservation`, `plotModule`, `networkProperties`, and associated 
+functions.
 
+To parallelise the permutation procedure in `modulePreservation` across multiple
+nodes you can use the `combineAnalyses` function. In this case, you must submit
+multiple jobs for the module preservation analysis and set the number of 
+permutations (using the `nPerm` argument) in each job to be the total number of
+permutations divided by the number of jobs you will submit. The `combineAnalyses` 
+function will take the output of the `modulePreservation` function, combine the
+null distributions, and calculate the permutation test p-values using the 
+combined permutations of each module preservation statistic.
 
+### Estimating memory usage
 
+Provided there are no other R objects in your R session, the memory required 
+for each job can be estimated as the sum of:
 
+ - 200 MB multiplied by the number of cores (the memory taken by an empty R 
+   session)
+ - The memory taken by the data matrices, correlation matrices, and network
+   matrices for the dataset comparison. This corresponds to the size of their
+   backing file on disk, which has a `.bin` extension.
+ - Memory to hold the permutation test results. This is roughly 5 MB for 10
+   modules and 10,000 permutations, or can be directly estimated by comparing
+   the size of an empty R session before and after creating an array to store
+   the permutations: `array(1.0, dim=c(nModules, 7, nPerm))`.
+   
+### Estimating wall time
 
+The required runtime of the permutation procedure will vary depending on the 
+size of the network, the size of the modules, the number of samples in each 
+dataset, the number of modules, and the number of permutations.
+
+To estimate the wall time required we first recommend wrapping the module 
+preservation script in a call to `system.time` and running `modulePreservation` 
+with a small number of permutations (e.g. 100) per core. The "elapsed" time 
+can then be divided by the number of permutations in the trial run, multiplied
+by the total number of permutations desiered, and then dividing by the number 
+of cores.
+
+Calculation of the network properties should take no longer than the trial run.
+Plotting the modules may take longer when rendering of heatmaps for large
+modules.
 
