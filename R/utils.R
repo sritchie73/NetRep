@@ -68,12 +68,17 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
   }
   
   if(verbose) {
+    # Put a timestamp at the start of the message:
+    if (is.null(labels))
+      labels <- paste0("[", format(Sys.time(), usetz=TRUE), "] ")
+    
     # We need to format each line with the indendation level
     if (ind > 0) {
       indent <- paste(rep("  ", ind), collapse="")
     } else {
       indent = ""
     }
+    
     args <- list(...)
     if (is.null(names(args))) {
       str <- paste(args, collapse=sep)
@@ -104,12 +109,13 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
         curnl <- 1
         for (w in lw) {
           if (newlines[curnl] == "") {
-            newlines[curnl] <- paste0(labels, " ", indent, w)
+            newlines[curnl] <- paste0(labels, indent, w)
           } else if(nchar(newlines[curnl]) + 1 + nchar(w) < fillWidth) {
             newlines[curnl] <- paste(newlines[curnl], w)
           } else {
             curnl <- curnl + 1
-            newlines[curnl] <- paste0(labels, " ", indent, w)
+            labels <- paste(rep(" ", nchar(labels)), collapse="")
+            newlines[curnl] <- paste0(labels, indent, w)
           }
         }
         paste(newlines, collapse="\n")

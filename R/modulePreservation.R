@@ -484,7 +484,7 @@ modulePreservation <- function(
     nPerm <- max(10000, requiredPerms(0.05/multiplier))
   }
 
-  vCat(verbose, 0, "User input ok!")
+  vCat(verbose, 0, "Input ok!")
   
   # Set up return list
   res <- foreach(di = seq_len(nDatasets)) %do% {
