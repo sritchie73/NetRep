@@ -37,24 +37,25 @@ test_that("'networkProperties' function runs without error", {
   expect_is(
     networkProperties(
       exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
-      verbose=FALSE
+      verbose=FALSE, nCores=2
     ), "list"
   )
   props <- networkProperties(
     exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10],
-    verbose=FALSE
+    verbose=FALSE, nCores=2
   )
   expect_is(props, "list")
 })
 
 test_that("'nodeOrder' function runs without error", {
   n <- nodeOrder(
-    exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], verbose=FALSE
+    exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
+    verbose=FALSE, nCores=2
   )
   expect_is(n, "character")
   n <- nodeOrder(
     NULL, coexpSets, adjSets, moduleAssignments, modules=modules[1:2], 
-    orderModules=FALSE, verbose=FALSE
+    orderModules=FALSE, verbose=FALSE, nCores=2
   )
   expect_is(n, "character")
 })
@@ -62,14 +63,14 @@ test_that("'nodeOrder' function runs without error", {
 test_that("'sampleOrder' function runs without error", {
   s <- sampleOrder(
     exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
-    verbose=FALSE
+    verbose=FALSE, nCores=2
   )
   expect_is(s, "integer")
 
   expect_error(
     sampleOrder(
       NULL, coexpSets, adjSets, moduleAssignments, modules=modules[1:2], 
-      simplify=FALSE, verbose=FALSE
+      simplify=FALSE, verbose=FALSE, nCores=2
     )
   )
 })

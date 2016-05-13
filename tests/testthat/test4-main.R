@@ -36,7 +36,7 @@ nModules <- length(modules)
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, modules,
-    discovery=1, test=2, nPerm=10, verbose=FALSE, nCores=1
+    discovery=1, test=2, nPerm=4, verbose=FALSE, nCores=2
   )
   expect_equal(dim(res1$nulls), c(nModules , 7, 10))
   expect_equal(dim(res1$observed), c(nModules , 7))
@@ -45,8 +45,8 @@ test_that("Main routine runs and produces sane output", {
   expect_equal(length(res1$nVarsPresent), nModules)
   res2 <- modulePreservation(
     NULL, coexpSets, adjSets, moduleAssignments,
-    modules, discovery=1, test=2, nPerm=10, 
-    verbose=FALSE, nCores=1
+    modules, discovery=1, test=2, nPerm=4, 
+    verbose=FALSE, nCores=2
   )
   expect_equal(dim(res2$nulls), c(nModules, 4, 10))
   expect_equal(dim(res2$observed), c(nModules, 4))
@@ -56,8 +56,8 @@ test_that("Main routine runs and produces sane output", {
   
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, 
-    modules, discovery="a", test="b", nPerm=10,
-    verbose=FALSE, nCores=1
+    modules, discovery="a", test="b", nPerm=4,
+    verbose=FALSE, nCores=2
   )
 })
 rm(exprSets, coexpSets, adjSets)
