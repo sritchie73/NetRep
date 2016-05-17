@@ -1,11 +1,10 @@
 Package: NetRep
 Type: Package
-Title: Testing network module replication and preservation through permutation
-    testing
-Version: 0.57.1
+Title: Permutation testing network module preservation across datasets 
+Version: 0.57.2
 Date: 2013-08-26
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
-Maintainer: Scott Ritchie <sritchie73@gmail.com>
+BugReports: https://github.com/InouyeLab/NetRep/issues
 Description: Functions for assessing the replication/preservation of a network 
   module's topology across datasets through permutation testing.
 License: GPL-2
@@ -35,3 +34,4 @@ Suggests:
 LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
 RoxygenNote: 5.0.0
 VignetteBuilder: knitr
+BuildVignettes: false
