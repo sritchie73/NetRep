@@ -702,7 +702,7 @@ modulePreservation <- function(
         gc()
         
         nulls <- array(NA, dim=c(nModules, nStatistics, nPerm))
-        dimnames(nulls)[[3]] <- rep("", dim(nulls)[3])
+        dimnames(nulls)[3] <- list(rep("", nPerm))
         chunkFiles <- list.files(tmp.dir, "chunk[0-9]*permutations.rds")
         offset <- 1
         for (cf in chunkFiles) {
