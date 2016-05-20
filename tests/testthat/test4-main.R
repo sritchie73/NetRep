@@ -38,7 +38,7 @@ test_that("Main routine runs and produces sane output", {
     exprSets, coexpSets, adjSets, moduleAssignments, modules,
     discovery=1, test=2, nPerm=4, verbose=FALSE, nCores=2
   )
-  expect_equal(dim(res1$nulls), c(nModules , 7, 10))
+  expect_equal(dim(res1$nulls), c(nModules , 7, 4))
   expect_equal(dim(res1$observed), c(nModules , 7))
   expect_equal(dim(res1$p.values), c(nModules , 7))
   expect_equal(length(res1$propVarsPresent), nModules)
@@ -48,7 +48,7 @@ test_that("Main routine runs and produces sane output", {
     modules, discovery=1, test=2, nPerm=4, 
     verbose=FALSE, nCores=2
   )
-  expect_equal(dim(res2$nulls), c(nModules, 4, 10))
+  expect_equal(dim(res2$nulls), c(nModules, 4, 4))
   expect_equal(dim(res2$observed), c(nModules, 4))
   expect_equal(dim(res2$p.values), c(nModules, 4))
   expect_equal(length(res2$propVarsPresent), nModules)
