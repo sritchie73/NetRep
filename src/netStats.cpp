@@ -1,5 +1,5 @@
-/* Functions for calculating the network properties (but not statistics) for a
- * single module within a single dataset.
+/* Functions for calculating the network properties and module preservation 
+ * statistics for a single module within a single dataset.
  */
 #include "functions.hpp"
 
@@ -20,6 +20,20 @@ uvec sortNodes (uvec& nodeIdx) {
   uvec order = sort_index(nodeIdx);
   nodeIdx = nodeIdx(order);
   return rank(order);
+}
+
+// Calculate the correlation between two vectors
+double Correlation (vec& v1, vec& v2) {
+  return as_scalar(cor(v1, v2));
+}
+
+// Calculate the sign-aware mean of two vectors
+// 
+// This is the mean of 'v2' where observations detract from the mean if they
+// differ in sign between 'v1' and 'v2'
+//
+double SignAwareMean (vec& v1, vec& v2) {
+  return mean(sign(v1) % v2);
 }
 
 // Calculate the weighted degree of a module
