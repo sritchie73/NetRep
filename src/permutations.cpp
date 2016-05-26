@@ -6,14 +6,62 @@ using namespace std;
 using namespace arma;
 using namespace Rcpp;
 
-//' Calculate the observed test statistics
-//'
-//' @export
+
+
+//' Multithreaded permutation procedure for module preservation statistics
+//' 
+//' @details
+//' \subsection{Input expectations:}{
+//'   Note that this function expects all inputs to be sensible, as checked by
+//'   the R function 'checkUserInput' and processed by 'modulePreservation'. 
+//'   
+//'   These requirements are:
+//'   \itemize{
+//'   \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
+//'         consistent.}
+//'   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
+//'         consistent.}
+//'   \item{The columns of 'dData' and 'tData' are the nodes.}
+//'   \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
+//'         rownames are identical to their column names.}
+//'   \item{'moduleAssigments' is a named character vector, where the names
+//'         represent node labels found in the test dataset (i.e. 'tNet').
+//'         The vector must not include nodes that are not present in the 
+//'         test dataset.}
+//'   \item{The labels in 'modules' must all be present in 'moduleAssignments'.}
+//'   \item{'nPermutations' is a single number, greater than 0.}
+//'   \item{'nCores' is a single number, greater than 0. Note, this number must
+//'         not be larger than the number of cores on your machine, or the 
+//'         number of cores allocated to your job!}
+//'   }
+//' }
+//' 
+//' @param dData data matrix from the \emph{discovery} dataset.
+//' @param dCorr matrix of correlation coefficients between all pairs of 
+//'   variables/nodes in the \emph{discovery} dataset.
+//' @param dNet adjacency matrix of network edge weights between all pairs of 
+//'   nodes in the \emph{discovery} dataset.
+//' @param tData data matrix from the \emph{test} dataset.
+//' @param tCorr matrix of correlation coefficients between all pairs of 
+//'   variables/nodes in the \emph{test} dataset.
+//' @param tNet adjacency matrix of network edge weights between all pairs of 
+//'   nodes in the \emph{test} dataset.
+//' @param moduleAssignments a named character vector containing the module 
+//'   each node belongs to in the discovery dataset. 
+//' @param modules a character vector of modules for which to calculate the 
+//'   module preservation statistics.
+//' @param nPermutations the number of permutations from which to generate the
+//'   null distributions for each statistic.
+//' @param nCores the number of cores that the permutation procedure may use.
+//' 
+//' @return a list containing a matrix of observed test statistics, and an
+//'   array of null distribution observations.
 // [[Rcpp::export]]
-NumericMatrix PermutationProcedure (
+List PermutationProcedure (
   NumericMatrix dData, NumericMatrix dCorr, NumericMatrix dNet,
   NumericMatrix tData, NumericMatrix tCorr, NumericMatrix tNet,
-  CharacterVector moduleAssignments, CharacterVector modules
+  CharacterVector moduleAssignments, CharacterVector modules,
+  IntegerVector nPermutations, IntegerVector nCores
 ) {
   /* First, we need to create pointers to the memory holding each
    * NumericMatrix that can be recognised by the armadillo library.
@@ -53,7 +101,21 @@ NumericMatrix PermutationProcedure (
 
   // What modules do we actually want to analyse?
   const vector<string> mods = as<vector<string>>(modules);
+  
+  // Map module labels to row indices in our armadillo matrices/cubes
   const namemap modIdxMap = makeIdxMap(mods);
+  
+  // How many threads are we using?
+  unsigned int nThreads = nCores[0];
+  
+  // How many permutations?
+  unsigned int nPerm = nPermutations[0];
+  
+  // Initialise matrix to store observed test statistics
+  mat obs (mods.size(), 7);
+  
+  // Initialise 3D-array to store null distributions
+  cube nulls (mods.size(), 7, nPerm);
   
   /**
    * CODE FROM THIS POINT ONWARDS CANNOT USE RCPP!!
@@ -81,10 +143,7 @@ NumericMatrix PermutationProcedure (
     obsNC.emplace(mod, NodeContribution(dDataScaled, dIdx, dSP)(dRank));
   }
 
-  /* Now calculate the observed test statistics
-   *
-   */
-  mat obs (mods.size(), 7);
+  // Now calculate the observed test statistics
   for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
     
     // What module are we analysing, and what index does it have internally?
@@ -141,13 +200,33 @@ NumericMatrix PermutationProcedure (
   * RCPP ALLOWED
   **/
   
-  /* Convert matrix of observed test statistics into an R object before
-   * returning
-   */
+  // Construct rownames
+  const vector<string> statnames = {
+    "avg.weight", "coherence", "cor.cor", "cor.degree", "cor.contrib", 
+    "avg.cor", "avg.contrib"
+  };
+  
+  // Construct permutation names
+  vector<string> permNames(nPerm);
+  for (unsigned int ii = 0; ii < permNames.size(); ++ii) {
+    permNames[ii] = "permutation." + to_string(ii + 1);
+  }
+  
+  // Convert cube of null distribution objects into an R array before returning
+  NumericVector nullsArray (nulls.begin(), nulls.end());
+  nullsArray.attr("dim") = IntegerVector::create(mods.size(), 7, nPerm);
+  nullsArray.attr("dimnames") = List::create(
+    modules, CharacterVector(statnames.begin(), statnames.end()), permNames
+  );
+  
+  // Convert matrix of observed test statistics into an R object before
+  // returning
   NumericMatrix observed (obs.n_rows,  obs.n_cols, obs.begin());
-  colnames(observed) = CharacterVector::create("avg.weight", "coherence", 
-           "cor.cor", "cor.degree", "cor.contrib", "avg.cor", "avg.contrib");
+  colnames(observed) = CharacterVector(statnames.begin(), statnames.end());
   rownames(observed) = modules;
   
-  return observed;
+  return List::create(
+    Named("nulls") = nullsArray,
+    Named("observed") = observed
+  );
 }
