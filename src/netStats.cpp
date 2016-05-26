@@ -132,9 +132,9 @@ vec SummaryProfile (const mat& dataPtr, uvec& nodeIdx) {
   
   if (!success) {
     vec summary (1);
-    summary.fill(-9);
+    summary.fill(datum::nan);
+    return summary;
   }
-  
   vec summary = U.col(0);
   
   /* Flip the sign of the summary profile so that the eigenvector is 
