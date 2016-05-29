@@ -18,8 +18,11 @@ typedef boost::unordered_map<unsigned int, unsigned int> intmap;
 void ShowProgress(unsigned int&, unsigned int&);
 namemap MakeIdxMap (const std::vector<std::string>&);
 stringmap MakeModMap (Rcpp::CharacterVector);
+stringmap MakeModMap (Rcpp::CharacterVector, const namemap&);
 namemap MakeNullMap (const std::vector<std::string>&, const namemap&, arma::uvec&);
 arma::uvec GetNodeIdx (std::string&, const stringmap&, const namemap&);
 arma::uvec GetRandomIdx(std::string&, const stringmap&, arma::uvec&, namemap&);
+std::vector<std::string> GetModNodeNames (std::string&, const stringmap&);
+void Fill(Rcpp::NumericVector&, arma::vec&, arma::uvec&);
 
 #endif // __UTILS__

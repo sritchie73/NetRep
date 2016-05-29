@@ -12,7 +12,7 @@ namemap MakeIdxMap (const std::vector<std::string>& labels) {
   return map;
 }
 
-/* Builds the dictionary between module labels are their associated nodes
+/* Builds the dictionary between module labels and their associated nodes
  * 
  * @param moduleAssignments a named vector of module labels where the names are
  *   the node IDs.
@@ -31,6 +31,36 @@ stringmap MakeModMap (Rcpp::CharacterVector moduleAssignments) {
     std::string value = nodes[ii];
     
     map.emplace(key, value);
+  }
+  
+  return map;
+}
+
+/* Builds the dictionary between module labels and their associated nodes,
+ * containing only nodes that are present in the dataset of interest.
+ *
+ * @param moduleAssignments a named vector of module labels where the names are
+ *   the node IDs.
+ * @param nodeIdx a mapping of node labels to indices in the dataset of interest.
+ *
+ * @return an unordered_map where the keys are module labels, and values are
+ *   arrays containing the node IDs belonging to that module
+ */
+stringmap MakeModMap (
+    Rcpp::CharacterVector moduleAssignments, const namemap& nodeIdx
+) {
+  stringmap map;
+  
+  const std::vector<std::string> nodes = moduleAssignments.names();
+  const std::vector<std::string> labels = Rcpp::as<std::vector<std::string>>(moduleAssignments);
+  
+  for (unsigned int ii = 0; ii < moduleAssignments.length(); ++ii) {
+    std::string key = labels[ii];
+    std::string value = nodes[ii];
+    
+    if (nodeIdx.find(value) != nodeIdx.end()) {
+      map.emplace(key, value);
+    }
   }
   
   return map;
@@ -125,4 +155,47 @@ arma::uvec GetRandomIdx(
   }
   
   return randIdx;
+}
+
+/* Get the indices of a module's nodes in the respective dataset
+ * 
+ * @param module module we want to get the indices for
+ * @param modNodeMap mapping between module labels and node IDs.
+ * @param nodeIdxMap mapping between node IDs and indices in the dataset of
+ *   interest
+ *
+ * @return a vector of indices   
+ */
+std::vector<std::string> GetModNodeNames (
+    std::string& module, const stringmap& modNodeMap
+) {
+  unsigned int nNodes = modNodeMap.count(module); 
+  std::vector<std::string> modNames (nNodes);
+  
+  unsigned int counter = 0;
+  auto keyit = modNodeMap.equal_range(module);
+  for (auto it = keyit.first; it != keyit.second; ++it) {
+    std::string nodeID = it->second;
+    modNames.at(counter) = nodeID;
+    counter++;
+  }
+  
+  return modNames;
+}
+
+/* Fill a non-contiguous subset of a NumericVector with the contents of an
+ * armadillo vector
+ * 
+ * Note: 'idx' must be the same size as 'contents': this is not checked by the 
+ * code!
+ *
+ * @param tofill vector to fill.
+ * @param contents vector whose contents to fill 'tofill' with.
+ * @param idx (ordered) indices in 'tofill' to use when filling 'tofill'.
+ * 
+ */
+void Fill(Rcpp::NumericVector& tofill, arma::vec& contents, arma::uvec& idx) {
+  for (unsigned int ii=0; ii < contents.size(); ++ii) {
+    tofill[idx.at(ii)] = contents.at(ii);
+  }
 }
