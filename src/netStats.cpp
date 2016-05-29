@@ -38,10 +38,10 @@ arma::mat Scale (const arma::mat& dataPtr) {
  *   order as in 'nodeIdx' prior to sorting.
  */
 arma::uvec sortNodes (arma::uvec& nodeIdx) {
-  arma::uvec rank = arma::regspace<arma::uvec>(0, nodeIdx.n_elem); // seq_along(nodeIdx)
+  arma::uvec rank = arma::sort_index(arma::sort_index(nodeIdx));
   arma::uvec order = arma::sort_index(nodeIdx);
   nodeIdx = nodeIdx(order);
-  return rank(order);
+  return rank;
 }
 
 // Calculate the correlation between two vectors
