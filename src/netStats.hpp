@@ -1,13 +1,11 @@
 #ifndef __FUNCS__
 #define __FUNCS__
 
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(BH, RcppArmadillo)]]
 #include <RcppArmadillo.h>
 
-using namespace arma;
-
 // Utility functions
-mat Scale (const mat&);
+arma::mat Scale (const arma::mat&);
 arma::uvec sortNodes (arma::uvec&);
 double Correlation (arma::vec&, arma::vec&);
 double SignAwareMean (arma::vec&, arma::vec&);

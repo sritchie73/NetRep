@@ -5,17 +5,19 @@
 #include "netStats.hpp"
 
 #define ARMA_USE_LAPACK
+#define ARMA_USE_BLAS
 #define ARMA_NO_DEBUG
+#define ARMA_DONT_PRINT_ERRORS
 
 /* Scale data across all nodes
  * 
  * Each node is centered by its mean and scaled by it standard deviation.
  */
-mat Scale (const mat& dataPtr) {
-  mat scaled = mat(dataPtr.n_rows, dataPtr.n_cols);
+arma::mat Scale (const arma::mat& dataPtr) {
+  arma::mat scaled = arma::mat(dataPtr.n_rows, dataPtr.n_cols);
   
   for (unsigned int ii = 0; ii < dataPtr.n_cols; ++ii) {
-    vec nodeData = dataPtr.col(ii);
+    arma::vec nodeData = dataPtr.col(ii);
     scaled.col(ii) = (nodeData - mean(nodeData))/stddev(nodeData, 0);
   }
   
@@ -35,16 +37,16 @@ mat Scale (const mat& dataPtr) {
  *   be used to re-order another results vector so that nodes are in the same
  *   order as in 'nodeIdx' prior to sorting.
  */
-uvec sortNodes (uvec& nodeIdx) {
-  uvec rank = arma::regspace<uvec>(0, nodeIdx.n_elem); // seq_along(nodeIdx)
-  uvec order = sort_index(nodeIdx);
+arma::uvec sortNodes (arma::uvec& nodeIdx) {
+  arma::uvec rank = arma::regspace<arma::uvec>(0, nodeIdx.n_elem); // seq_along(nodeIdx)
+  arma::uvec order = arma::sort_index(nodeIdx);
   nodeIdx = nodeIdx(order);
   return rank(order);
 }
 
 // Calculate the correlation between two vectors
-double Correlation (vec& v1, vec& v2) {
-  return as_scalar(cor(v1, v2));
+double Correlation (arma::vec& v1, arma::vec& v2) {
+  return arma::as_scalar(arma::cor(v1, v2));
 }
 
 /* Calculate the sign-aware mean of two vectors
@@ -52,8 +54,8 @@ double Correlation (vec& v1, vec& v2) {
  * This is the mean of 'v2' where observations detract from the mean if they
  * differ in sign between 'v1' and 'v2'
  */
-double SignAwareMean (vec& v1, vec& v2) {
-  return mean(sign(v1) % v2);
+double SignAwareMean (arma::vec& v1, arma::vec& v2) {
+  return arma::mean(arma::sign(v1) % v2);
 }
 
 /* Calculate the weighted degree of a module
@@ -66,11 +68,11 @@ double SignAwareMean (vec& v1, vec& v2) {
  *
  * @return a (column) vector of the weighted degree.
  */
-vec WeightedDegree(const mat& netPtr, uvec& nodeIdx) {
+arma::vec WeightedDegree(const arma::mat& netPtr, arma::uvec& nodeIdx) {
    // We do not want a negative weight to cancel out a positive one, so we take
    // the absolute value.
-  mat dg = diagvec(netPtr);
-  mat wDegree = sum(abs(netPtr(nodeIdx, nodeIdx))) - abs(dg(nodeIdx)).t();
+  arma::mat dg = diagvec(netPtr);
+  arma::mat wDegree = arma::sum(arma::abs(netPtr(nodeIdx, nodeIdx))) - arma::abs(dg(nodeIdx)).t();
 
   return wDegree;
 }
@@ -81,9 +83,9 @@ vec WeightedDegree(const mat& netPtr, uvec& nodeIdx) {
  *
  * @return a scalar value
  */
-double AverageEdgeWeight(vec& wDegree) {
+double AverageEdgeWeight(arma::vec& wDegree) {
   int n = wDegree.n_elem;
-  return as_scalar(sum(wDegree) / (n*n - n));
+  return arma::as_scalar(arma::sum(wDegree) / (n*n - n));
 }
 
 /* Get a vector of correlation coefficients for a module
@@ -95,13 +97,13 @@ double AverageEdgeWeight(vec& wDegree) {
  *
  * @return a vector of correlation coefficients
  */
-vec CorrVector (const mat& corrPtr, uvec& nodeIdx) {
+arma::vec CorrVector (const arma::mat& corrPtr, arma::uvec& nodeIdx) {
   // Number of nodes in the requested sub-matrix
   int n = nodeIdx.n_elem;
   
   // We need to flatten the matrices to a vector, ignoring the diagonals.
   unsigned int flatsize = (n*n - n)/2;
-  vec corrVec(flatsize);
+  arma::vec corrVec(flatsize);
   
   unsigned int vi = 0;  // keeps track of position in corrVec
   
@@ -124,28 +126,28 @@ vec CorrVector (const mat& corrPtr, uvec& nodeIdx) {
  * 
  * @return a vector of observations across samples
  */
-vec SummaryProfile (const mat& dataPtr, uvec& nodeIdx) {
-  mat U, V;
-  vec S;
+arma::vec SummaryProfile (const arma::mat& dataPtr, arma::uvec& nodeIdx) {
+  arma::mat U, V;
+  arma::vec S;
   
-  bool success = svd_econ(U, S, V, dataPtr.cols(nodeIdx), "left", "dc");
+  bool success = arma::svd_econ(U, S, V, dataPtr.cols(nodeIdx), "left", "dc");
   
   if (!success) {
-    vec summary (1);
-    summary.fill(datum::nan);
+    arma::vec summary (1);
+    summary.fill(arma::datum::nan);
     return summary;
   }
-  vec summary = U.col(0);
+  arma::vec summary = U.col(0);
   
   /* Flip the sign of the summary profile so that the eigenvector is 
    * positively correlated with the average scaled value of the underlying
    * data for the network module.
    */
-  vec meanObs = mean(dataPtr.cols(nodeIdx), 1);
-  int orientation = as_scalar(sign(cor(meanObs, summary)));
-  
+  arma::vec meanObs = arma::mean(dataPtr.cols(nodeIdx), 1);
+  int orientation = arma::as_scalar(arma::sign(arma::cor(meanObs, summary)));
+
   if (orientation == -1) {
-    summary *= -1; 
+    summary *= -1;
   }
   
   return summary;
@@ -159,8 +161,10 @@ vec SummaryProfile (const mat& dataPtr, uvec& nodeIdx) {
  *
  * @return a vector of correlations between each node and the summary profile
  */
-vec NodeContribution (const mat& dataPtr, uvec& nodeIdx, vec& summaryProfile) {
-  return cor(summaryProfile, dataPtr.cols(nodeIdx));
+arma::vec NodeContribution (
+    const arma::mat& dataPtr, arma::uvec& nodeIdx, arma::vec& summaryProfile
+) {
+  return arma::cor(summaryProfile, dataPtr.cols(nodeIdx));
 }
 
 /* Calculate module's coherence
@@ -172,8 +176,8 @@ vec NodeContribution (const mat& dataPtr, uvec& nodeIdx, vec& summaryProfile) {
  *
  * @return a double between 0 and 1
  */
-double ModuleCoherence (vec& nodeContribution) {
-  return mean(square(nodeContribution));
+double ModuleCoherence (arma::vec& nodeContribution) {
+  return arma::mean(arma::square(nodeContribution));
 }
 
 
