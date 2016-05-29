@@ -115,8 +115,11 @@ void calculateNulls(
 //'   \item{'nCores' is a single number, greater than 0. Note, this number must
 //'         not be larger than the number of cores on your machine, or the 
 //'         number of cores allocated to your job!}
-//'   \item{'nullHypothesis' must be a character vector of lenght 1, containing
+//'   \item{'nullHypothesis' must be a character vector of length 1, containing
 //'         either "overlap" or "all".}
+//'   \item{'verbose' must be a logical vector of length 1 containing either 
+//'         'TRUE' or 'FALSE'.}
+//'   \item{'vCat' must be the function NetRep:::vCat.}
 //'   }
 //' }
 //' 
@@ -162,16 +165,15 @@ Rcpp::List PermutationProcedure (
   const arma::mat& tCorrPtr = arma::mat(tCorr.begin(), tCorr.nrow(), tCorr.ncol(), false, true);
   const arma::mat& tNetPtr = arma::mat(tNet.begin(), tNet.nrow(), tNet.ncol(), false, true);
   
-  R_CheckUserInterrupt(); 
-  
   // Next we will scale the matrix data
   const arma::mat dDataScaled = Scale(dDataPtr);
   const arma::mat tDataScaled = Scale(tDataPtr);
   
+  R_CheckUserInterrupt(); 
+  
   // convert the colnames / rownames to C++ equivalents
   const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(colnames(dNet)));
   const std::vector<std::string> tNames (Rcpp::as<std::vector<std::string>>(colnames(tNet)));
-
   
   /* Next, we need to create three mappings:
    *  - From node IDs to indices in the discovery dataset

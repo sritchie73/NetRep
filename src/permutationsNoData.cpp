@@ -103,6 +103,9 @@ void calculateNullsNoData(
 //'         number of cores allocated to your job!}
 //'   \item{'nullHypothesis' must be a character vector of lenght 1, containing
 //'         either "overlap" or "all".}
+//'   \item{'verbose' must be a logical vector of length 1 containing either 
+//'         'TRUE' or 'FALSE'.}
+//'   \item{'vCat' must be the function NetRep:::vCat.}
 //'   }
 //' }
 //' 
@@ -143,8 +146,6 @@ Rcpp::List PermutationProcedureNoData (
   const arma::mat& dNetPtr = arma::mat(dNet.begin(), dNet.nrow(), dNet.ncol(), false, true);
   const arma::mat& tCorrPtr = arma::mat(tCorr.begin(), tCorr.nrow(), tCorr.ncol(), false, true);
   const arma::mat& tNetPtr = arma::mat(tNet.begin(), tNet.nrow(), tNet.ncol(), false, true);
-  
-  R_CheckUserInterrupt(); 
   
   // convert the colnames / rownames to C++ equivalents
   const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(colnames(dNet)));
