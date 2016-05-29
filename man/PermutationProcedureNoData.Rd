@@ -67,6 +67,9 @@ Multithreaded permutation procedure for module preservation statistics
         number of cores allocated to your job!}
   \item{'nullHypothesis' must be a character vector of lenght 1, containing
         either "overlap" or "all".}
+  \item{'verbose' must be a logical vector of length 1 containing either 
+        'TRUE' or 'FALSE'.}
+  \item{'vCat' must be the function NetRep:::vCat.}
   }
 }
 }
