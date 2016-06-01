@@ -235,9 +235,10 @@ Rcpp::List PermutationProcedure (
   } else { // otherwise take all nodes
     nullMap = MakeNullMap(tNames, tIdxMap, nullIdx);
   }
+  R_CheckUserInterrupt(); 
   
   // Calculate some network properties in the discovery dataset.
-  R_CheckUserInterrupt(); 
+  vCat(verbose, 1, "Calculating observed test statistics...");
   std::string mod;
   arma::uvec dIdx, dRank;
   arma::vec dSP; 
@@ -261,7 +262,6 @@ Rcpp::List PermutationProcedure (
   }
 
   // Now calculate the observed test statistics
-  vCat(verbose, 1, "Calculating observed test statistics...");
   unsigned int modIdx;
   arma::uvec tIdx, tRank;
   arma::vec tCV, tWD, tSP, tNC;
