@@ -545,6 +545,12 @@ processInput <- function(
            'nodes for dataset "', ii, '"')
     }
     
+    # Make sure the matrices have dimension names
+    if (is.null(rownames(network[[ii]])) || is.null(rownames(correlation[[ii]])) ||
+        (!is.null(data[[ii]]) && is.null(rownames(data[[ii]])))) {
+      stop("supplied matrices must have row and column names")      
+    }
+    
     # Make sure the 'correlation' and 'network' matrices are symmetric 
     if (any(rownames(network[[ii]]) != colnames(network[ii]))) {
       stop("mismatch between row and column names in 'network' for dataset ", 
@@ -660,31 +666,15 @@ processInput <- function(
         checkFinite(data[[ii]])
       checkFinite(correlation[[ii]])
       checkFinite(network[[ii]])
+      gc()
     }    
   }
-
-  if (!dryRun) {
-    # Temporarily create scaled data set for the calculation of the
-    # summary expression profile. Again, to save space and time, only do this for
-    # datasets we're analysing
-    scaledData <- rep(list(NULL), length(data))
-    names(scaledData) <- names(data)
-    for (ii in iterator) {
-      if (!is.null(data[[ii]])) {
-        scaledData[[ii]] <- scaleBigMatrix(data[[ii]], tempdir)
-      }
-    }
-  } else {
-    scaledData <- data # we just need to be able to get the row + column names
-  }
-
   
   if (!is.null(names(network))) {
     datasetNames <- names(network)
   } else {
     datasetNames <- paste0("Dataset", seq_len(nDatasets))
     names(data) <- datasetNames
-    names(scaledData) <- datasetNames
     names(modules) <- datasetNames
     names(correlation) <- datasetNames
     names(network) <- datasetNames
@@ -705,7 +695,7 @@ processInput <- function(
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
-    nDatasets=nDatasets, datasetNames=datasetNames, scaledData=scaledData,
+    nDatasets=nDatasets, datasetNames=datasetNames,
     orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy
   ))
 }
