@@ -93,10 +93,7 @@ void calculateNullsNoData(
 //'   \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
 //'         rownames are identical to their column names.}
 //'   \item{'moduleAssigments' is a named character vector, where the names
-//'         represent node labels found in the test dataset (i.e. 'tNet').
-//'         The vector must not include nodes that are not present in the 
-//'         test dataset.}
-//'   \item{The labels in 'modules' must all be present in 'moduleAssignments'.}
+//'         represent node labels found in the discovery dataset (e.g. 'dNet').}
 //'   \item{'nPermutations' is a single number, greater than 0.}
 //'   \item{'nCores' is a single number, greater than 0. Note, this number must
 //'         not be larger than the number of cores on your machine, or the 
@@ -152,20 +149,32 @@ Rcpp::List PermutationProcedureNoData (
   const std::vector<std::string> tNames (Rcpp::as<std::vector<std::string>>(colnames(tNet)));
   
   
+  
   /* Next, we need to create three mappings:
   *  - From node IDs to indices in the discovery dataset
   *  - From node IDs to indices in the test dataset
-  *  - From modules to node IDs
+  *  - From modules to all node IDs
+  *  - From modules to just node IDs present in the test dataset.
   */
   const namemap dIdxMap = MakeIdxMap(dNames);
   const namemap tIdxMap = MakeIdxMap(tNames);
   const stringmap modNodeMap = MakeModMap(moduleAssignments);
+  const stringmap modNodePresentMap = MakeModMap(moduleAssignments, tIdxMap);
   
   // What modules do we actually want to analyse?
   const std::vector<std::string> mods (Rcpp::as<std::vector<std::string>>(modules));
   
   // Map module labels to row indices in our armadillo matrices/cubes
   const namemap modIdxMap = MakeIdxMap(mods);
+  
+  // We only need to iterate through modules which have nodes in the test 
+  // dataset
+  std::vector<std::string> modsPresent;
+  for (auto it = mods.begin(); it != mods.end(); ++it) {
+    if (modNodePresentMap.count(*it) > 0) {
+      modsPresent.push_back(*it);
+    }
+  }
   
   // Typecast function options from R's vectors to appropriate C++ scalar 
   // equivalents
@@ -177,7 +186,8 @@ Rcpp::List PermutationProcedureNoData (
   // Initialise results containers
   arma::mat obs (mods.size(), 4); // stores the observed test statistics
   arma::cube nulls (mods.size(), 4, nPerm); // stores the null distributions
-  nulls.fill(NA_REAL); // Fill with NAs so killed results make sense
+  obs.fill(NA_REAL);
+  nulls.fill(NA_REAL);
   
   // We will save the weighted degree and correlation vectors in the observed 
   // dataset so we don't have to compute these at every permutation.
@@ -186,23 +196,20 @@ Rcpp::List PermutationProcedureNoData (
   R_CheckUserInterrupt(); 
   
   /* For the permutation procedure, we need to shuffle a vector of *valid*
-  * indices in the test network: if the null hypothesis is "overlap" (the
-  * default) then only nodes that are present in both the discovery and test
-  * datasets are used to generate the null distributions.
-  * 
-  * So we need:
-  *  - A *vector* of indices in the test dataset that can be shuffled
-  *  - A mapping from the valid node IDs to their indices in the vector to 
-  *    be shuffled
-  */
+   * indices in the test network: if the null hypothesis is "overlap" (the
+   * default) then only nodes that are present in both the discovery and test
+   * datasets are used to generate the null distributions.
+   * 
+   * So we need:
+   *  - A *vector* of indices in the test dataset that can be shuffled
+   *  - A mapping from the valid node IDs to their indices in the vector to 
+   *    be shuffled
+   */
   arma::uvec nullIdx;
   namemap nullMap;
   if (nullType == "overlap") {
-    // The valid nodes are the names of the moduleAssignments vector
-    nullIdx.set_size(moduleAssignments.length());
-    nullMap = MakeNullMap(moduleAssignments.names(), tIdxMap, nullIdx);
+    nullMap = MakeNullMap(dNames, tIdxMap, nullIdx);
   } else { // otherwise take all nodes
-    nullIdx.set_size(tNetPtr.n_cols);
     nullMap = MakeNullMap(tNames, tIdxMap, nullIdx);
   }
   
@@ -210,10 +217,10 @@ Rcpp::List PermutationProcedureNoData (
   R_CheckUserInterrupt(); 
   std::string mod;
   arma::uvec dIdx, dRank;
-  for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
+  for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
     // Get the node indices in the discovery dataset for this module
     mod = *mi;
-    dIdx = GetNodeIdx(mod, modNodeMap, dIdxMap);
+    dIdx = GetNodeIdx(mod, modNodePresentMap, dIdxMap);
     R_CheckUserInterrupt(); 
     
     // Calculate the network properties and insert into their storage containers
@@ -230,13 +237,13 @@ Rcpp::List PermutationProcedureNoData (
   unsigned int modIdx;
   arma::uvec tIdx, tRank;
   arma::vec tCV, tWD;
-  for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
+  for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
     // What module are we analysing, and what index does it have internally?
     mod = *mi;
     modIdx = modIdxMap.at(mod);
     
     // Get the node indices in the test dataset for this module
-    tIdx = GetNodeIdx(mod, modNodeMap, tIdxMap);
+    tIdx = GetNodeIdx(mod, modNodePresentMap, tIdxMap);
     
     // Now calculate required properties in the test dataset
     tCV = CorrVector(tCorrPtr, tIdx);
@@ -295,9 +302,9 @@ Rcpp::List PermutationProcedureNoData (
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
     tt[ii] = std::thread(
       calculateNullsNoData, std::ref(tCorrPtr), std::ref(tNetPtr), 
-      std::ref(discWD), std::ref(discCV), mods, modNodeMap, modIdxMap, nullIdx, 
-      nullMap, std::ref(nulls), chunkPerms.at(ii), startIdx.at(ii), 
-      std::ref(progress), ii, std::ref(interrupted)
+      std::ref(discWD), std::ref(discCV), modsPresent, modNodePresentMap, 
+      modIdxMap, nullIdx, nullMap, std::ref(nulls), chunkPerms.at(ii), 
+      startIdx.at(ii), std::ref(progress), ii, std::ref(interrupted)
     );
   }
   
