@@ -64,10 +64,7 @@ Multithreaded permutation procedure for module preservation statistics
   \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
         rownames are identical to their column names.}
   \item{'moduleAssigments' is a named character vector, where the names
-        represent node labels found in the test dataset (i.e. 'tNet').
-        The vector must not include nodes that are not present in the 
-        test dataset.}
-  \item{The labels in 'modules' must all be present in 'moduleAssignments'.}
+        represent node labels found in the discovery dataset (e.g. 'dNet').}
   \item{'nPermutations' is a single number, greater than 0.}
   \item{'nCores' is a single number, greater than 0. Note, this number must
         not be larger than the number of cores on your machine, or the 
