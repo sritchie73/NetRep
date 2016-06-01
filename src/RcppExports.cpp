@@ -6,32 +6,6 @@
 
 using namespace Rcpp;
 
-// CorStats
-List CorStats(SEXP pCorD, IntegerVector discIndices, SEXP pCorT, IntegerVector testIndices);
-RcppExport SEXP NetRep_CorStats(SEXP pCorDSEXP, SEXP discIndicesSEXP, SEXP pCorTSEXP, SEXP testIndicesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pCorD(pCorDSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type discIndices(discIndicesSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type pCorT(pCorTSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type testIndices(testIndicesSEXP);
-    __result = Rcpp::wrap(CorStats(pCorD, discIndices, pCorT, testIndices));
-    return __result;
-END_RCPP
-}
-// NetProps
-List NetProps(SEXP pAdjacency, IntegerVector subsetIndices);
-RcppExport SEXP NetRep_NetProps(SEXP pAdjacencySEXP, SEXP subsetIndicesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pAdjacency(pAdjacencySEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
-    __result = Rcpp::wrap(NetProps(pAdjacency, subsetIndices));
-    return __result;
-END_RCPP
-}
 // RangeSubset
 List RangeSubset(SEXP pDat, IntegerVector subsetIndices);
 RcppExport SEXP NetRep_RangeSubset(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
@@ -63,18 +37,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
     CheckFinite(pDat);
     return R_NilValue;
-END_RCPP
-}
-// DataProps
-List DataProps(SEXP pDat, IntegerVector subsetIndices);
-RcppExport SEXP NetRep_DataProps(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
-    __result = Rcpp::wrap(DataProps(pDat, subsetIndices));
-    return __result;
 END_RCPP
 }
 // PermutationProcedure
