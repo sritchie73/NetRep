@@ -4,12 +4,12 @@
 \alias{plotProps}
 \title{Get the network properties and order for a plot}
 \usage{
-plotProps(scaledData, correlation, network, moduleAssignments, modules, di, ti,
+plotProps(data, correlation, network, moduleAssignments, modules, di, ti,
   orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, dryRun,
   verbose)
 }
 \arguments{
-\item{scaledData}{scaled data returned by \code{'processInput'}.}
+\item{data}{data returned by \code{'processInput'}.}
 
 \item{correlation}{list returned by \code{'processInput'}.}
 

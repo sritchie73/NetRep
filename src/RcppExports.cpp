@@ -87,14 +87,3 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// Scale
-void Scale(SEXP pDat, SEXP spDat);
-RcppExport SEXP NetRep_Scale(SEXP pDatSEXP, SEXP spDatSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type spDat(spDatSEXP);
-    Scale(pDat, spDat);
-    return R_NilValue;
-END_RCPP
-}

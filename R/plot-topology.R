@@ -449,7 +449,6 @@ plotData <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   
@@ -477,7 +476,7 @@ plotData <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
     nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -633,7 +632,6 @@ plotCorrelation <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderNodesBy <- finput$orderNodesBy
   
   # Indexes for this function
@@ -660,7 +658,7 @@ plotCorrelation <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -811,7 +809,6 @@ plotNetwork <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderNodesBy <- finput$orderNodesBy
   
   # Indexes for this function
@@ -838,7 +835,7 @@ plotNetwork <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -989,7 +986,6 @@ plotContribution <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderNodesBy <- finput$orderNodesBy
   
   # Indexes for this function
@@ -1016,7 +1012,7 @@ plotContribution <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -1129,7 +1125,6 @@ plotDegree <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderNodesBy <- finput$orderNodesBy
   
   # Indexes for this function
@@ -1156,7 +1151,7 @@ plotDegree <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -1274,7 +1269,6 @@ plotSummary <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderSamplesBy <- finput$orderSamplesBy
   orderNodesBy <- finput$orderNodesBy
   
@@ -1302,7 +1296,7 @@ plotSummary <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
     nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps

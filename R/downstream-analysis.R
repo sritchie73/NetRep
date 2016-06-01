@@ -201,7 +201,7 @@ networkProperties <- function(
   
   # Calculate the network properties
   res <- with(finput, {
-    netPropsInternal(scaledData, correlation, network, moduleAssignments, 
+    netPropsInternal(data, correlation, network, moduleAssignments, 
                      modules, discovery, test, nDatasets, datasetNames, verbose)
   })
   
@@ -219,8 +219,7 @@ networkProperties <- function(
 #' input has been processed already by \code{\link{processInput}}. This allows
 #' for function-specific checking (i.e. failing early where the \code{'data'} is
 #' required), while avoiding duplication of time-intensive checks 
-#' (e.g. \code{\link{checkFinite}}) and data duplication (e.g. through
-#' \code{\link{scaleBigMatrix}}).
+#' (e.g. \code{\link{checkFinite}}).
 #' 
 #' @param data \code{'data'} after processing by \code{'processInput'}.
 #' @param correlation \code{'correlation'} after processing by
@@ -499,7 +498,7 @@ nodeOrder <- function(
     if (orderModules) {
       for (di in discovery) {
         for (ti in test[[di]]) {
-          if (is.null(scaledData[[ti]]) && length(modules[[di]]) > 1) {
+          if (is.null(data[[ti]]) && length(modules[[di]]) > 1) {
             stop("'data' must be provided for all 'test' datasets ",
                  "if 'orderModules' is TRUE")
           }   
@@ -517,7 +516,7 @@ nodeOrder <- function(
   with(finput, {
     for (di in discovery) {
       if (length(modules[[di]]) == 1) {
-        scaledData[di] <- list(NULL)
+        data[di] <- list(NULL)
       }
     }
   })
@@ -525,7 +524,7 @@ nodeOrder <- function(
   # Calculate the network properties
   props <- with(finput, { 
     netPropsInternal(
-      scaledData, correlation, network, moduleAssignments, 
+      data, correlation, network, moduleAssignments, 
       modules, discovery, test, nDatasets, datasetNames, verbose
     ) 
   })
@@ -875,7 +874,7 @@ sampleOrder <- function(
   # Calculate the network properties. We don't actually need the network-based
   # properties though, so we can speed things up by ignoring them
   props <- with(finput, {
-    netPropsInternal(scaledData, correlation, NULL, moduleAssignments, 
+    netPropsInternal(data, correlation, NULL, moduleAssignments, 
                      modules, discovery, test, nDatasets, datasetNames, verbose)
   })
 
@@ -964,7 +963,7 @@ filterInternalProps <- function(props, test, discovery, modules=NULL) {
 
 #' Get the network properties and order for a plot
 #'
-#' @param scaledData scaled data returned by \code{'processInput'}.
+#' @param data data returned by \code{'processInput'}.
 #' @param correlation list returned by \code{'processInput'}.
 #' @param network list returned by \code{'processInput'}.
 #' @param moduleAssignments list returned by \code{'processInput'}.
@@ -980,7 +979,7 @@ filterInternalProps <- function(props, test, discovery, modules=NULL) {
 #' @param verbose logical; turn on verbose printing.
 #'
 plotProps <- function(
-  scaledData, correlation, network, moduleAssignments, modules, di,
+  data, correlation, network, moduleAssignments, modules, di,
   ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
   dryRun, verbose
 ) {
@@ -1001,9 +1000,9 @@ plotProps <- function(
     if (is.null(orderSamplesBy)) {
       sampleOrder <- NULL
     } else if (!is.na(orderSamplesBy)) {
-        sampleOrder <- rownames(scaledData[[orderSamplesBy]])
+        sampleOrder <- rownames(data[[orderSamplesBy]])
     } else {
-      sampleOrder <- rownames(scaledData[[ti]])
+      sampleOrder <- rownames(data[[ti]])
     }
     testProps <- NULL
   } else {
@@ -1025,7 +1024,7 @@ plotProps <- function(
     
     # Calculate the network properties for all datasets required
     props <- netPropsInternal(
-      scaledData, correlation, network, moduleAssignments, modules, di,
+      data, correlation, network, moduleAssignments, modules, di,
       plotDatasets, nDatasets, datasetNames, FALSE
     )
     
@@ -1073,7 +1072,7 @@ plotProps <- function(
       sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
       sampleOrder <- simplifyList(sampleOrder, depth=3)
     } else {
-      sampleOrder <- rownames(scaledData[[ti]])
+      sampleOrder <- rownames(data[[ti]])
     }
     
     # Just keep the properties we need for plotting
@@ -1100,7 +1099,7 @@ plotProps <- function(
     na.pos.y <- NULL
     presentSamples <- NULL
   } else if (!is.numeric(sampleOrder)) {
-    na.pos.y <- which(sampleOrder %nin% rownames(scaledData[[ti]]))
+    na.pos.y <- which(sampleOrder %nin% rownames(data[[ti]]))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
     } else {

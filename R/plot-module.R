@@ -415,7 +415,6 @@ plotModule <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   
@@ -438,7 +437,7 @@ plotModule <- function(
   
   # Create empty plot windows so that we fail quickly if the margins are too
   # large
-  if (is.null(scaledData[[ti]])) {
+  if (is.null(data[[ti]])) {
     layout(mat=matrix(1:3, ncol=1), heights=c(0.4, 0.4, 0.2))
   } else {
     summary.window <- min(0.2 + (length(mods) - 1)* 0.1, 0.5) 
@@ -457,7 +456,7 @@ plotModule <- function(
     emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Network heatmap
     par(mar=c(1, 1, 1, 1))
     emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Degree barplot
-    if (!is.null(scaledData[[ti]])) {
+    if (!is.null(data[[ti]])) {
       par(mar=c(1, 1, 1, 1))
       emptyPlot(xlim=c(0, 1), ylim=c(0, 1), bty="n") # Contribution barplot
       par(mar=c(1,1,1,1))
@@ -480,7 +479,7 @@ plotModule <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(scaledData, correlation, network, moduleAssignments,
+  plotProps <- plotProps(data, correlation, network, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
     nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -501,7 +500,7 @@ plotModule <- function(
     # placehold vectors so that the plot functions work
     wDegreeVec <- rep(0, length(nodeOrder))
     names(wDegreeVec) <- nodeOrder
-    if (!is.null(scaledData[[ti]])) {
+    if (!is.null(data[[ti]])) {
       nodeContribVec <- rep(0, length(nodeOrder))
       names(nodeContribVec) <- nodeOrder
       
@@ -517,7 +516,7 @@ plotModule <- function(
     }
     wDegreeVec <- wDegreeVec[nodeOrder]
     
-    if (!is.null(scaledData[[ti]])) {
+    if (!is.null(data[[ti]])) {
       # node contribution
       nodeContribVec <- foreach(mi = moduleOrder, .combine=c) %do% {
         testProps[[mi]]$contribution
@@ -616,7 +615,7 @@ plotModule <- function(
   
   # Plot weighted degree
   par(mar=c(1,1,1,1))
-  if (is.null(scaledData[[ti]])) {
+  if (is.null(data[[ti]])) {
     plotBar(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
@@ -634,7 +633,7 @@ plotModule <- function(
     )
   }
   
-  if (!is.null(scaledData[[ti]])) {
+  if (!is.null(data[[ti]])) {
     # Plot Module Membership
     par(mar=c(1, 1, 1, 1))
     plotBar(

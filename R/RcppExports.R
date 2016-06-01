@@ -67,6 +67,7 @@ CheckFinite <- function(pDat) {
 #' 
 #' @return a list containing a matrix of observed test statistics, and an
 #'   array of null distribution observations.
+#' @import RcppArmadillo
 PermutationProcedure <- function(dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
     .Call('NetRep_PermutationProcedure', PACKAGE = 'NetRep', dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
@@ -192,16 +193,5 @@ NetworkProperties <- function(data, net, moduleAssignments, modules) {
 #'   coherence, weighted degree, and average edge weight for each 'module'.
 NetworkPropertiesNoData <- function(net, moduleAssignments, modules) {
     .Call('NetRep_NetworkPropertiesNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
-}
-
-#' Scale a matrix by its rows
-#' 
-#' @param pDat SEXP container for the pointer to the data matrix to be scaled.
-#' @param spDat SEXP container for the pointer to the pre-initialised
-#'   \code{\link[bigmemory]{big.matrix}} that the scaled version of \code{pDat}
-#'   will be stored in.
-#' @rdname scale-cpp
-Scale <- function(pDat, spDat) {
-    invisible(.Call('NetRep_Scale', PACKAGE = 'NetRep', pDat, spDat))
 }
 

@@ -5,20 +5,32 @@
 #' location of the 'big.matrix' descriptor file, and the big.matrix is attached
 #' and removed every time its elements are requested.
 #' 
+#' @details
+#'   On some operating systems, particularly multi-node clusters with job
+#'   submission systems, the kernel may spend a lot of time ensuring 
+#'   consistency of the data in shared memory due to there being multiple nodes.
+#'   Since \code{NetRep}'s functions never write to these objects, we specify
+#'   \code{readOnly = TRUE} by default to prevent the permutation procedure 
+#'   from griding to a halt. \code{readOnly} is set to \code{FALSE} when 
+#'   attaching the big matrix objects to do writes in the element accessor
+#'   methods (i.e. \code{\[<-}).
+#' 
 #' @param x the bigMatrix object to attach or detach
+#' @param readOnly logical; should the shared memory segment be marked 
+#'   read only by the operating system? (See details)
 #' 
 #' @return
 #'  The bigMatrix object with its state updated.
 #'  
 #' @name bigMatrix-state
-attach.bigMatrix <- function(x) {
+attach.bigMatrix <- function(x, readOnly=TRUE) {
   if (class(x) != 'bigMatrix')
     stop("object is not of class 'bigMatrix'")
   if (x@attached)
     return(x)
   if (!file.exists(x@descriptor))
     stop("Could not find backing file. Have you changed working directory?")
-  x@matrix <- bigmemory::attach.big.matrix(x@descriptor)
+  x@matrix <- bigmemory::attach.big.matrix(x@descriptor, readOnly=readOnly)
   poke(x@matrix)
   x@attached <- TRUE
   x
@@ -581,7 +593,7 @@ setMethod(
     # Attach the big.matrix object if not attached yet
     is.attached <- x@attached
     if (!is.attached)
-      x <- attach.bigMatrix(x)
+      x <- attach.bigMatrix(x, readOnly=FALSE)
     
     # assign the value to the appropriate location
     x@matrix[i, j] <- value
@@ -611,7 +623,7 @@ setMethod(
     # Attach the big.matrix object if not attached yet
     is.attached <- x@attached
     if (!is.attached)
-      x <- attach.bigMatrix(x)
+      x <- attach.bigMatrix(x, readOnly=FALSE)
     
     # assign the value to the appropriate location
     x@matrix[i,]<-value
@@ -641,7 +653,7 @@ setMethod(
     # Attach the big.matrix object if not attached yet
     is.attached <- x@attached
     if (!is.attached)
-      x <- attach.bigMatrix(x)
+      x <- attach.bigMatrix(x, readOnly=FALSE)
     
     # assign the value to the appropriate location
     x@matrix[,j]<-value
@@ -661,7 +673,7 @@ setMethod(
     # Attach the big.matrix object if not attached yet
     is.attached <- x@attached
     if (!is.attached)
-      x <- attach.bigMatrix(x)
+      x <- attach.bigMatrix(x, readOnly=FALSE)
     
     # assign the value to the appropriate location
     x@matrix[,j]<-value

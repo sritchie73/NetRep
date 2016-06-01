@@ -468,8 +468,7 @@ modulePreservation <- function(
   test <- finput$test
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  scaledData <- finput$scaledData
-  
+
   on.exit({
     vCat(verbose, 0, "Cleaning up temporary objects...")
     unlink(tmp.dir, recursive = TRUE)
@@ -535,7 +534,7 @@ modulePreservation <- function(
         overlapModules <- ct$overlapModules
         overlapAssignments <- ct$overlapAssignments
         
-        nStatistics <- ifelse(!is.null(scaledData[[di]]), 7, 4)
+        nStatistics <- ifelse(!is.null(data[[di]]) && !is.null(data[[ti]]), 7, 4)
         nModules <- length(overlapModules)
         
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
