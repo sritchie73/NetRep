@@ -1,4 +1,4 @@
-#' Scale and Center the rows of a 'big.matrix'
+#' Scale and Center the rows of a 'bigMatrix'
 #' 
 #' Create a new \code{\link{bigMatrix}} containing column-wise
 #' scaled data.
@@ -43,32 +43,7 @@ scaleBigMatrix <- function(x, tmp.dir) {
   )  
 }
 
-#' Get the range of a bigMatrix or its subset
-#' 
-#' Note subsetting only applies to columns: this is only meant for use with the 
-#' 'data' matrices.
-#' 
-#' @param x a bigMatrix
-#' @param subsetIndices an optional vector to subset the matrix by
-#' 
-rangeBigMatrix <- function(x, subsetIndices) {
-  is.attached <- x@attached
-  if (!is.attached)
-    x <- attach.bigMatrix(x)
-  
-  if (missing(subsetIndices)) {
-    res <- BigRange(x@matrix@address)
-  } else {
-    res <- RangeSubset(x@matrix@address, subsetIndices)
-  }
-  
-  if (is.attached)
-    x <- detach.bigMatrix(x)
-  
-  unlist(lapply(res, as.vector))
-}
-
-#' Check if all entries of a `bigMatrix` are Finite
+#' Check if all entries of a 'bigMatrix' are finite
 #' 
 #' If there are non-finite entires (\code{NA}, \code{NaN}, \code{-Inf}, 
 #' \code{Inf}), throw an exception. 
