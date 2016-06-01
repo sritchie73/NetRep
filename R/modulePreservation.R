@@ -538,196 +538,23 @@ modulePreservation <- function(
         nStatistics <- ifelse(!is.null(scaledData[[di]]), 7, 4)
         nModules <- length(overlapModules)
         
-        #---------------------------------------------------------------------
-        # Get the network properties for each module in the test dataset.
-        #   - We only need to calculate this once
-        #---------------------------------------------------------------------
-        vCat(verbose, 1, "Calculating observed test statistics...")
-        discProps <- rep(list(NULL), nModules)
-        names(discProps) <- overlapModules
-        for (mi in overlapModules) {
-          modVars <- names(overlapAssignments %sub_in% mi)
-          modInds <- match(modVars, colnames(correlation[[di]]))
-          discProps[[mi]] <- moduleProps(network[[di]], modInds, scaledData[[di]])
-        }
-        
-        #---------------------------------------------------------------------
-        # Calculate the observed value for each test statistic
-        #---------------------------------------------------------------------
-        observed <- matrix(NA, nrow=nModules, ncol=nStatistics)
-        rownames(observed) <- overlapModules
-        for (mi in overlapModules) {
-          modVars <- names(overlapAssignments %sub_in% mi)
-          discInds <- match(modVars, colnames(correlation[[di]]))
-          testInds <- match(modVars, colnames(correlation[[ti]]))
-          testProps <-  moduleProps(network[[ti]], testInds, scaledData[[ti]])
-          stats <- calcStats(
-            discProps[[mi]], testProps, 
-            correlation[[di]], discInds,
-            correlation[[ti]], testInds
+        if (is.null(data[[di]]) || is.null(data[[ti]])) {
+          perms <- PermutationProcedureNoData(
+            correlation[[di]][,], network[[di]][,], correlation[[ti]][,], 
+            network[[ti]][,], moduleAssignments[[di]], modules[[di]], nPerm, 
+            nCores-1, model, verbose, vCat
           )
-          observed[mi,] <- stats
-        }
-        colnames(observed) <- names(stats)
-        
-        # Clean up memory 
-        rm(testProps, stats)
-        gc()
-        
-        #---------------------------------------------------------------------
-        # Run permutation procedure
-        #---------------------------------------------------------------------
-        vCat(
-          verbose, 1, "Calculating null distributions with", nPerm, 
-          "permutations..."
-        )
-        if(verbose) {
-          # To log progress, we will write our progress to a file for each chunk
-          while (TRUE) {
-            run.dir <- file.path(tmp.dir, paste0(".run-progress", getUUID()))
-            # Handle the infintesimally small chance of a UUID collision
-            tryCatch({
-              dir.create(run.dir)
-              break
-            }, warning = function(w) {
-              if(!grepl("already exists", w$message)) {
-                break
-              }
-            })
-          }  
-          on.exit({
-            unlink(run.dir, recursive=TRUE)
-          }, add=TRUE)
-        }
-        
-        foreach(chunk=ichunkTasks(verbose, nPerm, nCores)) %dopar% {
-          if (verbose && length(chunk) == 1 && chunk == -1) {
-            monitorProgress(nCores - 1, 2, run.dir)
-            NULL
-          } else {
-            tryCatch({
-              if (verbose) {
-                conns <- setupParProgressLogs(chunk, nCores - 1, 2, run.dir)
-                progressBar <- conns[[1]]
-              } 
-              
-              # Attach matrices.
-              if (!is.null(scaledData[[di]]))
-                scaledData[[di]] <- attach.bigMatrix(scaledData[[di]])
-              correlation[[di]] <- attach.bigMatrix(correlation[[di]])
-              network[[di]] <- attach.bigMatrix(network[[di]])
-              
-              if (!is.null(scaledData[[ti]]))
-                scaledData[[ti]] <- attach.bigMatrix(scaledData[[ti]])
-              correlation[[ti]] <- attach.bigMatrix(correlation[[ti]])
-              network[[ti]] <- attach.bigMatrix(network[[ti]])
-              
-              #---------------------------------------------------------------
-              # Calculate the module preservation statistics for each module
-              # on a random subset of the same size in the test dataset
-              #---------------------------------------------------------------
-              chunkStats <- array(
-                NA, dim=c(nModules, nStatistics, length(chunk))
-              )
-              dimnames(chunkStats)[1:2] <- dimnames(observed)
-              dimnames(chunkStats)[[3]] <- paste0("permutation.", chunk)
-              for (pi in seq_along(chunk)) {
-                for (mi in overlapModules) {
-                  modVars <- names(overlapAssignments %sub_in% mi)
-                  discInds <- match(modVars, colnames(correlation[[di]]))
-                  
-                  # Select a random subset of nodes of the same size as the 
-                  # subsetss, depending on our null model.
-                  modSize <- length(modVars)
-                  if (model == "overlap") {
-                    permVars <- sample(names(overlapVars), modSize)
-                  } else {
-                    permVars <- sample(colnames(correlation[[ti]]), modSize)
-                  }
-                  permInds <- match(permVars, colnames(correlation[[ti]]))
-                  # Ensure crashes aren't fatal
-                  tryCatch({
-                    permProps <- moduleProps(network[[ti]], permInds, scaledData[[ti]])
-                    chunkStats[mi,,pi] <- calcStats(
-                      discProps[[mi]], permProps, 
-                      correlation[[di]], discInds,
-                      correlation[[ti]], permInds
-                    )
-                    rm(permProps)
-                    gc()
-                  }, error = function(e) {
-                    warning(
-                      "Calculation for module ", mi, " failed on ",
-                      "permutation ", chunk[pi], " with error message:\n",
-                      e$message
-                    )
-                  })
-                }
-                # Update the progress at the end of the loop.
-                if (verbose) {
-                  updateParProgress(progressBar, chunk[pi])
-                  if (nCores == 1) {
-                    reportProgress(2, run.dir)
-                    if (chunk[pi] == nPerm) {
-                      cat("\n")
-                    }
-                  }
-                }
-              }
-              chunkNum <- ceiling(chunk[1]/length(chunk))
-              permFile <- paste0("chunk", chunkNum, "permutations.rds")
-              saveRDS(chunkStats, file.path(tmp.dir, permFile))
-            }, finally = {
-              if (verbose) {
-                lapply(conns, close)
-              }
-              # detach once finished.
-              if (!is.null(scaledData[[di]]))
-                scaledData[[di]] <- detach.bigMatrix(scaledData[[di]])
-              correlation[[di]] <- detach.bigMatrix(correlation[[di]])
-              network[[di]] <- detach.bigMatrix(network[[di]])
-              
-              if (!is.null(scaledData[[ti]]))
-                scaledData[[ti]] <- detach.bigMatrix(scaledData[[ti]])
-              correlation[[ti]] <- detach.bigMatrix(correlation[[ti]])
-              network[[ti]] <- detach.bigMatrix(network[[ti]])
-              gc()
-            })
-          }
-        }
-        #---------------------------------------------------------------------
-        # Load in permutation results
-        #---------------------------------------------------------------------
-        rm(discProps)
-        gc()
-        
-        nulls <- array(NA, dim=c(nModules, nStatistics, nPerm))
-        dimnames(nulls)[3] <- list(rep("", nPerm))
-        chunkFiles <- list.files(tmp.dir, "chunk[0-9]*permutations.rds")
-        offset <- 1
-        for (cf in chunkFiles) {
-          chunk <- readRDS(file.path(tmp.dir, cf))
-          nCPerm <- dim(chunk)[3]
-          nulls[,,offset:(offset+nCPerm-1)] <- chunk
-          dimnames(nulls)[1:2] <- dimnames(chunk)[1:2]
-          dimnames(nulls)[[3]][offset:(offset+nCPerm-1)] <- dimnames(chunk)[[3]]
-          offset <- offset + nCPerm
-        }
-        
-        #----------------------------------------------------------------------
-        # Order statistics: First density stats, then connectivity, then hybrid
-        #----------------------------------------------------------------------
-        if (!is.null(scaledData[[di]])) {
-          statOrder <- c(
-            "avg.weight", "coherence", 
-            "cor.cor", "cor.degree", "cor.contrib",
-            "avg.cor", "avg.contrib"
-          ) 
         } else {
-          statOrder <- c("avg.weight", "cor.degree", "cor.cor", "avg.cor")
+          perms <- PermutationProcedure(
+            data[[di]][,], correlation[[di]][,], network[[di]][,],
+            data[[ti]][,], correlation[[ti]][,], network[[ti]][,],
+            moduleAssignments[[di]], modules[[di]], nPerm, nCores-1, 
+            model, verbose, vCat
+          )
         }
-        observed <- observed[, statOrder, drop=FALSE]
-        nulls <- nulls[, statOrder, , drop=FALSE]
+        
+        observed <- perms$observed
+        nulls <- perms$nulls
         
         #---------------------------------------------------------------------
         # Calculate permutation p-value
