@@ -35,7 +35,9 @@ void MonitorProgress (
     unsigned int& nPerm, arma::uvec& progress, bool& interrupted,
     const bool& verboseFlag
 ) {
-  Rcpp::Rcout << "\n";
+  if (verboseFlag) {
+    Rcpp::Rcout << "\n";
+  }
   unsigned int nCompleted = 0;
   unsigned int percentCompleted = 0;
   char formatted[6]; // stores a whitespace padded percentage value
