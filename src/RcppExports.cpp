@@ -6,29 +6,6 @@
 
 using namespace Rcpp;
 
-// RangeSubset
-List RangeSubset(SEXP pDat, IntegerVector subsetIndices);
-RcppExport SEXP NetRep_RangeSubset(SEXP pDatSEXP, SEXP subsetIndicesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
-    __result = Rcpp::wrap(RangeSubset(pDat, subsetIndices));
-    return __result;
-END_RCPP
-}
-// BigRange
-List BigRange(SEXP pDat);
-RcppExport SEXP NetRep_BigRange(SEXP pDatSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
-    __result = Rcpp::wrap(BigRange(pDat));
-    return __result;
-END_RCPP
-}
 // CheckFinite
 void CheckFinite(SEXP pDat);
 RcppExport SEXP NetRep_CheckFinite(SEXP pDatSEXP) {
