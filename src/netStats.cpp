@@ -164,7 +164,10 @@ arma::vec SummaryProfile (const arma::mat& dataPtr, arma::uvec& nodeIdx) {
 arma::vec NodeContribution (
     const arma::mat& dataPtr, arma::uvec& nodeIdx, arma::vec& summaryProfile
 ) {
-  return arma::cor(summaryProfile, dataPtr.cols(nodeIdx));
+  // We need to convert SP from a vector to a matrix since arma::cor doesn't
+  // have a method for comparing a matrix to a vector.
+  const arma::mat SP = arma::mat(summaryProfile.begin(), summaryProfile.n_elem, 1, false, true);
+  return arma::cor(dataPtr.cols(nodeIdx), SP);
 }
 
 /* Calculate module's coherence

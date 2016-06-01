@@ -349,18 +349,9 @@ Rcpp::List PermutationProcedure (
     tt[ii].join();
   }
   
-  // Convert any NaNs to NA_REALs
-  for (auto it = obs.begin(); it < obs.end(); ++it) {
-    if (isnan(*it)) {
-      *it = NA_REAL;
-    }
-  }
-  
-  for (auto it = nulls.begin(); it < nulls.end(); ++it) {
-    if (isnan(*it)) {
-      *it = NA_REAL;
-    }
-  }
+  // Convert any NaNs or Infinites to NA_REALs
+  nulls.elem(arma::find_nonfinite(nulls)).fill(NA_REAL);
+  obs.elem(arma::find_nonfinite(obs)).fill(NA_REAL);
   
   // Construct rownames
   const std::vector<std::string> statnames = {
