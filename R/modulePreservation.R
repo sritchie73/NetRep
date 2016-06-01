@@ -410,7 +410,7 @@ modulePreservation <- function(
   if (is.na(pmatch(null, nullModels))) {
     stop("overlap must match one of ", paste(nullModels, collapse=" "))
   }
-  model <- pmatch(null, nullModels)
+  model <- nullModels[pmatch(null, nullModels)]
   
   # Identify the alternate hypothesis to use
   validAlts <- c("two.sided", "less", "greater")
