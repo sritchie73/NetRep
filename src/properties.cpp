@@ -206,6 +206,7 @@ Rcpp::List NetworkPropertiesNoData (
   Rcpp::List results; // final storage container
   for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
     // What nodes are in this module?
+    // modNodeNames = names(moduleAssignments[moduleAssignments == mod])
     mod = *mi;
     modNodeNames = GetModNodeNames(mod, modNodeMap);
     
@@ -214,25 +215,29 @@ Rcpp::List NetworkPropertiesNoData (
     degree = Rcpp::NumericVector(modNodeNames.size(), NA_REAL);
     avgWeight = NA_REAL;
     degree.names() = modNodeNames;
-
-    // Create a mapping between node names and the result vectors
-    propIdxMap = MakeIdxMap(modNodeNames);
     
     // Get just the indices of nodes that are present in the requested dataset
+    // nodeIdx = match(intersect(modNodeNames, colnames(net)), colnames(net))
     nodeIdx = GetNodeIdx(mod, modNodePresentMap, nodeIdxMap);
     
     // And a mapping of those nodes to the initialised vectors
+    // propIdx = match(intersect(modNodeNames, colnames(net), modNodeNames)
+    propIdxMap = MakeIdxMap(modNodeNames);
     propIdx = GetNodeIdx(mod, modNodePresentMap, propIdxMap);
     
+    // Calculate the properties, provided the module has some nodes in the test
+    // dataset
     if (nodeIdx.size() > 0) {
-      // Calculate the properties
-      nodeRank = sortNodes(nodeIdx); // Sort nodes for sequential memory access
-      
+      // Node indices are sorted for sequential memory access, and 'nodeRank'
+      // provides the mapping to "unsort" the results so that they are in the
+      // original order requested.
+      nodeRank = sortNodes(nodeIdx); 
       WD = WeightedDegree(netPtr, nodeIdx)(nodeRank);
       avgWeight = AverageEdgeWeight(WD);
       R_CheckUserInterrupt(); 
       
       // Fill the results vectors appropriately
+      // degree[propIdx] <- WD
       Fill(degree, WD, propIdx);
     }
 
