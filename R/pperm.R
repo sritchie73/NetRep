@@ -161,7 +161,9 @@ permutationTest <- function(
       } 
     }
   }
-  if (any(is.na(observed)) || any(is.na(nulls))) {
+  # Check for missing values that aren't due to a module not being present
+  missingMods <- apply(observed, 1, function(x) all(is.na(x)))
+  if (any(is.na(observed[!missingMods,])) || any(is.na(nulls[!missingMods,,]))) {
     warning("Missing values encountered in the observed test statistics and/or ",
             "in their null distributions. P-values may be biased for these tests.",
             " See 'help(", '"permutationTest"', ")'")

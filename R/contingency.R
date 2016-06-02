@@ -22,21 +22,23 @@ contingencyTable <- function(moduleAssignments, modules, network, di, ti) {
   overlapModules <- unique(overlapAssignments)
   overlapModules <- overlapModules[orderAsNumeric(overlapModules)]
   
-  if (length(overlapAssignments) == 0) {
-    warning(
-      "No variables composing the modules of interest are present in", 
-      " the test dataset"
-    )
-    next
-  }
-  
   # How many variables are present in the test dataset for the modules 
   # of interest?
   varsPres <- table(overlapAssignments)
+  
   modulesWithNoOverlap <- modules[[di]] %sub_nin% overlapAssignments
   varsPres <- c(varsPres, rep(0, length(modulesWithNoOverlap)))
   names(varsPres)[names(varsPres) == ""] <- modulesWithNoOverlap
   varsPres <- varsPres[orderAsNumeric(names(varsPres))]
+  
+  if (any(varsPres == 0)) {
+    noNodes <- names(varsPres[varsPres == 0])
+    warning(
+      "None of the nodes in module(s) ", 
+      paste(paste0('"', noNodes, '"'), collapse=", "),
+      " are present in the test dataset"
+    )
+  }
   
   # What proportion?
   moduleSizes <- table(moduleAssignments[[di]])
