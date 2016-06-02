@@ -2,7 +2,7 @@
 % Please edit documentation in R/multi-machine.R
 \name{combineAnalyses}
 \alias{combineAnalyses}
-\title{Multi machine analysis}
+\title{Combine results of multiple permutation procedures}
 \usage{
 combineAnalyses(pres1, pres2)
 }

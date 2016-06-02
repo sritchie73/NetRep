@@ -1,4 +1,4 @@
-#' Multi machine analysis
+#' Combine results of multiple permutation procedures
 #' 
 #' This function takes the output from multiple runs of 
 #' \code{\link{modulePreservation}}, combines their results, and returns a new
