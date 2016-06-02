@@ -69,11 +69,14 @@ double SignAwareMean (arma::vec& v1, arma::vec& v2) {
  * @return a (column) vector of the weighted degree.
  */
 arma::vec WeightedDegree(const arma::mat& netPtr, arma::uvec& nodeIdx) {
-   // We do not want a negative weight to cancel out a positive one, so we take
-   // the absolute value.
-  arma::mat dg = diagvec(netPtr);
-  arma::mat wDegree = arma::sum(arma::abs(netPtr(nodeIdx, nodeIdx))) - arma::abs(dg(nodeIdx)).t();
-
+  // We take the absolute value so that negative weights (if they exist) do not
+  // cancel out positive ones
+  arma::rowvec colSums = arma::sum(arma::abs(netPtr(nodeIdx, nodeIdx)), 0);
+  // We need to convert to a column-vector
+  arma::vec wDegree = arma::vec(colSums.begin(), colSums.n_elem, false, true);
+  // subtract the diagonals
+  arma::vec dg = netPtr.diag(0);
+  wDegree -= arma::abs(dg.elem(nodeIdx));
   return wDegree;
 }
 
