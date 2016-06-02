@@ -144,6 +144,7 @@ void calculateNulls(
 //' 
 //' @return a list containing a matrix of observed test statistics, and an
 //'   array of null distribution observations.
+//' @import RcppArmadillo
 // [[Rcpp::export]]
 Rcpp::List PermutationProcedure (
   Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet,
@@ -173,9 +174,9 @@ Rcpp::List PermutationProcedure (
   const std::vector<std::string> tNames (Rcpp::as<std::vector<std::string>>(colnames(tNet)));
   
   /* Next, we need to create three mappings:
-   *  - From node IDs to indices in the discovery dataset
-   *  - From node IDs to indices in the test dataset
-   *  - From modules to all node IDs
+   *  - From node IDs to indices in the discovery dataset.
+   *  - From node IDs to indices in the test dataset.
+   *  - From modules to all node IDs.
    *  - From modules to just node IDs present in the test dataset.
    */
   const namemap dIdxMap = MakeIdxMap(dNames);

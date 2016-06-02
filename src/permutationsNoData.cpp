@@ -151,11 +151,11 @@ Rcpp::List PermutationProcedureNoData (
   
   
   /* Next, we need to create three mappings:
-  *  - From node IDs to indices in the discovery dataset
-  *  - From node IDs to indices in the test dataset
-  *  - From modules to all node IDs
-  *  - From modules to just node IDs present in the test dataset.
-  */
+   *  - From node IDs to indices in the discovery dataset.
+   *  - From node IDs to indices in the test dataset.
+   *  - From modules to all node IDs.
+   *  - From modules to just node IDs present in the test dataset.
+   */
   const namemap dIdxMap = MakeIdxMap(dNames);
   const namemap tIdxMap = MakeIdxMap(tNames);
   const stringmap modNodeMap = MakeModMap(moduleAssignments);
@@ -252,8 +252,8 @@ Rcpp::List PermutationProcedureNoData (
     tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
     
     /* Calculate and store test statistics in the appropriate location in the 
-    * results matrix
-    */
+     * results matrix
+     */
     obs(modIdx, 0) = AverageEdgeWeight(tWD);
     obs(modIdx, 1) = Correlation(discCV[mod], tCV);
     obs(modIdx, 2) = Correlation(discWD[mod], tWD);
@@ -315,18 +315,9 @@ Rcpp::List PermutationProcedureNoData (
     tt[ii].join();
   }
   
-  // Convert any NaNs to NA_REALs
-  for (auto it = obs.begin(); it < obs.end(); ++it) {
-    if (isnan(*it)) {
-      *it = NA_REAL;
-    }
-  }
-  
-  for (auto it = nulls.begin(); it < nulls.end(); ++it) {
-    if (isnan(*it)) {
-      *it = NA_REAL;
-    }
-  }
+  // Convert any NaNs or Infinites to NA_REALs
+  nulls.elem(arma::find_nonfinite(nulls)).fill(NA_REAL);
+  obs.elem(arma::find_nonfinite(obs)).fill(NA_REAL);
   
   // Construct rownames
   const std::vector<std::string> statnames = {"avg.weight", "cor.cor", "cor.degree", "avg.cor"};
