@@ -83,26 +83,6 @@ emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
   }
 }
 
-#' Get the hexidecimal value for a named color
-#'
-#' @param name the color name
-#' @return the hex value for that color
-col2hex <- function(name) {
-  paste0("#", paste(as.hexmode(col2rgb(name)), collapse=""))
-}
-
-#' Adds alpha transparency to any color
-#'
-#' @param col color
-#' @param alpha alpha transparency, should be between 0 and 1
-#' @return the hexidecimal value of the color with the added alpha channel
-addAlpha <- function(col, alpha) {
-  if (!grepl("^#", col)) {
-    col <- col2hex(col)
-  }
-  paste0(col, as.hexmode(floor(255*alpha)))
-}
-
 #' Color palette for correlation heatmaps
 #'
 #' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
