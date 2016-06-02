@@ -663,9 +663,9 @@ processInput <- function(
   if (!dryRun) {
     for (ii in iterator) {
       if (!is.null(data[[ii]])) 
-        checkFinite(data[[ii]])
-      checkFinite(correlation[[ii]])
-      checkFinite(network[[ii]])
+        CheckFinite(data[[ii]][,])
+      CheckFinite(correlation[[ii]][,])
+      CheckFinite(network[[ii]][,])
       gc()
     }    
   }

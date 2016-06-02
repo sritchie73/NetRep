@@ -219,7 +219,7 @@ networkProperties <- function(
 #' input has been processed already by \code{\link{processInput}}. This allows
 #' for function-specific checking (i.e. failing early where the \code{'data'} is
 #' required), while avoiding duplication of time-intensive checks 
-#' (e.g. \code{\link{checkFinite}}).
+#' (e.g. \code{\link{CheckFinite}}).
 #' 
 #' @param data \code{'data'} after processing by \code{'processInput'}.
 #' @param correlation \code{'correlation'} after processing by

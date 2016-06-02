@@ -7,12 +7,12 @@
 using namespace Rcpp;
 
 // CheckFinite
-void CheckFinite(SEXP pDat);
-RcppExport SEXP NetRep_CheckFinite(SEXP pDatSEXP) {
+void CheckFinite(Rcpp::NumericMatrix matPtr);
+RcppExport SEXP NetRep_CheckFinite(SEXP matPtrSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type pDat(pDatSEXP);
-    CheckFinite(pDat);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type matPtr(matPtrSEXP);
+    CheckFinite(matPtr);
     return R_NilValue;
 END_RCPP
 }

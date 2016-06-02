@@ -38,7 +38,6 @@ This function is used by several package functions. It assumes that all user
 input has been processed already by \code{\link{processInput}}. This allows
 for function-specific checking (i.e. failing early where the \code{'data'} is
 required), while avoiding duplication of time-intensive checks 
-(e.g. \code{\link{checkFinite}}) and data duplication (e.g. through
-\code{\link{scaleBigMatrix}}).
+(e.g. \code{\link{CheckFinite}}).
 }
 
