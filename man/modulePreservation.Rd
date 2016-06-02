@@ -7,8 +7,8 @@
 modulePreservation(data = NULL, correlation, network, moduleAssignments,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 2,
   selfPreservation = FALSE, nCores = NULL, nPerm = NULL,
-  null = "overlap", alternative = "greater", statCorMethod = "pearson",
-  simplify = TRUE, verbose = TRUE)
+  null = "overlap", alternative = "greater", simplify = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -62,11 +62,6 @@ Must be either "overlap" or "all" (see details).}
 
 \item{alternative}{The type of module preservation test to perform. Must be 
 one of "greater" (default), "less" or "two.sided" (see details).}
-
-\item{statCorMethod}{character vector indicating method to use when calculating 
-the correlation based statistics (see details). Must be one of "pearson", 
-"spearman", or "kendall". If the WGCNA package is installed then "bicor" 
-may also be specified as an option (see \code{\link[WGCNA]{bicor}}).}
 
 \item{simplify}{logical; if \code{TRUE}, simplify the structure of the output
 list if possible (see Return Value).}
@@ -196,12 +191,6 @@ in the test dataset.
   Alternatively, the \code{data}, \code{correlation}, and \code{network} 
   arguments will also accept file paths to tabular data or \code{bigMatrix} 
   backingfiles.
-}
-\subsection{Memory usage:}{
-  Provided there are no additional objects in the R session the
-  permutation procedure will use only the memory required to store each 
-  matrix once, along with an additional 200 MB per core used by each vanilla
-  R session.
 }
 \subsection{Module Preservation Statistics:}{
  Module preservation is assessed through seven module preservation statistics,
@@ -357,12 +346,16 @@ in the test dataset.
  permutation procedure is employed. Each statistic is calculated between the
  module in the \emph{discovery} dataset and \code{nPerm} random subsets of
  the same size in the \emph{test} dataset in order to assess the distribution
- of each statistic under the null hypothesis. Two models for the null 
- hypothesis are available. Under "overlap", the default, random sampling is
- performed only for the set of variables present in both the \emph{discovery} and
- \emph{test} datasets. Alternatively, the argument \code{null} can be set to
- "all", in which case random sampling is performed on all variables present in
- the \emph{test} dataset.
+ of each statistic under the null hypothesis. 
+ 
+ Two models for the null hypothesis are available: "overlap", the default, 
+ only nodes that are present in both the \emph{discovery} and \emph{test}
+ networks are used when generating null distributions. This is appropriate
+ under an assumption that nodes that are present in the \emph{test} dataset, 
+ but not present in the \emph{discovery} dataset, are unobserved: that is,
+ they may fall in the module(s) of interest in the \emph{discovery} dataset
+ if they were to be measured there. Alternatively, "all" will use all nodes
+ in the \emph{test} network when generating the null distributions.
   
  The number of permutations required for any given significance threshold is 
  approximately 1 / the desired significance for one sided tests, and double 
