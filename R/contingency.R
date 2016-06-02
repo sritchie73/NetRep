@@ -36,7 +36,8 @@ contingencyTable <- function(moduleAssignments, modules, network, di, ti) {
     warning(
       "None of the nodes in module(s) ", 
       paste(paste0('"', noNodes, '"'), collapse=", "),
-      " are present in the test dataset"
+      " are present in the test dataset",
+      immediate. = TRUE
     )
   }
   

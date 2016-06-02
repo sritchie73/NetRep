@@ -591,7 +591,8 @@ modulePreservation <- function(
         gc()
       }, error=function(e) {
         warning(
-          "Failed with error:\n", e$message, "\nSkipping to next comparison"
+          "Failed with error:\n", e$message, "\nSkipping to next comparison",
+          immediate. = TRUE
         )
       })
     }
