@@ -4,11 +4,6 @@
 
 #include "netStats.hpp"
 
-#define ARMA_USE_LAPACK
-#define ARMA_USE_BLAS
-#define ARMA_NO_DEBUG
-#define ARMA_DONT_PRINT_ERRORS
-
 /* Scale data across all nodes
  * 
  * Each node is centered by its mean and scaled by it standard deviation.

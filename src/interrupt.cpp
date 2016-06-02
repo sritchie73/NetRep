@@ -1,9 +1,6 @@
+#include "interrupt.hpp"
+
 // Functions for checking whether the user has asked the C++ code to interrupt
-
-#include <RcppArmadillo.h>
-
-using namespace Rcpp;
-
 static void chkIntFn(void *dummy) { 
   R_CheckUserInterrupt(); 
 } 

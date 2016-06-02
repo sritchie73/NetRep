@@ -4,8 +4,6 @@
 #include "netStats.hpp"
 #include "progress.hpp"
 
-#define ARMA_NO_DEBUG
-
 /* Generate null-distribution observations for the module preservation statistics
 * 
 * Fills out the corresponding slices of the provided 'nulls' cube based on the

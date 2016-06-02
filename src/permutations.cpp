@@ -4,8 +4,6 @@
 #include "netStats.hpp"
 #include "progress.hpp"
 
-#define ARMA_NO_DEBUG
-
 /* Generate null-distribution observations for the module preservation statistics
  * 
  * Fills out the corresponding slices of the provided 'nulls' cube based on the
@@ -144,7 +142,6 @@ void calculateNulls(
 //' 
 //' @return a list containing a matrix of observed test statistics, and an
 //'   array of null distribution observations.
-//' @import RcppArmadillo
 // [[Rcpp::export]]
 Rcpp::List PermutationProcedure (
   Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet,

@@ -1,7 +1,5 @@
 #include "utils.hpp"
 
-#define ARMA_NO_DEBUG
-
 /* Build a dictionary mapping labels to a sequence of integers
  */
 namemap MakeIdxMap (const std::vector<std::string>& labels) {

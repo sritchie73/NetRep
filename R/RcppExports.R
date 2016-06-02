@@ -70,7 +70,6 @@ CheckFinite <- function(matPtr) {
 #' 
 #' @return a list containing a matrix of observed test statistics, and an
 #'   array of null distribution observations.
-#' @import RcppArmadillo
 PermutationProcedure <- function(dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
     .Call('NetRep_PermutationProcedure', PACKAGE = 'NetRep', dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }

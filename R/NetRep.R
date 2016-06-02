@@ -24,6 +24,5 @@
 #' @name NetRep
 #' @useDynLib NetRep
 #' @importFrom Rcpp evalCpp
-#' @import BH
 #' @import bigmemory
 NULL
