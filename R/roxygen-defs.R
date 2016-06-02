@@ -50,19 +50,6 @@ NULL
 #' 
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
-#' 
-#' @param nCores number of cores to parallelise the calculation of network 
-#'   properties over. Ignored if the user has already registered a parallel 
-#'   backend. If \code{NULL} (default) the all but one core on the machine will
-#'   be used.
-#'  
-#' @name par_param
-NULL
-
-#' Template parameters
-#' 
-#' Template parameters to be imported into other function documentation. This 
-#' is not intended to be a stand-alone help file.
 #'
 #' @param orderModules logical; if \code{TRUE} modules ordered by clustering 
 #'   their summary vectors. If \code{FALSE} modules are returned in the order

@@ -3,7 +3,6 @@
 #' Functions for plotting the topology of a network module.
 #' 
 #' @inheritParams common_params
-#' @inheritParams par_param
 #' @inheritParams orderModules_param
 #' @inheritParams plot_params
 #'
@@ -378,7 +377,7 @@ NULL
 #' @export
 plotData <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, lwd=1, 
   plotLegend=TRUE, legend.main="Data", legend.main.line=1, naxt.line=-0.5, 
@@ -427,13 +426,6 @@ plotData <- function(
   # Handle variants that will not work for this plot function
   if (is.null(laxt.tck))
     stop("'laxt.tck' must be a numeric vector of length 1 or 'NA'")
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
@@ -568,7 +560,7 @@ plotData <- function(
 #' @export
 plotCorrelation <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
   legend.main="Correlation", legend.main.line=1, naxt.line=-0.5, maxt.line=3, 
@@ -611,13 +603,6 @@ plotCorrelation <- function(
     corRange=corRange, symmetric=symmetric, dryRun=dryRun,
     legend.main.line=legend.main.line)
 
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
-  
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
@@ -745,7 +730,7 @@ plotCorrelation <- function(
 #' @export
 plotNetwork <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
   legend.main="Edge weight", legend.main.line=1, naxt.line=-0.5, maxt.line=3, 
@@ -787,13 +772,6 @@ plotNetwork <- function(
     legend.main=legend.main, legend.position=legend.position,
     symmetric=symmetric, netCols=netCols, netRange=netRange, dryRun=dryRun,
     legend.main.line=legend.main.line)
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
@@ -922,7 +900,7 @@ plotNetwork <- function(
 #' @export
 plotContribution <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, ylab.line=2.5, lwd=1, 
   drawBorders=FALSE, naxt.line=-0.5, maxt.line=3, yaxt.line=0, yaxt.tck=-0.035, 
@@ -964,13 +942,6 @@ plotContribution <- function(
     ylab.line=ylab.line, drawBorders=drawBorders, naxt.line=naxt.line, 
     maxt.line=maxt.line, contribCols=contribCols, naCol=naCol, dryRun=dryRun, 
     yaxt.line=yaxt.line, yaxt.tck=yaxt.tck)
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
@@ -1064,7 +1035,7 @@ plotContribution <- function(
 #' @export
 plotDegree <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, drawBorders=FALSE, 
   naxt.line=-0.5, maxt.line=3, yaxt.line=0, yaxt.tck=-0.035, ylab.line=2.5, 
@@ -1103,13 +1074,6 @@ plotDegree <- function(
     drawBorders=drawBorders, naxt.line=naxt.line, maxt.line=maxt.line, 
     degreeCol=degreeCol, naCol=naCol, dryRun=dryRun, yaxt.line=yaxt.line, 
     yaxt.tck=yaxt.tck, ylab.line=ylab.line)
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
@@ -1205,7 +1169,7 @@ plotDegree <- function(
 #' @export
 plotSummary <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, 
   xlab.line=2.5, lwd=1, drawBorders=FALSE, saxt.line=-0.5, maxt.line=0, 
@@ -1247,13 +1211,6 @@ plotSummary <- function(
     saxt.line=saxt.line, maxt.line=maxt.line, summaryCols=summaryCols, 
     naCol=naCol, dryRun=dryRun, xaxt.line=xaxt.line, xaxt.tck=xaxt.tck,
     xlab.line=xlab.line)
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 

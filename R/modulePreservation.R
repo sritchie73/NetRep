@@ -12,11 +12,11 @@
 #' @param selfPreservation logical; if \code{FALSE} (default) then module 
 #'  preservation analysis will not be performed within a dataset (\emph{i.e.} 
 #'  where the \code{discovery} and \code{test} datasets are the same).
+#' @param nThreads number of threads to parallelise the calculation of network 
+#'   properties over. Automatically determined as the number of cores - 1 if 
+#'   not specified.
 #' @param nPerm number of permutations to use. If not specified, the number of 
 #'  permutations will be automatically determined (see details).
-#' @param nCores number of cores to parallelise the permutation procedure over.
-#'  Ignored if the user has already registered a parallel backend. If 
-#'  \code{NULL} (default) the all but one core on the machine will be used.
 #' @param null variables to include when generating the null distributions. 
 #'  Must be either "overlap" or "all" (see details).
 #' @param alternative The type of module preservation test to perform. Must be 
@@ -384,11 +384,12 @@
 #' }
 #' 
 #' @import foreach
+#' @import RhpcBLASctl
 #' @export
 modulePreservation <- function(
   data=NULL, correlation, network, moduleAssignments, modules=NULL, 
   backgroundLabel="0", discovery=1, test=2, selfPreservation=FALSE,
-  nCores=NULL, nPerm=NULL, null="overlap", alternative="greater", 
+  nThreads=NULL, nPerm=NULL, null="overlap", alternative="greater", 
   simplify=TRUE, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
@@ -419,13 +420,37 @@ modulePreservation <- function(
     stop("'nPerm' must be a single number > 1")
   }
   
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=TRUE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
+  # Validate 'nThreads'
+  maxThreads <- MaxThreads()
+  if (is.null(nThreads)) {
+    nThreads <- maxThreads - 1; # Leave a core for interactive use
+  }
   
+  if (!is.numeric(nThreads) || length(nThreads) > 1 || nThreads < 1)
+    stop("'nCores' must be a single number greater than 0")
+  
+  if (nThreads > maxThreads) {
+    stop(
+      "Number of threads requested (", nThreads, ") exceeds the maximum ",
+      "number of concurrent threads supported by the current hardware (",
+      maxThreads, ")."
+    )
+  }
+  
+  # Disable implicit parallelism (i.e. through multithreaded BLAS libraries).
+  # The permutation procedure will spawn its own threads.
+  oldOMPThreads <- omp_get_max_threads()
+  oldBLASThreads <- blas_get_num_procs()
+  
+  omp_set_num_threads(1)
+  blas_set_num_threads(1)
+  
+  # Restore to previous state
+  on.exit({
+    omp_set_num_threads(oldOMPThreads)
+    blas_set_num_threads(oldBLASThreads)
+  }, add=TRUE)
+
   # For the other functions this isn't necessary.
   if (missing(moduleAssignments))
     moduleAssignments <- NULL
@@ -518,13 +543,13 @@ modulePreservation <- function(
           perms <- PermutationProcedureNoData(
             correlation[[di]][,], network[[di]][,], correlation[[ti]][,], 
             network[[ti]][,], moduleAssignments[[di]], modules[[di]], nPerm, 
-            nCores-1, model, verbose, vCat
+            nThreads-1, model, verbose, vCat
           )
         } else {
           perms <- PermutationProcedure(
             data[[di]][,], correlation[[di]][,], network[[di]][,],
             data[[ti]][,], correlation[[ti]][,], network[[ti]][,],
-            moduleAssignments[[di]], modules[[di]], nPerm, nCores-1, 
+            moduleAssignments[[di]], modules[[di]], nPerm, nThreads-1, 
             model, verbose, vCat
           )
         }

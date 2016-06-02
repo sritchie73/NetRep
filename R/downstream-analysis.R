@@ -5,7 +5,6 @@
 #' 
 #' @inheritParams common_params
 #' @inheritParams simplify_param
-#' @inheritParams par_param
 #'  
 #' @details
 #'  \subsection{Input data structure:}{
@@ -170,7 +169,7 @@
 #' @export
 networkProperties <- function(
   data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, simplify=TRUE, 
+  backgroundLabel="0", discovery=NULL, test=NULL, simplify=TRUE, 
   verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
@@ -181,13 +180,6 @@ networkProperties <- function(
   
   vCat(verbose, 0, "Validating user input...")
   
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
-
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
@@ -300,7 +292,6 @@ netPropsInternal <- function(
 #' 
 #' @inheritParams common_params
 #' @inheritParams simplify_param
-#' @inheritParams par_param
 #' @inheritParams orderModules_param
 #' 
 #' @param na.rm logical; If \code{TRUE}, nodes and modules present in the 
@@ -452,7 +443,7 @@ netPropsInternal <- function(
 #' @export
 nodeOrder <- function(
   data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, na.rm=FALSE, 
+  backgroundLabel="0", discovery=NULL, test=NULL, na.rm=FALSE, 
   orderModules=TRUE, mean=FALSE, simplify=TRUE, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
@@ -462,13 +453,6 @@ nodeOrder <- function(
   dir.create(tmp.dir, showWarnings=FALSE)
   
   vCat(verbose, 0, "Validating user input...")
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
     stop("'na.rm' must be either 'TRUE' or 'FALSE'")
@@ -689,7 +673,6 @@ nodeOrderInternal <- function(
 #' 
 #' @inheritParams common_params
 #' @inheritParams simplify_param
-#' @inheritParams par_param
 #' 
 #' @param na.rm logical; If \code{TRUE} variables present in the 
 #'   \code{discovery} dataset but missing from the \code{test} dataset are 
@@ -825,7 +808,7 @@ nodeOrderInternal <- function(
 #' @export
 sampleOrder <- function(
   data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, na.rm=FALSE, 
+  backgroundLabel="0", discovery=NULL, test=NULL, na.rm=FALSE, 
   simplify=TRUE, verbose=TRUE
 ) {
   #-----------------------------------------------------------------------------
@@ -833,13 +816,6 @@ sampleOrder <- function(
   #-----------------------------------------------------------------------------
   tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
   dir.create(tmp.dir, showWarnings=FALSE)
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   vCat(verbose, 0, "Validating user input...")
   

@@ -6,19 +6,18 @@
 \usage{
 plotModule(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
-  orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames = NULL,
-  main = "Module Topology", main.line = 1, drawBorders = FALSE, lwd = 1,
-  naxt.line = -0.5, saxt.line = -0.5, maxt.line = NULL,
-  xaxt.line = -0.5, xaxt.tck = -0.025, xlab.line = 2.5, yaxt.line = 0,
-  yaxt.tck = -0.15, ylab.line = 2.5, laxt.line = 2.5, laxt.tck = 0.04,
-  cex.axis = 0.8, legend.main.line = 1.5, cex.lab = 1.2, cex.main = 2,
-  dataCols = NULL, dataRange = NULL, corCols = correlation.palette(),
-  corRange = c(-1, 1), netCols = network.palette(), netRange = c(0, 1),
-  degreeCol = "#feb24c", contribCols = c("#A50026", "#313695"),
-  summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
-  dryRun = FALSE)
+  verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
+  orderModules = TRUE, plotNodeNames = TRUE, plotSampleNames = TRUE,
+  plotModuleNames = NULL, main = "Module Topology", main.line = 1,
+  drawBorders = FALSE, lwd = 1, naxt.line = -0.5, saxt.line = -0.5,
+  maxt.line = NULL, xaxt.line = -0.5, xaxt.tck = -0.025,
+  xlab.line = 2.5, yaxt.line = 0, yaxt.tck = -0.15, ylab.line = 2.5,
+  laxt.line = 2.5, laxt.tck = 0.04, cex.axis = 0.8,
+  legend.main.line = 1.5, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
+  dataRange = NULL, corCols = correlation.palette(), corRange = c(-1, 1),
+  netCols = network.palette(), netRange = c(0, 1), degreeCol = "#feb24c",
+  contribCols = c("#A50026", "#313695"), summaryCols = c("#1B7837",
+  "#762A83"), naCol = "#bdbdbd", dryRun = FALSE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -55,11 +54,6 @@ dataset(s) in the \code{data}, \code{correlation}, \code{network},
 \item{test}{a list of vectors, one for each \code{discovery} dataset,
 of names or indices denoting the \emph{test} dataset(s) in the \code{data}, 
 \code{correlation}, and \code{network} lists.}
-
-\item{nCores}{number of cores to parallelise the calculation of network 
-properties over. Ignored if the user has already registered a parallel 
-backend. If \code{NULL} (default) the all but one core on the machine will
-be used.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 
@@ -251,12 +245,6 @@ Individual components of the module plot can be plotted using
   Alternatively, the \code{data}, \code{correlation}, and \code{network} 
   arguments will also accept file paths to tabular data or \code{bigMatrix} 
   backingfiles.
-}
-\subsection{Memory usage:}{
-  Provided there are no additional objects in the R session the
-  permutation procedure will use only the memory required to store each 
-  matrix once, along with an additional 200 MB per core used by each vanilla
-  R session.
 }
 \subsection{Node, sample, and module ordering:}{
   By default, nodes are ordered in decreasing order of \emph{weighted degree}

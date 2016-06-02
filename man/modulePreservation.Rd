@@ -6,7 +6,7 @@
 \usage{
 modulePreservation(data = NULL, correlation, network, moduleAssignments,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 2,
-  selfPreservation = FALSE, nCores = NULL, nPerm = NULL,
+  selfPreservation = FALSE, nThreads = NULL, nPerm = NULL,
   null = "overlap", alternative = "greater", simplify = TRUE,
   verbose = TRUE)
 }
@@ -50,9 +50,9 @@ of names or indices denoting the \emph{test} dataset(s) in the \code{data},
 preservation analysis will not be performed within a dataset (\emph{i.e.} 
 where the \code{discovery} and \code{test} datasets are the same).}
 
-\item{nCores}{number of cores to parallelise the permutation procedure over.
-Ignored if the user has already registered a parallel backend. If 
-\code{NULL} (default) the all but one core on the machine will be used.}
+\item{nThreads}{number of threads to parallelise the calculation of network 
+properties over. Automatically determined as the number of cores - 1 if 
+not specified.}
 
 \item{nPerm}{number of permutations to use. If not specified, the number of 
 permutations will be automatically determined (see details).}

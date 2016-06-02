@@ -11,7 +11,6 @@
 #' \code{\link{plotData}}, and \code{\link{plotSummary}}.
 #' 
 #' @inheritParams common_params
-#' @inheritParams par_param
 #' @inheritParams orderModules_param
 #' @inheritParams plot_params
 #' 
@@ -84,12 +83,6 @@
 #'   Alternatively, the \code{data}, \code{correlation}, and \code{network} 
 #'   arguments will also accept file paths to tabular data or \code{bigMatrix} 
 #'   backingfiles.
-#' }
-#' \subsection{Memory usage:}{
-#'   Provided there are no additional objects in the R session the
-#'   permutation procedure will use only the memory required to store each 
-#'   matrix once, along with an additional 200 MB per core used by each vanilla
-#'   R session.
 #' }
 #' \subsection{Node, sample, and module ordering:}{
 #'   By default, nodes are ordered in decreasing order of \emph{weighted degree}
@@ -341,7 +334,7 @@
 #' @export
 plotModule <- function(
   data, correlation, network, moduleAssignments=NULL, modules=NULL,
-  backgroundLabel="0", discovery=NULL, test=NULL, nCores=NULL, verbose=TRUE,
+  backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
   main.line=1, drawBorders=FALSE, lwd=1, naxt.line=-0.5, saxt.line=-0.5, 
@@ -393,13 +386,6 @@ plotModule <- function(
   # Handle variants that will not work for this plot function
   if (is.null(laxt.tck))
     stop("'laxt.tck' must be a numeric vector of length 1 or 'NA'")
-  
-  # Register parallel backend. 
-  par <- setupParallel(nCores, verbose, reporterCore=FALSE)
-  nCores <- par$nCores
-  on.exit({
-    cleanupCluster(par$cluster, par$predef, par$oldOMPThreads, par$oldBLASThreads)
-  }, add=TRUE)
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 

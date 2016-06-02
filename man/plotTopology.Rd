@@ -12,18 +12,18 @@
 \usage{
 plotData(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
-  orderNodesBy = NULL, orderModules = TRUE, plotNodeNames = TRUE,
-  plotSampleNames = TRUE, plotModuleNames = NULL, main = "",
-  main.line = 1, lwd = 1, plotLegend = TRUE, legend.main = "Data",
-  legend.main.line = 1, naxt.line = -0.5, saxt.line = -0.5,
-  maxt.line = 3, legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
+  verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
+  orderModules = TRUE, plotNodeNames = TRUE, plotSampleNames = TRUE,
+  plotModuleNames = NULL, main = "", main.line = 1, lwd = 1,
+  plotLegend = TRUE, legend.main = "Data", legend.main.line = 1,
+  naxt.line = -0.5, saxt.line = -0.5, maxt.line = 3,
+  legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
   cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
   dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
 
 plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
+  verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
   legend.main = "Correlation", legend.main.line = 1, naxt.line = -0.5,
@@ -34,7 +34,7 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
 
 plotNetwork(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
+  verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
   main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
   legend.main = "Edge weight", legend.main.line = 1, naxt.line = -0.5,
@@ -45,31 +45,31 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
 
 plotContribution(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", main.line = 1, ylab.line = 2.5, lwd = 1,
-  drawBorders = FALSE, naxt.line = -0.5, maxt.line = 3, yaxt.line = 0,
-  yaxt.tck = -0.035, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  verbose = TRUE, orderNodesBy = NULL, orderModules = TRUE,
+  plotNodeNames = TRUE, plotModuleNames = NULL, main = "",
+  main.line = 1, ylab.line = 2.5, lwd = 1, drawBorders = FALSE,
+  naxt.line = -0.5, maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
   contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
   dryRun = FALSE)
 
 plotDegree(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderNodesBy = NULL,
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", main.line = 1, lwd = 1, drawBorders = FALSE,
-  naxt.line = -0.5, maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035,
-  ylab.line = 2.5, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
-  degreeCol = "#feb24c", naCol = "#bdbdbd", dryRun = FALSE)
+  verbose = TRUE, orderNodesBy = NULL, orderModules = TRUE,
+  plotNodeNames = TRUE, plotModuleNames = NULL, main = "",
+  main.line = 1, lwd = 1, drawBorders = FALSE, naxt.line = -0.5,
+  maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035, ylab.line = 2.5,
+  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, degreeCol = "#feb24c",
+  naCol = "#bdbdbd", dryRun = FALSE)
 
 plotSummary(data, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, verbose = TRUE, orderSamplesBy = NULL,
-  orderNodesBy = NULL, orderModules = TRUE, plotSampleNames = TRUE,
-  plotModuleNames = NULL, main = "", main.line = 1, xlab.line = 2.5,
-  lwd = 1, drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0,
-  xaxt.line = 0, xaxt.tck = -0.025, cex.axis = 0.8, cex.lab = 1.2,
-  cex.main = 2, summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
+  verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
+  orderModules = TRUE, plotSampleNames = TRUE, plotModuleNames = NULL,
+  main = "", main.line = 1, xlab.line = 2.5, lwd = 1,
+  drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0, xaxt.line = 0,
+  xaxt.tck = -0.025, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
+  summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
   dryRun = FALSE)
 }
 \arguments{
@@ -107,11 +107,6 @@ dataset(s) in the \code{data}, \code{correlation}, \code{network},
 \item{test}{a list of vectors, one for each \code{discovery} dataset,
 of names or indices denoting the \emph{test} dataset(s) in the \code{data}, 
 \code{correlation}, and \code{network} lists.}
-
-\item{nCores}{number of cores to parallelise the calculation of network 
-properties over. Ignored if the user has already registered a parallel 
-backend. If \code{NULL} (default) the all but one core on the machine will
-be used.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 

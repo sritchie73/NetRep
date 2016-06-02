@@ -24,8 +24,6 @@ Imports:
     RColorBrewer
 Suggests: 
     testthat,
-    doMC,
-    doParallel,
     WGCNA,
     knitr,
     rmarkdown

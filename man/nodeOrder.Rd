@@ -6,8 +6,8 @@
 \usage{
 nodeOrder(data = NULL, correlation, network, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  nCores = NULL, na.rm = FALSE, orderModules = TRUE, mean = FALSE,
-  simplify = TRUE, verbose = TRUE)
+  na.rm = FALSE, orderModules = TRUE, mean = FALSE, simplify = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
@@ -44,11 +44,6 @@ dataset(s) in the \code{data}, \code{correlation}, \code{network},
 \item{test}{a list of vectors, one for each \code{discovery} dataset,
 of names or indices denoting the \emph{test} dataset(s) in the \code{data}, 
 \code{correlation}, and \code{network} lists.}
-
-\item{nCores}{number of cores to parallelise the calculation of network 
-properties over. Ignored if the user has already registered a parallel 
-backend. If \code{NULL} (default) the all but one core on the machine will
-be used.}
 
 \item{na.rm}{logical; If \code{TRUE}, nodes and modules present in the 
 \code{discovery} dataset but missing from the test dataset are excluded. If
