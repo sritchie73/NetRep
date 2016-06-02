@@ -364,7 +364,7 @@ processInput <- function(
       } else {
         # We need a label that doesn't conflict with any existing module labels.
         # This is the simplest way to do it.
-        bglabel <- getUUID() 
+        bglabel <- as.integer(Sys.time())
       }
       
       bgnodes <- rep(bglabel, length(unlabelled))
