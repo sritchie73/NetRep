@@ -11,7 +11,6 @@
 #' @param modules user input for the 'modules' argument.
 #' @param backgroundLabel user input for the 'backgroundLabel' argument.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param tempdir temporary directory to save new objects in.
 #' @param plotFunction logical; are we checking for a plot function?
 #' @param orderNodesBy user input for the 'orderNodesBy' argument in the 
 #'  plotting functions.
@@ -31,7 +30,7 @@
 #' @return a list of containing the formatted user input
 processInput <- function(
   discovery, test, network, correlation, data, moduleAssignments, modules, 
-  backgroundLabel, verbose, tempdir, plotFunction=FALSE, orderNodesBy=NA, 
+  backgroundLabel, verbose, plotFunction=FALSE, orderNodesBy=NA, 
   orderSamplesBy=NA, orderModules=NULL, dryRun=FALSE
 ) {
   # Where do we want to get:
@@ -185,8 +184,8 @@ processInput <- function(
     network <- list(network)
   
   # Make sure they're 'bigMatrix' objects
-  correlation <- lapply(correlation, dynamicMatLoad, tempdir, verbose)
-  network <- lapply(network, dynamicMatLoad, tempdir, verbose)
+  correlation <- lapply(correlation, dynamicMatLoad)
+  network <- lapply(network, dynamicMatLoad)
   
   # Add any datasets names that are not in dataNames
   dataNames <- c(dataNames, names(correlation))
@@ -218,7 +217,7 @@ processInput <- function(
     data <- list(data)
 
   # Make sure they're 'bigMatrix' objects
-  data <- lapply(data, dynamicMatLoad, tempdir, verbose)
+  data <- lapply(data, dynamicMatLoad)
 
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
   data <- verifyDatasetOrder(data, "data", dataNames, nDatasets)
@@ -663,10 +662,9 @@ processInput <- function(
   if (!dryRun) {
     for (ii in iterator) {
       if (!is.null(data[[ii]])) 
-        CheckFinite(data[[ii]][,])
-      CheckFinite(correlation[[ii]][,])
-      CheckFinite(network[[ii]][,])
-      gc()
+        CheckFinite(data[[ii]])
+      CheckFinite(correlation[[ii]])
+      CheckFinite(network[[ii]])
     }    
   }
   
@@ -731,45 +729,47 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
 #' Dynamically detect and load a bigMatrix object depending on input type
 #' 
 #' @param object user input object
-#' @param tempdir temporary directory to save objects in
-#' @param verbose logical; should progress be reported? 
 #' @param ... additional arguments to pass to read.bigMatrix
 #'   
 #' @return
 #'  A 'bigMatrix' object or error.
-dynamicMatLoad <- function(object, tempdir, verbose, ...) {
-  basename <- paste0("tmp", getUUID())
-  if (is.null(object)) {
-    return(NULL)
-  } else if (is.bigMatrix(object)) {
+dynamicMatLoad <- function(object, ...) {
+  if (is.bigMatrix(object)) {
+    return(object[,])
+  } else {
     return(object)
-  } else if (class(object) == "character") {
-    if (!file.exists(object))
-      stop("file", object, "does not exist")
-    
-    # Is this file a big.matrix descriptor?
-    if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
-      return(load.bigMatrix(object))
-    } else {
-      vCat(
-        verbose, 1,
-        "Creating new 'bigMatrix' in a temporary directory for file ", object,
-        ". This could take a while."
-      )
-      backingfile <- file.path(tempdir, basename)
-      return(read.bigMatrix(file=object, backingfile=backingfile, ...))
-    }
-    
-  } else if (class(object) == "matrix") {
-    vCat(
-      verbose, 1,
-      "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
-      " This could take a while."
-    )
-    backingfile <- file.path(tempdir, basename)
-    return(as.bigMatrix(object, backingfile=backingfile, ...))
-  } 
-  stop("unable to load object of type ", class(object), " as a bigMatrix!")
+  }
+  # if (is.null(object)) {
+  #   return(NULL)
+  # } else if (is.bigMatrix(object)) {
+  #   return(object)
+  # } else if (class(object) == "character") {
+  #   if (!file.exists(object))
+  #     stop("file", object, "does not exist")
+  #   
+  #   # Is this file a big.matrix descriptor?
+  #   if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
+  #     return(load.bigMatrix(object))
+  #   } else {
+  #     vCat(
+  #       verbose, 1,
+  #       "Creating new 'bigMatrix' in a temporary directory for file ", object,
+  #       ". This could take a while."
+  #     )
+  #     backingfile <- file.path(tempdir, basename)
+  #     return(read.bigMatrix(file=object, backingfile=backingfile, ...))
+  #   }
+  #   
+  # } else if (class(object) == "matrix") {
+  #   vCat(
+  #     verbose, 1,
+  #     "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
+  #     " This could take a while."
+  #   )
+  #   backingfile <- file.path(tempdir, basename)
+  #   return(as.bigMatrix(object, backingfile=backingfile, ...))
+  # } 
+  # stop("unable to load object of type ", class(object), " as a bigMatrix!")
 }
 
 #' Validate plot function arguments

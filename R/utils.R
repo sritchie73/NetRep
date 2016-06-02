@@ -161,31 +161,6 @@ poke <- function(...) {
   }
 }
 
-#' Get a universally unique identifier
-#' 
-#' Thanks to thelatemail's answer on stackoverflow:
-#' http://stackoverflow.com/questions/10492817/how-can-i-generate-a-guid-in-r
-#' 
-getUUID <- function() {
-  baseuuid <- paste(sample(c(letters[1:6],0:9),30,replace=TRUE),collapse="")
-  
-  paste(
-    substr(baseuuid,1,8),
-    "-",
-    substr(baseuuid,9,12),
-    "-",
-    "4",
-    substr(baseuuid,13,15),
-    "-",
-    sample(c("8","9","a","b"),1),
-    substr(baseuuid,16,18),
-    "-",
-    substr(baseuuid,19,30),
-    sep="",
-    collapse=""
-  )
-}
-
 #' Insert NAs into a vector at specified positions
 #' 
 #' Useful for inserting NAs into the correct positions when examining module 
@@ -272,13 +247,4 @@ sortModuleNames <- function(modules) {
   }, warning=function(w) {
     sort(modules)
   })
-}
-
-#' Silently check and load a package into the namespace
-#' 
-#' @param pkg name of the package to check
-#' 
-#' @return logical; \code{TRUE} if the package is installed and can be loaded.
-pkgReqCheck <- function(pkg) {
-  suppressMessages(suppressWarnings(requireNamespace(pkg, quietly=TRUE)))
 }

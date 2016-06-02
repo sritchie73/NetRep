@@ -395,9 +395,6 @@ modulePreservation <- function(
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   # Identify the null hypothesis to use 
@@ -460,7 +457,7 @@ modulePreservation <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir)
+                         verbose)
   data <- finput$data
   correlation <- finput$correlation
   network <- finput$network
@@ -470,11 +467,6 @@ modulePreservation <- function(
   test <- finput$test
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
 
   # If NULL, automatically determine.
   if (is.null(nPerm)) {
@@ -541,15 +533,15 @@ modulePreservation <- function(
         
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           perms <- PermutationProcedureNoData(
-            correlation[[di]][,], network[[di]][,], correlation[[ti]][,], 
-            network[[ti]][,], moduleAssignments[[di]], modules[[di]], nPerm, 
-            nThreads-1, model, verbose, vCat
+            correlation[[di]], network[[di]], correlation[[ti]], 
+            network[[ti]], moduleAssignments[[di]], modules[[di]], nPerm, 
+            nThreads, model, verbose, vCat
           )
         } else {
           perms <- PermutationProcedure(
-            data[[di]][,], correlation[[di]][,], network[[di]][,],
-            data[[ti]][,], correlation[[ti]][,], network[[ti]][,],
-            moduleAssignments[[di]], modules[[di]], nPerm, nThreads-1, 
+            data[[di]], correlation[[di]], network[[di]],
+            data[[ti]], correlation[[ti]], network[[ti]],
+            moduleAssignments[[di]], modules[[di]], nPerm, nThreads, 
             model, verbose, vCat
           )
         }

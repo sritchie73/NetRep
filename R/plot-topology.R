@@ -406,9 +406,6 @@ plotData <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   if (is.null(data))
@@ -430,7 +427,7 @@ plotData <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy, orderModules)
   discovery <- finput$discovery
   test <- finput$test
@@ -456,11 +453,6 @@ plotData <- function(
   if (is.numeric(ti))
     ti <- datasetNames[ti]
 
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
-  
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
@@ -589,9 +581,6 @@ plotCorrelation <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   # Check plot-specific arguments
@@ -606,7 +595,7 @@ plotCorrelation <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
@@ -630,11 +619,6 @@ plotCorrelation <- function(
     di <- datasetNames[di]
   if (is.numeric(ti))
     ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
   
   vCat(verbose, 0, "User input ok!")
   
@@ -759,9 +743,6 @@ plotNetwork <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   # Check plot-specific arguments
@@ -776,7 +757,7 @@ plotNetwork <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
@@ -800,11 +781,6 @@ plotNetwork <- function(
     di <- datasetNames[di]
   if (is.numeric(ti))
     ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
   
   vCat(verbose, 0, "User input ok!")
   
@@ -928,9 +904,6 @@ plotContribution <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   if (is.null(data))
@@ -946,7 +919,7 @@ plotContribution <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
@@ -970,11 +943,6 @@ plotContribution <- function(
     di <- datasetNames[di]
   if (is.numeric(ti))
     ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
   
   vCat(verbose, 0, "User input ok!")
   
@@ -1063,9 +1031,6 @@ plotDegree <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   # Check plot-specific arguments
@@ -1078,7 +1043,7 @@ plotDegree <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy=NA, orderModules)
   discovery <- finput$discovery
   test <- finput$test
@@ -1102,12 +1067,7 @@ plotDegree <- function(
     di <- datasetNames[di]
   if (is.numeric(ti))
     ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
-  
+
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
@@ -1197,9 +1157,6 @@ plotSummary <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   if (is.null(data))
@@ -1215,7 +1172,7 @@ plotSummary <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy, orderModules)
   discovery <- finput$discovery
   test <- finput$test
@@ -1240,11 +1197,6 @@ plotSummary <- function(
     di <- datasetNames[di]
   if (is.numeric(ti))
     ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
   
   vCat(verbose, 0, "User input ok!")
   

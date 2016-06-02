@@ -366,9 +366,6 @@ plotModule <- function(
   #-----------------------------------------------------------------------------
   # Validate user input and unify data structures
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   checkPlotArgs(orderModules=orderModules, plotNodeNames=plotNodeNames, 
@@ -390,7 +387,7 @@ plotModule <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir, plotFunction=TRUE, orderNodesBy, 
+                         verbose, plotFunction=TRUE, orderNodesBy, 
                          orderSamplesBy, orderModules, dryRun)
   discovery <- finput$discovery
   test <- finput$test
@@ -415,11 +412,6 @@ plotModule <- function(
     di <- datasetNames[di]
   if (is.numeric(ti))
     ti <- datasetNames[ti]
-  
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
   
   # Create empty plot windows so that we fail quickly if the margins are too
   # large

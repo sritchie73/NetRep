@@ -172,23 +172,16 @@ networkProperties <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, simplify=TRUE, 
   verbose=TRUE
 ) {
-  #-----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
   # Input processing and sanity checking
-  #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
+  #----------------------------------------------------------------------------
   vCat(verbose, 0, "Validating user input...")
   
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir)
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
-  
+                         verbose)
+
   vCat(verbose, 0, "User input ok!")
   
   # Calculate the network properties
@@ -259,11 +252,13 @@ netPropsInternal <- function(
   props <- foreach(di = discovery) %do% {
     foreach(ti = test[[di]]) %do% {
       if (is.null(data[[ti]])) {
-        NetworkPropertiesNoData(network[[ti]][,], moduleAssignments[[di]], 
-                                modules[[di]])
+        NetworkPropertiesNoData(
+          network[[ti]], moduleAssignments[[di]], modules[[di]]
+        )
       } else {
-        NetworkProperties(data[[ti]][,], network[[ti]][,], moduleAssignments[[di]], 
-                          modules[[di]])
+        NetworkProperties(
+          data[[ti]], network[[ti]], moduleAssignments[[di]], modules[[di]]
+        )
       }
     }
   }
@@ -449,9 +444,6 @@ nodeOrder <- function(
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
   #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
   vCat(verbose, 0, "Validating user input...")
   
   if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
@@ -470,12 +462,8 @@ nodeOrder <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir)
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
-  
+                         verbose)
+
   # If 'orderModules' is TRUE we need to make sure that there is data in each 
   # test dataset if there is more than one 'module'
   with(finput, {
@@ -811,12 +799,9 @@ sampleOrder <- function(
   backgroundLabel="0", discovery=NULL, test=NULL, na.rm=FALSE, 
   simplify=TRUE, verbose=TRUE
 ) {
-  #-----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
   # Input processing and sanity checking
-  #-----------------------------------------------------------------------------
-  tmp.dir <- file.path(tempdir(), paste0(".NetRep", getUUID()))
-  dir.create(tmp.dir, showWarnings=FALSE)
-  
+  #----------------------------------------------------------------------------
   vCat(verbose, 0, "Validating user input...")
   
   if (!is.logical(na.rm) || is.na(na.rm) || length(na.rm) > 1) {
@@ -826,11 +811,7 @@ sampleOrder <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, tmp.dir)
-  on.exit({
-    vCat(verbose, 0, "Cleaning up temporary objects...")
-    unlink(tmp.dir, recursive = TRUE)
-  }, add = TRUE)
+                         verbose)
   
   discovery <- finput$discovery
   test <- finput$test
