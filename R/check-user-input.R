@@ -734,7 +734,7 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
 #'  A matirx or an error.
 dynamicMatLoad <- function(object) {
   if (!is.null(object) && !is.matrix(object)) {
-    try({
+    tryCatch({
       return(as.matrix(object))
     }, error=function(e) {
       stop("unable to convert a ", class(object), " to a matrix!")
