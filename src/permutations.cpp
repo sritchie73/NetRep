@@ -1,8 +1,8 @@
 #include <thread>
 
-#include "utils.hpp"
-#include "netStats.hpp"
-#include "progress.hpp"
+#include "utils.h"
+#include "netStats.h"
+#include "progress.h"
 
 /* Generate null-distribution observations for the module preservation statistics
  * 

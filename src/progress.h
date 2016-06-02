@@ -8,7 +8,7 @@
 #define ARMA_DONT_USE_CXX11
 
 #include <RcppArmadillo.h>
-#include "interrupt.hpp"
+#include "interrupt.h"
 
 void MonitorProgress (unsigned int&, arma::uvec&, bool&, const bool&); 
 

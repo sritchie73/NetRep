@@ -4,7 +4,7 @@
   #include <unistd.h>
 #endif
 
-#include "progress.hpp"
+#include "progress.h"
 
 
 // Sleep this thread for N seconds

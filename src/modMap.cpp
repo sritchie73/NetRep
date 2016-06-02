@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "utils.h"
 
 /* Build a dictionary mapping labels to a sequence of integers
  */

@@ -1,4 +1,4 @@
-#include "interrupt.hpp"
+#include "interrupt.h"
 
 // Functions for checking whether the user has asked the C++ code to interrupt
 static void chkIntFn(void *dummy) { 

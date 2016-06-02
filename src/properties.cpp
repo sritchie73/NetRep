@@ -1,5 +1,5 @@
-#include "utils.hpp"
-#include "netStats.hpp"
+#include "utils.h"
+#include "netStats.h"
 
 //' Calculate the network properties 
 //' 

@@ -2,7 +2,7 @@
  * statistics for a single module within a single dataset.
  */
 
-#include "netStats.hpp"
+#include "netStats.h"
 
 /* Scale data across all nodes
  * 
