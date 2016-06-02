@@ -1,6 +1,8 @@
 context("Testing 'modulePreservation' function")
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
+sn1 <- paste0("S_", 1:50)
+sn2 <- paste0("S_", 1:75)
 
 coexpSets <- list(
   a=as.bigMatrix(
@@ -15,11 +17,11 @@ coexpSets <- list(
 adjSets <- coexpSets
 exprSets <- list(
   a=as.bigMatrix(
-    matrix(rnorm(50*100), 50, dimnames=list(NULL, gn1)),
+    matrix(rnorm(50*100), 50, dimnames=list(sn1, gn1)),
     file.path(tempdir(), "tmp3")
   ),
   b=as.bigMatrix(
-    matrix(rnorm(75*100), 75, dimnames=list(NULL, gn2)),
+    matrix(rnorm(75*100), 75, dimnames=list(sn2, gn2)),
     file.path(tempdir(), "tmp4")
   )
 )
@@ -36,19 +38,19 @@ nModules <- length(modules)
 test_that("Main routine runs and produces sane output", {
   res1 <- modulePreservation(
     exprSets, coexpSets, adjSets, moduleAssignments, modules,
-    discovery=1, test=2, nPerm=4, verbose=FALSE, nCores=2
+    discovery=1, test=2, nPerm=1000, verbose=FALSE, nCores=2
   )
-  expect_equal(dim(res1$nulls), c(nModules , 7, 4))
+  expect_equal(dim(res1$nulls), c(nModules , 7, 1000))
   expect_equal(dim(res1$observed), c(nModules , 7))
   expect_equal(dim(res1$p.values), c(nModules , 7))
   expect_equal(length(res1$propVarsPresent), nModules)
   expect_equal(length(res1$nVarsPresent), nModules)
   res2 <- modulePreservation(
     NULL, coexpSets, adjSets, moduleAssignments,
-    modules, discovery=1, test=2, nPerm=4, 
+    modules, discovery=1, test=2, nPerm=1000, 
     verbose=FALSE, nCores=2
   )
-  expect_equal(dim(res2$nulls), c(nModules, 4, 4))
+  expect_equal(dim(res2$nulls), c(nModules, 4, 1000))
   expect_equal(dim(res2$observed), c(nModules, 4))
   expect_equal(dim(res2$p.values), c(nModules, 4))
   expect_equal(length(res2$propVarsPresent), nModules)

@@ -871,10 +871,9 @@ sampleOrder <- function(
   
   vCat(verbose, 0, "User input ok!")
   
-  # Calculate the network properties. We don't actually need the network-based
-  # properties though, so we can speed things up by ignoring them
+  # Calculate the network properties.
   props <- with(finput, {
-    netPropsInternal(data, correlation, NULL, moduleAssignments, 
+    netPropsInternal(data, correlation, network, moduleAssignments, 
                      modules, discovery, test, nDatasets, datasetNames, verbose)
   })
 

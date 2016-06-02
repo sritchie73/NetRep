@@ -1,12 +1,5 @@
 context("Testing C++ S4 Method Extensions for big.matrix")
 
-test_that("scaleBigMatrix is correct", {
-  m <- matrix(1:9, 3)
-  bm <- as.bigMatrix(m, file.path(tempdir(), "tmp1"))
-  s <- scaleBigMatrix(bm, tempdir())
-  expect_equivalent(s[,], scale(m))
-})
-
 test_that("checkFinite is correct", {
   options(bigmemory.typecast.warning=FALSE)
   set.seed(1)
@@ -25,13 +18,6 @@ test_that("checkFinite is correct", {
   bm3 <- as.bigMatrix(m3, file.path(tempdir(), "tmp3"))
   expect_error(checkFinite(bm2))
   expect_error(checkFinite(bm3))
-})
-
-test_that("rangeBigMatrix is correct", {
-  m1 <- matrix(rnorm(30), ncol=10)
-  bm1 <- as.bigMatrix(m1, file.path(tempdir(), "tmp"))
-  expect_equivalent(rangeBigMatrix(bm1), range(m1))
-  expect_equivalent(rangeBigMatrix(bm1, c(2,4,5,1)), range(m1[,c(2,4,5,1)]))
 })
 
 unlink(file.path(tempdir(), c("tmp*", "scaled*")))

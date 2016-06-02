@@ -1,6 +1,8 @@
 context("Testing downstream analysis functions")
 gn1 <- paste0("N_", 1:100)
 gn2 <- paste0("N_", seq(2, 200, length=100))
+sn1 <- paste0("S_", 1:50)
+sn2 <- paste0("S_", 1:75)
 
 coexpSets <- list(
   a=as.bigMatrix(
@@ -15,11 +17,11 @@ coexpSets <- list(
 adjSets <- coexpSets
 exprSets <- list(
   a=as.bigMatrix(
-    matrix(rnorm(50*100), 50, dimnames=list(NULL, gn1)),
+    matrix(rnorm(50*100), 50, dimnames=list(sn1, gn1)),
     file.path(tempdir(), "tmp3")
   ),
   b=as.bigMatrix(
-    matrix(rnorm(75*100), 75, dimnames=list(NULL, gn2)),
+    matrix(rnorm(75*100), 75, dimnames=list(sn2, gn2)),
     file.path(tempdir(), "tmp4")
   )
 )

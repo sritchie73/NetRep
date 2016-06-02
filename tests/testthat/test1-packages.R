@@ -23,7 +23,7 @@ expectedVersionsDepends <- c(
   Rcpp="0.12.4",
   utils="3.2.4",
   statmod="1.4.24",
-  RcppArmadillo="0.6.600.4.0",
+  RcppArmadillo="0.6.700.6.0",
   BH="1.60.0.1",
   RhpcBLASctl="0.15.148",
   abind="1.4.3",
