@@ -15,8 +15,6 @@ Depends:
 Imports: 
     bigmemory,
     foreach,
-    iterators,
-    itertools,
     Rcpp (>= 0.11),
     RcppArmadillo (>= 0.4),
     statmod,
@@ -31,7 +29,7 @@ Suggests:
     WGCNA,
     knitr,
     rmarkdown
-LinkingTo: Rcpp, BH, bigmemory, RcppArmadillo
+LinkingTo: Rcpp, BH, RcppArmadillo
 RoxygenNote: 5.0.0
 VignetteBuilder: knitr
 BuildVignettes: false
