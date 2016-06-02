@@ -24,5 +24,10 @@
 #' @name NetRep
 #' @useDynLib NetRep
 #' @importFrom Rcpp evalCpp
-#' @import bigmemory
+#' @import RcppArmadillo
+#' @import BH
 NULL
+
+.onUnload <- function (libpath) {
+  library.dynam.unload("NetRep", libpath)
+}
