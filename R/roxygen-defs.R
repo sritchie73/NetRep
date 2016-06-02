@@ -4,17 +4,16 @@
 #' is not intended to be a stand-alone help file.
 #'
 #' @param data a list of matrices, one for each dataset. Each 
-#'  entry of the list should be a numeric \code{\link{bigMatrix}} of data used
-#'  to infer the interaction network for that dataset. The columns should
-#'  correspond to variables in the data (nodes in the network) and rows to 
-#'  samples in that dataset.
+#'  entry of the list should be the data used to infer the interaction network 
+#'  for that dataset. The columns should correspond to variables in the data
+#'  (nodes in the network) and rows to samples in that dataset.
 #' @param correlation a list of matrices, one for each dataset. Each entry of
-#'   the list should be a \eqn{n * n} numeric \code{\link{bigMatrix}} where each
+#'   the list should be a \eqn{n * n} numeric matrix where each
 #'   element contains the correlation coefficient between nodes \eqn{i} and
 #'   \eqn{j} in data used to infer the interaction network for that dataset.
 #' @param network a list of interaction networks, one for each dataset. Each 
-#'  entry of the list should be a \eqn{n * n} numeric \code{\link{bigMatrix}}
-#'  where each element contains the edge weight between nodes \eqn{i} and 
+#'  entry of the list should be a \eqn{n * n} numeric matrix where each 
+#'  element contains the edge weight between nodes \eqn{i} and 
 #'  \eqn{j} in the inferred network for that dataset. 
 #' @param moduleAssignments a list of vectors, one for each \emph{discovery} 
 #'   dataset, containing the module assignments for each node in that dataset.

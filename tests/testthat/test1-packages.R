@@ -15,11 +15,8 @@ if (thisVersion > Rversion) {
 }
 
 # Check the dependencies
-expectedVersionsDepends <- c(
-  bigmemory="4.5.19",
+testedVersionsDepends <- c(
   foreach="1.4.3",
-  iterators="1.0.8",
-  itertools="0.1.3",
   Rcpp="0.12.4",
   utils="3.2.4",
   statmod="1.4.24",
@@ -30,35 +27,32 @@ expectedVersionsDepends <- c(
   RColorBrewer="1.1.2"
 )
 
-for (pkg in names(expectedVersionsDepends)) {
+for (pkg in names(testedVersionsDepends)) {
   pkgVersion <- packageVersion(pkg)
-  if (pkgVersion > expectedVersionsDepends[pkg]) {
+  if (pkgVersion > testedVersionsDepends[pkg]) {
     if (!flag) cat("\n")
     cat(
       "Package ", pkg, " is newer than NetRep ",
       "(version ", as.character(pkgVersion), " detected, ",
-      "tested with version ", expectedVersionsDepends[pkg], ").\n", sep=""
+      "tested with version ", testedVersionsDepends[pkg], ").\n", sep=""
     )
     flag <- TRUE
   }
 }
 
 # Check suggested packages
-expectedVersionsSuggests <- c(
-  testthat="0.11.0",
-  doMC="1.3.4",
-  doParallel="1.0.10",
-  WGCNA="1.49"
+testedVersionsSuggests <- c(
+  testthat="0.11.0"
 )
-for (pkg in names(expectedVersionsSuggests)) {
+for (pkg in names(testedVersionsSuggests)) {
   tryCatch({
     pkgVersion <- packageVersion(pkg)
-    if (pkgVersion > expectedVersionsSuggests[pkg]) {
+    if (pkgVersion > testedVersionsSuggests[pkg]) {
       if (!flag) cat("\n")
       cat(
         "Package ", pkg, " is newer than NetRep ",
         "(version ", as.character(pkgVersion), " detected, ",
-        "tested with version ", expectedVersionsSuggests[pkg], ").\n", sep=""
+        "tested with version ", testedVersionsSuggests[pkg], ").\n", sep=""
       )
       flag <- TRUE
     }

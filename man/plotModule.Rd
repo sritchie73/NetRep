@@ -21,19 +21,18 @@ plotModule(data, correlation, network, moduleAssignments = NULL,
 }
 \arguments{
 \item{data}{a list of matrices, one for each dataset. Each 
-entry of the list should be a numeric \code{\link{bigMatrix}} of data used
-to infer the interaction network for that dataset. The columns should
-correspond to variables in the data (nodes in the network) and rows to 
-samples in that dataset.}
+entry of the list should be the data used to infer the interaction network 
+for that dataset. The columns should correspond to variables in the data
+(nodes in the network) and rows to samples in that dataset.}
 
 \item{correlation}{a list of matrices, one for each dataset. Each entry of
-the list should be a \eqn{n * n} numeric \code{\link{bigMatrix}} where each
+the list should be a \eqn{n * n} numeric matrix where each
 element contains the correlation coefficient between nodes \eqn{i} and
 \eqn{j} in data used to infer the interaction network for that dataset.}
 
 \item{network}{a list of interaction networks, one for each dataset. Each 
-entry of the list should be a \eqn{n * n} numeric \code{\link{bigMatrix}}
-where each element contains the edge weight between nodes \eqn{i} and 
+entry of the list should be a \eqn{n * n} numeric matrix where each 
+element contains the edge weight between nodes \eqn{i} and 
 \eqn{j} in the inferred network for that dataset.}
 
 \item{moduleAssignments}{a list of vectors, one for each \emph{discovery} 
@@ -227,24 +226,6 @@ Individual components of the module plot can be plotted using
   not need to be specified, and the input matrices for the \code{network},
   \code{data}, and \code{correlation} arguments do not need to be wrapped in
   a list.
-}
-\subsection{'bigMatrix' input data:}{
-  Although the \code{data}, \code{correlation}, and \code{network} arguments 
-  expect data to be provided in the \code{\link{bigMatrix}}, they can be 
-  provided as regular \code{\link[base]{matrix}} objects, in which case they 
-  will be temporarily converted to \code{bigMatrix} objects. \strong{This is 
-  not recommended}, as each matrix will be copied into memory of each 
-  parallel R session, resulting in much higher memory usage (see section on
-  Memory usage ), and increased computation time for the conversion and
-  copying processes. It is therefore strongly recommended that the user save
-  their data separately as \code{\link{bigMatrix}} objects prior to running
-  the permutation procedure or using any other package function. This is also
-  useful for other analyses, as \code{bigMatrix} objects can be
-  instantaneously loaded into any future R session.
-  
-  Alternatively, the \code{data}, \code{correlation}, and \code{network} 
-  arguments will also accept file paths to tabular data or \code{bigMatrix} 
-  backingfiles.
 }
 \subsection{Node, sample, and module ordering:}{
   By default, nodes are ordered in decreasing order of \emph{weighted degree}

@@ -183,7 +183,7 @@ processInput <- function(
   if (!is.list(network))
     network <- list(network)
   
-  # Make sure they're 'bigMatrix' objects
+  # Convert to matrix objects
   correlation <- lapply(correlation, dynamicMatLoad)
   network <- lapply(network, dynamicMatLoad)
   
@@ -216,7 +216,7 @@ processInput <- function(
   if (!is.list(data))
     data <- list(data)
 
-  # Make sure they're 'bigMatrix' objects
+  # Convert to matrices
   data <- lapply(data, dynamicMatLoad)
 
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
@@ -726,50 +726,22 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   return(tocheck)
 }
 
-#' Dynamically detect and load a bigMatrix object depending on input type
+#' Dynamically detect load matrices
 #' 
 #' @param object user input object
-#' @param ... additional arguments to pass to read.bigMatrix
 #'   
 #' @return
-#'  A 'bigMatrix' object or error.
-dynamicMatLoad <- function(object, ...) {
-  if (is.bigMatrix(object)) {
-    return(object[,])
+#'  A matirx or an error.
+dynamicMatLoad <- function(object) {
+  if (!is.null(object) && !is.matrix(object)) {
+    try({
+      return(as.matrix(object))
+    }, error=function(e) {
+      stop("unable to convert a ", class(object), " to a matrix!")
+    })
   } else {
     return(object)
   }
-  # if (is.null(object)) {
-  #   return(NULL)
-  # } else if (is.bigMatrix(object)) {
-  #   return(object)
-  # } else if (class(object) == "character") {
-  #   if (!file.exists(object))
-  #     stop("file", object, "does not exist")
-  #   
-  #   # Is this file a big.matrix descriptor?
-  #   if (readLines(object, 1) == "new(\"big.matrix.descriptor\"") {
-  #     return(load.bigMatrix(object))
-  #   } else {
-  #     vCat(
-  #       verbose, 1,
-  #       "Creating new 'bigMatrix' in a temporary directory for file ", object,
-  #       ". This could take a while."
-  #     )
-  #     backingfile <- file.path(tempdir, basename)
-  #     return(read.bigMatrix(file=object, backingfile=backingfile, ...))
-  #   }
-  #   
-  # } else if (class(object) == "matrix") {
-  #   vCat(
-  #     verbose, 1,
-  #     "Matrix encountered. Creating new 'bigMatrix' in a temporary directory.",
-  #     " This could take a while."
-  #   )
-  #   backingfile <- file.path(tempdir, basename)
-  #   return(as.bigMatrix(object, backingfile=backingfile, ...))
-  # } 
-  # stop("unable to load object of type ", class(object), " as a bigMatrix!")
 }
 
 #' Validate plot function arguments

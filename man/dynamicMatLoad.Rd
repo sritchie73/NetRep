@@ -2,19 +2,17 @@
 % Please edit documentation in R/check-user-input.R
 \name{dynamicMatLoad}
 \alias{dynamicMatLoad}
-\title{Dynamically detect and load a bigMatrix object depending on input type}
+\title{Dynamically detect load matrices}
 \usage{
-dynamicMatLoad(object, ...)
+dynamicMatLoad(object)
 }
 \arguments{
 \item{object}{user input object}
-
-\item{...}{additional arguments to pass to read.bigMatrix}
 }
 \value{
-A 'bigMatrix' object or error.
+A matirx or an error.
 }
 \description{
-Dynamically detect and load a bigMatrix object depending on input type
+Dynamically detect load matrices
 }
 

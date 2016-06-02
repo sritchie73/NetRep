@@ -10,7 +10,6 @@ Description: Functions for assessing the replication/preservation of a network
 License: GPL-2
 Depends: 
     R (>= 3.0.0),
-    methods,
     utils
 Imports: 
     bigmemory,
@@ -25,7 +24,6 @@ Imports:
     RColorBrewer
 Suggests: 
     testthat,
-    WGCNA,
     knitr,
     rmarkdown
 LinkingTo: Rcpp, BH, RcppArmadillo

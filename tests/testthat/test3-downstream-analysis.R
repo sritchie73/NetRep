@@ -5,25 +5,13 @@ sn1 <- paste0("S_", 1:50)
 sn2 <- paste0("S_", 1:75)
 
 coexpSets <- list(
-  a=as.bigMatrix(
-    matrix(rnorm(100*100), 100, dimnames=list(gn1, gn1)), 
-    file.path(tempdir(), "tmp1")
-  ),
-  b=as.bigMatrix(
-    matrix(rnorm(100*100), 100, dimnames=list(gn2, gn2)), 
-    file.path(tempdir(), "tmp2")
-  )
+  a=matrix(rnorm(100*100), 100, dimnames=list(gn1, gn1)), 
+  b=matrix(rnorm(100*100), 100, dimnames=list(gn2, gn2))
 )
 adjSets <- coexpSets
 exprSets <- list(
-  a=as.bigMatrix(
-    matrix(rnorm(50*100), 50, dimnames=list(sn1, gn1)),
-    file.path(tempdir(), "tmp3")
-  ),
-  b=as.bigMatrix(
-    matrix(rnorm(75*100), 75, dimnames=list(sn2, gn2)),
-    file.path(tempdir(), "tmp4")
-  )
+  a=matrix(rnorm(50*100), 50, dimnames=list(sn1, gn1)),
+  b=matrix(rnorm(75*100), 75, dimnames=list(sn2, gn2))
 )
 moduleAssignments <- list(a=sample(1:7, 100, replace=TRUE), b=NULL)
 names(moduleAssignments[[1]]) <- gn1
@@ -39,12 +27,12 @@ test_that("'networkProperties' function runs without error", {
   expect_is(
     networkProperties(
       exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
-      verbose=FALSE, nCores=2
+      verbose=FALSE
     ), "list"
   )
   props <- networkProperties(
     exprSets[[1]][,1:10], coexpSets[[1]][1:10, 1:10], adjSets[[1]][1:10, 1:10],
-    verbose=FALSE, nCores=2
+    verbose=FALSE
   )
   expect_is(props, "list")
 })
@@ -52,12 +40,12 @@ test_that("'networkProperties' function runs without error", {
 test_that("'nodeOrder' function runs without error", {
   n <- nodeOrder(
     exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
-    verbose=FALSE, nCores=2
+    verbose=FALSE
   )
   expect_is(n, "character")
   n <- nodeOrder(
     NULL, coexpSets, adjSets, moduleAssignments, modules=modules[1:2], 
-    orderModules=FALSE, verbose=FALSE, nCores=2
+    orderModules=FALSE, verbose=FALSE
   )
   expect_is(n, "character")
 })
@@ -65,15 +53,14 @@ test_that("'nodeOrder' function runs without error", {
 test_that("'sampleOrder' function runs without error", {
   s <- sampleOrder(
     exprSets, coexpSets, adjSets, moduleAssignments, modules=modules[1], 
-    verbose=FALSE, nCores=2
+    verbose=FALSE
   )
-  expect_is(s, "integer")
+  expect_is(s, "character")
 
   expect_error(
     sampleOrder(
       NULL, coexpSets, adjSets, moduleAssignments, modules=modules[1:2], 
-      simplify=FALSE, verbose=FALSE, nCores=2
+      simplify=FALSE, verbose=FALSE
     )
   )
 })
-
