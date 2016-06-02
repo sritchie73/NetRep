@@ -172,15 +172,9 @@ modules by the similarity of their summary vectors.
 # and test dataset:
 data("NetRep")
 
-# Convert them to the 'bigMatrix' format:
-discovery_data <- as.bigMatrix(discovery_data)
-discovery_correlation <- as.bigMatrix(discovery_correlation)
-discovery_network <- as.bigMatrix(discovery_network)
-test_data <- as.bigMatrix(test_data)
-test_correlation <- as.bigMatrix(test_correlation)
-test_network <- as.bigMatrix(test_network)
-
-# Set up input lists for each input matrix type across datasets:
+# Set up input lists for each input matrix type across datasets. The list
+# elements can have any names, so long as they are consistent between the
+# inputs.
 data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 network_list <- list(discovery=discovery_network, test=test_network)
