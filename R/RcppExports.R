@@ -16,12 +16,6 @@ CheckFinite <- function(matPtr) {
     invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', matPtr))
 }
 
-#' Get the maximum number of concurrent threads supported by this machine
-#' 
-MaxThreads <- function() {
-    .Call('NetRep_MaxThreads', PACKAGE = 'NetRep')
-}
-
 #' Multithreaded permutation procedure for module preservation statistics
 #' 
 #' @details

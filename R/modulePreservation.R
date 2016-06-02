@@ -383,6 +383,7 @@
 #' 
 #' }
 #' 
+#' @importFrom parallel detectCores
 #' @import foreach
 #' @import RhpcBLASctl
 #' @export
@@ -418,19 +419,22 @@ modulePreservation <- function(
   }
   
   # Validate 'nThreads'
-  maxThreads <- MaxThreads()
+  maxThreads <- detectCores()
   if (is.null(nThreads)) {
+    if (is.na(maxThreads)) {
+      stop("'nThreads' must always be supplied by the user on this machine")
+    }
     nThreads <- maxThreads - 1; # Leave a core for interactive use
   }
   
   if (!is.numeric(nThreads) || length(nThreads) > 1 || nThreads < 1)
-    stop("'nCores' must be a single number greater than 0")
+    stop("'nThreads' must be a single number greater than 0")
   
-  if (nThreads > maxThreads) {
-    stop(
-      "Number of threads requested (", nThreads, ") exceeds the maximum ",
-      "number of concurrent threads supported by the current hardware (",
-      maxThreads, ")."
+  if (!is.na(maxThreads) && nThreads > maxThreads) {
+    stop(    
+      "Number of threads requested (", nThreads, ") exceeds the reported ",
+      "maximum number of concurrent threads supported by the current ", 
+      "hardware (", maxThreads, ")."
     )
   }
   

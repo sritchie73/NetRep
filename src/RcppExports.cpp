@@ -16,16 +16,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// MaxThreads
-Rcpp::NumericVector MaxThreads();
-RcppExport SEXP NetRep_MaxThreads() {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    __result = Rcpp::wrap(MaxThreads());
-    return __result;
-END_RCPP
-}
 // PermutationProcedure
 Rcpp::List PermutationProcedure(Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::NumericMatrix tData, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
 RcppExport SEXP NetRep_PermutationProcedure(SEXP dDataSEXP, SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tDataSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {

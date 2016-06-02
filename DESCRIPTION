@@ -21,6 +21,7 @@ Imports:
     BH,
     RhpcBLASctl,
     abind,
+    parallel,
     RColorBrewer
 Suggests: 
     testthat,
