@@ -6,6 +6,10 @@
 \usage{
 load.bigMatrix(backingfile)
 }
+\arguments{
+\item{backingfile}{path to the backingfile for the \code{'bigMatrix'}. The
+file extension must be omitted.}
+}
 \description{
 The \code{'bigMatrix'} class is no longer implemented in the \code{NetRep}
 package: the shared memory approach was incompatabile with high performance

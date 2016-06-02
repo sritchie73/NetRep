@@ -8,6 +8,9 @@
 #' objects to the similar \code{'\link[bigmemory]{big.matrix}'} class
 #' from the \code{\link{bigmemory}} package.
 #' 
+#' @param backingfile path to the backingfile for the \code{'bigMatrix'}. The
+#'   file extension must be omitted.
+#' 
 #' @rdname bigMatrix
 #' @importFrom bigmemory attach.big.matrix
 #' @export
