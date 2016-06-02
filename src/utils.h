@@ -6,6 +6,7 @@
 #define ARMA_NO_DEBUG
 #define ARMA_DONT_PRINT_ERRORS
 #define ARMA_DONT_USE_CXX11
+#define BOOST_DISABLE_ASSERTS
 
 #include <RcppArmadillo.h>
 #include <boost/unordered_map.hpp>
