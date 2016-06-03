@@ -68,7 +68,9 @@ arma::vec WeightedDegree(const arma::mat& netPtr, arma::uvec& nodeIdx) {
   // cancel out positive ones
   arma::rowvec colSums = arma::sum(arma::abs(netPtr(nodeIdx, nodeIdx)), 0);
   // We need to convert to a column-vector
-  arma::vec wDegree = arma::vec(colSums.begin(), colSums.n_elem, false, true);
+  // Note to self: do not set copy_aux_memory to false! The program may free
+  // the memory used in the returned vector to be used elsewhere!
+  arma::vec wDegree = arma::vec(colSums.begin(), colSums.n_elem, true);
   // subtract the diagonals
   arma::vec dg = netPtr.diag(0);
   wDegree -= arma::abs(dg.elem(nodeIdx));
@@ -82,8 +84,10 @@ arma::vec WeightedDegree(const arma::mat& netPtr, arma::uvec& nodeIdx) {
  * @return a scalar value
  */
 double AverageEdgeWeight(arma::vec& wDegree) {
-  int n = wDegree.n_elem;
-  return arma::as_scalar(arma::sum(wDegree) / (n*n - n));
+  unsigned int n = wDegree.n_elem;
+  double nEdgePairs = (double)(n*n - n);
+  double allEdges =  arma::as_scalar(arma::sum(wDegree));
+  return allEdges / nEdgePairs;
 }
 
 /* Get a vector of correlation coefficients for a module
@@ -164,7 +168,7 @@ arma::vec NodeContribution (
 ) {
   // We need to convert SP from a vector to a matrix since arma::cor doesn't
   // have a method for comparing a matrix to a vector.
-  const arma::mat SP = arma::mat(summaryProfile.begin(), summaryProfile.n_elem, 1, false, true);
+  const arma::mat SP = arma::mat(summaryProfile.begin(), summaryProfile.n_elem, 1, true);
   return arma::cor(dataPtr.cols(nodeIdx), SP);
 }
 
