@@ -91,14 +91,14 @@
 #' # Set up input lists for each input matrix type across datasets. The list
 #' # elements can have any names, so long as they are consistent between the
 #' # inputs.
+#' network_list <- list(discovery=discovery_network, test=test_network)
 #' data_list <- list(discovery=discovery_data, test=test_data)
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-#' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
 #' # Sort nodes within module 1 in descending order by module summary
 #' samples <- sampleOrder(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list,
 #'   moduleAssignments=labels_list, modules="1" 
 #' )
 #' }
@@ -108,7 +108,7 @@
 #' @name sampleOrder
 #' @export
 sampleOrder <- function(
-  data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
+  network, data, correlation, moduleAssignments=NULL, modules=NULL, 
   backgroundLabel="0", discovery=NULL, test=NULL, na.rm=FALSE, 
   simplify=TRUE, verbose=TRUE
 ) {
@@ -143,7 +143,7 @@ sampleOrder <- function(
   
   # Calculate the network properties.
   props <- with(finput, {
-    netPropsInternal(data, correlation, network, moduleAssignments, 
+    netPropsInternal(network, data, correlation, moduleAssignments, 
                      modules, discovery, test, nDatasets, datasetNames, verbose)
   })
 
@@ -232,9 +232,9 @@ filterInternalProps <- function(props, test, discovery, modules=NULL) {
 
 #' Get the network properties and order for a plot
 #'
+#' @param network list returned by \code{'processInput'}.
 #' @param data data returned by \code{'processInput'}.
 #' @param correlation list returned by \code{'processInput'}.
-#' @param network list returned by \code{'processInput'}.
 #' @param moduleAssignments list returned by \code{'processInput'}.
 #' @param modules vector of modules to show on the plot.
 #' @param di name of the discovery dataset.
@@ -248,7 +248,7 @@ filterInternalProps <- function(props, test, discovery, modules=NULL) {
 #' @param verbose logical; turn on verbose printing.
 #'
 plotProps <- function(
-  data, correlation, network, moduleAssignments, modules, di,
+  network, data, correlation, moduleAssignments, modules, di,
   ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
   dryRun, verbose
 ) {
@@ -293,7 +293,7 @@ plotProps <- function(
     
     # Calculate the network properties for all datasets required
     props <- netPropsInternal(
-      data, correlation, network, moduleAssignments, modules, di,
+      network, data, correlation, moduleAssignments, modules, di,
       plotDatasets, nDatasets, datasetNames, FALSE
     )
     

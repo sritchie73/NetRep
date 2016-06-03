@@ -4,7 +4,7 @@
 \alias{plotModule}
 \title{Plot the topology of a network module}
 \usage{
-plotModule(data, correlation, network, moduleAssignments = NULL,
+plotModule(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotSampleNames = TRUE,
@@ -20,20 +20,22 @@ plotModule(data, correlation, network, moduleAssignments = NULL,
   "#762A83"), naCol = "#bdbdbd", dryRun = FALSE)
 }
 \arguments{
-\item{data}{a list of matrices, one for each dataset. Each 
-entry of the list should be the data used to infer the interaction network 
-for that dataset. The columns should correspond to variables in the data
-(nodes in the network) and rows to samples in that dataset.}
+\item{network}{a list of interaction networks, one for each dataset. Each 
+entry of the list should be a \eqn{n * n} matrix where each element 
+contains the edge weight between nodes \eqn{i} and \eqn{j} in the inferred 
+network for that dataset. Matrices may also be supplied in the 
+\code{\link[bigmemory]{big.matrix}} format.}
+
+\item{data}{a list of matrices, one for each dataset. Each entry of the list 
+should be the data used to infer the interaction \code{network} for that 
+dataset. The columns should correspond to variables in the data
+(nodes in the network) and rows to samples in that dataset. Matrices may 
+also be supplied in the \code{\link[bigmemory]{big.matrix}} format.}
 
 \item{correlation}{a list of matrices, one for each dataset. Each entry of
-the list should be a \eqn{n * n} numeric matrix where each
-element contains the correlation coefficient between nodes \eqn{i} and
-\eqn{j} in data used to infer the interaction network for that dataset.}
-
-\item{network}{a list of interaction networks, one for each dataset. Each 
-entry of the list should be a \eqn{n * n} numeric matrix where each 
-element contains the edge weight between nodes \eqn{i} and 
-\eqn{j} in the inferred network for that dataset.}
+the list should be a \eqn{n * n} matrix where each element contains the 
+correlation coefficient between nodes \eqn{i} and \eqn{j} in the 
+\code{data}used to infer the interaction network for that dataset.}
 
 \item{moduleAssignments}{a list of vectors, one for each \emph{discovery} 
 dataset, containing the module assignments for each node in that dataset.}
@@ -432,20 +434,20 @@ data("NetRep")
 # Set up input lists for each input matrix type across datasets. The list
 # elements can have any names, so long as they are consistent between the
 # inputs.
+network_list <- list(discovery=discovery_network, test=test_network)
 data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
 # Plot module 1, 2 and 4 in the discovery dataset
 plotModule(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4)
 )
 
 # Now plot them in the test dataset (module 2 does not replicate)
 plotModule(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list,data=data_list, correlation=correlation_list,
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test"
 )
@@ -453,7 +455,7 @@ plotModule(
 # Plot modules 1 and 4, which replicate, in the test datset ordering nodes
 # by weighted degree averaged across the two datasets
 plotModule(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 4), discovery="discovery",
   test="test", orderNodesBy=c("discovery", "test")
 )

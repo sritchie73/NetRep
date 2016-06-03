@@ -4,16 +4,16 @@
 \alias{plotProps}
 \title{Get the network properties and order for a plot}
 \usage{
-plotProps(data, correlation, network, moduleAssignments, modules, di, ti,
+plotProps(network, data, correlation, moduleAssignments, modules, di, ti,
   orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, dryRun,
   verbose)
 }
 \arguments{
+\item{network}{list returned by \code{'processInput'}.}
+
 \item{data}{data returned by \code{'processInput'}.}
 
 \item{correlation}{list returned by \code{'processInput'}.}
-
-\item{network}{list returned by \code{'processInput'}.}
 
 \item{moduleAssignments}{list returned by \code{'processInput'}.}
 

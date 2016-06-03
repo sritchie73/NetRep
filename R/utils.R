@@ -271,8 +271,8 @@ loadIntoRAM <- function(x) {
 #' 
 #' @param ... objects to check.
 #' 
-#' @param
-#'  returns \code{TRUE} if the class of any object in the list of input 
+#' @return 
+#'  \code{TRUE} if the class of any object in the list of input 
 #'  arguments is a "big.matrix".
 any.big.matrix <- function(...) {
   "big.matrix" %in% sapply(list(...), class)

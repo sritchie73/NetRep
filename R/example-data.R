@@ -5,6 +5,11 @@
 #' 
 #' @format
 #' \itemize{
+#'   \item{\code{"discovery_network"}:}{
+#'      a \code{matrix} with 150 columns and 150 rows containing the network 
+#'      edge weights encoding the interaction strength between each pair of
+#'      genes in the \emph{discovery} dataset.
+#'   }
 #'   \item{\code{"discovery_data"}:}{
 #'      a \code{matrix} with 150 columns (genes) and 30 rows (samples) whose 
 #'      entries correspond to the expression level of each gene in each sample
@@ -15,14 +20,14 @@
 #'      correlation-coefficients between each pair of genes calculated from the
 #'      \code{"discovery_data"} \code{matrix}.
 #'   }
-#'   \item{\code{"discovery_network"}:}{
-#'      a \code{matrix} with 150 columns and 150 rows containing the network 
-#'      edge weights encoding the interaction strength between each pair of
-#'      genes in the \emph{discovery} dataset.
-#'   }
 #'   \item{\code{"module_labels"}:}{
 #'      a named \code{vector} with 150 entries containing the module assignment
 #'      for each gene as identified in the \emph{discovery} dataset.
+#'   }  
+#'   \item{\code{"test_network"}:}{
+#'      a \code{matrix} with 150 columns and 150 rows containing the network 
+#'      edge weights encoding the interaction strength between each pair of
+#'      genes in the \emph{test} dataset.
 #'   }  
 #'   \item{\code{"test_data"}:}{
 #'      a \code{matrix} with 150 columns (genes) and 30 rows (samples) whose 
@@ -34,11 +39,6 @@
 #'      correlation-coefficients between each pair of genes calculated from the
 #'      \code{"test_data"} \code{matrix}.
 #'   }
-#'   \item{\code{"test_network"}:}{
-#'      a \code{matrix} with 150 columns and 150 rows containing the network 
-#'      edge weights encoding the interaction strength between each pair of
-#'      genes in the \emph{test} dataset.
-#'   }  
 #' }
 #' 
 #' @details 
@@ -152,24 +152,22 @@
 NULL
 
 #' @rdname example-data
+"discovery_network"
+
+#' @rdname example-data
 "discovery_data"
 
 #' @rdname example-data
 "discovery_correlation"
 
 #' @rdname example-data
-"discovery_network"
+"module_labels"
+
+#' @rdname example-data
+"test_network"
 
 #' @rdname example-data
 "test_data"
 
 #' @rdname example-data
 "test_correlation"
-
-#' @rdname example-data
-"test_network"
-
-#' @inheritParams
-#'
-#' @rdname example-data
-"module_labels"

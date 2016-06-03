@@ -10,7 +10,7 @@
 \alias{plotTopology}
 \title{Plot a topological feature of network module}
 \usage{
-plotData(data, correlation, network, moduleAssignments = NULL,
+plotData(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
   orderModules = TRUE, plotNodeNames = TRUE, plotSampleNames = TRUE,
@@ -21,7 +21,7 @@ plotData(data, correlation, network, moduleAssignments = NULL,
   cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
   dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
 
-plotCorrelation(data, correlation, network, moduleAssignments = NULL,
+plotCorrelation(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
@@ -32,7 +32,7 @@ plotCorrelation(data, correlation, network, moduleAssignments = NULL,
   corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
   dryRun = FALSE)
 
-plotNetwork(data, correlation, network, moduleAssignments = NULL,
+plotNetwork(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
   orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
@@ -43,7 +43,7 @@ plotNetwork(data, correlation, network, moduleAssignments = NULL,
   netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
   dryRun = FALSE)
 
-plotContribution(data, correlation, network, moduleAssignments = NULL,
+plotContribution(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderNodesBy = NULL, orderModules = TRUE,
   plotNodeNames = TRUE, plotModuleNames = NULL, main = "",
@@ -53,7 +53,7 @@ plotContribution(data, correlation, network, moduleAssignments = NULL,
   contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
   dryRun = FALSE)
 
-plotDegree(data, correlation, network, moduleAssignments = NULL,
+plotDegree(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderNodesBy = NULL, orderModules = TRUE,
   plotNodeNames = TRUE, plotModuleNames = NULL, main = "",
@@ -62,7 +62,7 @@ plotDegree(data, correlation, network, moduleAssignments = NULL,
   cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, degreeCol = "#feb24c",
   naCol = "#bdbdbd", dryRun = FALSE)
 
-plotSummary(data, correlation, network, moduleAssignments = NULL,
+plotSummary(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
   verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
   orderModules = TRUE, plotSampleNames = TRUE, plotModuleNames = NULL,
@@ -73,20 +73,22 @@ plotSummary(data, correlation, network, moduleAssignments = NULL,
   dryRun = FALSE)
 }
 \arguments{
-\item{data}{a list of matrices, one for each dataset. Each 
-entry of the list should be the data used to infer the interaction network 
-for that dataset. The columns should correspond to variables in the data
-(nodes in the network) and rows to samples in that dataset.}
+\item{network}{a list of interaction networks, one for each dataset. Each 
+entry of the list should be a \eqn{n * n} matrix where each element 
+contains the edge weight between nodes \eqn{i} and \eqn{j} in the inferred 
+network for that dataset. Matrices may also be supplied in the 
+\code{\link[bigmemory]{big.matrix}} format.}
+
+\item{data}{a list of matrices, one for each dataset. Each entry of the list 
+should be the data used to infer the interaction \code{network} for that 
+dataset. The columns should correspond to variables in the data
+(nodes in the network) and rows to samples in that dataset. Matrices may 
+also be supplied in the \code{\link[bigmemory]{big.matrix}} format.}
 
 \item{correlation}{a list of matrices, one for each dataset. Each entry of
-the list should be a \eqn{n * n} numeric matrix where each
-element contains the correlation coefficient between nodes \eqn{i} and
-\eqn{j} in data used to infer the interaction network for that dataset.}
-
-\item{network}{a list of interaction networks, one for each dataset. Each 
-entry of the list should be a \eqn{n * n} numeric matrix where each 
-element contains the edge weight between nodes \eqn{i} and 
-\eqn{j} in the inferred network for that dataset.}
+the list should be a \eqn{n * n} matrix where each element contains the 
+correlation coefficient between nodes \eqn{i} and \eqn{j} in the 
+\code{data}used to infer the interaction network for that dataset.}
 
 \item{moduleAssignments}{a list of vectors, one for each \emph{discovery} 
 dataset, containing the module assignments for each node in that dataset.}
@@ -508,27 +510,27 @@ data("NetRep")
 # Set up input lists for each input matrix type across datasets. The list
 # elements can have any names, so long as they are consistent between the
 # inputs.
+network_list <- list(discovery=discovery_network, test=test_network)
 data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
 # Plot the data for module 1, 2 and 4 in the discovery dataset
 plotData(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4)
 )
 
 # Symmetric = TRUE gives a traditional heatmap for the correlation structure
 # and weighted network
 plotCorrelation(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list,
   moduleAssignments=labels_list, modules=c(1, 2, 4), symmetric=TRUE
 )
 
 # While the default is to render only one half of the (symmetric) matrix
 plotNetwork(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4)
 )
 
@@ -536,34 +538,34 @@ plotNetwork(
 # in the same order as the discovery dataset to compare how node degree 
 # changes
 plotDegree(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test"
 )
 
 # Alternatively nodes can be ordered on the plot by degree in the test dataset
 plotDegree(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list,
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test", orderNodesBy="test"
 )
 
 # Or by averaging the degree across datasets for a more robust ordering  
 plotDegree(
-  data=data_list, correlation=correlation_list, network=network_list, 
+ network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test", orderNodesBy=c("discovery", "test")
 )
 
 # Arbitrary subsets can be plotted:
 plotContribution(
-  data=data_list[[1]][, 1:10], correlation=correlation_list[[1]][1:10, 1:10], 
-  network=network_list[[1]][1:10, 1:10], orderNodesBy=NA
+  network=network_list[[1]][1:10, 1:10], data=data_list[[1]][, 1:10], 
+  correlation=correlation_list[[1]][1:10, 1:10], orderNodesBy=NA
 )
 
 # Plot the module summary vectors for multiple modules:
 plotSummary(
-  data=data_list, correlation=correlation_list, network=network_list, 
+  network=network_list, data=data_list, correlation=correlation_list, 
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test", orderSamplesBy="test"
 )

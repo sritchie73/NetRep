@@ -279,20 +279,20 @@
 #' # Set up input lists for each input matrix type across datasets. The list
 #' # elements can have any names, so long as they are consistent between the
 #' # inputs.
+#' network_list <- list(discovery=discovery_network, test=test_network)
 #' data_list <- list(discovery=discovery_data, test=test_data)
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-#' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
 #' # Plot module 1, 2 and 4 in the discovery dataset
 #' plotModule(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4)
 #' )
 #' 
 #' # Now plot them in the test dataset (module 2 does not replicate)
 #' plotModule(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list,data=data_list, correlation=correlation_list,
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test"
 #' )
@@ -300,7 +300,7 @@
 #' # Plot modules 1 and 4, which replicate, in the test datset ordering nodes
 #' # by weighted degree averaged across the two datasets
 #' plotModule(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 4), discovery="discovery",
 #'   test="test", orderNodesBy=c("discovery", "test")
 #' )
@@ -309,7 +309,7 @@
 #' @name plotModule
 #' @export
 plotModule <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="Module Topology", 
@@ -433,7 +433,7 @@ plotModule <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
     nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps

@@ -8,9 +8,10 @@
 }
 \arguments{
 \item{...}{objects to check.}
-
-\item{returns}{\code{TRUE} if the class of any object in the list of input 
-arguments is a "big.matrix".}
+}
+\value{
+\code{TRUE} if the class of any object in the list of input 
+ arguments is a "big.matrix".
 }
 \description{
 Check if any objects are a 'big.matrix'

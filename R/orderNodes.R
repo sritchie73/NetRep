@@ -110,14 +110,14 @@
 #' # Set up input lists for each input matrix type across datasets. The list
 #' # elements can have any names, so long as they are consistent between the
 #' # inputs.
+#' network_list <- list(discovery=discovery_network, test=test_network)
 #' data_list <- list(discovery=discovery_data, test=test_data)
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-#' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
 #' # Sort nodes by module similarity and node degree
 #' nodes <- nodeOrder(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list,  
 #'   moduleAssignments=labels_list
 #' )
 #' }
@@ -125,7 +125,7 @@
 #' @name nodeOrder
 #' @export
 nodeOrder <- function(
-  data=NULL, correlation, network, moduleAssignments=NULL, modules=NULL, 
+  network, data, correlation, moduleAssignments=NULL, modules=NULL, 
   backgroundLabel="0", discovery=NULL, test=NULL, na.rm=FALSE, 
   orderModules=TRUE, mean=FALSE, simplify=TRUE, verbose=TRUE
 ) {
@@ -184,7 +184,7 @@ nodeOrder <- function(
   # Calculate the network properties
   props <- with(finput, { 
     netPropsInternal(
-      data, correlation, network, moduleAssignments, 
+      network, data, correlation, moduleAssignments, 
       modules, discovery, test, nDatasets, datasetNames, verbose
     ) 
   })

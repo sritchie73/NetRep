@@ -2,19 +2,21 @@
 #' 
 #' Template parameters to be imported into other function documentation. This 
 #' is not intended to be a stand-alone help file.
-#'
-#' @param data a list of matrices, one for each dataset. Each 
-#'  entry of the list should be the data used to infer the interaction network 
-#'  for that dataset. The columns should correspond to variables in the data
-#'  (nodes in the network) and rows to samples in that dataset.
-#' @param correlation a list of matrices, one for each dataset. Each entry of
-#'   the list should be a \eqn{n * n} numeric matrix where each
-#'   element contains the correlation coefficient between nodes \eqn{i} and
-#'   \eqn{j} in data used to infer the interaction network for that dataset.
+#' 
 #' @param network a list of interaction networks, one for each dataset. Each 
-#'  entry of the list should be a \eqn{n * n} numeric matrix where each 
-#'  element contains the edge weight between nodes \eqn{i} and 
-#'  \eqn{j} in the inferred network for that dataset. 
+#'  entry of the list should be a \eqn{n * n} matrix where each element 
+#'  contains the edge weight between nodes \eqn{i} and \eqn{j} in the inferred 
+#'  network for that dataset. Matrices may also be supplied in the 
+#'  \code{\link[bigmemory]{big.matrix}} format.
+#' @param data a list of matrices, one for each dataset. Each entry of the list 
+#'  should be the data used to infer the interaction \code{network} for that 
+#'  dataset. The columns should correspond to variables in the data
+#'  (nodes in the network) and rows to samples in that dataset. Matrices may 
+#'  also be supplied in the \code{\link[bigmemory]{big.matrix}} format.
+#' @param correlation a list of matrices, one for each dataset. Each entry of
+#'   the list should be a \eqn{n * n} matrix where each element contains the 
+#'   correlation coefficient between nodes \eqn{i} and \eqn{j} in the 
+#'   \code{data}used to infer the interaction network for that dataset.
 #' @param moduleAssignments a list of vectors, one for each \emph{discovery} 
 #'   dataset, containing the module assignments for each node in that dataset.
 #' @param modules a list of vectors, one for each \code{discovery} dataset, 

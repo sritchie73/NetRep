@@ -4,27 +4,29 @@
 \alias{modulePreservation}
 \title{Replication and preservation of network modules across datasets}
 \usage{
-modulePreservation(data = NULL, correlation, network, moduleAssignments,
+modulePreservation(network, data, correlation, moduleAssignments,
   modules = NULL, backgroundLabel = "0", discovery = 1, test = 2,
   selfPreservation = FALSE, nThreads = NULL, nPerm = NULL,
   null = "overlap", alternative = "greater", simplify = TRUE,
   verbose = TRUE)
 }
 \arguments{
-\item{data}{a list of matrices, one for each dataset. Each 
-entry of the list should be the data used to infer the interaction network 
-for that dataset. The columns should correspond to variables in the data
-(nodes in the network) and rows to samples in that dataset.}
+\item{network}{a list of interaction networks, one for each dataset. Each 
+entry of the list should be a \eqn{n * n} matrix where each element 
+contains the edge weight between nodes \eqn{i} and \eqn{j} in the inferred 
+network for that dataset. Matrices may also be supplied in the 
+\code{\link[bigmemory]{big.matrix}} format.}
+
+\item{data}{a list of matrices, one for each dataset. Each entry of the list 
+should be the data used to infer the interaction \code{network} for that 
+dataset. The columns should correspond to variables in the data
+(nodes in the network) and rows to samples in that dataset. Matrices may 
+also be supplied in the \code{\link[bigmemory]{big.matrix}} format.}
 
 \item{correlation}{a list of matrices, one for each dataset. Each entry of
-the list should be a \eqn{n * n} numeric matrix where each
-element contains the correlation coefficient between nodes \eqn{i} and
-\eqn{j} in data used to infer the interaction network for that dataset.}
-
-\item{network}{a list of interaction networks, one for each dataset. Each 
-entry of the list should be a \eqn{n * n} numeric matrix where each 
-element contains the edge weight between nodes \eqn{i} and 
-\eqn{j} in the inferred network for that dataset.}
+the list should be a \eqn{n * n} matrix where each element contains the 
+correlation coefficient between nodes \eqn{i} and \eqn{j} in the 
+\code{data}used to infer the interaction network for that dataset.}
 
 \item{moduleAssignments}{a list of vectors, one for each \emph{discovery} 
 dataset, containing the module assignments for each node in that dataset.}
@@ -364,16 +366,16 @@ data("NetRep")
 # Set up input lists for each input matrix type across datasets. The list
 # elements can have any names, so long as they are consistent between the
 # inputs.
+network_list <- list(discovery=discovery_network, test=test_network)
 data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-network_list <- list(discovery=discovery_network, test=test_network)
 labels_list <- list(discovery=module_labels)
 
 # Assess module preservation. This will take a few minutes depending on the 
 # number of cores on your machine
 preservation <- modulePreservation(
- data=data_list, correlation=correlation_list, network=network_list,
- moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
+ network=network_list, data=data_list, correlation=correlation_list, 
+ moduleAssignments=labels_list, nPerm=10000, discovery="discovery", 
  test="test"
 )
 

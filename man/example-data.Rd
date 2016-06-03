@@ -13,6 +13,11 @@
 \alias{test_network}
 \title{Example data}
 \format{\itemize{
+  \item{\code{"discovery_network"}:}{
+     a \code{matrix} with 150 columns and 150 rows containing the network 
+     edge weights encoding the interaction strength between each pair of
+     genes in the \emph{discovery} dataset.
+  }
   \item{\code{"discovery_data"}:}{
      a \code{matrix} with 150 columns (genes) and 30 rows (samples) whose 
      entries correspond to the expression level of each gene in each sample
@@ -23,14 +28,14 @@
      correlation-coefficients between each pair of genes calculated from the
      \code{"discovery_data"} \code{matrix}.
   }
-  \item{\code{"discovery_network"}:}{
-     a \code{matrix} with 150 columns and 150 rows containing the network 
-     edge weights encoding the interaction strength between each pair of
-     genes in the \emph{discovery} dataset.
-  }
   \item{\code{"module_labels"}:}{
      a named \code{vector} with 150 entries containing the module assignment
      for each gene as identified in the \emph{discovery} dataset.
+  }  
+  \item{\code{"test_network"}:}{
+     a \code{matrix} with 150 columns and 150 rows containing the network 
+     edge weights encoding the interaction strength between each pair of
+     genes in the \emph{test} dataset.
   }  
   \item{\code{"test_data"}:}{
      a \code{matrix} with 150 columns (genes) and 30 rows (samples) whose 
@@ -42,28 +47,23 @@
      correlation-coefficients between each pair of genes calculated from the
      \code{"test_data"} \code{matrix}.
   }
-  \item{\code{"test_network"}:}{
-     a \code{matrix} with 150 columns and 150 rows containing the network 
-     edge weights encoding the interaction strength between each pair of
-     genes in the \emph{test} dataset.
-  }  
 }}
 \usage{
 data("NetRep")
+
+discovery_network
 
 discovery_data
 
 discovery_correlation
 
-discovery_network
+module_labels
+
+test_network
 
 test_data
 
 test_correlation
-
-test_network
-
-module_labels
 }
 \description{
 Example gene coexpression networks inferred from two independent datasets 

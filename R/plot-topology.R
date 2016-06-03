@@ -276,27 +276,27 @@
 #' # Set up input lists for each input matrix type across datasets. The list
 #' # elements can have any names, so long as they are consistent between the
 #' # inputs.
+#' network_list <- list(discovery=discovery_network, test=test_network)
 #' data_list <- list(discovery=discovery_data, test=test_data)
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
-#' network_list <- list(discovery=discovery_network, test=test_network)
 #' labels_list <- list(discovery=module_labels)
 #' 
 #' # Plot the data for module 1, 2 and 4 in the discovery dataset
 #' plotData(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4)
 #' )
 #' 
 #' # Symmetric = TRUE gives a traditional heatmap for the correlation structure
 #' # and weighted network
 #' plotCorrelation(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list,
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), symmetric=TRUE
 #' )
 #' 
 #' # While the default is to render only one half of the (symmetric) matrix
 #' plotNetwork(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4)
 #' )
 #' 
@@ -304,34 +304,34 @@
 #' # in the same order as the discovery dataset to compare how node degree 
 #' # changes
 #' plotDegree(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test"
 #' )
 #' 
 #' # Alternatively nodes can be ordered on the plot by degree in the test dataset
 #' plotDegree(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list,
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test", orderNodesBy="test"
 #' )
 #' 
 #' # Or by averaging the degree across datasets for a more robust ordering  
 #' plotDegree(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'  network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test", orderNodesBy=c("discovery", "test")
 #' )
 #' 
 #' # Arbitrary subsets can be plotted:
 #' plotContribution(
-#'   data=data_list[[1]][, 1:10], correlation=correlation_list[[1]][1:10, 1:10], 
-#'   network=network_list[[1]][1:10, 1:10], orderNodesBy=NA
+#'   network=network_list[[1]][1:10, 1:10], data=data_list[[1]][, 1:10], 
+#'   correlation=correlation_list[[1]][1:10, 1:10], orderNodesBy=NA
 #' )
 #' 
 #' # Plot the module summary vectors for multiple modules:
 #' plotSummary(
-#'   data=data_list, correlation=correlation_list, network=network_list, 
+#'   network=network_list, data=data_list, correlation=correlation_list, 
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test", orderSamplesBy="test"
 #' )
@@ -346,7 +346,7 @@ NULL
 #' @rdname plotTopology
 #' @export
 plotData <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, lwd=1, 
@@ -430,7 +430,7 @@ plotData <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
     nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -521,7 +521,7 @@ plotData <- function(
 #' @rdname plotTopology
 #' @export
 plotCorrelation <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
@@ -597,7 +597,7 @@ plotCorrelation <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -683,7 +683,7 @@ plotCorrelation <- function(
 #' @rdname plotTopology
 #' @export
 plotNetwork <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, symmetric=FALSE, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, plotLegend=TRUE, 
@@ -759,7 +759,7 @@ plotNetwork <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -845,7 +845,7 @@ plotNetwork <- function(
 #' @rdname plotTopology
 #' @export
 plotContribution <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, ylab.line=2.5, lwd=1, 
@@ -921,7 +921,7 @@ plotContribution <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -972,7 +972,7 @@ plotContribution <- function(
 #' @rdname plotTopology
 #' @export
 plotDegree <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderNodesBy=NULL, orderModules=TRUE, plotNodeNames=TRUE, 
   plotModuleNames=NULL, main="", main.line=1, lwd=1, drawBorders=FALSE, 
@@ -1045,7 +1045,7 @@ plotDegree <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
     datasetNames, nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps
@@ -1098,7 +1098,7 @@ plotDegree <- function(
 #' @rdname plotTopology
 #' @export
 plotSummary <- function(
-  data, correlation, network, moduleAssignments=NULL, modules=NULL,
+  network, data, correlation, moduleAssignments=NULL, modules=NULL,
   backgroundLabel="0", discovery=NULL, test=NULL, verbose=TRUE,
   orderSamplesBy=NULL, orderNodesBy=NULL, orderModules=TRUE, 
   plotSampleNames=TRUE, plotModuleNames=NULL, main="", main.line=1, 
@@ -1175,7 +1175,7 @@ plotSummary <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(data, correlation, network, moduleAssignments,
+  plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
     nDatasets, dryRun, verbose)
   testProps <- plotProps$testProps

@@ -4,16 +4,16 @@
 \alias{netPropsInternal}
 \title{Internal function for calculating 'networkProperties'}
 \usage{
-netPropsInternal(data, correlation, network, moduleAssignments, modules,
+netPropsInternal(network, data, correlation, moduleAssignments, modules,
   discovery, test, nDatasets, datasetNames, verbose)
 }
 \arguments{
+\item{network}{\code{'network'} after processing by \code{'processInput'}.}
+
 \item{data}{\code{'data'} after processing by \code{'processInput'}.}
 
 \item{correlation}{\code{'correlation'} after processing by
 \code{'processInput'}.}
-
-\item{network}{\code{'network'} after processing by \code{'processInput'}.}
 
 \item{moduleAssignments}{\code{'moduleAssignments'} after processing by
 \code{'processInput'}.}
