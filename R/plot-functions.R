@@ -56,12 +56,15 @@ plotTriangleHeatmap <- function(
   
   # render triangles row by row
   if (!dryRun) {
+    #cj <- ncol(values)
+    valueRow <- 1
     for (plotRow in 1:nNodes) {
-      startCol <- nNodes - (plotRow - 1)
+      startPlotCol <- nNodes - (plotRow - 1)
+      startValueCol <- ncol(values) - (valueRow - 1)
+      vi <- 1
       for (ii in 1:plotRow) {
-        jj <- startCol + (ii - 1)
-        ci <- ii
-        cj <- jj
+        jj <- startPlotCol + (ii - 1)
+        vj <- startValueCol + (vi - 1)
         
         topy <- (nNodes - (plotRow - 1))/2
         # If we're on the diagonal, plot a triangle, otherwise a diamond
@@ -76,9 +79,8 @@ plotTriangleHeatmap <- function(
         leftx <- rightx - 1
         
         if (ii %nin% na.indices && jj %nin% na.indices) {
-          col <- getColFromPalette(values[ci, cj], palette, vlim)
-          cj <- cj + 1
-          ci <- ci + 1
+          col <- getColFromPalette(values[vi, vj], palette, vlim)
+          vi <- vi + 1
         } else {
           col <- na.col
         }
@@ -93,6 +95,9 @@ plotTriangleHeatmap <- function(
           y=c(topy-halfUnit, topy, topy-halfUnit, boty, topy-halfUnit),
           col=col, border=col
         )
+      }
+      if (plotRow %nin% na.indices) {
+        valueRow = valueRow + 1
       }
     } 
   }
