@@ -12,11 +12,13 @@
 #'   file extension must be omitted.
 #' 
 #' @rdname bigMatrix
-#' @importFrom bigmemory attach.big.matrix
 #' @export
 load.bigMatrix <- function(backingfile) {
+  if (!pkgReqCheck("bigmemory")) {
+    stop("the 'bigmemory' package must be installed")
+  }
   message("The 'bigMatrix' class is deprecated. Converting to file to a ",
-          "file-backed 'big.matrix' object (see the bigmemory package).")
+          "file-backed 'big.matrix' object from the bigmemory package.")
   
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)

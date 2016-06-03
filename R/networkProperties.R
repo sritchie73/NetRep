@@ -218,16 +218,32 @@ netPropsInternal <- function(
   } 
   names(res) <- datasetNames
   
-  vCat(verbose, 0, 'Calculating network properties...\n')
   props <- foreach(di = discovery) %do% {
     foreach(ti = test[[di]]) %do% {
+      
+      # Load matrices into RAM if they are 'big.matrix' objects.
+      #   Calls to the garbage collector are necessary so we don't have 
+      #   a copy of the data in shared memory as well.
+      anyBM <- any.big.matrix(data[[ti]], network[[ti]])
+      if (anyBM) {
+        vCat(verbose, 0, "Loading 'big.matrix' data for dataset", 
+             datasetNames[ti], "into RAM...")
+      }
+      data_mat <- loadIntoRAM(data[[ti]])
+      gc()
+      network_mat <- loadIntoRAM(network[[ti]])
+      gc()
+      
+      vCat(verbose, 0, "Calculating network properties in dataset", 
+           datasetNames[ti], "...")
+      
       if (is.null(data[[ti]])) {
         NetworkPropertiesNoData(
-          network[[ti]], moduleAssignments[[di]], modules[[di]]
+          network_mat, moduleAssignments[[di]], modules[[di]]
         )
       } else {
         NetworkProperties(
-          data[[ti]], network[[ti]], moduleAssignments[[di]], modules[[di]]
+          data_mat, network_mat, moduleAssignments[[di]], modules[[di]]
         )
       }
     }

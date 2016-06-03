@@ -183,9 +183,9 @@ processInput <- function(
   if (!is.list(network))
     network <- list(network)
   
-  # Convert to matrix objects
-  correlation <- lapply(correlation, dynamicMatLoad)
-  network <- lapply(network, dynamicMatLoad)
+  # Check if the data is in an appropriate format
+  lapply(correlation, checkIsMatrix)
+  lapply(network, checkIsMatrix)
   
   # Add any datasets names that are not in dataNames
   dataNames <- c(dataNames, names(correlation))
@@ -216,8 +216,8 @@ processInput <- function(
   if (!is.list(data))
     data <- list(data)
 
-  # Convert to matrices
-  data <- lapply(data, dynamicMatLoad)
+  # Check data is in appropriate format
+  lapply(data, checkIsMatrix)
 
   # Check that we can match 'discovery' and 'test' to the provided matrices. 
   data <- verifyDatasetOrder(data, "data", dataNames, nDatasets)
@@ -661,10 +661,23 @@ processInput <- function(
   # Now check finite, but skip for dry runs of plots
   if (!dryRun) {
     for (ii in iterator) {
-      if (!is.null(data[[ii]])) 
-        CheckFinite(data[[ii]])
-      CheckFinite(correlation[[ii]])
-      CheckFinite(network[[ii]])
+      # First, we need to load in matrices into RAM if they are 'big.matrix' 
+      # objects
+      data_mat <- loadIntoRAM(data[[ii]])
+      gc()
+      correlation_mat <- loadIntoRAM(correlation[[ii]])
+      gc()
+      network_mat <- loadIntoRAM(network[[ii]])
+      gc()
+      
+      if (!is.null(data_mat))
+        CheckFinite(data_mat)
+      CheckFinite(correlation_mat)
+      CheckFinite(network_mat)
+      
+      # Frees up memory if any objects are big matrices.
+      rm(data_mat, correlation_mat, network_mat)
+      gc()
     }    
   }
   
@@ -726,24 +739,18 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   return(tocheck)
 }
 
-#' Dynamically detect load matrices
+#' Check whether an object is a 'matrix' or a 'big.matrix'
 #' 
-#' @param object user input object
-#'   
-#' @return
-#'  A matirx or an error.
-dynamicMatLoad <- function(object) {
-  if (!is.null(object) && !is.matrix(object)) {
-    tryCatch({
-      return(as.matrix(object))
-    }, error=function(e) {
-      stop("unable to convert a ", class(object), " to a matrix!")
-    })
-  } else {
-    return(object)
+#' @param object object to check.
+#' 
+#' @return 
+#'   throws an error or returns silently
+checkIsMatrix <- function(object) {
+  if (!is.null(object) && !is.matrix(object) && class(object) != "big.matrix") { 
+    stop('Input data must be a "matrix" or "big.matrix"')
   }
 }
-
+  
 #' Validate plot function arguments
 #' 
 #' Simple typechecking for the extensive plot arguments

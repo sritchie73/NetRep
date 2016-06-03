@@ -248,3 +248,42 @@ sortModuleNames <- function(modules) {
     sort(modules)
   })
 }
+
+#' Get the matrix in RAM
+#' 
+#' If \code{x} is a \code{'big.matrix'} convert it to a matrix. This loads it 
+#' into regular memory rather than shared memory, since shared memory is not
+#' compatible with distributed file systems (i.e. multi-node clusters). If
+#' \code{x} is already a \code{'matrix'}, just return as is.
+#' 
+#' @param x a \code{'matrix'} or \code{'big.matrix'}
+#' 
+#' @return a \code{'matrix'}
+loadIntoRAM <- function(x) {
+  if (class(x) == "big.matrix") {
+    return(x[,])
+  } else {
+    return(x)
+  }
+}
+
+#' Check if any objects are a 'big.matrix'
+#' 
+#' @param ... objects to check.
+#' 
+#' @param
+#'  returns \code{TRUE} if the class of any object in the list of input 
+#'  arguments is a "big.matrix".
+any.big.matrix <- function(...) {
+  "big.matrix" %in% sapply(list(...), class)
+}
+
+#' Silently check and load a package into the namespace
+#' 
+#' @param pkg name of the package to check
+#' 
+#' @return logical; \code{TRUE} if the package is installed and can be loaded.
+pkgReqCheck <- function(pkg) {
+  suppressMessages(suppressWarnings(requireNamespace(pkg, quietly=TRUE)))
+}
+

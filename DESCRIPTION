@@ -12,7 +12,6 @@ Depends:
     R (>= 3.0.0),
     utils
 Imports: 
-    bigmemory,
     foreach,
     Rcpp (>= 0.11),
     RcppArmadillo (>= 0.4),
@@ -22,7 +21,8 @@ Imports:
     abind,
     parallel,
     RColorBrewer
-Suggests: 
+Suggests:
+    bigmemory,
     testthat,
     knitr,
     rmarkdown

@@ -510,23 +510,53 @@ modulePreservation <- function(
         nStatistics <- ifelse(!is.null(data[[di]]) && !is.null(data[[ti]]), 7, 4)
         nModules <- length(overlapModules)
         
+        # Load matrices into RAM if they are 'big.matrix' objects.
+        #   Calls to the garbage collector are necessary so we don't have 
+        #   a copy of the data in shared memory as well.
+        anyBM <- any.big.matrix(data[[di]], correlation[[di]], network[[di]],
+                                data[[ti]], correlation[[ti]], network[[ti]])
+        if (anyBM) {
+          vCat(verbose, 1, "Loading 'big.matrix' data into RAM...")
+        }
+        if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
+          discovery_data <- loadIntoRAM(data[[di]])
+          gc()
+          test_data <- loadIntoRAM(data[[ti]])
+          gc()
+        } else {
+          discovery_data <- NULL
+          test_data <- NULL
+        }
+        discovery_correlation <- loadIntoRAM(correlation[[di]])
+        gc()
+        test_correlation <- loadIntoRAM(correlation[[ti]])
+        gc()
+        discovery_network <- loadIntoRAM(network[[di]])
+        gc()
+        test_network <- loadIntoRAM(network[[ti]])
+        gc()
+        
+        # Run the permutation procedure
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           perms <- PermutationProcedureNoData(
-            correlation[[di]], network[[di]], correlation[[ti]], 
-            network[[ti]], moduleAssignments[[di]], modules[[di]], nPerm, 
+            discovery_correlation, discovery_network, test_correlation, 
+            test_network, moduleAssignments[[di]], modules[[di]], nPerm, 
             nThreads, model, verbose, vCat
           )
         } else {
           perms <- PermutationProcedure(
-            data[[di]], correlation[[di]], network[[di]],
-            data[[ti]], correlation[[ti]], network[[ti]],
-            moduleAssignments[[di]], modules[[di]], nPerm, nThreads, 
-            model, verbose, vCat
+            discovery_data, discovery_correlation, discovery_network,
+            test_data, test_correlation, test_network, moduleAssignments[[di]], 
+            modules[[di]], nPerm, nThreads, model, verbose, vCat
           )
         }
-        
         observed <- perms$observed
         nulls <- perms$nulls
+        
+        # Free up memory
+        rm(discovery_data, discovery_correlation, discovery_network, test_data,
+           test_correlation, test_network)
+        gc()
         
         #---------------------------------------------------------------------
         # Calculate permutation p-value
