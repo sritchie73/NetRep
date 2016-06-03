@@ -610,7 +610,7 @@ plotMultiBar <- function(
     lengths <- matrix(lengths, ncol=lengths)
   if (missing(lengths.lim)) {
     lengths.lim <- lapply(seq_len(ncol(lengths)), function(ci) {
-      range(lengths[,ci])
+      range(lengths[,ci], na.rm=TRUE)
     })
   }
   if (!is.list(lengths.lim))
@@ -674,15 +674,17 @@ plotMultiBar <- function(
     # Only draw bars if dryRun is FALSE
     if (!dryRun) {
       for (jj in seq_len(nrow(lengths))) {
-        rect(
-          xleft=getX(ax),
-          xright=getX(lengths[jj,ii]),
-          ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
-          ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
-          col=colmat[jj, ii],
-          border=ifelse(drawBorders, "black", NA),
-          lwd=lwd
-        ) 
+        if (!is.na(lengths[jj,ii])) {
+          rect(
+            xleft=getX(ax),
+            xright=getX(lengths[jj,ii]),
+            ybottom=nrow(lengths) - jj + (1 - bar.width)/2,
+            ytop=nrow(lengths) - (jj - 1) - (1 - bar.width)/2,
+            col=colmat[jj, ii],
+            border=ifelse(drawBorders, "black", NA),
+            lwd=lwd
+          ) 
+        }
       }
     }
     

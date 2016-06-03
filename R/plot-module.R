@@ -487,7 +487,7 @@ plotModule <- function(
       colnames(summaries) <- moduleOrder
       rownames(summaries) <- sampleOrder
       summaries.range <- lapply(1:ncol(summaries), function(ii) { 
-        range(summaries[,ii])
+        range(summaries[,ii], na.rm=TRUE)
       })
     }
   }
