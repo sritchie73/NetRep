@@ -520,15 +520,17 @@ plotBar <- function(
     }
     
     for (ii in seq_along(heights)) {
-      rect(
-        xleft=ii-bar.width/2,
-        xright=ii+bar.width/2,
-        ybottom=0,
-        ytop=heights[ii],
-        col=colvec[ii],
-        border=ifelse(drawBorders, "black", NA),
-        lwd=lwd
-      ) 
+      if (!is.na(heights[ii])) {
+        rect(
+          xleft=ii-bar.width/2,
+          xright=ii+bar.width/2,
+          ybottom=0,
+          ytop=heights[ii],
+          col=colvec[ii],
+          border=ifelse(drawBorders, "black", NA),
+          lwd=lwd
+        )  
+      }
     }
   }
   abline(h=0, col="black", lwd=lwd)
