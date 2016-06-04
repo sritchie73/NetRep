@@ -26,8 +26,8 @@ load.bigMatrix <- function(backingfile) {
   if (!pkgReqCheck("bigmemory")) {
     stop("the 'bigmemory' package must be installed")
   }
-  message("The 'bigMatrix' class is deprecated. Converting to file to a ",
-          "file-backed 'big.matrix' object from the bigmemory package.")
+  message("The 'bigMatrix' class is deprecated. Use 'attach.big.matrix' from",
+          " the 'bigmemory' package instead.")
   
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
@@ -57,9 +57,14 @@ load.bigMatrix <- function(backingfile) {
   if (!is.null(rn))
     d1@description$rowNames <- rn
   
-  dput(d1, file=descFile)
-  unlink(rnFile, force = TRUE)
-  unlink(cnFile, force = TRUE)
-  
+  if (!is.null(cn) || !is.null(rn)) {
+    message("Converting to a file-backed 'big.matrix' object from the",
+            " bigmemory package.")
+    dput(d1, file=descFile)
+    unlink(rnFile, force = TRUE)
+    unlink(cnFile, force = TRUE)
+  }
+
+  message("attaching as a 'big.matrix'")
   bigmemory::attach.big.matrix(descFile)
 }
