@@ -267,6 +267,17 @@ plotProps <- function(
     }
   }
   
+  # Unless we are ordering nodes/samples by the discovery dataset, we should 
+  # only show nodes or samples present in the current dataset.
+  if (length(orderNodesBy) == 1 && (is.na(orderNodesBy) || orderNodesBy != di)) {
+    nodeOrder <- intersect(nodeOrder, colnames(network[[orderNodesBy]]))
+  }
+  
+  if (!is.null(sampleOrder) && (is.na(orderSamplesBy) || orderSamplesBy != di)) {
+    samplesInBoth <- intersect(rownames(data[[orderSamplesBy]]), rownames(data[[ti]]))
+    sampleOrder <- intersect(sampleOrder, samplesInBoth)
+  }
+  
   #-----------------------------------------------------------------------------
   # Identify nodes and samples from the 'discovery' dataset not present in the 
   # 'test' dataset.
