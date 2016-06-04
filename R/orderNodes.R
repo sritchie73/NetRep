@@ -251,6 +251,11 @@ nodeOrderInternal <- function(
 ) {
   vCat(verbose, 0, "Ordering nodes...")
   
+  # Iterators used in foreach calls. Declaration suppresses R CMD Check NOTEs.
+  di <- NULL # discovery datasets iterator
+  ti <- NULL # test datasets iterator
+  mi <- NULL # modules iterator
+  
   # Average weighted degree and pool summary profiles across test datasets if 'mean'
   # is 'TRUE'
   if (mean) {
