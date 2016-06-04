@@ -233,60 +233,51 @@ nodeOrderInternal <- function(
 ) {
   vCat(verbose, 0, "Ordering nodes...")
   
-  # Average weighted degree and pool summary profiles across datasets if 'mean'
+  # Average weighted degree and pool summary profiles across test datasets if 'mean'
   # is 'TRUE'
   if (mean) {
-    avgProps <- foreach(ii = seq_along(props)) %do% {
-      # Skip datasets if they have not had modules discovered in them 
-      if (is.null(props[[ii]][[1]])) {
+    avgProps <- foreach(di = seq_along(props)) %do% {
+      # skip this discovery dataset if properties have not been calculated for
+      # any of its modules in any dataset (i.e. it was not requested)
+      notDiscovery <- foreach(ti = seq_along(props[[di]]), .combine=`&&`) %do% {
+        is.null(props[[di]][[ti]])
+      }
+      if (notDiscovery) {
         return(list(avgProps=NULL))
       }
-      warned <- FALSE
-      # For each module in the discovery dataset, loop through the test datasets
-      # to combine the properties.
-      modProps <- foreach(mi = names(props[[ii]][[1]])) %do% {
-        # If the order of this module has not been requested, return NULL
-        notRequested <- foreach(jj = seq_along(props[[ii]]), .combine=c) %do% { 
-          is.null(props[[ii]][[jj]][[mi]]) 
+      # Otherwise, for each module in this discovery dataset,
+      res <- foreach(mi = names(props[[di]][[1]])) %do% {
+        # Skip if its properties haven't been calculated in any dataset (i.e.
+        # it was not requested)
+        notRequested <- foreach(ti = seq_along(props[[di]]), .combine=`&&`) %do% {
+          is.null(props[[di]][[ti]][[mi]])
         }
-        if (all(notRequested)) {
+        if (notRequested) {
           return(NULL)
         }
-        
-        if (sum(!notRequested) == 1 & !warned) {
-          warning("'mean' is 'TRUE' where only one 'test' dataset specified ", 
-                  "for discovery dataset ", '"', names(props)[ii], '"')
-          warned <- TRUE # suppress printing out many warnings across modules
-        }
-        
-        # Get the node names
-        nodeNames <- names(props[[ii]][!notRequested][[1]][[mi]][["degree"]])
-        
-        # Otherwise calculate the mean weighted degree and concatenate the 
-        # summary profiles
-        degreeMat <- foreach(jj = seq_along(props[[ii]]), .combine = rbind) %do% {
-          degree <- props[[ii]][[jj]][[mi]][["degree"]]
+        # Get a matrix of degree vectors 
+        degreeMat <- foreach(ti = seq_along(props[[di]]), .combine=rbind) %do% {
+          if(!is.null(props[[di]][[ti]][[mi]])) {
+            degree <- props[[di]][[ti]][[mi]][["degree"]]
+            return(degree / max(degree, na.rm=TRUE)) # scale the weighted degree
+          }
         }
         # Gracefully handles case where the module is only requested across 1 
         # dataset.
         if(is.null(dim(degreeMat))) {
           degreeMat <- matrix(degreeMat, nrow=1)
         }
-        # Normalise the weighted degree so that more densely connected datasets
-        # do not outweigh less densely conencted datasets.
-        degreeMat <- foreach(ii = seq_len(nrow(degreeMat)), .combine=rbind) %do% {
-          degreeMat[ii,] <- degreeMat[ii,] / max(degreeMat[ii,], na.rm=TRUE)
-        }
         avgDegree <- colMeans(degreeMat, na.rm=TRUE)
-        names(avgDegree) <- nodeNames
         
-        pooledSummary <- foreach(jj = seq_along(props[[ii]]), .combine=c) %do% {
-          props[[ii]][[jj]][[mi]][["summary"]]
+        # Pool the summary profile vectors
+        pooledSummary <- foreach(ti = seq_along(props[[di]]), .combine=c) %do% {
+          props[[di]][[ti]][[mi]][["summary"]]
         }
+        
         return(list(degree = avgDegree, summary = pooledSummary))
       }
-      names(modProps) <- names(props[[ii]][[1]])
-      return(list(avgProps=modProps))
+      names(res) <- names(props[[di]][[1]])
+      return(list(avgProps=res))
     }
     names(avgProps) <- names(props)
     props <- avgProps
@@ -345,17 +336,6 @@ nodeOrderInternal <- function(
         names(modProps) <- NULL
       }
       props[[ii]][[jj]] <- modProps
-    }
-  }
-  # remove the extra list level in 'avgProps': this was added so that the
-  # above code would work regardless of the 'mean' argument.
-  if (mean) { 
-    for (ii in rev(seq_along(props))) {
-      if (!is.null(props[[ii]][["avgProps"]])) {
-        props[[ii]] <- props[[ii]][["avgProps"]]
-      } else {
-        props[ii] <- list(NULL)
-      }
     }
   }
   return(props)
