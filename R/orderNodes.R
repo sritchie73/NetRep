@@ -21,13 +21,14 @@
 #'    When multiple \code{'test'} datasets are specified and \code{'mean'} is
 #'    \code{TRUE}, then the order of nodes will be determine by the average of
 #'    each node's weighted degree across datasets. The weighted degree in each 
-#'    dataset is scaled to the node with the maximum weighted degree that 
-#'    dataset: this prevents differences in average edge weight across datasets
-#'    from influencing the outcome (otherwise the mean would be weighted by the 
-#'    overall density of connections in the module). Thus, the mean weighted 
-#'    degree is a robust measure of a node's relative importance to a module 
-#'    across datasets. The mean is calculated with \code{'na.rm=TRUE'}: where
-#'    a node is missing it does not contribute to the mean.
+#'    dataset is scaled to the node with the maximum weighted degree in that
+#'    module in that dataset: this prevents differences in average edge weight 
+#'    across datasets from influencing the outcome (otherwise the mean would be
+#'    weighted by the overall density of connections in the module). Thus, the 
+#'    mean weighted degree is a robust measure of a node's relative importance 
+#'    to a module across datasets. The mean is calculated with 
+#'    \code{'na.rm=TRUE'}: where a node is missing it does not contribute to 
+#'    the mean.
 #'  }
 #'  \subsection{Input data structure:}{
 #'   The \link[=modulePreservation]{preservation of network modules} in a second

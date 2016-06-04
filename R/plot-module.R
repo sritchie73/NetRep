@@ -73,18 +73,23 @@
 #'   modules across datasets, as the node ordering will be preserved. 
 #'   
 #'   Alternatively, a vector containing the names or indices of one or more
-#'   datasets can be provided to the \code{orderNodesBy} argument. If a single
-#'   dataset is provided, then nodes will be ordered in decreasing order of
-#'   \emph{weighted degree} in that dataset. If multiple datasets are provided
-#'   then the \emph{weighted degree} will be calculated in each dataset and
-#'   nodes will be ordered in decreasing order of average weighted degree. This
-#'   is useful for obtaining a robust ordering of nodes by importance across
-#'   independent datasets where a module is reproducible.
+#'   datasets can be provided to the \code{orderNodesBy} argument. 
+#'   
+#'   If a single dataset is provided, then nodes will be ordered in decreasing 
+#'   order of \emph{weighted degree} in that dataset. Only nodes that are 
+#'   present in this dataset will be drawn when ordering nodes by a dataset 
+#'   that is not the \code{discovery} dataset for the requested modules(s).
+#'   
+#'   If multiple datasets are provided then the \emph{weighted degree} will be
+#'   averaged across these datasets (see \link{nodeOrder} for more details). 
+#'   This is useful for obtaining a robust ordering of nodes by relative 
+#'   importance, assuming the modules displayed are preserved in those 
+#'   datasets.
 #'   
 #'   Ordering of nodes by \emph{weighted degree} can be suppressed by setting
-#'   \code{orderNodesBy} to \code{NA}, in which case nodes will be ordered as in
-#'   the matrices provided in the \code{data}, \code{correlation} and
-#'   \code{network} arguments.
+#'   \code{orderNodesBy} to \code{NA}, in which case nodes will be ordered as 
+#'   in the matrices provided in the \code{network}, \code{data}, and
+#'   \code{correlation} arguments.
 #'   
 #'   When multiple modules are drawn, modules are ordered by the similarity
 #'   of their summary vectors in the dataset(s) specified in \code{orderNodesBy}
@@ -96,22 +101,28 @@
 #'   dataset (specified by the \code{test} argument). If multiple modules are 
 #'   drawn, samples are ordered as per the left-most module on the plot.
 #'   
-#'   Alternatively, a vector containing the name or index of another dataset may
-#'   be provided to the \code{orderSamplesBy} argument. In this case, samples
-#'   will be ordered in descending order of \emph{module summary} in the 
-#'   specified dataset. This is useful when comparing different measurements 
-#'   across samples, for example, gene expression data obtained from multiple 
-#'   tissues samples across the same individuals. Samples that are not present 
-#'   in the drawn dataset will be colored in grey.
-#'   
+#'   Alternatively, a vector containing the name or index of another dataset 
+#'   may be provided to the \code{orderSamplesBy} argument. In this case, 
+#'   samples will be ordered in descending order of \emph{module summary} in 
+#'   the specified dataset. This is useful when comparing different 
+#'   measurements across samples, for example, gene expression data obtained 
+#'   from multiple tissues samples across the same individuals. If the dataset 
+#'   specified is the \code{discovery} dataset, then missing samples will be 
+#'   displayed as horizontal grey bars. If the dataset specified is one of the 
+#'   other datasets, then only samples present in both the specified dataset 
+#'   and the \code{test} dataset will be displayed.
+#'    
 #'   Order of samples by \emph{module summary} can be suppressed by setting 
 #'   \code{orderSamplesBy} to \code{NA}, in which case samples will be order as
 #'   in the matrix provided to the \code{data} argument for the drawn dataset.
 #' }
-#' \subsection{Normalised degree:}{
-#'   The weighted degree is normalised by the maximum weighted degree in
-#'   any given module when rendered on the bar plot. This facilitates visual 
-#'   comparison of multiple modules with differing sizes or densities.
+#' \subsection{Weighted degree scaling:}{
+#'   When drawn on a plot, the weighted degree of each node is scaled to the 
+#'   maximum weighted degree within its module. The scaled weighted degree is 
+#'   measure of relative importance for each node to its module. This makes 
+#'   visualisation of multiple modules with different sizes and densities 
+#'   possible. However, the scaled weighted degree should only be interpreted
+#'   for groups of nodes that have an apparent module structure.
 #' }
 #' \subsection{Plot layout and device size}{
 #'   For optimal results we recommend viewing single modules on a PNG device
@@ -464,7 +475,7 @@ plotModule <- function(
       names(summaries.range) <- mods
     }
   } else {
-    # (Normalised) weighted degree vector
+    # (Scaled) weighted degree vector
     wDegreeVec <- foreach(mi = moduleOrder, .combine=c) %do% {
       testProps[[mi]]$degree/max(na.omit(testProps[[mi]]$degree))
     }
