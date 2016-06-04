@@ -70,6 +70,14 @@
 #'   when calculating the sample order. Use of 
 #'   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
 #'   illustrated in the package vignette (see \code{vignette("NetRep")}).
+#'   
+#'   A note for users using multi-node high performance clusters:
+#'   \code{'big.matrix'} objects are not suitable for general usage. Access
+#'   to file-backed shared memory segments on multi-node systems is very slow
+#'   due to consistency checks performed by the operating system. We address
+#'   this limitation by copying the data from \code{'big.matrix'} objects into
+#'   new \code{'matrix'} objects. This can take several minutes, depending on
+#'   the size of the total network.
 #' }
 #' 
 #' @return
