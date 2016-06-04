@@ -23,7 +23,7 @@
 #'   one of "greater" (default), "less" or "two.sided" (see details).
 #'  
 #' @details
-#'  \subsection{Input data structure:}{
+#'  \subsection{Input data structures:}{
 #'   The preservation of network modules in a second dataset is quantified by
 #'   measuring the preservation of topological properties between the
 #'   \emph{discovery} and \emph{test} datasets. These properties are calculated
@@ -67,6 +67,16 @@
 #'   to make sense of the user input. For example, if there is only one 
 #'   \code{discovery} dataset, then input to the \code{moduleAssigments} and 
 #'   \code{test} arguments may be vectors, rather than lists. 
+#' }
+#' \subsection{Compatability with 'big.matrix' input:}{
+#'   The matrices supplied in the \code{network}, \code{data}, and 
+#'   \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
+#'   objects from the \pkg{bigmemory} package. Supplying data in this format
+#'   reduces memory consumption when multiple datasets are being analysed.
+#'   This function will keep in RAM only the matrices from the pair of 
+#'   datasets being compared at any given time. Use of 
+#'   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
+#'   illustrated in the package vignette (see \code{vignette("NetRep")}).
 #' }
 #' \subsection{Module Preservation Statistics:}{
 #'  Module preservation is assessed through seven module preservation statistics,

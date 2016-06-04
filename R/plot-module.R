@@ -15,7 +15,7 @@
 #' @inheritParams plot_params
 #' 
 #' @details
-#'  \subsection{Input data structure:}{
+#'  \subsection{Input data structures:}{
 #'   The \link[=modulePreservation]{preservation of network modules} in a second
 #'   dataset is quantified by measuring the preservation of topological
 #'   properties between the \emph{discovery} and \emph{test} datasets. These 
@@ -65,6 +65,16 @@
 #'   not need to be specified, and the input matrices for the \code{network},
 #'   \code{data}, and \code{correlation} arguments do not need to be wrapped in
 #'   a list.
+#' }
+#' \subsection{Compatability with 'big.matrix' input:}{
+#'   The matrices supplied in the \code{network}, \code{data}, and 
+#'   \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
+#'   objects from the \pkg{bigmemory} package. Supplying data in this format
+#'   reduces memory consumption when multiple datasets are being analysed.
+#'   This function will keep in RAM only the matrices for one dataset at a time
+#'   when calculating network properties and generating the subsequent plot. 
+#'   Use of \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
+#'   illustrated in the package vignette (see \code{vignette("NetRep")}).
 #' }
 #' \subsection{Node, sample, and module ordering:}{
 #'   By default, nodes are ordered in decreasing order of \emph{weighted degree}
