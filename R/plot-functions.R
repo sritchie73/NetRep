@@ -222,13 +222,13 @@ plotSquareHeatmap <- function(
   
   # render squares
   if (!dryRun) {
-    cj <- 1
-    for (jj in 1:nX) {
-      ci <- 1
-      for (ii in 1:nY) {
+    ci <- 1
+    for (ii in 1:nY) {
+      cj <- 1
+      for (jj in 1:nX) {
         if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
           col <- getColFromPalette(values[ci, cj], palette, vlim)
-          ci <- ci + 1
+          cj <- cj + 1
         } else {
           col <- na.col
         }
@@ -241,8 +241,8 @@ plotSquareHeatmap <- function(
         rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, col=col, 
              border=col)
       }
-      if (jj %nin% na.indices.x) {
-        cj <- cj + 1
+      if (ii %nin% na.indices.x) {
+        ci <- ci + 1
       }
     }    
   }
