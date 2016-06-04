@@ -17,6 +17,18 @@
 #'   dataset.
 #'      
 #' @details
+#'  \subsection{Mean weighted degree:}{
+#'    When multiple \code{'test'} datasets are specified and \code{'mean'} is
+#'    \code{TRUE}, then the order of nodes will be determine by the average of
+#'    each node's weighted degree across datasets. The weighted degree in each 
+#'    dataset is scaled to the node with the maximum weighted degree that 
+#'    dataset: this prevents differences in average edge weight across datasets
+#'    from influencing the outcome (otherwise the mean would be weighted by the 
+#'    overall density of connections in the module). Thus, the mean weighted 
+#'    degree is a robust measure of a node's relative importance to a module 
+#'    across datasets. The mean is calculated with \code{'na.rm=TRUE'}: where
+#'    a node is missing it does not contribute to the mean.
+#'  }
 #'  \subsection{Input data structure:}{
 #'   The \link[=modulePreservation]{preservation of network modules} in a second
 #'   dataset is quantified by measuring the preservation of topological
@@ -258,6 +270,11 @@ nodeOrderInternal <- function(
         # dataset.
         if(is.null(dim(degreeMat))) {
           degreeMat <- matrix(degreeMat, nrow=1)
+        }
+        # Normalise the weighted degree so that more densely connected datasets
+        # do not outweigh less densely conencted datasets.
+        degreeMat <- foreach(ii = seq_len(nrow(degreeMat)), .combine=rbind) %do% {
+          degreeMat[ii,] <- degreeMat[ii,] / max(degreeMat[ii,], na.rm=TRUE)
         }
         avgDegree <- colMeans(degreeMat, na.rm=TRUE)
         names(avgDegree) <- nodeNames

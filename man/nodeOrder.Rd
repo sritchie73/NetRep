@@ -91,7 +91,19 @@ Order nodes in descending order of \emph{weighted degree} and order
 modules by the similarity of their summary vectors.
 }
 \details{
-\subsection{Input data structure:}{
+\subsection{Mean weighted degree:}{
+   When multiple \code{'test'} datasets are specified and \code{'mean'} is
+   \code{TRUE}, then the order of nodes will be determine by the average of
+   each node's weighted degree across datasets. The weighted degree in each 
+   dataset is scaled to the node with the maximum weighted degree that 
+   dataset: this prevents differences in average edge weight across datasets
+   from influencing the outcome (otherwise the mean would be weighted by the 
+   overall density of connections in the module). Thus, the mean weighted 
+   degree is a robust measure of a node's relative importance to a module 
+   across datasets. The mean is calculated with \code{'na.rm=TRUE'}: where
+   a node is missing it does not contribute to the mean.
+ }
+ \subsection{Input data structure:}{
   The \link[=modulePreservation]{preservation of network modules} in a second
   dataset is quantified by measuring the preservation of topological
   properties between the \emph{discovery} and \emph{test} datasets. These 
