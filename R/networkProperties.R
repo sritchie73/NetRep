@@ -236,7 +236,7 @@ netPropsInternal <- function(
   } 
   names(res) <- datasetNames
   
-  props <- foreach(di = discovery) %do% {
+  foreach(di = discovery) %do% {
     foreach(ti = test[[di]]) %do% {
       
       # Load matrices into RAM if they are 'big.matrix' objects.
@@ -256,11 +256,11 @@ netPropsInternal <- function(
            datasetNames[ti], "...")
       
       if (is.null(data[[ti]])) {
-        NetworkPropertiesNoData(
+        props <- NetworkPropertiesNoData(
           network_mat, moduleAssignments[[di]], modules[[di]]
         )
       } else {
-        NetworkProperties(
+        props <- NetworkProperties(
           data_mat, network_mat, moduleAssignments[[di]], modules[[di]]
         )
       }
@@ -269,19 +269,9 @@ netPropsInternal <- function(
       rm(data_mat, network_mat)
       gc()
       
-    }
-  }
-  
-  # We populate the results list separately since they cannot be assigned 
-  # directly in a parallel loop.
-  for (ii in seq_along(props)) {
-    for (jj in seq_along(props[[ii]])) {
-      for (kk in seq_along(props[[ii]][[jj]])) {
-        di <- discovery[ii]
-        ti <- test[[di]][jj]
-        mi <- as.character(modules[[di]][kk])
-        res[[di]][[ti]][[mi]] <- props[[ii]][[jj]][[kk]]
-      }
+      # Insert into correct location
+      res[[di]][[ti]][names(props)] <- props
+      NULL
     }
   }
   
