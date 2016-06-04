@@ -6,7 +6,7 @@
 #' into C++ code (which is also much faster). For those who had saved their 
 #' data in the \code{'bigMatrix'} format, this function will convert these 
 #' objects to the similar \code{'\link[bigmemory]{big.matrix}'} class
-#' from the \code{\link{bigmemory}} package.
+#' from the \pkg{bigmemory} package.
 #' 
 #' @param backingfile path to the backingfile for the \code{'bigMatrix'}. The
 #'   file extension must be omitted.
