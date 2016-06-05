@@ -340,6 +340,8 @@ plotSquareHeatmap <- function(
 #' @param lwd line width for borders.
 #' @param srt angle of text labels
 #' 
+#' @import graphics
+#' @import grDevices
 addGradientLegend <- function(
   palette, legend.vlim, horizontal, main, xlim, ylim, 
   tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt

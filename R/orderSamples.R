@@ -101,7 +101,6 @@
 #' order have not been requested will contain \code{NULL}.
 #'  
 #' @examples 
-#' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery 
 #' # and test dataset:
 #' data("NetRep")
@@ -119,7 +118,6 @@
 #'   network=network_list, data=data_list, correlation=correlation_list,
 #'   moduleAssignments=labels_list, modules="1" 
 #' )
-#' }
 #' 
 #' @seealso \code{\link{networkProperties}}
 #' 

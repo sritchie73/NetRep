@@ -297,7 +297,6 @@
 #' properties for a network module.
 #' 
 #' @examples
-#' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery and test dataset:
 #' data("NetRep")
 #' 
@@ -363,7 +362,6 @@
 #'   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
 #'   test="test", orderSamplesBy="test"
 #' )
-#' }
 #' 
 #' @name plotTopology
 NULL

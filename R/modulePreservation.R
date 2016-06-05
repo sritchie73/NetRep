@@ -354,7 +354,6 @@
 #'   \link[=combineAnalyses]{splitting computation over multiple machines}.
 #'   
 #' @examples
-#' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery and test dataset:
 #' data("NetRep")
 #' 
@@ -366,15 +365,12 @@
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # Assess module preservation. This will take a few minutes depending on the 
-#' # number of cores on your machine
+#' # Assess module preservation.
 #' preservation <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list, 
 #'  moduleAssignments=labels_list, nPerm=10000, discovery="discovery", 
-#'  test="test"
+#'  test="test", nThreads=2
 #' )
-#' 
-#' }
 #' 
 #' @importFrom parallel detectCores
 #' @import foreach

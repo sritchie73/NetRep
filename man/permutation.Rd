@@ -60,7 +60,6 @@ Calculates exact p-values for permutation tests when permutations are
  to low power.
 }
 \examples{
-\dontrun{
 data("NetRep")
 
 # Set up input lists for each input matrix type across datasets. The list
@@ -89,7 +88,6 @@ p.values <- permutationTest(
   preservation$nulls, preservation$observed, preservation$nVarsPresent,
   preservation$totalSize, preservation$alternative
 )
-}
 
 }
 \references{

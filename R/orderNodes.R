@@ -133,7 +133,6 @@
 #' @seealso \code{\link{networkProperties}}
 #'  
 #' @examples
-#' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery
 #' # and test dataset:
 #' data("NetRep")
@@ -146,12 +145,12 @@
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # Sort nodes by module similarity and node degree
+#' # Sort modules by similarity and nodes within each module by their weighted 
+#' # degree
 #' nodes <- nodeOrder(
 #'   network=network_list, data=data_list, correlation=correlation_list,  
 #'   moduleAssignments=labels_list
 #' )
-#' }
 #' 
 #' @name nodeOrder
 #' @export
@@ -246,6 +245,8 @@ nodeOrder <- function(
 #'  test datasets?
 #' 
 #' @return list structure of ordered nodes.
+#' 
+#' @import stats
 nodeOrderInternal <- function(
   props, orderModules, simplify, verbose, na.rm, mean
 ) {

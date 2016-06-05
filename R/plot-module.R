@@ -300,7 +300,6 @@
 #' \code{\link{plotSummary}}.
 #' 
 #' @examples
-#' \dontrun{
 #' # load in example data, correlation, and network matrices for a discovery 
 #' # and test dataset:
 #' data("NetRep")
@@ -333,7 +332,6 @@
 #'   moduleAssignments=labels_list, modules=c(1, 4), discovery="discovery",
 #'   test="test", orderNodesBy=c("discovery", "test")
 #' )
-#' }
 #' 
 #' @name plotModule
 #' @export

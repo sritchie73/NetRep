@@ -18,7 +18,6 @@
 #'  \code{\link{modulePreservation}}.
 #' 
 #' @examples 
-#' \dontrun{
 #' data("NetRep")
 #' 
 #' # Set up input lists for each input matrix type across datasets. The list
@@ -29,23 +28,19 @@
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # Assess module preservation on two different machines to spread computational
-#' # burden.
 #' pres1 <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list,
-#'  moduleAssignments=labels_list, nPerm=10000, discovery="discovery", 
-#'  test="test"
+#'  moduleAssignments=labels_list, nPerm=5000, discovery="discovery", 
+#'  test="test", nThreads=2
 #' )
 #' 
 #' pres2 <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list, 
-#'  moduleAssignments=labels_list, nPerm=10000, discovery="discovery", 
-#'  test="test"
+#'  moduleAssignments=labels_list, nPerm=5000, discovery="discovery", 
+#'  test="test", nThreads=2
 #' )
 #' 
 #' combined <- combineAnalyses(pres1, pres2)
-#' 
-#' }
 #' 
 #' @importFrom abind abind
 #' @export

@@ -9,6 +9,8 @@
 #'
 #' @return
 #'  The color for a given value.
+#'  
+#' @import utils
 getColFromPalette <- function(values, palette, vlim) {
   if (missing(vlim)) {
     vlim <- range(values)

@@ -531,7 +531,6 @@ one or more network modules.
 }
 }
 \examples{
-\dontrun{
 # load in example data, correlation, and network matrices for a discovery and test dataset:
 data("NetRep")
 
@@ -597,7 +596,6 @@ plotSummary(
   moduleAssignments=labels_list, modules=c(1, 2, 4), discovery="discovery",
   test="test", orderSamplesBy="test"
 )
-}
 
 }
 \seealso{

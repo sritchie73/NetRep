@@ -173,7 +173,6 @@ or more modules in a user specified dataset.
 }
 }
 \examples{
-\dontrun{
 # load in example data, correlation, and network matrices for a discovery and test dataset:
 data("NetRep")
 
@@ -196,7 +195,6 @@ test_props <- networkProperties(
   network=network_list, data=data_list, correlation=correlation_list,
   moduleAssignments=labels_list, discovery="discovery", test="test"
 )
-}
 
 }
 \seealso{

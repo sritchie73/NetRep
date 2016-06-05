@@ -175,7 +175,6 @@ modules by the similarity of their summary vectors.
  }
 }
 \examples{
-\dontrun{
 # load in example data, correlation, and network matrices for a discovery
 # and test dataset:
 data("NetRep")
@@ -188,12 +187,12 @@ data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 labels_list <- list(discovery=module_labels)
 
-# Sort nodes by module similarity and node degree
+# Sort modules by similarity and nodes within each module by their weighted 
+# degree
 nodes <- nodeOrder(
   network=network_list, data=data_list, correlation=correlation_list,  
   moduleAssignments=labels_list
 )
-}
 
 }
 \references{

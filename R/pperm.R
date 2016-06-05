@@ -41,7 +41,6 @@
 #'  You can specify just the initial letter.
 #'  
 #' @examples 
-#' \dontrun{
 #' data("NetRep")
 #' 
 #' # Set up input lists for each input matrix type across datasets. The list
@@ -70,7 +69,6 @@
 #'   preservation$nulls, preservation$observed, preservation$nVarsPresent,
 #'   preservation$totalSize, preservation$alternative
 #' )
-#' }
 #' 
 #' @aliases permutation permuted
 #' @name permutation

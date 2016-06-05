@@ -8,10 +8,9 @@ BugReports: https://github.com/InouyeLab/NetRep/issues
 Description: Functions for assessing the replication/preservation of a network 
   module's topology across datasets through permutation testing.
 License: GPL-2
-Depends: 
-    R (>= 3.0.0),
-    utils
-Imports: 
+Depends:
+    R (>= 3.0.0)
+Imports:
     foreach,
     Rcpp (>= 0.11),
     RcppArmadillo (>= 0.4),
@@ -20,7 +19,11 @@ Imports:
     RhpcBLASctl,
     abind,
     parallel,
-    RColorBrewer
+    RColorBrewer,
+    utils,
+    stats,
+    graphics,
+    grDevices
 Suggests:
     bigmemory,
     testthat,
@@ -28,6 +31,6 @@ Suggests:
     rmarkdown
 LinkingTo: Rcpp, BH, RcppArmadillo
 SystemRequirements: C++11
-RoxygenNote: 5.0.0
+RoxygenNote: 5.0.1
 VignetteBuilder: knitr
 BuildVignettes: false
