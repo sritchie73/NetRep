@@ -2,7 +2,7 @@ context("Checking package dependencies")
 flag <- FALSE
 
 # First check R version
-Rversion <- "3.2.4"
+Rversion <- "3.3.0"
 thisVersion <- paste(R.Version()[["major"]], R.Version()[["minor"]], sep=".")
 if (thisVersion > Rversion) {
   if (!flag) cat("\n")
@@ -17,11 +17,11 @@ if (thisVersion > Rversion) {
 # Check the dependencies
 testedVersionsDepends <- c(
   foreach="1.4.3",
-  Rcpp="0.12.4",
-  utils="3.2.4",
+  Rcpp="0.12.5",
+  utils="3.3.0",
   statmod="1.4.24",
-  RcppArmadillo="0.6.700.6.0",
-  BH="1.60.0.1",
+  RcppArmadillo="0.7.100.3.1",
+  BH="1.60.0.2",
   RhpcBLASctl="0.15.148",
   abind="1.4.3",
   RColorBrewer="1.1.2"
@@ -42,7 +42,7 @@ for (pkg in names(testedVersionsDepends)) {
 
 # Check suggested packages
 testedVersionsSuggests <- c(
-  testthat="0.11.0"
+  testthat="1.0.2"
 )
 for (pkg in names(testedVersionsSuggests)) {
   tryCatch({

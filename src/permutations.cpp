@@ -235,7 +235,7 @@ Rcpp::List PermutationProcedure (
   Rcpp::List lNC = Rcpp::as<Rcpp::List>(discProps["contribution"]);
   Rcpp::NumericVector vWD, vCV, vNC; 
   
-  arma::vec dWD, dNC, dCV;
+  vecmap discWD, discNC, discCV;
   addrmap addrWD, addrNC, addrCV; 
   std::string mod;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -247,14 +247,14 @@ Rcpp::List PermutationProcedure (
     vNC = Rcpp::as<Rcpp::NumericVector>(lNC[mod]);
     
     // construct armadillo vectors that point to their locations in memory
-    dWD = arma::vec(vWD.begin(), vWD.size(), false, true);
-    dCV = arma::vec(vCV.begin(), vCV.size(), false, true);
-    dNC = arma::vec(vNC.begin(), vNC.size(), false, true);
+    discWD[mod] = arma::vec(vWD.begin(), vWD.size(), false, true);
+    discCV[mod] = arma::vec(vCV.begin(), vCV.size(), false, true);
+    discNC[mod] = arma::vec(vNC.begin(), vNC.size(), false, true);
     
     // and save their addresses
-    addrWD[mod] = dWD.memptr();
-    addrCV[mod] = dCV.memptr();
-    addrNC[mod] = dNC.memptr();
+    addrWD[mod] = discWD[mod].memptr();
+    addrCV[mod] = discCV[mod].memptr();
+    addrNC[mod] = discNC[mod].memptr();
   }
   
   R_CheckUserInterrupt();
