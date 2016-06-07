@@ -624,10 +624,37 @@ processInput <- function(
     }
   }
   
+  # ----------------------------------------------------------------------------
+  # Construct consistent names to use internally for each dataset
+  # ----------------------------------------------------------------------------
+  if (!is.null(names(network))) {
+    datasetNames <- names(network)
+  } else {
+    datasetNames <- paste0("Dataset", seq_len(nDatasets))
+    names(data) <- datasetNames
+    names(modules) <- datasetNames
+    names(correlation) <- datasetNames
+    names(network) <- datasetNames
+    names(moduleAssignments) <- datasetNames
+  }
+  names(datasetNames) <- datasetNames
+  
+  # Convert indices to dataset names for the plot functions
+  if (plotFunction) {
+    if (is.numeric(orderNodesBy)) {
+      orderNodesBy <- datasetNames[orderNodesBy]
+    }
+    if (is.numeric(orderSamplesBy)) {
+      orderSamplesBy <- datasetNames[orderSamplesBy]
+    }
+  }
+  
+  # ----------------------------------------------------------------------------
+  # Check matrices for non-finite values
+  # ----------------------------------------------------------------------------
   # Sanity check input data for values that will cause the calculation of 
   # network properties and statistics to hang. This can take a while, so 
   # we only want to check datasets that we're analysing (especially for plotting)
-  vCat(verbose, 1, "Checking matrices for non-finite values...")
   
   # Construct an iterator that includes only the datasets we're analysing:
   if (is.character(discovery)) {
@@ -660,7 +687,16 @@ processInput <- function(
 
   # Now check finite, but skip for dry runs of plots
   if (!dryRun) {
+    anyBM <- do.call("any.big.matrix", c(data[iterator], correlation[iterator], network[iterator]))
+    if(!(anyBM)) {
+      vCat(verbose, 1, "Checking matrices for non-finite values...")
+    }
     for (ii in iterator) {
+      anyBM <- any.big.matrix(data[iterator], correlation[iterator], network[iterator])
+      if (anyBM) {
+        vCat(verbose, 1, 'Loading matrices of dataset "', datasetNames[ii], 
+             '" into RAM...', sep="")
+      }
       # First, we need to load in matrices into RAM if they are 'big.matrix' 
       # objects
       data_mat <- loadIntoRAM(data[[ii]])
@@ -670,37 +706,21 @@ processInput <- function(
       network_mat <- loadIntoRAM(network[[ii]])
       gc()
       
+      if (anyBM) {
+        vCat(verbose, 1, "Checking matrices for non-finite values...")
+      }
       if (!is.null(data_mat))
         CheckFinite(data_mat)
       CheckFinite(correlation_mat)
       CheckFinite(network_mat)
       
+      if (anyBM) {
+        vCat(verbose, 1, "Unloading matrices...")
+      }
       # Frees up memory if any objects are big matrices.
       rm(data_mat, correlation_mat, network_mat)
       gc()
     }    
-  }
-  
-  if (!is.null(names(network))) {
-    datasetNames <- names(network)
-  } else {
-    datasetNames <- paste0("Dataset", seq_len(nDatasets))
-    names(data) <- datasetNames
-    names(modules) <- datasetNames
-    names(correlation) <- datasetNames
-    names(network) <- datasetNames
-    names(moduleAssignments) <- datasetNames
-  }
-  names(datasetNames) <- datasetNames
-  
-  # Convert indices to dataset names for the plot functions
-  if (plotFunction) {
-    if (is.numeric(orderNodesBy)) {
-      orderNodesBy <- datasetNames[orderNodesBy]
-    }
-    if (is.numeric(orderSamplesBy)) {
-      orderSamplesBy <- datasetNames[orderSamplesBy]
-    }
   }
 
   return(list(

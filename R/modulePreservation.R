@@ -567,6 +567,9 @@ modulePreservation <- function(
         observed <- perms$observed
         nulls <- perms$nulls
         
+        if (anyBM) {
+          vCat(verbose, 1, "Unloading matrices...")
+        }
         # Free up memory
         rm(discovery_data, discovery_correlation, discovery_network, test_data,
            test_correlation, test_network)
