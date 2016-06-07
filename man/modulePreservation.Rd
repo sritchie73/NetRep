@@ -184,13 +184,23 @@ in the test dataset.
   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
   illustrated in the package vignette (see \code{vignette("NetRep")}).
   
-  A note for users using multi-node high performance clusters:
-  \code{'big.matrix'} objects are not suitable for general usage. Access
-  to file-backed shared memory segments on multi-node systems is very slow
-  due to consistency checks performed by the operating system. We address
-  this limitation by copying the data from \code{'big.matrix'} objects into
-  new \code{'matrix'} objects. This can take several minutes, depending on
-  the size of the total network.
+  \strong{Warning:} We generally do not recommned using \code{'big.matrix'} 
+  objects on multi-node clusters. These systems typically have a distributed 
+  file-system, which allows other types of programs to communicate over 
+  multiple nodes safely. An implication of this is that the Operating System 
+  will check for consistency across nodes every time a program reads from, 
+  or writes to a file-backed shared memory segment. This results in very 
+  slow access speeds when extracting elements from a \code{'big.matrix'}, 
+  which gets exponentially worse the more R sessions you have accessing the 
+  \code{big.matrix} at once (for example through explicit parallelism using 
+  the \pkg{foreach} package). \pkg{NetRep} circumvents this limitation 
+  somewhat by copying the data stored in each \code{'big.matrix'} to a 
+  regular \code{'matrix'}, but this process can take a long time. For 
+  example, our gene expression datasets with 20,000 variables and 300 
+  samples take anywhere between 30 seconds and 15 minutes to copy, 
+  depending on the run. \pkg{NetRep} will output a message whenever a 
+  \code{'big.matrix'} is loaded into RAM. If this takes a long time, then 
+  this is an issue on your system.
 }
 \subsection{Module Preservation Statistics:}{
  Module preservation is assessed through seven module preservation statistics,
