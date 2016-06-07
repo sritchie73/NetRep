@@ -53,21 +53,8 @@ void calculateNulls(
   arma::mat tCorrPtr = arma::mat(tCorrAddr, nNodes, nNodes, false, true);
   arma::mat tNetPtr = arma::mat(tNetAddr, nNodes, nNodes, false, true);
   arma::cube nulls = arma::cube(nullsAddr, mods.size(), 7, totalPerm, false, true);
-
-  // build the vecmaps from the addrmaps
-  vecmap discWD, discNC, discCV;
   
   std::string mod;
-  unsigned int n;
-  for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
-    mod = *mi;
-    n = GetRandomIdx(mod, modNodeMap, nullIdx, nullMap).n_elem;
-    
-    discWD[mod] = arma::vec(addrWD[mod], n, false, true);
-    discNC[mod] = arma::vec(addrNC[mod], n, false, true);
-    discCV[mod] = arma::vec(addrCV[mod], (n*n - n)/2, false, true);
-  }
-  
   unsigned int modIdx;
   arma::uvec tIdx, tRank;
   arma::vec tWD, tSP, tNC, tCV;
@@ -96,13 +83,14 @@ void calculateNulls(
       
       // Calculate and store test statistics in the appropriate location in the 
       // results matrix
-      nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD);
-      nulls.at(modIdx, 1, pp) = ModuleCoherence(tNC);
-      nulls.at(modIdx, 2, pp) = Correlation(discCV[mod], tCV);
-      nulls.at(modIdx, 3, pp) = Correlation(discWD[mod], tWD);
-      nulls.at(modIdx, 4, pp) = Correlation(discNC[mod], tNC);
-      nulls.at(modIdx, 5, pp) = SignAwareMean(discCV[mod], tCV);
-      nulls.at(modIdx, 6, pp) = SignAwareMean(discNC[mod], tNC);
+
+      nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
+      nulls.at(modIdx, 1, pp) = ModuleCoherence(tNC.memptr(), tNC.n_elem);
+      nulls.at(modIdx, 2, pp) = Correlation(addrCV[mod], tCV.memptr(), tCV.n_elem);
+      nulls.at(modIdx, 3, pp) = Correlation(addrWD[mod], tWD.memptr(), tWD.n_elem);
+      nulls.at(modIdx, 4, pp) = Correlation(addrNC[mod], tNC.memptr(), tNC.n_elem);
+      nulls.at(modIdx, 5, pp) = SignAwareMean(addrCV[mod], tCV.memptr(), tCV.n_elem);
+      nulls.at(modIdx, 6, pp) = SignAwareMean(addrNC[mod], tNC.memptr(), tNC.n_elem);
     }
     progress[thread]++; 
   }
@@ -237,19 +225,17 @@ Rcpp::List PermutationProcedure (
   }
   R_CheckUserInterrupt(); 
   
-  /* We need to convert each 'discProps' list a mapping from the property
-   *  - From each module to the property vector
-   *  - From each module to the property vector's address in memory to be
-   *    passed to each thread.
+  /* We need to convert each 'discProps' list to a mapping from each module
+   * to the address in memory its corresponding property vector
    */
-  
+
   // We need to do a lot of casting to get list elements in C++!
   Rcpp::List lWD = Rcpp::as<Rcpp::List>(discProps["degree"]);
   Rcpp::List lCV = Rcpp::as<Rcpp::List>(discProps["corr"]);
   Rcpp::List lNC = Rcpp::as<Rcpp::List>(discProps["contribution"]);
   Rcpp::NumericVector vWD, vCV, vNC; 
   
-  vecmap discWD, discNC, discCV;
+  arma::vec dWD, dNC, dCV;
   addrmap addrWD, addrNC, addrCV; 
   std::string mod;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -261,14 +247,14 @@ Rcpp::List PermutationProcedure (
     vNC = Rcpp::as<Rcpp::NumericVector>(lNC[mod]);
     
     // construct armadillo vectors that point to their locations in memory
-    discWD[mod] = arma::vec(vWD.begin(), vWD.size(), false, true);
-    discCV[mod] = arma::vec(vCV.begin(), vCV.size(), false, true);
-    discNC[mod] = arma::vec(vNC.begin(), vNC.size(), false, true);
+    dWD = arma::vec(vWD.begin(), vWD.size(), false, true);
+    dCV = arma::vec(vCV.begin(), vCV.size(), false, true);
+    dNC = arma::vec(vNC.begin(), vNC.size(), false, true);
     
     // and save their addresses
-    addrWD[mod] = discWD[mod].memptr();
-    addrCV[mod] = discCV[mod].memptr();
-    addrNC[mod] = discNC[mod].memptr();
+    addrWD[mod] = dWD.memptr();
+    addrCV[mod] = dCV.memptr();
+    addrNC[mod] = dNC.memptr();
   }
   
   R_CheckUserInterrupt();
@@ -297,13 +283,13 @@ Rcpp::List PermutationProcedure (
     /* Calculate and store test statistics in the appropriate location in the 
     * results matrix
     */
-    obs(modIdx, 0) = AverageEdgeWeight(tWD);
-    obs(modIdx, 1) = ModuleCoherence(tNC);
-    obs(modIdx, 2) = Correlation(discCV[mod], tCV);
-    obs(modIdx, 3) = Correlation(discWD[mod], tWD);
-    obs(modIdx, 4) = Correlation(discNC[mod], tNC);
-    obs(modIdx, 5) = SignAwareMean(discCV[mod], tCV);
-    obs(modIdx, 6) = SignAwareMean(discNC[mod], tNC);
+    obs(modIdx, 0) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
+    obs(modIdx, 1) = ModuleCoherence(tNC.memptr(), tNC.n_elem);
+    obs(modIdx, 2) = Correlation(addrCV[mod], tCV.memptr(), tCV.n_elem);
+    obs(modIdx, 3) = Correlation(addrWD[mod], tWD.memptr(), tWD.n_elem);
+    obs(modIdx, 4) = Correlation(addrNC[mod], tNC.memptr(), tNC.n_elem);
+    obs(modIdx, 5) = SignAwareMean(addrCV[mod], tCV.memptr(), tCV.n_elem);
+    obs(modIdx, 6) = SignAwareMean(addrNC[mod], tNC.memptr(), tNC.n_elem);
   }
   
   if (nThreads == 1) {

@@ -12,15 +12,15 @@
 // Utility functions
 arma::mat Scale (const arma::mat&);
 arma::uvec sortNodes (arma::uvec&);
-double Correlation (arma::vec&, arma::vec&);
-double SignAwareMean (arma::vec&, arma::vec&);
+double Correlation (double *, double *, unsigned int);
+double SignAwareMean (double *, double *, unsigned int);
 
 // Network properties
 arma::vec WeightedDegree (const arma::mat&, arma::uvec&);
-double AverageEdgeWeight (arma::vec&);
+double AverageEdgeWeight (double *, unsigned int);
 arma::vec CorrVector (const arma::mat&, arma::uvec&);
 arma::vec SummaryProfile (const arma::mat&, arma::uvec&);
 arma::vec NodeContribution (const arma::mat&, arma::uvec&, arma::vec&);
-double ModuleCoherence (arma::vec&);
+double ModuleCoherence (double *, unsigned int);
   
 #endif // __FUNCS__

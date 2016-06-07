@@ -106,12 +106,12 @@ Rcpp::List NetworkProperties (
       // Calculate the properties
       nodeRank = sortNodes(nodeIdx); // Sort nodes for sequential memory access
       WD =  WeightedDegree(netPtr, nodeIdx)(nodeRank);
-      avgWeight = AverageEdgeWeight(WD);
+      avgWeight = AverageEdgeWeight(WD.memptr(), WD.n_elem);
       R_CheckUserInterrupt(); 
       SP = SummaryProfile(dataScaled, nodeIdx);
       R_CheckUserInterrupt(); 
       NC = NodeContribution(dataScaled, nodeIdx, SP)(nodeRank);
-      coherence = ModuleCoherence(NC);
+      coherence = ModuleCoherence(NC.memptr(), NC.n_elem);
       R_CheckUserInterrupt(); 
       
       // Fill the results vectors appropriately
@@ -233,7 +233,7 @@ Rcpp::List NetworkPropertiesNoData (
       // original order requested.
       nodeRank = sortNodes(nodeIdx); 
       WD = WeightedDegree(netPtr, nodeIdx)(nodeRank);
-      avgWeight = AverageEdgeWeight(WD);
+      avgWeight = AverageEdgeWeight(WD.memptr(), WD.n_elem);
       R_CheckUserInterrupt(); 
       
       // Fill the results vectors appropriately

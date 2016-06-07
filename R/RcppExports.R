@@ -269,27 +269,3 @@ NetworkPropertiesNoData <- function(net, moduleAssignments, modules) {
     .Call('NetRep_NetworkPropertiesNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
 }
 
-WD <- function(net, subsetIndices) {
-    .Call('NetRep_WD', PACKAGE = 'NetRep', net, subsetIndices)
-}
-
-avgWeight <- function(net, subsetIndices) {
-    .Call('NetRep_avgWeight', PACKAGE = 'NetRep', net, subsetIndices)
-}
-
-CV <- function(net, subsetIndices) {
-    .Call('NetRep_CV', PACKAGE = 'NetRep', net, subsetIndices)
-}
-
-SP <- function(net, subsetIndices) {
-    .Call('NetRep_SP', PACKAGE = 'NetRep', net, subsetIndices)
-}
-
-NC <- function(net, subsetIndices) {
-    .Call('NetRep_NC', PACKAGE = 'NetRep', net, subsetIndices)
-}
-
-MC <- function(net, subsetIndices) {
-    .Call('NetRep_MC', PACKAGE = 'NetRep', net, subsetIndices)
-}
-

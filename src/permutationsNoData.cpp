@@ -48,19 +48,7 @@ void calculateNullsNoData(
   arma::mat tNetPtr = arma::mat(tNetAddr, nNodes, nNodes, false, true);
   arma::cube nulls = arma::cube(nullsAddr, mods.size(), 4, totalPerm, false, true);
   
-  // build the vecmaps from the addrmaps
-  vecmap discWD, discCV;
-  
   std::string mod;
-  unsigned int n;
-  for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
-    mod = *mi;
-    n = GetRandomIdx(mod, modNodeMap, nullIdx, nullMap).n_elem;
-    
-    discWD[mod] = arma::vec(addrWD[mod], n, false, true);
-    discCV[mod] = arma::vec(addrCV[mod], (n*n - n)/2, false, true);
-  }
-  
   unsigned int modIdx;
   arma::uvec tIdx, tRank;
   arma::vec tWD, tCV;
@@ -85,11 +73,10 @@ void calculateNullsNoData(
 
       // Calculate and store test statistics in the appropriate location in the 
       // results matrix
-      
-      nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD);
-      nulls.at(modIdx, 1, pp) = Correlation(discCV[mod], tCV);
-      nulls.at(modIdx, 2, pp) = Correlation(discWD[mod], tWD);
-      nulls.at(modIdx, 3, pp) = SignAwareMean(discCV[mod], tCV);
+      nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
+      nulls.at(modIdx, 1, pp) = Correlation(addrCV[mod], tCV.memptr(), tCV.n_elem);
+      nulls.at(modIdx, 2, pp) = Correlation(addrWD[mod], tWD.memptr(), tWD.n_elem);
+      nulls.at(modIdx, 3, pp) = SignAwareMean(addrCV[mod], tCV.memptr(), tCV.n_elem);
     }
     progress[thread]++; 
   }
@@ -216,10 +203,8 @@ Rcpp::List PermutationProcedureNoData (
   }
   R_CheckUserInterrupt(); 
   
-  /* We need to convert each 'discProps' list a mapping from the property
-   *  - From each module to the property vector
-   *  - From each module to the property vector's address in memory to be
-   *    passed to each thread.
+  /* We need to convert each 'discProps' list to a mapping from each module
+   * to the address in memory its corresponding property vector
    */
   
   // We need to do a lot of casting to get list elements in C++!
@@ -227,7 +212,7 @@ Rcpp::List PermutationProcedureNoData (
   Rcpp::List lCV = Rcpp::as<Rcpp::List>(discProps["corr"]);
   Rcpp::NumericVector vWD, vCV; 
   
-  vecmap discWD, discCV;
+  arma::vec dWD, dCV;
   addrmap addrWD, addrCV; 
   std::string mod;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -238,12 +223,12 @@ Rcpp::List PermutationProcedureNoData (
     vCV = Rcpp::as<Rcpp::NumericVector>(lCV[mod]);
     
     // construct armadillo vectors that point to their locations in memory
-    discWD[mod] = arma::vec(vWD.begin(), vWD.size(), false, true);
-    discCV[mod] = arma::vec(vCV.begin(), vCV.size(), false, true);
+    dWD = arma::vec(vWD.begin(), vWD.size(), false, true);
+    dCV = arma::vec(vCV.begin(), vCV.size(), false, true);
 
     // and save their addresses
-    addrWD[mod] = discWD[mod].memptr();
-    addrCV[mod] = discCV[mod].memptr();
+    addrWD[mod] = dWD.memptr();
+    addrCV[mod] = dCV.memptr();
   }
   
   R_CheckUserInterrupt(); 
@@ -270,10 +255,10 @@ Rcpp::List PermutationProcedureNoData (
     /* Calculate and store test statistics in the appropriate location in the 
      * results matrix
      */
-    obs(modIdx, 0) = AverageEdgeWeight(tWD);
-    obs(modIdx, 1) = Correlation(discCV[mod], tCV);
-    obs(modIdx, 2) = Correlation(discWD[mod], tWD);
-    obs(modIdx, 3) = SignAwareMean(discCV[mod], tCV);
+    obs(modIdx, 0) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
+    obs(modIdx, 1) = Correlation(addrCV[mod], tCV.memptr(), tCV.n_elem);
+    obs(modIdx, 2) = Correlation(addrWD[mod], tWD.memptr(), tWD.n_elem);
+    obs(modIdx, 3) = SignAwareMean(addrCV[mod], tCV.memptr(), tCV.n_elem);
   }
   
   if (nThreads == 1) {

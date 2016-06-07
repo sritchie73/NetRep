@@ -39,8 +39,15 @@ arma::uvec sortNodes (arma::uvec& nodeIdx) {
   return rank;
 }
 
-// Calculate the correlation between two vectors
-double Correlation (arma::vec& v1, arma::vec& v2) {
+/* Calculate the correlation between two vectors
+* @param v1addr memory address of a vector.
+* @param v2addr memory address of a vector.
+* @param size size of the two vectors
+*/
+double Correlation (double * v1addr, double * v2addr, unsigned int size) {
+  arma::vec v1 = arma::vec(v1addr, size, false, true);
+  arma::vec v2 = arma::vec(v2addr, size, false, true);
+  
   return arma::as_scalar(arma::cor(v1, v2));
 }
 
@@ -48,8 +55,15 @@ double Correlation (arma::vec& v1, arma::vec& v2) {
  * 
  * This is the mean of 'v2' where observations detract from the mean if they
  * differ in sign between 'v1' and 'v2'
+ * 
+ * @param v1addr memory address of a vector.
+ * @param v2addr memory address of a vector.
+ * @param size size of the two vectors
+ * 
  */
-double SignAwareMean (arma::vec& v1, arma::vec& v2) {
+double SignAwareMean (double * v1addr, double * v2addr, unsigned int size) {
+  arma::vec v1 = arma::vec(v1addr, size, false, true);
+  arma::vec v2 = arma::vec(v2addr, size, false, true);
   return arma::mean(arma::sign(v1) % v2);
 }
 
@@ -79,13 +93,15 @@ arma::vec WeightedDegree(const arma::mat& netPtr, arma::uvec& nodeIdx) {
 
 /* Calculate the average edge weight
  *
- * @param wDegree the weighted degree, see 'WeightedDegree'
+ * @param wDegreeAddr memory address of the weighted degree vector, see 
+ *  'WeightedDegree'.
+ * @param nNodes number of nodes in the module
  *
  * @return a scalar value
  */
-double AverageEdgeWeight(arma::vec& wDegree) {
-  unsigned int n = wDegree.n_elem;
-  double nEdgePairs = (double)(n*n - n);
+double AverageEdgeWeight(double * wDegreeAddr, unsigned int nNodes) {
+  arma::vec wDegree = arma::vec(wDegreeAddr, nNodes, false, true);
+  double nEdgePairs = (double)(nNodes*nNodes - nNodes);
   double allEdges =  arma::as_scalar(arma::sum(wDegree));
   return allEdges / nEdgePairs;
 }
@@ -164,7 +180,7 @@ arma::vec SummaryProfile (const arma::mat& dataPtr, arma::uvec& nodeIdx) {
  * @return a vector of correlations between each node and the summary profile
  */
 arma::vec NodeContribution (
-    const arma::mat& dataPtr, arma::uvec& nodeIdx, arma::vec& summaryProfile
+  const arma::mat& dataPtr, arma::uvec& nodeIdx, arma::vec& summaryProfile
 ) {
   // We need to convert SP from a vector to a matrix since arma::cor doesn't
   // have a method for comparing a matrix to a vector.
@@ -177,11 +193,14 @@ arma::vec NodeContribution (
  * As measured by the proportion of variance in the module's data explained 
  * by the module summary profile.
  *
- * @param nodeContribution the vector of node contributions, see 'NodeContribution'
+ * @param ncAddr memory address of the vector of node contributions, see 
+ *  'NodeContribution'.
+ * @param nNodes number of nodes in the module.
  *
  * @return a double between 0 and 1
  */
-double ModuleCoherence (arma::vec& nodeContribution) {
+double ModuleCoherence (double * ncAddr, unsigned int nNodes) {
+  arma::vec nodeContribution = arma::vec(ncAddr, nNodes, false, true);
   return arma::mean(arma::square(nodeContribution));
 }
 
