@@ -179,9 +179,8 @@ in the test dataset.
   The matrices supplied in the \code{network}, \code{data}, and 
   \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
   objects from the \pkg{bigmemory} package. Supplying data in this format
-  reduces memory consumption when multiple datasets are being analysed.
-  This function will keep in RAM only the matrices from the pair of 
-  datasets being compared at any given time. Use of 
+  reduces memory usage of \pkg{NetRep}'s functions: only the matrices from
+  one dataset will be kept in RAM at any point in time. Use of 
   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
   illustrated in the package vignette (see \code{vignette("NetRep")}).
   

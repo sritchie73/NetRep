@@ -4,15 +4,12 @@
 \alias{PermutationProcedureNoData}
 \title{Multithreaded permutation procedure for module preservation statistics}
 \usage{
-PermutationProcedureNoData(dCorr, dNet, tCorr, tNet, moduleAssignments, modules,
+PermutationProcedureNoData(discProps, tCorr, tNet, moduleAssignments, modules,
   nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
 \arguments{
-\item{dCorr}{matrix of correlation coefficients between all pairs of 
-variables/nodes in the \emph{discovery} dataset.}
-
-\item{dNet}{adjacency matrix of network edge weights between all pairs of 
-nodes in the \emph{discovery} dataset.}
+\item{discProps}{a list of intermediate properties calculated in the 
+discovery dataset by \code{\link{IntermediatePropertiesNoData}}.}
 
 \item{tCorr}{matrix of correlation coefficients between all pairs of 
 variables/nodes in the \emph{test} dataset.}
@@ -52,10 +49,9 @@ Multithreaded permutation procedure for module preservation statistics
   
   These requirements are:
   \itemize{
-  \item{The ordering of node names across dCorr' and 'dNet' is consistent.}
   \item{The ordering of node names across 'tCorr' and 'tNet' is consistent.}
-  \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
-        rownames are identical to their column names.}
+  \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
+        identical to their column names.}
   \item{'moduleAssigments' is a named character vector, where the names
         represent node labels found in the discovery dataset (e.g. 'dNet').}
   \item{'nPermutations' is a single number, greater than 0.}

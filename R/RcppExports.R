@@ -16,7 +16,10 @@ CheckFinite <- function(matPtr) {
     invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', matPtr))
 }
 
-#' Multithreaded permutation procedure for module preservation statistics
+#' Calculate the intermediate network properties in the discovery dataset
+#' 
+#' These properties are need at every permutation: so they will be computed 
+#' once.
 #' 
 #' @details
 #' \subsection{Input expectations:}{
@@ -27,11 +30,86 @@ CheckFinite <- function(matPtr) {
 #'   \itemize{
 #'   \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
 #'         consistent.}
+#'   \item{The columns of 'dData' are the nodes.}
+#'   \item{'dCorr' and 'dNet'  are square matrices, and their rownames are 
+#'         identical to their column names.}
+#'   \item{'moduleAssigments' is a named character vector, where the names
+#'         represent node labels found in the discovery dataset (e.g. 'dNet').}
+#'   }
+#' }
+#' 
+#' @param dData data matrix from the \emph{discovery} dataset.
+#' @param dCorr matrix of correlation coefficients between all pairs of 
+#'   variables/nodes in the \emph{discovery} dataset.
+#' @param dNet adjacency matrix of network edge weights between all pairs of 
+#'   nodes in the \emph{discovery} dataset.
+#' @param tNodeNames a character vector of node names in the test dataset
+#' @param moduleAssignments a named character vector containing the module 
+#'   each node belongs to in the discovery dataset. 
+#' @param modules a character vector of modules for which to calculate the 
+#'   module preservation statistics.
+#' 
+#' @return a list containing three lists: a list of weighted degree vectors,
+#'   a list of correlation coefficient vectors, and a list of node 
+#'   contribution vectors. There is one vector for each module in each list.
+#'   
+IntermediateProperties <- function(dData, dCorr, dNet, tNodeNames, moduleAssignments, modules) {
+    .Call('NetRep_IntermediateProperties', PACKAGE = 'NetRep', dData, dCorr, dNet, tNodeNames, moduleAssignments, modules)
+}
+
+#' Calculate the intermediate network properties in the discovery dataset
+#' 
+#' These properties are need at every permutation: so they will be computed 
+#' once.
+#' 
+#' @details
+#' \subsection{Input expectations:}{
+#'   Note that this function expects all inputs to be sensible, as checked by
+#'   the R function 'checkUserInput' and processed by 'modulePreservation'. 
+#'   
+#'   These requirements are:
+#'   \itemize{
+#'   \item{The ordering of node names across 'dCorr' and 'dNet' is
+#'         consistent.}
+#'   \item{'dCorr' and 'dNet'  are square matrices, and their rownames are 
+#'         identical to their column names.}
+#'   \item{'moduleAssigments' is a named character vector, where the names
+#'         represent node labels found in the discovery dataset (e.g. 'dNet').}
+#'   }
+#' }
+#' 
+#' @param dCorr matrix of correlation coefficients between all pairs of 
+#'   variables/nodes in the \emph{discovery} dataset.
+#' @param dNet adjacency matrix of network edge weights between all pairs of 
+#'   nodes in the \emph{discovery} dataset.
+#' @param tNodeNames a character vector of node names in the test dataset
+#' @param moduleAssignments a named character vector containing the module 
+#'   each node belongs to in the discovery dataset. 
+#' @param modules a character vector of modules for which to calculate the 
+#'   module preservation statistics.
+#' 
+#' @return a list containing two lists: a list of weighted degree vectors,
+#'   and a list of correlation coefficient vectors. There is one vector for 
+#'   each module in each list.
+#'   
+IntermediatePropertiesNoData <- function(dCorr, dNet, tNodeNames, moduleAssignments, modules) {
+    .Call('NetRep_IntermediatePropertiesNoData', PACKAGE = 'NetRep', dCorr, dNet, tNodeNames, moduleAssignments, modules)
+}
+
+#' Multithreaded permutation procedure for module preservation statistics
+#' 
+#' @details
+#' \subsection{Input expectations:}{
+#'   Note that this function expects all inputs to be sensible, as checked by
+#'   the R function 'checkUserInput' and processed by 'modulePreservation'. 
+#'   
+#'   These requirements are:
+#'   \itemize{
 #'   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
 #'         consistent.}
-#'   \item{The columns of 'dData' and 'tData' are the nodes.}
-#'   \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
-#'         rownames are identical to their column names.}
+#'   \item{The columns of 'tData' are the nodes.}
+#'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
+#'         identical to their column names.}
 #'   \item{'moduleAssigments' is a named character vector, where the names
 #'         represent node labels found in the discovery dataset (e.g. 'dNet').}
 #'   \item{'nPermutations' is a single number, greater than 0.}
@@ -46,11 +124,8 @@ CheckFinite <- function(matPtr) {
 #'   }
 #' }
 #' 
-#' @param dData data matrix from the \emph{discovery} dataset.
-#' @param dCorr matrix of correlation coefficients between all pairs of 
-#'   variables/nodes in the \emph{discovery} dataset.
-#' @param dNet adjacency matrix of network edge weights between all pairs of 
-#'   nodes in the \emph{discovery} dataset.
+#' @param discProps a list of intermediate properties calculated in the 
+#'   discovery dataset by \code{\link{IntermediateProperties}}.
 #' @param tData data matrix from the \emph{test} dataset.
 #' @param tCorr matrix of correlation coefficients between all pairs of 
 #'   variables/nodes in the \emph{test} dataset.
@@ -70,8 +145,8 @@ CheckFinite <- function(matPtr) {
 #' 
 #' @return a list containing a matrix of observed test statistics, and an
 #'   array of null distribution observations.
-PermutationProcedure <- function(dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
-    .Call('NetRep_PermutationProcedure', PACKAGE = 'NetRep', dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
+PermutationProcedure <- function(discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
+    .Call('NetRep_PermutationProcedure', PACKAGE = 'NetRep', discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
 
 #' Multithreaded permutation procedure for module preservation statistics
@@ -83,10 +158,9 @@ PermutationProcedure <- function(dData, dCorr, dNet, tData, tCorr, tNet, moduleA
 #'   
 #'   These requirements are:
 #'   \itemize{
-#'   \item{The ordering of node names across dCorr' and 'dNet' is consistent.}
 #'   \item{The ordering of node names across 'tCorr' and 'tNet' is consistent.}
-#'   \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
-#'         rownames are identical to their column names.}
+#'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
+#'         identical to their column names.}
 #'   \item{'moduleAssigments' is a named character vector, where the names
 #'         represent node labels found in the discovery dataset (e.g. 'dNet').}
 #'   \item{'nPermutations' is a single number, greater than 0.}
@@ -101,10 +175,8 @@ PermutationProcedure <- function(dData, dCorr, dNet, tData, tCorr, tNet, moduleA
 #'   }
 #' }
 #' 
-#' @param dCorr matrix of correlation coefficients between all pairs of 
-#'   variables/nodes in the \emph{discovery} dataset.
-#' @param dNet adjacency matrix of network edge weights between all pairs of 
-#'   nodes in the \emph{discovery} dataset.
+#' @param discProps a list of intermediate properties calculated in the 
+#'   discovery dataset by \code{\link{IntermediatePropertiesNoData}}.
 #' @param tCorr matrix of correlation coefficients between all pairs of 
 #'   variables/nodes in the \emph{test} dataset.
 #' @param tNet adjacency matrix of network edge weights between all pairs of 
@@ -123,8 +195,8 @@ PermutationProcedure <- function(dData, dCorr, dNet, tData, tCorr, tNet, moduleA
 #' 
 #' @return a list containing a matrix of observed test statistics, and an
 #'   array of null distribution observations.
-PermutationProcedureNoData <- function(dCorr, dNet, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
-    .Call('NetRep_PermutationProcedureNoData', PACKAGE = 'NetRep', dCorr, dNet, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
+PermutationProcedureNoData <- function(discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
+    .Call('NetRep_PermutationProcedureNoData', PACKAGE = 'NetRep', discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
 
 #' Calculate the network properties 
@@ -195,5 +267,29 @@ NetworkProperties <- function(data, net, moduleAssignments, modules) {
 #'   coherence, weighted degree, and average edge weight for each 'module'.
 NetworkPropertiesNoData <- function(net, moduleAssignments, modules) {
     .Call('NetRep_NetworkPropertiesNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
+}
+
+WD <- function(net, subsetIndices) {
+    .Call('NetRep_WD', PACKAGE = 'NetRep', net, subsetIndices)
+}
+
+avgWeight <- function(net, subsetIndices) {
+    .Call('NetRep_avgWeight', PACKAGE = 'NetRep', net, subsetIndices)
+}
+
+CV <- function(net, subsetIndices) {
+    .Call('NetRep_CV', PACKAGE = 'NetRep', net, subsetIndices)
+}
+
+SP <- function(net, subsetIndices) {
+    .Call('NetRep_SP', PACKAGE = 'NetRep', net, subsetIndices)
+}
+
+NC <- function(net, subsetIndices) {
+    .Call('NetRep_NC', PACKAGE = 'NetRep', net, subsetIndices)
+}
+
+MC <- function(net, subsetIndices) {
+    .Call('NetRep_MC', PACKAGE = 'NetRep', net, subsetIndices)
 }
 

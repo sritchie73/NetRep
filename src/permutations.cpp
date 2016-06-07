@@ -1,23 +1,23 @@
-#include <thread>
-
 #include "utils.h"
 #include "netStats.h"
-#include "progress.h"
+#include "thread-utils.h"
 
 /* Generate null-distribution observations for the module preservation statistics
  * 
  * Fills out the corresponding slices of the provided 'nulls' cube based on the
  * number of permutations requested, and the start index.
  * 
- * @param tDataScaled pointer to the (scaled) test data matrix.
- * @param tCorrPtr pointer to the test correlation matrix.
- * @param tNetPtr pointer to the test network matrix.
- * @param discWD unordered_map containing the weighted degree vectors for all
- *   modules in the discovery dataset.
- * @param discNC unordered_map containing the node contribution vectors for all
- *   modules in the discovery dataset.
- * @param discCV unordered_map containing the correlation coefficient vectors
- *   for all modules in the discovery dataset.
+ * @param tDataAddr memory address of the (scaled) test data matrix.
+ * @param tCorrAddr memory address of the test correlation matrix.
+ * @param tNetAddr memory address of the test network matrix.
+ * @param nNodes number of nodes in the test network.
+ * @param nSamples number of samples in the test dataset.
+ * @param addrWD unordered_map containing the memory addresses of the weighted 
+ *   degree vectors for all modules in the discovery dataset.
+ * @param addrNC unordered_map containing the memory addresses of the node 
+ *   contribution vectors for all modules in the discovery dataset.
+ * @param daddrCV unordered_map containing the memory addresses of the 
+ *   correlation coefficient vectors for all modules in the discovery dataset.
  * @param mods vector of modules for which the module preservation statistics
  *   are being calculated for.
  * @param modNodeMap mapping of module labels to node IDs.
@@ -25,29 +25,50 @@
  * @param nullIdx a vector of node IDs to be shuffled in the permutation 
  *  procedure.
  * @param nullMap mapping of node IDs to indices in 'nullIdx'.
- * @param nulls cube to store the results in
- * @param nPerm number of permutations to calculate.
+ * @param nullsAddr memory address of the cube to store the results in
+ * @param totalPerm total number of permutations.
+ * @param nPerm number of permutations for this thread to calculate.
  * @param start slice index to start at when filling in the 'nulls' cube.
- * @param progress vector to fill in number of permutations completed for this
- *   thread.
+ * @param progress vector to fill in number of permutations completed for this 
+ *  thread.
  * @param thread the number of the thread.
  * @param interrupted variable on the heap checking whether the user has asked
  *   to cancel the computation
  */
 void calculateNulls(
-  const arma::mat& tDataScaled, const arma::mat& tCorrPtr, 
-  const arma::mat& tNetPtr, vecmap& discWD, vecmap& discNC, 
-  vecmap& discCV, const std::vector<std::string> mods, 
+  double * tDataAddr, double * tCorrAddr, double * tNetAddr, 
+  unsigned int nNodes, unsigned int nSamples, addrmap& addrWD, addrmap& addrNC, 
+  addrmap& addrCV, const std::vector<std::string> mods, 
   const stringmap modNodeMap, const namemap modIdxMap, arma::uvec nullIdx, 
-  namemap nullMap, arma::cube& nulls, unsigned int nPerm, unsigned int start, 
-  arma::uvec& progress, unsigned int thread, bool& interrupted
+  namemap nullMap, double * nullsAddr, unsigned int totalPerm, 
+  unsigned int nPerm, unsigned int start, arma::uvec& progress,
+  unsigned int thread, bool& interrupted
 ) {    
   /**
-   * The R API is single threaded, we *must not* access it
+   * Note: the R API is single threaded, we *must not* access it
    * at all during our parallel calls.
    **/
-  unsigned int modIdx;
+  // Tell this thread where the matrix data is located in memory:
+  arma::mat tDataPtr = arma::mat(tDataAddr, nSamples, nNodes, false, true);
+  arma::mat tCorrPtr = arma::mat(tCorrAddr, nNodes, nNodes, false, true);
+  arma::mat tNetPtr = arma::mat(tNetAddr, nNodes, nNodes, false, true);
+  arma::cube nulls = arma::cube(nullsAddr, mods.size(), 7, totalPerm, false, true);
+
+  // build the vecmaps from the addrmaps
+  vecmap discWD, discNC, discCV;
+  
   std::string mod;
+  unsigned int n;
+  for (auto mi = mods.begin(); mi != mods.end(); ++mi) {
+    mod = *mi;
+    n = GetRandomIdx(mod, modNodeMap, nullIdx, nullMap).n_elem;
+    
+    discWD[mod] = arma::vec(addrWD[mod], n, false, true);
+    discNC[mod] = arma::vec(addrNC[mod], n, false, true);
+    discCV[mod] = arma::vec(addrCV[mod], (n*n - n)/2, false, true);
+  }
+  
+  unsigned int modIdx;
   arma::uvec tIdx, tRank;
   arma::vec tWD, tSP, tNC, tCV;
   for (unsigned int pp = start; pp < start + nPerm; ++pp) {
@@ -68,14 +89,13 @@ void calculateNulls(
       tRank = sortNodes(tIdx); // Sort nodes for sequential memory access
       tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
       if (interrupted) return; 
-      tSP = SummaryProfile(tDataScaled, tIdx);
+      tSP = SummaryProfile(tDataPtr, tIdx);
       if (interrupted) return; 
-      tNC = NodeContribution(tDataScaled, tIdx, tSP)(tRank);
+      tNC = NodeContribution(tDataPtr, tIdx, tSP)(tRank);
       if (interrupted) return; 
-     
+      
       // Calculate and store test statistics in the appropriate location in the 
       // results matrix
-      
       nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD);
       nulls.at(modIdx, 1, pp) = ModuleCoherence(tNC);
       nulls.at(modIdx, 2, pp) = Correlation(discCV[mod], tCV);
@@ -97,13 +117,11 @@ void calculateNulls(
 //'   
 //'   These requirements are:
 //'   \itemize{
-//'   \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
-//'         consistent.}
 //'   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
 //'         consistent.}
-//'   \item{The columns of 'dData' and 'tData' are the nodes.}
-//'   \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
-//'         rownames are identical to their column names.}
+//'   \item{The columns of 'tData' are the nodes.}
+//'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
+//'         identical to their column names.}
 //'   \item{'moduleAssigments' is a named character vector, where the names
 //'         represent node labels found in the discovery dataset (e.g. 'dNet').}
 //'   \item{'nPermutations' is a single number, greater than 0.}
@@ -118,11 +136,8 @@ void calculateNulls(
 //'   }
 //' }
 //' 
-//' @param dData data matrix from the \emph{discovery} dataset.
-//' @param dCorr matrix of correlation coefficients between all pairs of 
-//'   variables/nodes in the \emph{discovery} dataset.
-//' @param dNet adjacency matrix of network edge weights between all pairs of 
-//'   nodes in the \emph{discovery} dataset.
+//' @param discProps a list of intermediate properties calculated in the 
+//'   discovery dataset by \code{\link{IntermediateProperties}}.
 //' @param tData data matrix from the \emph{test} dataset.
 //' @param tCorr matrix of correlation coefficients between all pairs of 
 //'   variables/nodes in the \emph{test} dataset.
@@ -144,39 +159,33 @@ void calculateNulls(
 //'   array of null distribution observations.
 // [[Rcpp::export]]
 Rcpp::List PermutationProcedure (
-  Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet,
-  Rcpp::NumericMatrix tData, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet,
-  Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules,
-  Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, 
-  Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose,
-  Rcpp::Function vCat
+  Rcpp::List discProps, Rcpp::NumericMatrix tData, Rcpp::NumericMatrix tCorr, 
+  Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, 
+  Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, 
+  Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, 
+  Rcpp::LogicalVector verbose, Rcpp::Function vCat
 ) {
   // First, we need to create pointers to the memory holding each
   // NumericMatrix that can be recognised by the armadillo library.
-  const arma::mat& dDataPtr = arma::mat(dData.begin(), dData.nrow(), dData.ncol(), false, true);
-  const arma::mat& dCorrPtr = arma::mat(dCorr.begin(), dCorr.nrow(), dCorr.ncol(), false, true);
-  const arma::mat& dNetPtr = arma::mat(dNet.begin(), dNet.nrow(), dNet.ncol(), false, true);
-  const arma::mat& tDataPtr = arma::mat(tData.begin(), tData.nrow(), tData.ncol(), false, true);
-  const arma::mat& tCorrPtr = arma::mat(tCorr.begin(), tCorr.nrow(), tCorr.ncol(), false, true);
-  const arma::mat& tNetPtr = arma::mat(tNet.begin(), tNet.nrow(), tNet.ncol(), false, true);
+
+  arma::mat tDataPtr = arma::mat(tData.begin(), tData.nrow(), tData.ncol(), false, true);
+  arma::mat tCorrPtr = arma::mat(tCorr.begin(), tCorr.nrow(), tCorr.ncol(), false, true);
+  arma::mat tNetPtr = arma::mat(tNet.begin(), tNet.nrow(), tNet.ncol(), false, true);
   
   // Next we will scale the matrix data
-  const arma::mat dDataScaled = Scale(dDataPtr);
-  const arma::mat tDataScaled = Scale(tDataPtr);
+  arma::mat tDataScaled = Scale(tDataPtr);
   
   R_CheckUserInterrupt(); 
   
   // convert the colnames / rownames to C++ equivalents
-  const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(colnames(dNet)));
+  const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(moduleAssignments.names()));
   const std::vector<std::string> tNames (Rcpp::as<std::vector<std::string>>(colnames(tNet)));
   
   /* Next, we need to create three mappings:
-   *  - From node IDs to indices in the discovery dataset.
    *  - From node IDs to indices in the test dataset.
    *  - From modules to all node IDs.
    *  - From modules to just node IDs present in the test dataset.
    */
-  const namemap dIdxMap = MakeIdxMap(dNames);
   const namemap tIdxMap = MakeIdxMap(tNames);
   const stringmap modNodeMap = MakeModMap(moduleAssignments);
   const stringmap modNodePresentMap = MakeModMap(moduleAssignments, tIdxMap);
@@ -209,13 +218,6 @@ Rcpp::List PermutationProcedure (
   obs.fill(NA_REAL);
   nulls.fill(NA_REAL);
   
-  // We will save the weighted degree, node contribution, and correlation
-  // vectors in the observed dataset so we don't have to compute these at
-  // every permutation.
-  vecmap discWD, discNC, discCV;
-  
-  R_CheckUserInterrupt(); 
-  
   /* For the permutation procedure, we need to shuffle a vector of *valid*
    * indices in the test network: if the null hypothesis is "overlap" (the
    * default) then only nodes that are present in both the discovery and test
@@ -235,31 +237,44 @@ Rcpp::List PermutationProcedure (
   }
   R_CheckUserInterrupt(); 
   
-  // Calculate some network properties in the discovery dataset.
-  vCat(verbose, 1, "Calculating observed test statistics...");
+  /* We need to convert each 'discProps' list a mapping from the property
+   *  - From each module to the property vector
+   *  - From each module to the property vector's address in memory to be
+   *    passed to each thread.
+   */
+  
+  // We need to do a lot of casting to get list elements in C++!
+  Rcpp::List lWD = Rcpp::as<Rcpp::List>(discProps["degree"]);
+  Rcpp::List lCV = Rcpp::as<Rcpp::List>(discProps["corr"]);
+  Rcpp::List lNC = Rcpp::as<Rcpp::List>(discProps["contribution"]);
+  Rcpp::NumericVector vWD, vCV, vNC; 
+  
+  vecmap discWD, discNC, discCV;
+  addrmap addrWD, addrNC, addrCV; 
   std::string mod;
-  arma::uvec dIdx, dRank;
-  arma::vec dSP; 
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
-    // Get the node indices in the discovery dataset for this module
     mod = *mi;
-    dIdx = GetNodeIdx(mod, modNodePresentMap, dIdxMap);
-    R_CheckUserInterrupt(); 
-
-    // Calculate the network properties and insert into their storage containers
-    discCV[mod] = CorrVector(dCorrPtr, dIdx);
-    R_CheckUserInterrupt(); 
-
-    dRank = sortNodes(dIdx); // Sort nodes for sequential memory access
-    discWD[mod] = WeightedDegree(dNetPtr, dIdx)(dRank);
-    R_CheckUserInterrupt(); 
-    dSP = SummaryProfile(dDataScaled, dIdx);
-    R_CheckUserInterrupt(); 
-    discNC[mod] = NodeContribution(dDataScaled, dIdx, dSP)(dRank);
-    R_CheckUserInterrupt(); 
+    
+    // Extract the numeric vectors
+    vWD = Rcpp::as<Rcpp::NumericVector>(lWD[mod]);
+    vCV = Rcpp::as<Rcpp::NumericVector>(lCV[mod]);
+    vNC = Rcpp::as<Rcpp::NumericVector>(lNC[mod]);
+    
+    // construct armadillo vectors that point to their locations in memory
+    discWD[mod] = arma::vec(vWD.begin(), vWD.size(), false, true);
+    discCV[mod] = arma::vec(vCV.begin(), vCV.size(), false, true);
+    discNC[mod] = arma::vec(vNC.begin(), vNC.size(), false, true);
+    
+    // and save their addresses
+    addrWD[mod] = discWD[mod].memptr();
+    addrCV[mod] = discCV[mod].memptr();
+    addrNC[mod] = discNC[mod].memptr();
   }
-
+  
+  R_CheckUserInterrupt();
+  
   // Now calculate the observed test statistics
+  vCat(verbose, 1, "Calculating observed test statistics...");
   unsigned int modIdx;
   arma::uvec tIdx, tRank;
   arma::vec tCV, tWD, tSP, tNC;
@@ -270,7 +285,7 @@ Rcpp::List PermutationProcedure (
     
     // Get the node indices in the test dataset for this module
     tIdx = GetNodeIdx(mod, modNodePresentMap, tIdxMap);
-
+    
     // Now calculate required properties in the test dataset
     tCV = CorrVector(tCorrPtr, tIdx);
     
@@ -278,10 +293,10 @@ Rcpp::List PermutationProcedure (
     tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
     tSP = SummaryProfile(tDataScaled, tIdx);
     tNC = NodeContribution(tDataScaled, tIdx, tSP)(tRank);
-
+    
     /* Calculate and store test statistics in the appropriate location in the 
-     * results matrix
-     */
+    * results matrix
+    */
     obs(modIdx, 0) = AverageEdgeWeight(tWD);
     obs(modIdx, 1) = ModuleCoherence(tNC);
     obs(modIdx, 2) = Correlation(discCV[mod], tCV);
@@ -301,18 +316,18 @@ Rcpp::List PermutationProcedure (
 
   // Create nThreads to run the permutation procedure in parallel
   std::thread *tt = new std::thread[nThreads];
-  
+
   // Determine the number of permutations for each thread
   arma::uvec chunkPerms (nThreads, arma::fill::zeros);
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
-    chunkPerms.at(ii) = nPerm / nThreads; 
+    chunkPerms.at(ii) = nPerm / nThreads;
   }
   // When the number of permtutations cannot be distributed evenly, spread the
   // remainder out across threads.
   for (unsigned int ii = 0; ii < nPerm % nThreads; ++ii) {
     chunkPerms.at(ii)++;
   }
-  
+
   // Set up the slice indices each thread should start at in the results cube
   arma::uvec startIdx (nThreads, arma::fill::zeros);
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
@@ -320,33 +335,34 @@ Rcpp::List PermutationProcedure (
       startIdx.at(ii) += chunkPerms.at(jj);
     }
   }
-  
+
   // Set up the progress bar
   arma::uvec progress (nThreads, arma::fill::zeros);
-  
+
   // This variable stored on the heap will get modified to be 'true' of ^C is
   // entered in the R terminal (see 'MonitorProgress'). Each thread will check
   // this, then abort if it is 'true'
   bool interrupted = false;
-  
+
   // Spawn the threads
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
     tt[ii] = std::thread(
-      calculateNulls, std::ref(tDataScaled), std::ref(tCorrPtr), 
-      std::ref(tNetPtr), std::ref(discWD), std::ref(discNC), std::ref(discCV),
-      modsPresent, modNodePresentMap, modIdxMap, nullIdx, nullMap, 
-      std::ref(nulls), chunkPerms.at(ii), startIdx.at(ii), std::ref(progress), 
-      ii, std::ref(interrupted)
+      calculateNulls, tDataScaled.memptr(), tCorrPtr.memptr(),
+      tNetPtr.memptr(), tNetPtr.n_cols, tDataScaled.n_rows,
+      std::ref(addrWD), std::ref(addrNC), std::ref(addrCV),
+      modsPresent, modNodePresentMap, modIdxMap, nullIdx, nullMap,
+      nulls.memptr(), nPerm, chunkPerms.at(ii), startIdx.at(ii), 
+      std::ref(progress), ii, std::ref(interrupted)
     );
   }
-  
+
   MonitorProgress(nPerm, progress, interrupted, verboseFlag);
 
   // Wait for all the threads to finish
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
     tt[ii].join();
   }
-  
+
   // Convert any NaNs or Infinites to NA_REALs
   nulls.elem(arma::find_nonfinite(nulls)).fill(NA_REAL);
   obs.elem(arma::find_nonfinite(obs)).fill(NA_REAL);

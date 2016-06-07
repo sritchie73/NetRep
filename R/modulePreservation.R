@@ -72,9 +72,8 @@
 #'   The matrices supplied in the \code{network}, \code{data}, and 
 #'   \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
 #'   objects from the \pkg{bigmemory} package. Supplying data in this format
-#'   reduces memory consumption when multiple datasets are being analysed.
-#'   This function will keep in RAM only the matrices from the pair of 
-#'   datasets being compared at any given time. Use of 
+#'   reduces memory usage of \pkg{NetRep}'s functions: only the matrices from
+#'   one dataset will be kept in RAM at any point in time. Use of 
 #'   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
 #'   illustrated in the package vignette (see \code{vignette("NetRep")}).
 #'   
@@ -501,7 +500,8 @@ modulePreservation <- function(
       if (!selfPreservation && di == ti) {
         vCat(
           verbose, 0, sep="", "skipping module preservation analysis for modules",
-          " from dataset ", '"', di, '"', " within dataset ", '"', di, '"', "."
+          " from dataset ", '"', datasetNames[di], '"', " within dataset ", '"', 
+          datasetNames[di], '"', "."
         )
         next
       }
@@ -509,10 +509,11 @@ modulePreservation <- function(
         vCat(
           verbose, 0, sep="", 
           "Calculating preservation of network subsets from dataset ", '"', 
-          di, '"', " in dataset ", '"', ti, '"', "."
+          datasetNames[di], '"', " in dataset ", '"', datasetNames[ti], '"', "."
         )
-
+        #----------------------------------------------------------------------
         # Calculate the overlap between datasets
+        #----------------------------------------------------------------------
         ct <- contingencyTable(moduleAssignments, modules, network, di, ti)
         contingency <- ct$contingency
         propVarsPres <- ct$propVarsPres
@@ -524,28 +525,66 @@ modulePreservation <- function(
         nStatistics <- ifelse(!is.null(data[[di]]) && !is.null(data[[ti]]), 7, 4)
         nModules <- length(overlapModules)
         
+        #----------------------------------------------------------------------
+        # Calculate the intermediate properties of the discovery dataset
+        #----------------------------------------------------------------------
+        # These are needed at every permutation, but we can cut runtime by 
+        # calculating them once, and cut memory by loading and unloading the
+        # the discovery dataset if provided as 'big.matrix' objects.
+        
         # Load matrices into RAM if they are 'big.matrix' objects.
         #   Calls to the garbage collector are necessary so we don't have 
         #   a copy of the data in shared memory as well.
-        anyBM <- any.big.matrix(data[[di]], correlation[[di]], network[[di]],
-                                data[[ti]], correlation[[ti]], network[[ti]])
-        if (anyBM) {
-          vCat(verbose, 1, "Loading 'big.matrix' data into RAM...")
-        }
+        anyBM <- any.big.matrix(data[[di]], correlation[[di]], network[[di]])
+        vCat(verbose && anyBM, 1, 'Loading matrices of dataset "', 
+             datasetNames[di], '" into RAM...', sep="")
         if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
           discovery_data <- loadIntoRAM(data[[di]])
           gc()
-          test_data <- loadIntoRAM(data[[ti]])
-          gc()
         } else {
           discovery_data <- NULL
-          test_data <- NULL
         }
         discovery_correlation <- loadIntoRAM(correlation[[di]])
         gc()
-        test_correlation <- loadIntoRAM(correlation[[ti]])
-        gc()
         discovery_network <- loadIntoRAM(network[[di]])
+        gc()
+
+        # Calculate the intermediate properties
+        vCat(verbose, 1, 'Pre-computing intermediate properties in dataset "',
+             datasetNames[di], '"...', sep="")
+        if (is.null(data[[di]]) || is.null(data[[ti]])) {
+          discProps <- IntermediatePropertiesNoData(
+            discovery_correlation, discovery_network, colnames(network[[ti]]),
+            moduleAssignments[[di]], modules[[di]]
+          )
+        } else {
+          discProps <- IntermediateProperties(
+            discovery_data, discovery_correlation, discovery_network,
+            colnames(network[[ti]]), moduleAssignments[[di]], modules[[di]]
+          )
+        }
+
+        # Free up memory
+        vCat(verbose && anyBM, 1, "Unloading matrices...")
+        rm(discovery_data, discovery_correlation, discovery_network)
+        gc()
+        
+        #----------------------------------------------------------------------
+        # Run the permutation procedure
+        #----------------------------------------------------------------------
+        # Load matrices into RAM if they are 'big.matrix' objects.
+        #   Calls to the garbage collector are necessary so we don't have 
+        #   a copy of the data in shared memory as well.
+        anyBM <- any.big.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+        vCat(verbose && anyBM, 1, 'Loading matrices of dataset "', 
+             datasetNames[ti], '" into RAM...', sep="")
+        if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
+          test_data <- loadIntoRAM(data[[ti]])
+          gc()
+        } else {
+          test_data <- NULL
+        }
+        test_correlation <- loadIntoRAM(correlation[[ti]])
         gc()
         test_network <- loadIntoRAM(network[[ti]])
         gc()
@@ -553,26 +592,22 @@ modulePreservation <- function(
         # Run the permutation procedure
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           perms <- PermutationProcedureNoData(
-            discovery_correlation, discovery_network, test_correlation, 
-            test_network, moduleAssignments[[di]], modules[[di]], nPerm, 
-            nThreads, model, verbose, vCat
+            discProps, test_correlation, test_network, moduleAssignments[[di]], 
+            modules[[di]], nPerm, nThreads, model, verbose, vCat
           )
         } else {
           perms <- PermutationProcedure(
-            discovery_data, discovery_correlation, discovery_network,
-            test_data, test_correlation, test_network, moduleAssignments[[di]], 
-            modules[[di]], nPerm, nThreads, model, verbose, vCat
+            discProps, test_data, test_correlation, test_network, 
+            moduleAssignments[[di]], modules[[di]], nPerm, nThreads, model, 
+            verbose, vCat
           )
         }
         observed <- perms$observed
         nulls <- perms$nulls
         
-        if (anyBM) {
-          vCat(verbose, 1, "Unloading matrices...")
-        }
+        vCat(verbose && anyBM, 1, "Unloading matrices...")
         # Free up memory
-        rm(discovery_data, discovery_correlation, discovery_network, test_data,
-           test_correlation, test_network)
+        rm(test_data, test_correlation, test_network)
         gc()
         
         #---------------------------------------------------------------------

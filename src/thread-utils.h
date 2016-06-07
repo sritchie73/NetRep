@@ -9,6 +9,7 @@
 
 #include <RcppArmadillo.h>
 #include "interrupt.h"
+#include <thread>
 
 void MonitorProgress (unsigned int&, arma::uvec&, bool&, const bool&); 
 

@@ -4,17 +4,12 @@
 \alias{PermutationProcedure}
 \title{Multithreaded permutation procedure for module preservation statistics}
 \usage{
-PermutationProcedure(dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments,
-  modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
+PermutationProcedure(discProps, tData, tCorr, tNet, moduleAssignments, modules,
+  nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
 \arguments{
-\item{dData}{data matrix from the \emph{discovery} dataset.}
-
-\item{dCorr}{matrix of correlation coefficients between all pairs of 
-variables/nodes in the \emph{discovery} dataset.}
-
-\item{dNet}{adjacency matrix of network edge weights between all pairs of 
-nodes in the \emph{discovery} dataset.}
+\item{discProps}{a list of intermediate properties calculated in the 
+discovery dataset by \code{\link{IntermediateProperties}}.}
 
 \item{tData}{data matrix from the \emph{test} dataset.}
 
@@ -56,13 +51,11 @@ Multithreaded permutation procedure for module preservation statistics
   
   These requirements are:
   \itemize{
-  \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
-        consistent.}
   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
         consistent.}
-  \item{The columns of 'dData' and 'tData' are the nodes.}
-  \item{'dCorr', 'dNet', 'tCorr', and 'tNet' are square matrices, and their
-        rownames are identical to their column names.}
+  \item{The columns of 'tData' are the nodes.}
+  \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
+        identical to their column names.}
   \item{'moduleAssigments' is a named character vector, where the names
         represent node labels found in the discovery dataset (e.g. 'dNet').}
   \item{'nPermutations' is a single number, greater than 0.}

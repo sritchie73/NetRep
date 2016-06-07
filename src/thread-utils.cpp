@@ -1,20 +1,23 @@
-#if WINDOWS
+// header files for sleeping a thread
+#if defined (_WIN32) || defined (_WIN64)
   #include <windows.h>
 #else
   #include <unistd.h>
 #endif
 
-#include "progress.h"
+#include "thread-utils.h"
 
 
 // Sleep this thread for N seconds
 void sleep(int secs) {
-  #if WINDOWS
+#if defined (_WIN32) || defined (_WIN64)
     Sleep(secs * 1000);
   #else
     usleep(secs * 1000000);  
   #endif
 }
+
+
 
 /* Monitors the progress of the permutation procedure
  * 

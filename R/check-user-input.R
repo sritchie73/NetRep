@@ -688,15 +688,11 @@ processInput <- function(
   # Now check finite, but skip for dry runs of plots
   if (!dryRun) {
     anyBM <- do.call("any.big.matrix", c(data[iterator], correlation[iterator], network[iterator]))
-    if(!(anyBM)) {
-      vCat(verbose, 1, "Checking matrices for non-finite values...")
-    }
+    vCat(verbose && !anyBM, 1, "Checking matrices for non-finite values...")
     for (ii in iterator) {
       anyBM <- any.big.matrix(data[iterator], correlation[iterator], network[iterator])
-      if (anyBM) {
-        vCat(verbose, 1, 'Loading matrices of dataset "', datasetNames[ii], 
-             '" into RAM...', sep="")
-      }
+      vCat(verbose && anyBM, 1, 'Loading matrices of dataset "', 
+           datasetNames[ii], '" into RAM...', sep="")
       # First, we need to load in matrices into RAM if they are 'big.matrix' 
       # objects
       data_mat <- loadIntoRAM(data[[ii]])
@@ -706,17 +702,13 @@ processInput <- function(
       network_mat <- loadIntoRAM(network[[ii]])
       gc()
       
-      if (anyBM) {
-        vCat(verbose, 1, "Checking matrices for non-finite values...")
-      }
+      vCat(verbose && anyBM, 1, "Checking matrices for non-finite values...")
       if (!is.null(data_mat))
         CheckFinite(data_mat)
       CheckFinite(correlation_mat)
       CheckFinite(network_mat)
       
-      if (anyBM) {
-        vCat(verbose, 1, "Unloading matrices...")
-      }
+      vCat(verbose && anyBM, 1, "Unloading matrices...")
       # Frees up memory if any objects are big matrices.
       rm(data_mat, correlation_mat, network_mat)
       gc()

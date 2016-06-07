@@ -16,8 +16,10 @@
 typedef boost::unordered_map<std::string, unsigned int> namemap; 
 // For mapping module labels to node IDs 
 typedef boost::unordered_multimap<std::string, std::string> stringmap; 
-// For storing properties across modules
+// For storing property vectors across modules
 typedef boost::unordered_map<std::string, arma::vec> vecmap;
+// For storing their addresses to pass to threads
+typedef boost::unordered_map<std::string, double *> addrmap;
 // For getting randomly shuffled node ids
 typedef boost::unordered_map<unsigned int, unsigned int> intmap;
 

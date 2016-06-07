@@ -17,15 +17,44 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// PermutationProcedure
-Rcpp::List PermutationProcedure(Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::NumericMatrix tData, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
-RcppExport SEXP NetRep_PermutationProcedure(SEXP dDataSEXP, SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tDataSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
+// IntermediateProperties
+Rcpp::List IntermediateProperties(Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::CharacterVector tNodeNames, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
+RcppExport SEXP NetRep_IntermediateProperties(SEXP dDataSEXP, SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tNodeNamesSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dData(dDataSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dCorr(dCorrSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dNet(dNetSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type tNodeNames(tNodeNamesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type moduleAssignments(moduleAssignmentsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type modules(modulesSEXP);
+    __result = Rcpp::wrap(IntermediateProperties(dData, dCorr, dNet, tNodeNames, moduleAssignments, modules));
+    return __result;
+END_RCPP
+}
+// IntermediatePropertiesNoData
+Rcpp::List IntermediatePropertiesNoData(Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::CharacterVector tNodeNames, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
+RcppExport SEXP NetRep_IntermediatePropertiesNoData(SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tNodeNamesSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dCorr(dCorrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dNet(dNetSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type tNodeNames(tNodeNamesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type moduleAssignments(moduleAssignmentsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type modules(modulesSEXP);
+    __result = Rcpp::wrap(IntermediatePropertiesNoData(dCorr, dNet, tNodeNames, moduleAssignments, modules));
+    return __result;
+END_RCPP
+}
+// PermutationProcedure
+Rcpp::List PermutationProcedure(Rcpp::List discProps, Rcpp::NumericMatrix tData, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
+RcppExport SEXP NetRep_PermutationProcedure(SEXP discPropsSEXP, SEXP tDataSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< Rcpp::List >::type discProps(discPropsSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type tData(tDataSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type tCorr(tCorrSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type tNet(tNetSEXP);
@@ -36,18 +65,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type nullHypothesis(nullHypothesisSEXP);
     Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< Rcpp::Function >::type vCat(vCatSEXP);
-    __result = Rcpp::wrap(PermutationProcedure(dData, dCorr, dNet, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat));
+    __result = Rcpp::wrap(PermutationProcedure(discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat));
     return __result;
 END_RCPP
 }
 // PermutationProcedureNoData
-Rcpp::List PermutationProcedureNoData(Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
-RcppExport SEXP NetRep_PermutationProcedureNoData(SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
+Rcpp::List PermutationProcedureNoData(Rcpp::List discProps, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
+RcppExport SEXP NetRep_PermutationProcedureNoData(SEXP discPropsSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dCorr(dCorrSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dNet(dNetSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type discProps(discPropsSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type tCorr(tCorrSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type tNet(tNetSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type moduleAssignments(moduleAssignmentsSEXP);
@@ -57,7 +85,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type nullHypothesis(nullHypothesisSEXP);
     Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< Rcpp::Function >::type vCat(vCatSEXP);
-    __result = Rcpp::wrap(PermutationProcedureNoData(dCorr, dNet, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat));
+    __result = Rcpp::wrap(PermutationProcedureNoData(discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat));
     return __result;
 END_RCPP
 }
@@ -85,6 +113,78 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type moduleAssignments(moduleAssignmentsSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type modules(modulesSEXP);
     __result = Rcpp::wrap(NetworkPropertiesNoData(net, moduleAssignments, modules));
+    return __result;
+END_RCPP
+}
+// WD
+NumericMatrix WD(NumericMatrix net, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_WD(SEXP netSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type net(netSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(WD(net, subsetIndices));
+    return __result;
+END_RCPP
+}
+// avgWeight
+double avgWeight(NumericMatrix net, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_avgWeight(SEXP netSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type net(netSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(avgWeight(net, subsetIndices));
+    return __result;
+END_RCPP
+}
+// CV
+NumericMatrix CV(NumericMatrix net, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_CV(SEXP netSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type net(netSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(CV(net, subsetIndices));
+    return __result;
+END_RCPP
+}
+// SP
+NumericMatrix SP(NumericMatrix net, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_SP(SEXP netSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type net(netSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(SP(net, subsetIndices));
+    return __result;
+END_RCPP
+}
+// NC
+NumericMatrix NC(NumericMatrix net, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_NC(SEXP netSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type net(netSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(NC(net, subsetIndices));
+    return __result;
+END_RCPP
+}
+// MC
+double MC(NumericMatrix net, IntegerVector subsetIndices);
+RcppExport SEXP NetRep_MC(SEXP netSEXP, SEXP subsetIndicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type net(netSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type subsetIndices(subsetIndicesSEXP);
+    __result = Rcpp::wrap(MC(net, subsetIndices));
     return __result;
 END_RCPP
 }
