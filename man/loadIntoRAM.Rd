@@ -2,20 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{loadIntoRAM}
 \alias{loadIntoRAM}
-\title{Get the matrix in RAM}
+\title{Load a \code{'disk.matrix'} into RAM}
 \usage{
 loadIntoRAM(x)
 }
 \arguments{
-\item{x}{a \code{'matrix'} or \code{'big.matrix'}}
+\item{x}{a \code{'matrix'} or \code{'disk.matrix'}}
 }
 \value{
 a \code{'matrix'}
 }
 \description{
-If \code{x} is a \code{'big.matrix'} convert it to a matrix. This loads it 
-into regular memory rather than shared memory, since shared memory is not
-compatible with distributed file systems (i.e. multi-node clusters). If
-\code{x} is already a \code{'matrix'}, just return as is.
+If \code{x} is a \code{\link{disk.matrix}} load in the matrix data at its
+associated file. If \code{x} is already a matrix, return as is.
 }
 

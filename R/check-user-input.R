@@ -493,97 +493,7 @@ processInput <- function(
         orderSamplesBy <- test[[discovery]]
       }
     }
-  }
 
-  # ----------------------------------------------------------------------------
-  # Check for data consistency
-  # ----------------------------------------------------------------------------
-  # Now that we have made sure the input data can be sensibly accessed using the
-  # provided 'discovery' and 'test' inputs, we need to make sure the data is 
-  # consistent across the input lists.
-
-  # If one, but not all, input lists are named, throw an error -- we don't know
-  # what the datasets are!
-  datNames <- names(data)
-  corNames <- names(correlation)
-  netNames <- names(network)
-  modLabNames <- names(moduleAssignments)
-  modNames <- names(modules)
-  
-  hasNames <- c(!is.null(datNames), !is.null(corNames), !is.null(netNames), 
-                !is.null(modLabNames), !is.null(modNames))
-  
-  if (sum(hasNames) > 0 && !all(hasNames)) {
-    stop("cannot match dataset names across all input arguments")
-  }
-
-  # Do the names need to match?
-  if (matchByIndice) {
-    iterator <- seq_along(network)
-    if (all(hasNames) && (any(datNames != corNames) || any(corNames != netNames) || 
-        any(modNames != netNames) || any(modLabNames != modNames))) {
-      stop("mismatch in dataset names across input arguments when matching ",
-           "'discovery' or 'test' by index")
-    }
-  } else {
-    iterator <- names(network)
-  }
-  
-  for (ii in iterator) {
-    # Make sure the 'correlation' and 'network' matrices are square
-    if (nrow(network[[ii]]) != ncol(network[[ii]])) {
-      stop("'network' for dataset ", '"', ii, '"', " is not square")
-    }
-    if (nrow(correlation[[ii]]) != ncol(correlation[[ii]])) {
-      stop("'correlation' for dataset ", '"', ii, '"', " is not square")
-    }
-    # And that they have the same dimensions
-    if ((nrow(correlation[[ii]]) != nrow(network[[ii]])) ||
-        (!is.null(data[[ii]]) && (ncol(data[[ii]]) != ncol(network[[ii]])))) {
-      stop("'correlation', 'network', and 'data' have a different number of ",
-           'nodes for dataset "', ii, '"')
-    }
-    
-    # Make sure the matrices have dimension names
-    if (is.null(rownames(network[[ii]])) || is.null(rownames(correlation[[ii]])) ||
-        (!is.null(data[[ii]]) && is.null(rownames(data[[ii]])))) {
-      stop("supplied matrices must have row and column names")      
-    }
-    
-    # Make sure the 'correlation' and 'network' matrices are symmetric 
-    if (any(rownames(network[[ii]]) != colnames(network[ii]))) {
-      stop("mismatch between row and column names in 'network' for dataset ", 
-           '"', ii, '"')
-    }
-    if (any(rownames(correlation[[ii]]) != colnames(correlation[ii]))) {
-      stop("mismatch between row and column names in 'network' for dataset ",
-           '"', ii, '"')
-    }
-    # Make sure the ordering of nodes is the same between 'correlation', 
-    # 'network' and 'data'.
-    if (any(colnames(network[[ii]]) != colnames(correlation[ii])) |
-        (!is.null(data[[ii]]) && any(colnames(network[[ii]]) != colnames(data[[ii]])))) {
-      stop("mismatch in node order between 'correlation' and 'network' for",
-           'dataset "', ii, '"')
-    }
-    
-    # Make sure the 'moduleAssignments' have the same nodes as the 'correlation'
-    # etc.
-    if (!is.null(moduleAssignments[[ii]])) {
-      if (any(names(moduleAssignments[[ii]]) %nin% colnames(network[[ii]]))) {
-        stop("module assigments are present for nodes that are not in the",
-             " 'network' inferred from dataset ", '"', ii, '"')
-      }
-    }
-    
-    # Make sure all module labels are in 'moduleAssignments'
-    if (any(modules[[ii]] %nin% moduleAssignments[[ii]])) {
-      stop("some 'modules' specified for dataset ", '"', ii, '"', 
-          " are not in 'moduleAssignments' for dataset ", '"', ii, '"')
-    }
-  }
-  
-  if (plotFunction) {
     ti <- test[[discovery]]
     # Are the datasets specified in 'orderNodesBy' and 'orderSamplesBy' valid?
     if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
@@ -624,9 +534,29 @@ processInput <- function(
     }
   }
   
+  
   # ----------------------------------------------------------------------------
   # Construct consistent names to use internally for each dataset
   # ----------------------------------------------------------------------------
+  # Make sure the input data can be sensibly accessed using the provided 
+  # 'discovery' and 'test' inputs.
+  
+  # If one, but not all, input lists are named, throw an error -- we don't know
+  # what the datasets are!
+  datNames <- names(data)
+  corNames <- names(correlation)
+  netNames <- names(network)
+  modLabNames <- names(moduleAssignments)
+  modNames <- names(modules)
+  
+  hasNames <- c(!is.null(datNames), !is.null(corNames), !is.null(netNames), 
+                !is.null(modLabNames), !is.null(modNames))
+  
+  if (sum(hasNames) > 0 && !all(hasNames)) {
+    stop("cannot match dataset names across all input arguments")
+  }
+  
+  # Construct the dataset names to use as indices
   if (!is.null(names(network))) {
     datasetNames <- names(network)
   } else {
@@ -648,53 +578,53 @@ processInput <- function(
       orderSamplesBy <- datasetNames[orderSamplesBy]
     }
   }
-  
+
   # ----------------------------------------------------------------------------
-  # Check matrices for non-finite values
+  # Check for data consistency
   # ----------------------------------------------------------------------------
-  # Sanity check input data for values that will cause the calculation of 
-  # network properties and statistics to hang. This can take a while, so 
-  # we only want to check datasets that we're analysing (especially for plotting)
-  
-  # Construct an iterator that includes only the datasets we're analysing:
-  if (is.character(discovery)) {
-    iterator <- match(discovery, names(network))
-  } else {
-    iterator <- discovery
-  }
-  for (tv in test) {
-    if (is.character(tv)) {
-      iterator <- c(iterator, match(tv, names(network)))
+  if (!dryRun) {
+    # Construct an iterator that includes only the datasets we're analysing:
+    if (is.character(discovery)) {
+      iterator <- match(discovery, names(network))
     } else {
-      iterator <- c(iterator, tv)
+      iterator <- discovery
     }
-  }
-  if (plotFunction) {
-    if (orderModules) {
-      if (is.character(orderNodesBy)) {
-        iterator <- c(iterator, match(orderNodesBy, names(network)))
-      } else if (is.numeric(orderNodesBy)) {
-        iterator <- c(iterator, orderNodesBy)
+    for (tv in test) {
+      if (is.character(tv)) {
+        iterator <- c(iterator, match(tv, names(network)))
+      } else {
+        iterator <- c(iterator, tv)
       }
     }
-    if (is.character(orderSamplesBy)) {
-      iterator <- c(iterator, match(orderSamplesBy, names(network)))
-    } else if (is.numeric(orderSamplesBy)) {
-      iterator <- c(iterator, orderSamplesBy)
+    if (plotFunction) {
+      if (orderModules) {
+        if (is.character(orderNodesBy)) {
+          iterator <- c(iterator, match(orderNodesBy, names(network)))
+        } else if (is.numeric(orderNodesBy)) {
+          iterator <- c(iterator, orderNodesBy)
+        }
+      }
+      if (is.character(orderSamplesBy)) {
+        iterator <- c(iterator, match(orderSamplesBy, names(network)))
+      } else if (is.numeric(orderSamplesBy)) {
+        iterator <- c(iterator, orderSamplesBy)
+      }
     }
-  }
-  iterator <- unique(iterator)
-
-  # Now check finite, but skip for dry runs of plots
-  if (!dryRun) {
-    anyBM <- do.call("any.big.matrix", c(data[iterator], correlation[iterator], network[iterator]))
-    vCat(verbose && !anyBM, 1, "Checking matrices for non-finite values...")
+    iterator <- unique(iterator)
+    
+    # We need a list of nodes present in each dataset independent of having
+    # the datasets loaded into RAM.
+    nodelist <- rep(list(NULL), length(iterator))
+    names(nodelist) <- datasetNames[iterator]
+    
+    anyDM <- do.call("any.disk.matrix", c(data[iterator], correlation[iterator], network[iterator]))
+    vCat(verbose && !anyDM, 1, "Checking matrices for problems...")
     for (ii in iterator) {
-      anyBM <- any.big.matrix(data[iterator], correlation[iterator], network[iterator])
-      vCat(verbose && anyBM, 1, 'Loading matrices of dataset "', 
-           datasetNames[ii], '" into RAM...', sep="")
-      # First, we need to load in matrices into RAM if they are 'big.matrix' 
+      # First, we need to load in matrices into RAM if they are 'disk.matrix' 
       # objects
+      anyDM <- any.disk.matrix(data[[ii]], correlation[[ii]], network[[ii]])
+      vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
+           datasetNames[ii], '" into RAM...', sep="")
       data_mat <- loadIntoRAM(data[[ii]])
       gc()
       correlation_mat <- loadIntoRAM(correlation[[ii]])
@@ -702,24 +632,101 @@ processInput <- function(
       network_mat <- loadIntoRAM(network[[ii]])
       gc()
       
-      vCat(verbose && anyBM, 1, "Checking matrices for non-finite values...")
-      if (!is.null(data_mat))
-        CheckFinite(data_mat)
-      CheckFinite(correlation_mat)
-      CheckFinite(network_mat)
+      vCat(verbose && anyDM, 1, "Checking matrices for problems...")
       
-      vCat(verbose && anyBM, 1, "Unloading matrices...")
-      # Frees up memory if any objects are big matrices.
-      rm(data_mat, correlation_mat, network_mat)
-      gc()
-    }    
+      # Make sure matrices are (a) actually matrices, and (b) contain numeric 
+      # data
+      if (class(network_mat) != "matrix" || 
+          typeof(network_mat) %nin% c("double", "integer")) {
+        stop("'network' for dataset ", '"', ii, '"', 
+             " is not a numeric matrix")
+      }
+      if (class(correlation_mat) != "matrix" || 
+          typeof(correlation_mat) %nin% c("double", "integer")) {
+        stop("'correlation' for dataset ", '"', ii, '"', 
+             " is not a numeric matrix")
+      }
+      
+      if (!is.null(data_mat) && (class(data_mat) != "matrix" || 
+                                 typeof(data_mat) %nin% c("double", "integer"))) {
+        stop("'data' for dataset ", '"', ii, '"', " is not a numeric matrix")
+      }
+      
+      # Make sure the 'correlation' and 'network' matrices are square
+      if (nrow(network_mat) != ncol(network_mat)) {
+        stop("'network' for dataset ", '"', ii, '"', " is not square")
+      }
+      if (nrow(correlation_mat) != ncol(correlation_mat)) {
+        stop("'correlation' for dataset ", '"', ii, '"', " is not square")
+      }
+      # And that they have the same dimensions
+      if ((nrow(correlation_mat) != nrow(network_mat)) ||
+          (!is.null(data_mat) && (ncol(data_mat) != ncol(network_mat)))) {
+        stop("'correlation', 'network', and 'data' have a different number of ",
+             'nodes for dataset "', ii, '"')
+      }
+      
+      # Make sure the matrices have dimension names
+      if (is.null(rownames(network_mat)) || is.null(rownames(correlation_mat)) ||
+          (!is.null(data_mat) && is.null(rownames(data_mat)))) {
+        stop("supplied matrices must have row and column names")      
+      }
+      
+      # Make sure the 'correlation' and 'network' matrices are symmetric 
+      if (any(rownames(network_mat) != colnames(network_mat))) {
+        stop("mismatch between row and column names in 'network' for dataset ", 
+             '"', ii, '"')
+      }
+      if (any(rownames(correlation_mat) != colnames(correlation_mat))) {
+        stop("mismatch between row and column names in 'network' for dataset ",
+             '"', ii, '"')
+      }
+      # Make sure the ordering of nodes is the same between 'correlation', 
+      # 'network' and 'data'.
+      if (any(colnames(network_mat) != colnames(correlation_mat)) |
+          (!is.null(data_mat) && any(colnames(network_mat) != colnames(data_mat)))) {
+        stop("mismatch in node order between 'correlation' and 'network' for",
+             'dataset "', ii, '"')
+      }
+      
+      # Make sure the 'moduleAssignments' have the same nodes as the 'correlation'
+      # etc.
+      if (!is.null(moduleAssignments[[ii]])) {
+        if (any(names(moduleAssignments[[ii]]) %nin% colnames(network_mat))) {
+          stop("module assigments are present for nodes that are not in the",
+               " 'network' inferred from dataset ", '"', ii, '"')
+        }
+      }
+      
+      # Make sure all module labels are in 'moduleAssignments'
+      if (any(modules[[ii]] %nin% moduleAssignments[[ii]])) {
+        stop("some 'modules' specified for dataset ", '"', ii, '"', 
+             " are not in 'moduleAssignments' for dataset ", '"', ii, '"')
+      }
+    }
+    
+    # Check matrices for non-finite values: these will cause the calculation
+    # of network properties and module preservation statistics to hang. 
+    if (!is.null(data_mat))
+      CheckFinite(data_mat)
+    CheckFinite(correlation_mat)
+    CheckFinite(network_mat)
+    
+    # Store the node names for later
+    nodelist[[datasetNames[ii]]] <- colnames(network_mat)
+    
+    # Free up memory if any objects are big matrices.
+    vCat(verbose && anyDM, 1, "Unloading matrices...")
+    rm(data_mat, correlation_mat, network_mat)
+    gc()
   }
 
   return(list(
     data=data, correlation=correlation, network=network, discovery=discovery,
     test=test, moduleAssignments=moduleAssignments, modules=modules,
     nDatasets=nDatasets, datasetNames=datasetNames,
-    orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy
+    orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy,
+    nodelist=nodelist
   ))
 }
 
@@ -751,15 +758,15 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   return(tocheck)
 }
 
-#' Check whether an object is a 'matrix' or a 'big.matrix'
+#' Check whether an object is a 'matrix' or a 'disk.matrix'
 #' 
 #' @param object object to check.
 #' 
 #' @return 
 #'   throws an error or returns silently
 checkIsMatrix <- function(object) {
-  if (!is.null(object) && !is.matrix(object) && class(object) != "big.matrix") { 
-    stop('Input data must be a "matrix" or "big.matrix"')
+  if (!is.null(object) && !is.matrix(object) && class(object) != "disk.matrix") { 
+    stop('Input data must be a "matrix" or "disk.matrix"')
   }
 }
   

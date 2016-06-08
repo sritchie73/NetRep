@@ -68,32 +68,18 @@
 #'   \code{discovery} dataset, then input to the \code{moduleAssigments} and 
 #'   \code{test} arguments may be vectors, rather than lists. 
 #' }
-#' \subsection{Compatability with 'big.matrix' input:}{
-#'   The matrices supplied in the \code{network}, \code{data}, and 
-#'   \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
-#'   objects from the \pkg{bigmemory} package. Supplying data in this format
-#'   reduces memory usage of \pkg{NetRep}'s functions: only the matrices from
-#'   one dataset will be kept in RAM at any point in time. Use of 
-#'   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
-#'   illustrated in the package vignette (see \code{vignette("NetRep")}).
+#' \subsection{Analysing large datasets:}{
+#'   Matrices in the \code{network}, \code{data}, and \code{correlation} lists
+#'   can be supplied as \code{\link{disk.matrix}} objects. This class allows 
+#'   matrix data to be kept on disk and loaded as required by \pkg{NetRep}. 
+#'   This dramatically decreases memory usage: the matrices for only one 
+#'   dataset will be kept in RAM at any point in time.
 #'   
-#'   \strong{Warning:} We generally do not recommned using \code{'big.matrix'} 
-#'   objects on multi-node clusters. These systems typically have a distributed 
-#'   file-system, which allows other types of programs to communicate over 
-#'   multiple nodes safely. An implication of this is that the Operating System 
-#'   will check for consistency across nodes every time a program reads from, 
-#'   or writes to a file-backed shared memory segment. This results in very 
-#'   slow access speeds when extracting elements from a \code{'big.matrix'}, 
-#'   which gets exponentially worse the more R sessions you have accessing the 
-#'   \code{big.matrix} at once (for example through explicit parallelism using 
-#'   the \pkg{foreach} package). \pkg{NetRep} circumvents this limitation 
-#'   somewhat by copying the data stored in each \code{'big.matrix'} to a 
-#'   regular \code{'matrix'}, but this process can take a long time. For 
-#'   example, our gene expression datasets with 20,000 variables and 300 
-#'   samples take anywhere between 30 seconds and 15 minutes to copy, 
-#'   depending on the run. \pkg{NetRep} will output a message whenever a 
-#'   \code{'big.matrix'} is loaded into RAM. If this takes a long time, then 
-#'   this is an issue on your system.
+#'   Additional memory usage of the permutation procedure is directly
+#'   proportional to the sum of module sizes squared multiplied by the number 
+#'   of threads. Very large modules may result in significant additional memory
+#'   usage per core due to extraction of the correlation coefficient sub-matrix
+#'   at each permutation.
 #' }
 #' \subsection{Module Preservation Statistics:}{
 #'  Module preservation is assessed through seven module preservation statistics,
@@ -469,6 +455,7 @@ modulePreservation <- function(
   test <- finput$test
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
+  nodelist <- finput$nodelist
 
   # If NULL, automatically determine.
   if (is.null(nPerm)) {
@@ -524,7 +511,8 @@ modulePreservation <- function(
         #----------------------------------------------------------------------
         # Calculate the overlap between datasets
         #----------------------------------------------------------------------
-        ct <- contingencyTable(moduleAssignments, modules, network, di, ti)
+        ct <- contingencyTable(moduleAssignments[c(di, ti)], modules[[di]], 
+                               nodelist[[ti]])
         contingency <- ct$contingency
         propVarsPres <- ct$propVarsPres
         overlapVars <- ct$overlapVars
@@ -540,65 +528,53 @@ modulePreservation <- function(
         #----------------------------------------------------------------------
         # These are needed at every permutation, but we can cut runtime by 
         # calculating them once, and cut memory by loading and unloading the
-        # the discovery dataset if provided as 'big.matrix' objects.
-        
-        # Load matrices into RAM if they are 'big.matrix' objects.
-        #   Calls to the garbage collector are necessary so we don't have 
-        #   a copy of the data in shared memory as well.
-        anyBM <- any.big.matrix(data[[di]], correlation[[di]], network[[di]])
-        vCat(verbose && anyBM, 1, 'Loading matrices of dataset "', 
+        # the discovery dataset if provided as 'disk.matrix' objects.
+        anyDM <- any.disk.matrix(data[[di]], correlation[[di]], network[[di]])
+        vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
              datasetNames[di], '" into RAM...', sep="")
         if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
           discovery_data <- loadIntoRAM(data[[di]])
-          gc()
         } else {
           discovery_data <- NULL
         }
         discovery_correlation <- loadIntoRAM(correlation[[di]])
-        gc()
         discovery_network <- loadIntoRAM(network[[di]])
-        gc()
 
         # Calculate the intermediate properties
         vCat(verbose, 1, 'Pre-computing intermediate properties in dataset "',
              datasetNames[di], '"...', sep="")
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           discProps <- IntermediatePropertiesNoData(
-            discovery_correlation, discovery_network, colnames(network[[ti]]),
+            discovery_correlation, discovery_network, nodelist[[ti]],
             moduleAssignments[[di]], modules[[di]]
           )
         } else {
           discProps <- IntermediateProperties(
             discovery_data, discovery_correlation, discovery_network,
-            colnames(network[[ti]]), moduleAssignments[[di]], modules[[di]]
+            nodelist[[ti]], moduleAssignments[[di]], modules[[di]]
           )
         }
 
         # Free up memory
-        vCat(verbose && anyBM, 1, "Unloading matrices...")
+        vCat(verbose && anyDM, 1, "Unloading matrices...")
         rm(discovery_data, discovery_correlation, discovery_network)
         gc()
         
         #----------------------------------------------------------------------
         # Run the permutation procedure
         #----------------------------------------------------------------------
-        # Load matrices into RAM if they are 'big.matrix' objects.
-        #   Calls to the garbage collector are necessary so we don't have 
-        #   a copy of the data in shared memory as well.
-        anyBM <- any.big.matrix(data[[ti]], correlation[[ti]], network[[ti]])
-        vCat(verbose && anyBM, 1, 'Loading matrices of dataset "', 
+        # Load matrices into RAM if they are 'disk.matrix' objects.
+        anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+        vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
              datasetNames[ti], '" into RAM...', sep="")
         if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
           test_data <- loadIntoRAM(data[[ti]])
-          gc()
         } else {
           test_data <- NULL
         }
         test_correlation <- loadIntoRAM(correlation[[ti]])
-        gc()
         test_network <- loadIntoRAM(network[[ti]])
-        gc()
-        
+
         # Run the permutation procedure
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           perms <- PermutationProcedureNoData(
@@ -615,7 +591,7 @@ modulePreservation <- function(
         observed <- perms$observed
         nulls <- perms$nulls
         
-        vCat(verbose && anyBM, 1, "Unloading matrices...")
+        vCat(verbose && anyDM, 1, "Unloading matrices...")
         # Free up memory
         rm(test_data, test_correlation, test_network)
         gc()

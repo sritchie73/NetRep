@@ -139,28 +139,6 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
   }
 }
 
-#' Poke attached big matrix objects to initialise them
-#' 
-#' This is a magical speed hack. See details
-#' 
-#' @details
-#' For some reason, one of the datasets i tried running on took an incredibly
-#' long time for some very small network subsets. After playing around it turns
-#' out that the first time any of the Rcpp functions are called, regardless of 
-#' subset size, it was taking forever. This can be solved simply by accessing
-#' the big.matrix objects beforehand.
-#' 
-#' @param ... a number of big.matrix objects
-poke <- function(...) {
-  for (o in list(...)) {
-    if (!is.null(o)) {
-      pCols <- min(ncol(o), 5)
-      pRows <- min(nrow(o), 5)
-      o[1:pRows, 1:pCols]
-    }
-  }
-}
-
 #' Insert NAs into a vector at specified positions
 #' 
 #' Useful for inserting NAs into the correct positions when examining module 
@@ -249,33 +227,29 @@ sortModuleNames <- function(modules) {
   })
 }
 
-#' Get the matrix in RAM
+#' Load a \code{'disk.matrix'} into RAM
 #' 
-#' If \code{x} is a \code{'big.matrix'} convert it to a matrix. This loads it 
-#' into regular memory rather than shared memory, since shared memory is not
-#' compatible with distributed file systems (i.e. multi-node clusters). If
-#' \code{x} is already a \code{'matrix'}, just return as is.
+#' If \code{x} is a \code{\link{disk.matrix}} load in the matrix data at its
+#' associated file. If \code{x} is already a matrix, return as is.
 #' 
-#' @param x a \code{'matrix'} or \code{'big.matrix'}
+#' @param x a \code{'matrix'} or \code{'disk.matrix'}
 #' 
 #' @return a \code{'matrix'}
 loadIntoRAM <- function(x) {
-  if (class(x) == "big.matrix") {
-    return(x[,])
-  } else {
-    return(x)
-  }
+  if (is.null(x))
+    return(NULL)
+  as.matrix(x)
 }
 
-#' Check if any objects are a 'big.matrix'
+#' Check if any objects are a 'disk.matrix'
 #' 
 #' @param ... objects to check.
 #' 
 #' @return 
 #'  \code{TRUE} if the class of any object in the list of input 
-#'  arguments is a "big.matrix".
-any.big.matrix <- function(...) {
-  "big.matrix" %in% sapply(list(...), class)
+#'  arguments is a "disk.matrix".
+any.disk.matrix <- function(...) {
+  "disk.matrix" %in% sapply(list(...), class)
 }
 
 #' Silently check and load a package into the namespace
@@ -287,3 +261,16 @@ pkgReqCheck <- function(pkg) {
   suppressMessages(suppressWarnings(requireNamespace(pkg, quietly=TRUE)))
 }
 
+#' Convert an absolute file path to a relative one if possible
+#' 
+#' @param file file path to convert
+#' 
+#' @return
+#'  a file path relative to either the users home directory or the current 
+#'  working directory if the file is located underneath either.
+prettyPath <- function(file) {
+  file <- gsub("//", "/", file)
+  file <- gsub(paste0(getwd(), "/?"), "", file)
+  file <- gsub(normalizePath("~"), "~", file)
+  file
+}

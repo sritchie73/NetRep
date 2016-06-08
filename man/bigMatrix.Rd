@@ -14,18 +14,26 @@ file extension must be omitted.}
 The \code{'bigMatrix'} class is no longer implemented in the \code{NetRep}
 package: the shared memory approach was incompatabile with high performance
 compute clusters, so the parallel permutation procedure has been translated
-into C++ code (which is also much faster). For those who had saved their 
-data in the \code{'bigMatrix'} format, this function will convert these 
-objects to the similar \code{'\link[bigmemory]{big.matrix}'} class
-from the \pkg{bigmemory} package.
+into C++ code (which is also much faster). The \code{\link{disk.matrix}}
+class should now be used instead when analysing large datasets.
 }
 \details{
+This function will convert \code{'bigMatrix'} data saved by previous 
+versions of \pkg{NetRep} to a serialized R matrix saved in the same location
+and return a \code{\link{disk.matrix}} object with the associated file path.
+If this conversion has taken place already the function will throw a warning.
+
+This function will also convert the \code{'bigMatrix'} descriptor file to a 
+\code{\link[bigmemory]{big.matrix}} descriptor file to preserve 
+compatability with functions in the \pkg{bigmemory} package. If this 
+functionality is not required, the files with the extensions ".bin" and 
+".desc" may be removed.
+
 A note for users using multi-node high performance clusters:
-  \code{'big.matrix'} objects are not suitable for general usage. Access
-  to file-backed shared memory segments on multi-node systems is very slow
-  due to consistency checks performed by the operating system. We address
-  this limitation by copying the data from \code{'big.matrix'} objects into
-  new \code{'matrix'} objects. This can take several minutes, depending on
-  the size of the total network.
+\code{'big.matrix'} objects are not suitable for general usage. Access
+to file-backed shared memory segments on multi-node systems is very slow
+due to consistency checks performed by the operating system. This becomes
+exponentially worse the more R sessions there are simultaneously accessing
+the shared memory segment, e.g. through parallel \pkg{foreach} loops.
 }
 

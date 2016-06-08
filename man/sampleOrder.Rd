@@ -10,21 +10,19 @@ sampleOrder(network, data, correlation, moduleAssignments = NULL,
 }
 \arguments{
 \item{network}{a list of interaction networks, one for each dataset. Each 
-entry of the list should be a \eqn{n * n} matrix where each element 
+entry of the list should be a \eqn{n * n} matrix or where each element 
 contains the edge weight between nodes \eqn{i} and \eqn{j} in the inferred 
-network for that dataset. Matrices may also be supplied in the 
-\code{\link[bigmemory]{big.matrix}} format.}
+network for that dataset.}
 
 \item{data}{a list of matrices, one for each dataset. Each entry of the list 
 should be the data used to infer the interaction \code{network} for that 
 dataset. The columns should correspond to variables in the data
-(nodes in the network) and rows to samples in that dataset. Matrices may 
-also be supplied in the \code{\link[bigmemory]{big.matrix}} format.}
+(nodes in the network) and rows to samples in that dataset.}
 
 \item{correlation}{a list of matrices, one for each dataset. Each entry of
 the list should be a \eqn{n * n} matrix where each element contains the 
 correlation coefficient between nodes \eqn{i} and \eqn{j} in the 
-\code{data}used to infer the interaction network for that dataset.}
+\code{data} used to infer the interaction network for that dataset.}
 
 \item{moduleAssignments}{a list of vectors, one for each \emph{discovery} 
 dataset, containing the module assignments for each node in that dataset.}
@@ -129,32 +127,12 @@ Get the order of samples within a module based on the module summary vector.
   \code{data}, and \code{correlation} arguments do not need to be wrapped in
   a list.
 }
-\subsection{Compatability with 'big.matrix' input:}{
-  The matrices supplied in the \code{network}, \code{data}, and 
-  \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
-  objects from the \pkg{bigmemory} package. Supplying data in this format
-  reduces memory usage of \pkg{NetRep}'s functions: only the matrices from
-  one dataset will be kept in RAM at any point in time. Use of 
-  \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
-  illustrated in the package vignette (see \code{vignette("NetRep")}).
-  
-  \strong{Warning:} We generally do not recommned using \code{'big.matrix'} 
-  objects on multi-node clusters. These systems typically have a distributed 
-  file-system, which allows other types of programs to communicate over 
-  multiple nodes safely. An implication of this is that the Operating System 
-  will check for consistency across nodes every time a program reads from, 
-  or writes to a file-backed shared memory segment. This results in very 
-  slow access speeds when extracting elements from a \code{'big.matrix'}, 
-  which gets exponentially worse the more R sessions you have accessing the 
-  \code{big.matrix} at once (for example through explicit parallelism using 
-  the \pkg{foreach} package). \pkg{NetRep} circumvents this limitation 
-  somewhat by copying the data stored in each \code{'big.matrix'} to a 
-  regular \code{'matrix'}, but this process can take a long time. For 
-  example, our gene expression datasets with 20,000 variables and 300 
-  samples take anywhere between 30 seconds and 15 minutes to copy, 
-  depending on the run. \pkg{NetRep} will output a message whenever a 
-  \code{'big.matrix'} is loaded into RAM. If this takes a long time, then 
-  this is an issue on your system.
+\subsection{Analysing large datasets:}{
+  Matrices in the \code{network}, \code{data}, and \code{correlation} lists
+  can be supplied as \code{\link{disk.matrix}} objects. This class allows 
+  matrix data to be kept on disk and loaded as required by \pkg{NetRep}. 
+  This dramatically decreases memory usage: the matrices for only one 
+  dataset will be kept in RAM at any point in time.
 }
 }
 \examples{

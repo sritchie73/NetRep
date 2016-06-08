@@ -4,19 +4,16 @@
 \alias{contingencyTable}
 \title{Calculate a contigency table of module overlap between datasets}
 \usage{
-contingencyTable(moduleAssignments, modules, network, di, ti)
+contingencyTable(modAssignments, mods, tiNodelist)
 }
 \arguments{
-\item{moduleAssignments}{processed user input for the 'moduleAssignments'
-argument (see \link{processInput})}
+\item{modAssignments}{a list where the first element is the 
+'moduleAssignments' vector in the discovery dataset, and the second element
+is the 'moduleAssignments vector in the test dataset.}
 
-\item{modules}{user processed input for the 'modules' argument.}
+\item{mods}{the 'modules' vector for the discovery dataset.}
 
-\item{network}{user processd input for the 'network' argument.}
-
-\item{di}{the discovery dataset to use}
-
-\item{ti}{the test dataset to use}
+\item{tiNodelist}{a vector of node IDs in the test dataset.}
 }
 \value{
 a list containing a contigency table,

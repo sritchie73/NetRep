@@ -2,7 +2,7 @@
 % Please edit documentation in R/check-user-input.R
 \name{checkIsMatrix}
 \alias{checkIsMatrix}
-\title{Check whether an object is a 'matrix' or a 'big.matrix'}
+\title{Check whether an object is a 'matrix' or a 'disk.matrix'}
 \usage{
 checkIsMatrix(object)
 }
@@ -13,6 +13,6 @@ checkIsMatrix(object)
 throws an error or returns silently
 }
 \description{
-Check whether an object is a 'matrix' or a 'big.matrix'
+Check whether an object is a 'matrix' or a 'disk.matrix'
 }
 

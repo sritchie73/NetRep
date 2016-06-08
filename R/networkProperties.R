@@ -58,32 +58,12 @@
 #'   \code{data}, and \code{correlation} arguments do not need to be wrapped in
 #'   a list.
 #' }
-#' \subsection{Compatability with 'big.matrix' input:}{
-#'   The matrices supplied in the \code{network}, \code{data}, and 
-#'   \code{correlation} arguments may be \code{\link[bigmemory]{big.matrix}}
-#'   objects from the \pkg{bigmemory} package. Supplying data in this format
-#'   reduces memory usage of \pkg{NetRep}'s functions: only the matrices from
-#'   one dataset will be kept in RAM at any point in time. Use of 
-#'   \code{\link[bigmemory]{big.matrix}} objects with \pkg{NetRep} is 
-#'   illustrated in the package vignette (see \code{vignette("NetRep")}).
-#'   
-#'   \strong{Warning:} We generally do not recommned using \code{'big.matrix'} 
-#'   objects on multi-node clusters. These systems typically have a distributed 
-#'   file-system, which allows other types of programs to communicate over 
-#'   multiple nodes safely. An implication of this is that the Operating System 
-#'   will check for consistency across nodes every time a program reads from, 
-#'   or writes to a file-backed shared memory segment. This results in very 
-#'   slow access speeds when extracting elements from a \code{'big.matrix'}, 
-#'   which gets exponentially worse the more R sessions you have accessing the 
-#'   \code{big.matrix} at once (for example through explicit parallelism using 
-#'   the \pkg{foreach} package). \pkg{NetRep} circumvents this limitation 
-#'   somewhat by copying the data stored in each \code{'big.matrix'} to a 
-#'   regular \code{'matrix'}, but this process can take a long time. For 
-#'   example, our gene expression datasets with 20,000 variables and 300 
-#'   samples take anywhere between 30 seconds and 15 minutes to copy, 
-#'   depending on the run. \pkg{NetRep} will output a message whenever a 
-#'   \code{'big.matrix'} is loaded into RAM. If this takes a long time, then 
-#'   this is an issue on your system.
+#' \subsection{Analysing large datasets:}{
+#'   Matrices in the \code{network}, \code{data}, and \code{correlation} lists
+#'   can be supplied as \code{\link{disk.matrix}} objects. This class allows 
+#'   matrix data to be kept on disk and loaded as required by \pkg{NetRep}. 
+#'   This dramatically decreases memory usage: the matrices for only one 
+#'   dataset will be kept in RAM at any point in time.
 #' }
 #' 
 #' @return 
@@ -245,20 +225,13 @@ netPropsInternal <- function(
   
   foreach(di = discovery) %do% {
     foreach(ti = test[[di]]) %do% {
-      
-      # Load matrices into RAM if they are 'big.matrix' objects.
-      #   Calls to the garbage collector are necessary so we don't have 
-      #   a copy of the data in shared memory as well.
-      anyBM <- any.big.matrix(data[[ti]], network[[ti]])
-      if (anyBM) {
-        vCat(verbose, 0, "Loading 'big.matrix' data for dataset", 
-             datasetNames[ti], "into RAM...")
-      }
+      # Load matrices into RAM if they are 'disk.matrix' objects.
+      anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+      vCat(verbose && anyDM, 0, "Loading matrices of dataset", 
+           datasetNames[ti], "into RAM...")
       data_mat <- loadIntoRAM(data[[ti]])
-      gc()
       network_mat <- loadIntoRAM(network[[ti]])
-      gc()
-      
+
       vCat(verbose, 0, "Calculating network properties in dataset", 
            datasetNames[ti], "...")
       
@@ -272,7 +245,8 @@ netPropsInternal <- function(
         )
       }
       
-      # remove from RAM
+      # unload from RAM
+      vCat(verbose && anyDM, 0, "Unloading matrices...")
       rm(data_mat, network_mat)
       gc()
       
