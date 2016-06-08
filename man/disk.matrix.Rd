@@ -3,24 +3,33 @@
 \docType{class}
 \name{disk.matrix}
 \alias{as.disk.matrix}
+\alias{as.disk.matrix,ANY-method}
+\alias{as.disk.matrix,disk.matrix-method}
+\alias{as.disk.matrix,matrix-method}
 \alias{as.matrix,disk.matrix-method}
 \alias{attach.matrix}
 \alias{disk.matrix}
 \alias{serialize.table}
+\alias{show,disk.matrix-method}
 \title{The 'disk.matrix' class}
 \usage{
-\S4method{as.matrix}{disk.matrix}(x)
-
 attach.matrix(file, serialized = TRUE, ...)
+
+serialize.table(file, ...)
 
 as.disk.matrix(x, file, serialize = TRUE)
 
-serialize.table(file, ...)
+\S4method{as.disk.matrix}{disk.matrix}(x, file, serialize = TRUE)
+
+\S4method{as.disk.matrix}{matrix}(x, file, serialize = TRUE)
+
+\S4method{as.disk.matrix}{ANY}(x, file, serialize = TRUE)
+
+\S4method{as.matrix}{disk.matrix}(x)
+
+\S4method{show}{disk.matrix}(object)
 }
 \arguments{
-\item{x}{for \code{as.matrix} a \code{disk.matrix} object to load into R. 
-For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}.}
-
 \item{file}{for \code{attach.matrix} the file name of a matrix on disk. For
 \code{as.disk.matrix} the file name to save the matrix to. For 
 \code{serialize.table} the file name of a matrix in table format on disk.}
@@ -33,10 +42,15 @@ be used.}
 \item{...}{arguments to be used by \code{read.table} when reading in matrix 
 data from a file in table format.}
 
+\item{x}{for \code{as.matrix} a \code{disk.matrix} object to load into R. 
+For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}.}
+
 \item{serialize}{determines how the matrix is saved to disk by 
 \code{as.disk.matrix}. If \code{TRUE} it will be stored as a serialized R 
 object using \code{saveRDS}. If \code{FALSE} it will be stored as a 
 tab-separated file using \code{write.table}.}
+
+\item{object}{a \code{'disk.matrix'} object.}
 }
 \value{
 A \code{disk.matrix} object (\code{attach.matrix}, \code{as.disk.matrix}),

@@ -17,6 +17,7 @@
 #'  be used. 
 #' @param x for \code{as.matrix} a \code{disk.matrix} object to load into R. 
 #'  For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}.
+#' @param object a \code{'disk.matrix'} object. 
 #' @param serialize determines how the matrix is saved to disk by 
 #'  \code{as.disk.matrix}. If \code{TRUE} it will be stored as a serialized R 
 #'  object using \code{saveRDS}. If \code{FALSE} it will be stored as a 
@@ -87,15 +88,6 @@ setClass("disk.matrix",
     }
   })
 
-#' @rdname disk.matrix 
-#' @export
-setMethod("as.matrix", signature(x="disk.matrix"), function(x) {
-  if (!file.exists(x@file)) {
-    stop("file ", prettyPath(x@file), " does not exist")
-  }
-  as.matrix(do.call(x@read.func, c(file=x@file, x@func.args)))
-})
-
 #' @rdname disk.matrix
 #' @export
 attach.matrix <- function(file, serialized=TRUE, ...) {
@@ -111,10 +103,20 @@ attach.matrix <- function(file, serialized=TRUE, ...) {
       func.args=list(...))
 }
 
+#' @rdname disk.matrix
 #' @export
-setMethod("show", signature(object="disk.matrix"), function(object) {
-  cat("Pointer to matrix stored at", prettyPath(object@file), "\n")
-})
+serialize.table <- function(file, ...) {
+  if (length(file) != 1 || !is.character(file) || !file.exists(file)) {
+    stop("'file' must be the name of a file and that file must already exist")
+  }
+  
+  ext <- gsub(".*\\.", "", file)
+  serialized.file <- gsub(paste0(ext, "$"), "rds", file)
+  
+  m <- as.matrix(read.table(file, ...))
+  saveRDS(m, serialized.file)
+  serialized.file
+}
 
 #' @rdname disk.matrix
 #' @export
@@ -122,18 +124,14 @@ setGeneric("as.disk.matrix", function(x, file, serialize=TRUE) {
   standardGeneric("as.disk.matrix")
 })
 
+#' @rdname disk.matrix
 setMethod("as.disk.matrix", signature(x="disk.matrix"), 
           function(x, file, serialize=TRUE) {
             warning("already a 'disk.matrix'")
             return(x)
           })
 
-setMethod("as.disk.matrix", signature(x="ANY"), 
-          function(x, file, serialize=TRUE) {
-            x <- as.matrix(x)
-            as.disk.matrix(x, file, serialize)
-          })
-
+#' @rdname disk.matrix
 setMethod("as.disk.matrix", signature(x="matrix"), 
           function(x, file, serialize=TRUE) {
             if (is.na(serialize) || length(serialize) != 1) {
@@ -157,17 +155,23 @@ setMethod("as.disk.matrix", signature(x="matrix"),
           })
 
 #' @rdname disk.matrix
+setMethod("as.disk.matrix", signature(x="ANY"), 
+          function(x, file, serialize=TRUE) {
+            x <- as.matrix(x)
+            as.disk.matrix(x, file, serialize)
+          })
+
+#' @rdname disk.matrix 
 #' @export
-serialize.table <- function(file, ...) {
-  if (length(file) != 1 || !is.character(file) || !file.exists(file)) {
-    stop("'file' must be the name of a file and that file must already exist")
+setMethod("as.matrix", signature(x="disk.matrix"), function(x) {
+  if (!file.exists(x@file)) {
+    stop("file ", prettyPath(x@file), " does not exist")
   }
+  as.matrix(do.call(x@read.func, c(file=x@file, x@func.args)))
+})
 
-  ext <- gsub(".*\\.", "", file)
-  serialized.file <- gsub(paste0(ext, "$"), "rds", file)
-  
-  m <- as.matrix(read.table(file, ...))
-  saveRDS(m, serialized.file)
-  serialized.file
-}
-
+#' @rdname disk.matrix
+#' @export
+setMethod("show", signature(object="disk.matrix"), function(object) {
+  cat("Pointer to matrix stored at", prettyPath(object@file), "\n")
+})
