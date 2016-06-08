@@ -34,7 +34,7 @@ load.bigMatrix <- function(backingfile) {
   if (!pkgReqCheck("bigmemory")) {
     stop("the 'bigmemory' package must be installed")
   }
-  warning("The 'bigMatrix' class is deprecated")
+  warning("The 'bigMatrix' class is deprecated", immediate.=TRUE)
   
   # Get components for interfacing with bigmemory and resolve paths as absolute
   backingname <- basename(backingfile)
