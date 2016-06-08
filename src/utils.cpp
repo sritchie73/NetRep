@@ -91,8 +91,8 @@ stringmap MakeModMap (
  * @param validNodes a vector of node names to be used when generating the 
  *   null hypothesis.
  * @param tIdxMap a mapping of node IDs to indices in the test dataset.
- * @param nullIdx a vector that has been initialised to the size of 
- *   'validNodes', this will be filled with indices in the test dataset.
+ * @param nullIdxAddr address to a vector that will be filled with indices in 
+ *  the test dataset.
  * 
  * @details
  *   If the node names of the test dataset are provided to 'validNodes', then
@@ -110,7 +110,7 @@ namemap MakeNullMap (
   arma::uvec& nullIdx
 ) {
   namemap nullMap;
-  nullIdx.set_size(validNodes.size()); // Will have, at most, this many elements
+  nullIdx.set_size(validNodes.size()); // set maximum possible size
   
   unsigned int counter = 0;
   // For each valid node
@@ -165,17 +165,22 @@ arma::uvec GetNodeIdx (
  * 
  * @param module module we want to get random indices for.
  * @param modNodeMap mapping between module labels and node IDs.
- * @param nodeIdx a (shuffled) vector of node indices in the test dataset. 
- *  These indices correspond to the set of nodes to use when generating the 
- *  null distributions.
+ * @param nodeIdxAddr memory address of a shuffled vector of node indices in 
+ *  the test dataset. These indices correspond to the set of nodes to use when 
+ *  generating the null distributions.
+ * @param nNullNodes number of nodes in the null distribution vector.
  * @param nullMap a mapping of node IDs to indices of the 'nodeIdx' vector.
  * 
  * @return a vector of indices in the test dataset.
  */ 
 arma::uvec GetRandomIdx(
-  std::string& module, const stringmap& modNodeMap, arma::uvec& nodeIdx, 
-  namemap& nullMap
+  std::string& module, const stringmap& modNodeMap, unsigned int * nodeIdxAddr,
+  unsigned int nNullNodes, namemap& nullMap
 ) {
+  // Construct armadillo matrices and vectors from memory addresses and 
+  // provided sizes
+  arma::uvec nodeIdx = arma::uvec(nodeIdxAddr, nNullNodes, false, true);
+  
   unsigned int nNodes = modNodeMap.count(module);
   arma::uvec randIdx (nNodes);
   
@@ -227,13 +232,26 @@ std::vector<std::string> GetModNodeNames (
  * Note: 'idx' must be the same size as 'contents': this is not checked by the 
  * code!
  *
- * @param tofill vector to fill.
- * @param contents vector whose contents to fill 'tofill' with.
- * @param idx (ordered) indices in 'tofill' to use when filling 'tofill'.
+ * @param tofill R vector to fill.
+ * @param contentsAddr memory address to the vector whose contents to fill 
+ *  'tofill' with.
+ * @param mNodesPresent number of nodes present in the module in the test 
+ *  dataset.
+ * @param idxAddr memory address to the ordered indices in 'tofill' to use 
+ *  when filling 'tofill'.
+ * @param mNodes number of nodes in the module.
  * 
  */
-void Fill(Rcpp::NumericVector& tofill, arma::vec& contents, arma::uvec& idx) {
-  for (unsigned int ii=0; ii < contents.size(); ++ii) {
+void Fill(
+  Rcpp::NumericVector& tofill, double * contentsAddr, 
+  unsigned int mNodesPresent, unsigned int * idxAddr, unsigned int mNodes
+) {
+  // Construct armadillo matrices and vectors from memory addresses and 
+  // provided sizes
+  arma::vec contents = arma::vec(contentsAddr, mNodesPresent, false, true);
+  arma::uvec idx = arma::uvec(idxAddr, mNodes, false, true);
+  
+  for (unsigned int ii=0; ii < mNodesPresent; ++ii) {
     tofill[idx.at(ii)] = contents.at(ii);
   }
 }

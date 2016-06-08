@@ -10,17 +10,17 @@
 #include <RcppArmadillo.h>
 
 // Utility functions
-arma::mat Scale (const arma::mat&);
-arma::uvec sortNodes (arma::uvec&);
+arma::mat Scale (double *, unsigned int, unsigned int);
+arma::uvec SortNodes (unsigned int *, unsigned int);
 double Correlation (double *, double *, unsigned int);
 double SignAwareMean (double *, double *, unsigned int);
 
 // Network properties
-arma::vec WeightedDegree (const arma::mat&, arma::uvec&);
+arma::vec WeightedDegree (double *, unsigned int, unsigned int *, unsigned int);
 double AverageEdgeWeight (double *, unsigned int);
-arma::vec CorrVector (const arma::mat&, arma::uvec&);
-arma::vec SummaryProfile (const arma::mat&, arma::uvec&);
-arma::vec NodeContribution (const arma::mat&, arma::uvec&, arma::vec&);
+arma::vec CorrVector (double *, unsigned int, unsigned int *, unsigned int);
+arma::vec SummaryProfile (double *, unsigned int, unsigned int, unsigned int *, unsigned int);
+arma::vec NodeContribution (double *, unsigned int, unsigned int, unsigned int *, unsigned int, double *);
 double ModuleCoherence (double *, unsigned int);
   
 #endif // __FUNCS__

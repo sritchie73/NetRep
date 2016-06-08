@@ -10,13 +10,13 @@
  * @param tDataAddr memory address of the (scaled) test data matrix.
  * @param tCorrAddr memory address of the test correlation matrix.
  * @param tNetAddr memory address of the test network matrix.
- * @param nNodes number of nodes in the test network.
  * @param nSamples number of samples in the test dataset.
+ * @param nNodes number of nodes in the test network.
  * @param addrWD unordered_map containing the memory addresses of the weighted 
  *   degree vectors for all modules in the discovery dataset.
  * @param addrNC unordered_map containing the memory addresses of the node 
  *   contribution vectors for all modules in the discovery dataset.
- * @param daddrCV unordered_map containing the memory addresses of the 
+ * @param addrCV unordered_map containing the memory addresses of the 
  *   correlation coefficient vectors for all modules in the discovery dataset.
  * @param mods vector of modules for which the module preservation statistics
  *   are being calculated for.
@@ -29,33 +29,34 @@
  * @param totalPerm total number of permutations.
  * @param nPerm number of permutations for this thread to calculate.
  * @param start slice index to start at when filling in the 'nulls' cube.
- * @param progress vector to fill in number of permutations completed for this 
- *  thread.
+ * @param progressAddr memory address of the vector to fill in number of 
+ *  permutations completed for this thread.
+ * @param nThreads total number of threads executing.
  * @param thread the number of the thread.
  * @param interrupted variable on the heap checking whether the user has asked
  *   to cancel the computation
  */
 void calculateNulls(
   double * tDataAddr, double * tCorrAddr, double * tNetAddr, 
-  unsigned int nNodes, unsigned int nSamples, addrmap& addrWD, addrmap& addrNC, 
+  unsigned int nSamples, unsigned int nNodes, addrmap& addrWD, addrmap& addrNC, 
   addrmap& addrCV, const std::vector<std::string> mods, 
-  const stringmap modNodeMap, const namemap modIdxMap, arma::uvec nullIdx, 
+  const stringmap modNodeMap, const namemap modIdxMap, arma::uvec nullIdx,
   namemap nullMap, double * nullsAddr, unsigned int totalPerm, 
-  unsigned int nPerm, unsigned int start, arma::uvec& progress,
-  unsigned int thread, bool& interrupted
+  unsigned int nPerm, unsigned int start, unsigned int * progressAddr,
+  unsigned int nThreads, unsigned int thread, bool& interrupted
 ) {    
   /**
    * Note: the R API is single threaded, we *must not* access it
-   * at all during our parallel calls.
+   * at all in this function or any functions it calls (i.e. netStats.cpp).
    **/
-  // Tell this thread where the matrix data is located in memory:
-  arma::mat tDataPtr = arma::mat(tDataAddr, nSamples, nNodes, false, true);
-  arma::mat tCorrPtr = arma::mat(tCorrAddr, nNodes, nNodes, false, true);
-  arma::mat tNetPtr = arma::mat(tNetAddr, nNodes, nNodes, false, true);
+  
+  // Tell this thread where the results cube and progress bar are located in 
+  // memory:
   arma::cube nulls = arma::cube(nullsAddr, mods.size(), 7, totalPerm, false, true);
+  arma::uvec progress = arma::uvec(progressAddr, nThreads, false, true);
   
   std::string mod;
-  unsigned int modIdx;
+  unsigned int modIdx, mNodes;
   arma::uvec tIdx, tRank;
   arma::vec tWD, tSP, tNC, tCV;
   for (unsigned int pp = start; pp < start + nPerm; ++pp) {
@@ -67,23 +68,30 @@ void calculateNulls(
       modIdx = modIdxMap.at(mod);
      
       // Get the node indices in the test dataset for this module
-      tIdx = GetRandomIdx(mod, modNodeMap, nullIdx, nullMap);
+      tIdx = GetRandomIdx(mod, modNodeMap, nullIdx.memptr(), nullIdx.n_elem, nullMap);
+      mNodes = tIdx.n_elem;
       
       // Now calculate required properties in the test dataset
-      tCV = CorrVector(tCorrPtr, tIdx);
+      tCV = CorrVector(tCorrAddr, nNodes, tIdx.memptr(), mNodes);
       if (interrupted) return; 
-     
-      tRank = sortNodes(tIdx); // Sort nodes for sequential memory access
-      tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
+      
+      // Sort nodes indices for sequential memory access
+      tRank = SortNodes(tIdx.memptr(), mNodes); 
+      
+      tWD = WeightedDegree(tNetAddr, nNodes, tIdx.memptr(), mNodes);
+      tWD = tWD(tRank); //reorder results
       if (interrupted) return; 
-      tSP = SummaryProfile(tDataPtr, tIdx);
+      
+      tSP = SummaryProfile(tDataAddr, nSamples, nNodes, tIdx.memptr(), mNodes);
       if (interrupted) return; 
-      tNC = NodeContribution(tDataPtr, tIdx, tSP)(tRank);
+      
+      tNC = NodeContribution(tDataAddr, nSamples, nNodes, tIdx.memptr(),
+                             mNodes, tSP.memptr());
+      tNC = tNC(tRank); // reorder results
       if (interrupted) return; 
       
       // Calculate and store test statistics in the appropriate location in the 
       // results matrix
-
       nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
       nulls.at(modIdx, 1, pp) = ModuleCoherence(tNC.memptr(), tNC.n_elem);
       nulls.at(modIdx, 2, pp) = Correlation(addrCV[mod], tCV.memptr(), tCV.n_elem);
@@ -153,15 +161,11 @@ Rcpp::List PermutationProcedure (
   Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, 
   Rcpp::LogicalVector verbose, Rcpp::Function vCat
 ) {
-  // First, we need to create pointers to the memory holding each
-  // NumericMatrix that can be recognised by the armadillo library.
-
-  arma::mat tDataPtr = arma::mat(tData.begin(), tData.nrow(), tData.ncol(), false, true);
-  arma::mat tCorrPtr = arma::mat(tCorr.begin(), tCorr.nrow(), tCorr.ncol(), false, true);
-  arma::mat tNetPtr = arma::mat(tNet.begin(), tNet.nrow(), tNet.ncol(), false, true);
   
-  // Next we will scale the matrix data
-  arma::mat tDataScaled = Scale(tDataPtr);
+  // First, scale the matrix data
+  unsigned int nSamples = tData.nrow();
+  unsigned int nNodes = tData.ncol();
+  arma::mat tScaledData = Scale(tData.begin(), nSamples, nNodes);
   
   R_CheckUserInterrupt(); 
   
@@ -235,7 +239,6 @@ Rcpp::List PermutationProcedure (
   Rcpp::List lNC = Rcpp::as<Rcpp::List>(discProps["contribution"]);
   Rcpp::NumericVector vWD, vCV, vNC; 
   
-  vecmap discWD, discNC, discCV;
   addrmap addrWD, addrNC, addrCV; 
   std::string mod;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -246,22 +249,16 @@ Rcpp::List PermutationProcedure (
     vCV = Rcpp::as<Rcpp::NumericVector>(lCV[mod]);
     vNC = Rcpp::as<Rcpp::NumericVector>(lNC[mod]);
     
-    // construct armadillo vectors that point to their locations in memory
-    discWD[mod] = arma::vec(vWD.begin(), vWD.size(), false, true);
-    discCV[mod] = arma::vec(vCV.begin(), vCV.size(), false, true);
-    discNC[mod] = arma::vec(vNC.begin(), vNC.size(), false, true);
-    
-    // and save their addresses
-    addrWD[mod] = discWD[mod].memptr();
-    addrCV[mod] = discCV[mod].memptr();
-    addrNC[mod] = discNC[mod].memptr();
+    addrWD[mod] = vWD.begin();
+    addrCV[mod] = vCV.begin();
+    addrNC[mod] = vNC.begin();
   }
   
   R_CheckUserInterrupt();
   
   // Now calculate the observed test statistics
   vCat(verbose, 1, "Calculating observed test statistics...");
-  unsigned int modIdx;
+  unsigned int modIdx, mNodes;
   arma::uvec tIdx, tRank;
   arma::vec tCV, tWD, tSP, tNC;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -271,14 +268,27 @@ Rcpp::List PermutationProcedure (
     
     // Get the node indices in the test dataset for this module
     tIdx = GetNodeIdx(mod, modNodePresentMap, tIdxMap);
+    mNodes = tIdx.n_elem;
     
     // Now calculate required properties in the test dataset
-    tCV = CorrVector(tCorrPtr, tIdx);
+    tCV = CorrVector(tCorr.begin(), nNodes, tIdx.memptr(), mNodes);
+    R_CheckUserInterrupt();
     
-    tRank = sortNodes(tIdx); // Sort nodes for sequential memory access
-    tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
-    tSP = SummaryProfile(tDataScaled, tIdx);
-    tNC = NodeContribution(tDataScaled, tIdx, tSP)(tRank);
+    // Sort node indices for sequential memory access
+    tRank = SortNodes(tIdx.memptr(), mNodes); 
+    
+    tWD = WeightedDegree(tNet.begin(), nNodes, tIdx.memptr(), mNodes);
+    tWD = tWD(tRank); // reorder results
+    R_CheckUserInterrupt(); 
+    
+    tSP = SummaryProfile(tScaledData.memptr(), nSamples, nNodes, tIdx.memptr(), 
+                         mNodes);
+    R_CheckUserInterrupt(); 
+    
+    tNC = NodeContribution(tScaledData.memptr(), nSamples, nNodes, 
+                           tIdx.memptr(), mNodes, tSP.memptr());
+    tNC = tNC(tRank); // reorder results
+    R_CheckUserInterrupt(); 
     
     /* Calculate and store test statistics in the appropriate location in the 
     * results matrix
@@ -333,16 +343,15 @@ Rcpp::List PermutationProcedure (
   // Spawn the threads
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
     tt[ii] = std::thread(
-      calculateNulls, tDataScaled.memptr(), tCorrPtr.memptr(),
-      tNetPtr.memptr(), tNetPtr.n_cols, tDataScaled.n_rows,
-      std::ref(addrWD), std::ref(addrNC), std::ref(addrCV),
-      modsPresent, modNodePresentMap, modIdxMap, nullIdx, nullMap,
-      nulls.memptr(), nPerm, chunkPerms.at(ii), startIdx.at(ii), 
-      std::ref(progress), ii, std::ref(interrupted)
+      calculateNulls, tScaledData.memptr(), tCorr.begin(),
+      tNet.begin(), nSamples, nNodes, std::ref(addrWD), std::ref(addrNC), 
+      std::ref(addrCV),modsPresent, modNodePresentMap, modIdxMap, nullIdx, 
+      nullMap, nulls.memptr(), nPerm, chunkPerms.at(ii), startIdx.at(ii), 
+      progress.memptr(), nThreads, ii, std::ref(interrupted)
     );
   }
 
-  MonitorProgress(nPerm, progress, interrupted, verboseFlag);
+  MonitorProgress(nPerm, progress.memptr(), nThreads, interrupted, verboseFlag);
 
   // Wait for all the threads to finish
   for (unsigned int ii = 0; ii < nThreads; ++ii) {

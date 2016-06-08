@@ -1,3 +1,11 @@
+#define ARMA_USE_LAPACK
+#define ARMA_USE_BLAS
+#define ARMA_NO_DEBUG
+#define ARMA_DONT_PRINT_ERRORS
+#define ARMA_DONT_USE_CXX11
+
+#include <RcppArmadillo.h>
+
 // header files for sleeping a thread
 #if defined (_WIN32) || defined (_WIN64)
   #include <windows.h>
@@ -17,8 +25,6 @@ void sleep(int secs) {
   #endif
 }
 
-
-
 /* Monitors the progress of the permutation procedure
  * 
  * The primary role of this function is to facilitate user interrupts to cancel
@@ -27,19 +33,23 @@ void sleep(int secs) {
  * is also printed every second.
  * 
  * @param nPerm the total number of permutations to compute
- * @param progress a vector that is being updated by each thread with the 
- *   number of permutations that have been completed by each thread
+ * @param progressAddr memory address of a vector that is being updated by each 
+ *   thread with the number of permutations that have been completed by each 
+ *   thread.
+ * @param nThreads total number of threads being run.
  * @param interrupted a boolean value in the heap, accessible to each thread,
  *   that is modified when the user attempts to cancel the permutation 
  *   procedure in the R session.
  * @param verboseFlag if 'false' messages are not printed.
  */
 void MonitorProgress (
-    unsigned int& nPerm, arma::uvec& progress, bool& interrupted,
-    const bool& verboseFlag
+    unsigned int& nPerm, unsigned int * progressAddr, unsigned int nThreads,
+    bool& interrupted, const bool& verboseFlag
 ) {
+  arma::uvec progress = arma::uvec(progressAddr, nThreads, false, true);
+  
   if (verboseFlag) {
-    Rcpp::Rcout << "\n";
+    Rcpp::Rcout << std::endl;
   }
   unsigned int nCompleted = 0;
   unsigned int percentCompleted = 0;
@@ -64,6 +74,6 @@ void MonitorProgress (
     sleep(1);
   }
   if (verboseFlag) {
-    Rcpp::Rcout << "\n\n";
+    Rcpp::Rcout << std::endl << std::endl;
   }
 }

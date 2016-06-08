@@ -12,7 +12,7 @@
 * @param nNodes number of nodes in the test network.
 * @param addrWD unordered_map containing the memory addresses of the weighted 
 *   degree vectors for all modules in the discovery dataset.
-* @param daddrCV unordered_map containing the memory addresses of the 
+* @param addrCV unordered_map containing the memory addresses of the 
 *   correlation coefficient vectors for all modules in the discovery dataset.
 * @param mods vector of modules for which the module preservation statistics
 *   are being calculated for.
@@ -25,31 +25,33 @@
 * @param totalPerm total number of permutations.
 * @param nPerm number of permutations for this thread to calculate.
 * @param start slice index to start at when filling in the 'nulls' cube.
-* @param progress vector to fill in number of permutations completed for this
-*   thread.
+* @param progressAddr memory address of the vector to fill in number of 
+*  permutations completed for this thread.
+* @param nThreads total number of threads executing.
 * @param thread the number of the thread.
 * @param interrupted variable on the heap checking whether the user has asked
 *   to cancel the computation
 */
-void calculateNullsNoData(
-    double * tCorrAddr, double * tNetAddr, unsigned int nNodes,
+void calculateNulls(
+    double * tCorrAddr, double * tNetAddr, unsigned int nNodes, 
     addrmap& addrWD, addrmap& addrCV, const std::vector<std::string> mods, 
     const stringmap modNodeMap, const namemap modIdxMap, arma::uvec nullIdx, 
     namemap nullMap, double * nullsAddr, unsigned int totalPerm, 
-    unsigned int nPerm, unsigned int start, arma::uvec& progress, 
-    unsigned int thread, bool& interrupted
+    unsigned int nPerm, unsigned int start, unsigned int * progressAddr,
+    unsigned int nThreads, unsigned int thread, bool& interrupted
 ) {    
   /**
   * Note: the R API is single threaded, we *must not* access it
-  * at all during our parallel calls.
+  * at all in this function or any functions it calls (i.e. netStats.cpp).
   **/
-  // Tell this thread where the matrix data is located in memory:
-  arma::mat tCorrPtr = arma::mat(tCorrAddr, nNodes, nNodes, false, true);
-  arma::mat tNetPtr = arma::mat(tNetAddr, nNodes, nNodes, false, true);
+  
+  // Tell this thread where the results cube and progress bar are located in 
+  // memory:
   arma::cube nulls = arma::cube(nullsAddr, mods.size(), 4, totalPerm, false, true);
+  arma::uvec progress = arma::uvec(progressAddr, nThreads, false, true);
   
   std::string mod;
-  unsigned int modIdx;
+  unsigned int modIdx, mNodes;
   arma::uvec tIdx, tRank;
   arma::vec tWD, tCV;
   for (unsigned int pp = start; pp < start + nPerm; ++pp) {
@@ -61,16 +63,20 @@ void calculateNullsNoData(
       modIdx = modIdxMap.at(mod);
       
       // Get the node indices in the test dataset for this module
-      tIdx = GetRandomIdx(mod, modNodeMap, nullIdx, nullMap);
+      tIdx = GetRandomIdx(mod, modNodeMap, nullIdx.memptr(), nullIdx.n_elem, nullMap);
+      mNodes = tIdx.n_elem;
       
       // Now calculate required properties in the test dataset
-      tCV = CorrVector(tCorrPtr, tIdx);
+      tCV = CorrVector(tCorrAddr, nNodes, tIdx.memptr(), mNodes);
       if (interrupted) return; 
       
-      tRank = sortNodes(tIdx); // Sort nodes for sequential memory access
-      tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
+      // Sort nodes indices for sequential memory access
+      tRank = SortNodes(tIdx.memptr(), mNodes); 
+      
+      tWD = WeightedDegree(tNetAddr, nNodes, tIdx.memptr(), mNodes);
+      tWD = tWD(tRank); //reorder results
       if (interrupted) return; 
-
+      
       // Calculate and store test statistics in the appropriate location in the 
       // results matrix
       nulls.at(modIdx, 0, pp) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
@@ -100,7 +106,7 @@ void calculateNullsNoData(
 //'   \item{'nCores' is a single number, greater than 0. Note, this number must
 //'         not be larger than the number of cores on your machine, or the 
 //'         number of cores allocated to your job!}
-//'   \item{'nullHypothesis' must be a character vector of lenght 1, containing
+//'   \item{'nullHypothesis' must be a character vector of length 1, containing
 //'         either "overlap" or "all".}
 //'   \item{'verbose' must be a logical vector of length 1 containing either 
 //'         'TRUE' or 'FALSE'.}
@@ -130,28 +136,25 @@ void calculateNullsNoData(
 //'   array of null distribution observations.
 // [[Rcpp::export]]
 Rcpp::List PermutationProcedureNoData (
-    Rcpp::List discProps, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet,
-    Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules,
+    Rcpp::List discProps, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, 
+    Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, 
     Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, 
-    Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose,
+    Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, 
     Rcpp::Function vCat
 ) {
-  // First, we need to create pointers to the memory holding each
-  // NumericMatrix that can be recognised by the armadillo library.
-  arma::mat tCorrPtr = arma::mat(tCorr.begin(), tCorr.nrow(), tCorr.ncol(), false, true);
-  arma::mat tNetPtr = arma::mat(tNet.begin(), tNet.nrow(), tNet.ncol(), false, true);
+  unsigned int nNodes = tNet.ncol();
+
+  R_CheckUserInterrupt(); 
   
   // convert the colnames / rownames to C++ equivalents
   const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(moduleAssignments.names()));
   const std::vector<std::string> tNames (Rcpp::as<std::vector<std::string>>(colnames(tNet)));
   
   /* Next, we need to create three mappings:
-   *  - From node IDs to indices in the discovery dataset.
-   *  - From node IDs to indices in the test dataset.
-   *  - From modules to all node IDs.
-   *  - From modules to just node IDs present in the test dataset.
-   */
-  const namemap dIdxMap = MakeIdxMap(dNames);
+  *  - From node IDs to indices in the test dataset.
+  *  - From modules to all node IDs.
+  *  - From modules to just node IDs present in the test dataset.
+  */
   const namemap tIdxMap = MakeIdxMap(tNames);
   const stringmap modNodeMap = MakeModMap(moduleAssignments);
   const stringmap modNodePresentMap = MakeModMap(moduleAssignments, tIdxMap);
@@ -204,15 +207,14 @@ Rcpp::List PermutationProcedureNoData (
   R_CheckUserInterrupt(); 
   
   /* We need to convert each 'discProps' list to a mapping from each module
-   * to the address in memory its corresponding property vector
-   */
+  * to the address in memory its corresponding property vector
+  */
   
   // We need to do a lot of casting to get list elements in C++!
   Rcpp::List lWD = Rcpp::as<Rcpp::List>(discProps["degree"]);
   Rcpp::List lCV = Rcpp::as<Rcpp::List>(discProps["corr"]);
   Rcpp::NumericVector vWD, vCV; 
   
-  vecmap discWD, discCV;
   addrmap addrWD, addrCV; 
   std::string mod;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -221,21 +223,17 @@ Rcpp::List PermutationProcedureNoData (
     // Extract the numeric vectors
     vWD = Rcpp::as<Rcpp::NumericVector>(lWD[mod]);
     vCV = Rcpp::as<Rcpp::NumericVector>(lCV[mod]);
-    
-    // construct armadillo vectors that point to their locations in memory
-    discWD[mod] = arma::vec(vWD.begin(), vWD.size(), false, true);
-    discCV[mod] = arma::vec(vCV.begin(), vCV.size(), false, true);
 
     // and save their addresses
-    addrWD[mod] = discWD[mod].memptr();
-    addrCV[mod] = discCV[mod].memptr();
+    addrWD[mod] = vWD.begin();
+    addrCV[mod] = vCV.begin();
   }
   
-  R_CheckUserInterrupt(); 
-
+  R_CheckUserInterrupt();
+  
   // Now calculate the observed test statistics
   vCat(verbose, 1, "Calculating observed test statistics...");
-  unsigned int modIdx;
+  unsigned int modIdx, mNodes;
   arma::uvec tIdx, tRank;
   arma::vec tCV, tWD;
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
@@ -245,16 +243,22 @@ Rcpp::List PermutationProcedureNoData (
     
     // Get the node indices in the test dataset for this module
     tIdx = GetNodeIdx(mod, modNodePresentMap, tIdxMap);
+    mNodes = tIdx.n_elem;
     
     // Now calculate required properties in the test dataset
-    tCV = CorrVector(tCorrPtr, tIdx);
+    tCV = CorrVector(tCorr.begin(), nNodes, tIdx.memptr(), mNodes);
+    R_CheckUserInterrupt();
     
-    tRank = sortNodes(tIdx); // Sort nodes for sequential memory access
-    tWD = WeightedDegree(tNetPtr, tIdx)(tRank);
+    // Sort node indices for sequential memory access
+    tRank = SortNodes(tIdx.memptr(), mNodes); 
+    
+    tWD = WeightedDegree(tNet.begin(), nNodes, tIdx.memptr(), mNodes);
+    tWD = tWD(tRank); // reorder results
+    R_CheckUserInterrupt(); 
     
     /* Calculate and store test statistics in the appropriate location in the 
-     * results matrix
-     */
+    * results matrix
+    */
     obs(modIdx, 0) = AverageEdgeWeight(tWD.memptr(), tWD.n_elem);
     obs(modIdx, 1) = Correlation(addrCV[mod], tCV.memptr(), tCV.n_elem);
     obs(modIdx, 2) = Correlation(addrWD[mod], tWD.memptr(), tWD.n_elem);
@@ -275,7 +279,7 @@ Rcpp::List PermutationProcedureNoData (
   // Determine the number of permutations for each thread
   arma::uvec chunkPerms (nThreads, arma::fill::zeros);
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
-    chunkPerms.at(ii) = nPerm / nThreads; 
+    chunkPerms.at(ii) = nPerm / nThreads;
   }
   // When the number of permtutations cannot be distributed evenly, spread the
   // remainder out across threads.
@@ -302,14 +306,14 @@ Rcpp::List PermutationProcedureNoData (
   // Spawn the threads
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
     tt[ii] = std::thread(
-      calculateNullsNoData, tCorrPtr.memptr(), tNetPtr.memptr(), tNetPtr.n_cols,
-      std::ref(addrWD), std::ref(addrCV), modsPresent, modNodePresentMap, 
-      modIdxMap, nullIdx, nullMap, nulls.memptr(), nPerm, chunkPerms.at(ii), 
-      startIdx.at(ii), std::ref(progress), ii, std::ref(interrupted)
+      calculateNulls, tCorr.begin(), tNet.begin(), nNodes, std::ref(addrWD), 
+      std::ref(addrCV),modsPresent, modNodePresentMap, modIdxMap, nullIdx, 
+      nullMap, nulls.memptr(), nPerm, chunkPerms.at(ii), startIdx.at(ii), 
+      progress.memptr(), nThreads, ii, std::ref(interrupted)
     );
   }
   
-  MonitorProgress(nPerm, progress, interrupted, verboseFlag);
+  MonitorProgress(nPerm, progress.memptr(), nThreads, interrupted, verboseFlag);
   
   // Wait for all the threads to finish
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
@@ -321,7 +325,9 @@ Rcpp::List PermutationProcedureNoData (
   obs.elem(arma::find_nonfinite(obs)).fill(NA_REAL);
   
   // Construct rownames
-  const std::vector<std::string> statnames = {"avg.weight", "cor.cor", "cor.degree", "avg.cor"};
+  const std::vector<std::string> statnames = {
+    "avg.weight", "cor.cor", "cor.degree",  "avg.cor"
+  };
   
   // Construct permutation names
   std::vector<std::string> permNames(nPerm);

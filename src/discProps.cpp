@@ -44,14 +44,10 @@ Rcpp::List IntermediateProperties (
     Rcpp::CharacterVector tNodeNames, Rcpp::CharacterVector moduleAssignments, 
     Rcpp::CharacterVector modules
 ) {
-  // First, we need to create pointers to the memory holding each
-  // NumericMatrix that can be recognised by the armadillo library.
-  arma::mat dDataPtr = arma::mat(dData.begin(), dData.nrow(), dData.ncol(), false, true);
-  arma::mat dCorrPtr = arma::mat(dCorr.begin(), dCorr.nrow(), dCorr.ncol(), false, true);
-  arma::mat dNetPtr = arma::mat(dNet.begin(), dNet.nrow(), dNet.ncol(), false, true);
-  
-  // Next we will scale the matrix data
-  arma::mat dDataScaled = Scale(dDataPtr);
+  // First, scale the matrix data
+  unsigned int nSamples = dData.nrow();
+  unsigned int nNodes = dData.ncol();
+  arma::mat dScaledData = Scale(dData.begin(), nSamples, nNodes);
 
   R_CheckUserInterrupt(); 
   
@@ -89,25 +85,33 @@ Rcpp::List IntermediateProperties (
   
   // Calculate the network properties in the discovery dataset.
   std::string mod;
+  unsigned int mNodes;
   arma::uvec dIdx, dRank;
   arma::vec dSP, dWD, dCV, dNC; 
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
     // Get the node indices in the discovery dataset for this module
     mod = *mi;
     dIdx = GetNodeIdx(mod, modNodePresentMap, dIdxMap);
+    mNodes = dIdx.n_elem;
     R_CheckUserInterrupt(); 
     
     // Calculate the network properties and insert into their storage containers
-    dCV = CorrVector(dCorrPtr, dIdx);
-    
+    dCV = CorrVector(dCorr.begin(), nNodes, dIdx.memptr(), mNodes);
     R_CheckUserInterrupt(); 
     
-    dRank = sortNodes(dIdx); // Sort nodes for sequential memory access
-    dWD = WeightedDegree(dNetPtr, dIdx)(dRank);
+    // Sort node indices for sequential memory access
+    dRank = SortNodes(dIdx.memptr(), mNodes); 
+    
+    dWD = WeightedDegree(dNet.begin(), nNodes, dIdx.memptr(), mNodes);
+    dWD = dWD(dRank); // reorder
     R_CheckUserInterrupt(); 
-    dSP = SummaryProfile(dDataScaled, dIdx);
+    
+    dSP = SummaryProfile(dScaledData.memptr(), nSamples, nNodes, dIdx.memptr(), mNodes);
     R_CheckUserInterrupt(); 
-    dNC = NodeContribution(dDataScaled, dIdx, dSP)(dRank);
+    
+    dNC = NodeContribution(dScaledData.memptr(), nSamples, nNodes, 
+                           dIdx.memptr(), mNodes, dSP.memptr());
+    dNC = dNC(dRank); // reorder results
     R_CheckUserInterrupt(); 
     
     // Cast to R-vectors and add to results lists
@@ -167,12 +171,7 @@ Rcpp::List IntermediatePropertiesNoData (
     Rcpp::CharacterVector tNodeNames, Rcpp::CharacterVector moduleAssignments, 
     Rcpp::CharacterVector modules
 ) {
-  // First, we need to create pointers to the memory holding each
-  // NumericMatrix that can be recognised by the armadillo library.
-  arma::mat dCorrPtr = arma::mat(dCorr.begin(), dCorr.nrow(), dCorr.ncol(), false, true);
-  arma::mat dNetPtr = arma::mat(dNet.begin(), dNet.nrow(), dNet.ncol(), false, true);
-  
-  R_CheckUserInterrupt(); 
+  unsigned int nNodes = dNet.ncol();
   
   // convert the colnames / rownames to C++ equivalents
   const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(colnames(dNet)));
@@ -207,21 +206,26 @@ Rcpp::List IntermediatePropertiesNoData (
 
   // Calculate the network properties in the discovery dataset.
   std::string mod;
+  unsigned int mNodes;
+  
   arma::uvec dIdx, dRank;
   arma::vec dWD, dCV; 
   for (auto mi = modsPresent.begin(); mi != modsPresent.end(); ++mi) {
     // Get the node indices in the discovery dataset for this module
     mod = *mi;
     dIdx = GetNodeIdx(mod, modNodePresentMap, dIdxMap);
+    mNodes = dIdx.n_elem;
     R_CheckUserInterrupt(); 
     
     // Calculate the network properties and insert into their storage containers
-    dCV = CorrVector(dCorrPtr, dIdx);
-    
+    dCV = CorrVector(dCorr.begin(), nNodes, dIdx.memptr(), mNodes);
     R_CheckUserInterrupt(); 
     
-    dRank = sortNodes(dIdx); // Sort nodes for sequential memory access
-    dWD = WeightedDegree(dNetPtr, dIdx)(dRank);
+    // Sort node indices for sequential memory access
+    dRank = SortNodes(dIdx.memptr(), mNodes); 
+    
+    dWD = WeightedDegree(dNet.begin(), nNodes, dIdx.memptr(), mNodes);
+    dWD = dWD(dRank); // reorder
     R_CheckUserInterrupt(); 
     
     // Cast to R-vectors and add to results lists

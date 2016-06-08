@@ -167,7 +167,7 @@ PermutationProcedure <- function(discProps, tData, tCorr, tNet, moduleAssignment
 #'   \item{'nCores' is a single number, greater than 0. Note, this number must
 #'         not be larger than the number of cores on your machine, or the 
 #'         number of cores allocated to your job!}
-#'   \item{'nullHypothesis' must be a character vector of lenght 1, containing
+#'   \item{'nullHypothesis' must be a character vector of length 1, containing
 #'         either "overlap" or "all".}
 #'   \item{'verbose' must be a logical vector of length 1 containing either 
 #'         'TRUE' or 'FALSE'.}

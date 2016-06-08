@@ -40,14 +40,10 @@ Rcpp::List NetworkProperties (
     Rcpp::CharacterVector moduleAssignments,
     Rcpp::CharacterVector modules
 ) {
-  
-  // First, we need to create pointers to the memory holding each
-  // NumericMatrix that can be recognised by the armadillo library.
-  const arma::mat& dataPtr = arma::mat(data.begin(), data.nrow(), data.ncol(), false, true);
-  const arma::mat& netPtr = arma::mat(net.begin(), net.nrow(), net.ncol(), false, true);
-  
-  // Next we will scale the matrix data
-  const arma::mat dataScaled = Scale(dataPtr);
+  // First, scale the matrix data
+  unsigned int nSamples = data.nrow();
+  unsigned int nNodes = data.ncol();
+  arma::mat scaledData = Scale(data.begin(), nSamples, nNodes);
   
   R_CheckUserInterrupt(); 
   
@@ -71,6 +67,7 @@ Rcpp::List NetworkProperties (
   
   // Calculate the network properties for each module
   std::string mod; // iterators
+  unsigned int mNodesPresent, mNodes;
   arma::uvec nodeIdx, propIdx, nodeRank;
   namemap propIdxMap;
   std::vector<std::string> modNodeNames; 
@@ -87,7 +84,7 @@ Rcpp::List NetworkProperties (
     // the dataset we're calculating the network properties in.
     degree = Rcpp::NumericVector(modNodeNames.size(), NA_REAL);
     contribution = Rcpp::NumericVector(modNodeNames.size(), NA_REAL);
-    summary = Rcpp::NumericVector(dataPtr.n_rows, NA_REAL);
+    summary = Rcpp::NumericVector(nSamples, NA_REAL);
     avgWeight = NA_REAL;
     coherence = NA_REAL;
     degree.names() = modNodeNames;
@@ -98,25 +95,37 @@ Rcpp::List NetworkProperties (
     
     // Get just the indices of nodes that are present in the requested dataset
     nodeIdx = GetNodeIdx(mod, modNodePresentMap, nodeIdxMap);
+    mNodesPresent = nodeIdx.n_elem;
     
     // And a mapping of those nodes to the initialised vectors
     propIdx = GetNodeIdx(mod, modNodePresentMap, propIdxMap);
+    mNodes = propIdx.n_elem;
     
-    if (nodeIdx.size() > 0) {
-      // Calculate the properties
-      nodeRank = sortNodes(nodeIdx); // Sort nodes for sequential memory access
-      WD =  WeightedDegree(netPtr, nodeIdx)(nodeRank);
+    // Calculate the properties if the module has nodes in the test dataset
+    if (nodeIdx.n_elem > 0) {
+      // sort the node indices for sequential memory access
+      nodeRank = SortNodes(nodeIdx.memptr(), mNodesPresent);
+      
+      WD = WeightedDegree(net.begin(), nNodes, nodeIdx.memptr(), mNodesPresent);
+      WD = WD(nodeRank); // reorder results
+      
       avgWeight = AverageEdgeWeight(WD.memptr(), WD.n_elem);
       R_CheckUserInterrupt(); 
-      SP = SummaryProfile(dataScaled, nodeIdx);
+      
+      SP = SummaryProfile(scaledData.memptr(), nSamples, nNodes, 
+                          nodeIdx.memptr(), mNodesPresent);
       R_CheckUserInterrupt(); 
-      NC = NodeContribution(dataScaled, nodeIdx, SP)(nodeRank);
-      coherence = ModuleCoherence(NC.memptr(), NC.n_elem);
+      
+      NC = NodeContribution(scaledData.memptr(), nSamples, nNodes, 
+                            nodeIdx.memptr(), mNodesPresent, SP.memptr());
+      NC = NC(nodeRank); // reorder results
+      
+      coherence = ModuleCoherence(NC.memptr(), mNodesPresent);
       R_CheckUserInterrupt(); 
       
       // Fill the results vectors appropriately
-      Fill(degree, WD, propIdx);
-      Fill(contribution, NC, propIdx);
+      Fill(degree, WD.memptr(), mNodesPresent, propIdx.memptr(), mNodes);
+      Fill(contribution, NC.memptr(), mNodesPresent, propIdx.memptr(), mNodes);
       summary = Rcpp::NumericVector(SP.begin(), SP.end());
     }
     summary.names() = sampleNames;
@@ -171,14 +180,10 @@ Rcpp::List NetworkPropertiesNoData (
     Rcpp::CharacterVector moduleAssignments,
     Rcpp::CharacterVector modules
 ) {
-  
-  // First, we need to create pointers to the memory holding each
-  // NumericMatrix that can be recognised by the armadillo library.
-  const arma::mat& netPtr = arma::mat(net.begin(), net.nrow(), net.ncol(), false, true);
-  
   // convert the colnames / rownames to C++ equivalents
   const std::vector<std::string> nodeNames (Rcpp::as<std::vector<std::string>>(colnames(net)));
-
+  unsigned int nNodes = net.ncol();
+  
   R_CheckUserInterrupt(); 
   
   /* Next, we need to create two mappings:
@@ -197,6 +202,7 @@ Rcpp::List NetworkPropertiesNoData (
   
   // Calculate the network properties for each module
   std::string mod; // iterators
+  unsigned int mNodesPresent, mNodes;
   arma::uvec nodeIdx, propIdx, nodeRank;
   namemap propIdxMap;
   std::vector<std::string> modNodeNames; 
@@ -216,29 +222,30 @@ Rcpp::List NetworkPropertiesNoData (
     avgWeight = NA_REAL;
     degree.names() = modNodeNames;
     
+    // Create a mapping between node names and the result vectors
+    propIdxMap = MakeIdxMap(modNodeNames);
+    
     // Get just the indices of nodes that are present in the requested dataset
-    // nodeIdx = match(intersect(modNodeNames, colnames(net)), colnames(net))
     nodeIdx = GetNodeIdx(mod, modNodePresentMap, nodeIdxMap);
+    mNodesPresent = nodeIdx.n_elem;
     
     // And a mapping of those nodes to the initialised vectors
-    // propIdx = match(intersect(modNodeNames, colnames(net), modNodeNames)
-    propIdxMap = MakeIdxMap(modNodeNames);
     propIdx = GetNodeIdx(mod, modNodePresentMap, propIdxMap);
-    
-    // Calculate the properties, provided the module has some nodes in the test
-    // dataset
-    if (nodeIdx.size() > 0) {
-      // Node indices are sorted for sequential memory access, and 'nodeRank'
-      // provides the mapping to "unsort" the results so that they are in the
-      // original order requested.
-      nodeRank = sortNodes(nodeIdx); 
-      WD = WeightedDegree(netPtr, nodeIdx)(nodeRank);
+    mNodes = propIdx.n_elem;
+
+    // Calculate the properties if the module has nodes in the test dataset
+    if (nodeIdx.n_elem > 0) {
+      // sort the node indices for sequential memory access
+      nodeRank = SortNodes(nodeIdx.memptr(), mNodesPresent);
+      
+      WD = WeightedDegree(net.begin(), nNodes, nodeIdx.memptr(), mNodesPresent);
+      WD = WD(nodeRank); // reorder results
+      
       avgWeight = AverageEdgeWeight(WD.memptr(), WD.n_elem);
       R_CheckUserInterrupt(); 
       
       // Fill the results vectors appropriately
-      // degree[propIdx] <- WD
-      Fill(degree, WD, propIdx);
+      Fill(degree, WD.memptr(), mNodesPresent, propIdx.memptr(), mNodes);
     }
 
     results.push_back(
