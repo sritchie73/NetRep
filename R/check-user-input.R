@@ -582,6 +582,7 @@ processInput <- function(
   # ----------------------------------------------------------------------------
   # Check for data consistency
   # ----------------------------------------------------------------------------
+  nodelist <- NULL # prevents crashes when dryRun=TRUE
   if (!dryRun) {
     # Construct an iterator that includes only the datasets we're analysing:
     if (is.character(discovery)) {
