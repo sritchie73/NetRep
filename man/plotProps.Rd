@@ -5,8 +5,7 @@
 \title{Get the network properties and order for a plot}
 \usage{
 plotProps(network, data, correlation, moduleAssignments, modules, di, ti,
-  orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, dryRun,
-  verbose)
+  orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, verbose)
 }
 \arguments{
 \item{network}{list returned by \code{'processInput'}.}
@@ -32,8 +31,6 @@ plotProps(network, data, correlation, moduleAssignments, modules, di, ti,
 \item{datasetNames}{vector returned by \code{'processInput'}.}
 
 \item{nDatasets}{vector returned by \code{'processInput'}.}
-
-\item{dryRun}{logical; are we just doing a dry run of the plot?}
 
 \item{verbose}{logical; turn on verbose printing.}
 }

@@ -447,7 +447,7 @@ plotData <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
-    nDatasets, dryRun, verbose)
+    nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -614,7 +614,7 @@ plotCorrelation <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, dryRun, verbose)
+    datasetNames, nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -776,7 +776,7 @@ plotNetwork <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, dryRun, verbose)
+    datasetNames, nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -938,7 +938,7 @@ plotContribution <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, dryRun, verbose)
+    datasetNames, nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -1062,7 +1062,7 @@ plotDegree <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, dryRun, verbose)
+    datasetNames, nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -1192,7 +1192,7 @@ plotSummary <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
-    nDatasets, dryRun, verbose)
+    nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder

@@ -380,7 +380,7 @@ plotModule <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules, dryRun)
+                         orderSamplesBy, orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -451,7 +451,7 @@ plotModule <- function(
   
   plotProps <- plotProps(network, data, correlation, moduleAssignments,
     modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
-    nDatasets, dryRun, verbose)
+    nDatasets, verbose)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder

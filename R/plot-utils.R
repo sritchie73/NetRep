@@ -161,112 +161,90 @@ areColors <- function(colvec) {
 #' @param orderModules vector returned by \code{'checkPlotArgs'}.
 #' @param datasetNames vector returned by \code{'processInput'}.
 #' @param nDatasets vector returned by \code{'processInput'}.
-#' @param dryRun logical; are we just doing a dry run of the plot?
 #' @param verbose logical; turn on verbose printing.
 #'
 plotProps <- function(
   network, data, correlation, moduleAssignments, modules, di,
   ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-  dryRun, verbose
+  verbose
 ) {
   mods <- modules[[di]]
   mi <- NULL # suppresses CRAN note
   
-  if (dryRun) {
-    # If doing a dry run just get the nodes and samples that will be shown on
-    # the plot in any order.
-    moduleOrder <- mods
-    nodeOrder <- unlist(sapply(mods, function(mi) {
-      names(moduleAssignments[[di]][moduleAssignments[[di]] == mi])
-    }))
-    if (identical(orderNodesBy, ti)) {
-      nodeOrder <- intersect(nodeOrder, colnames(network[[ti]]))
-    }
-    
-    if (is.null(orderSamplesBy)) {
-      sampleOrder <- NULL
-    } else if (!is.na(orderSamplesBy)) {
-      sampleOrder <- rownames(data[[orderSamplesBy]])
+  # Scenarios:
+  # - No ordering of nodes + samples. We only need to calculate the network 
+  #   properties for the 'test' dataset.
+  # - Ordering of nodes only. We need to calculate the network properties in
+  #   all datasets specified in 'orderNodesBy' (may be one or more) and in the
+  #   'test' dataset (may or may not be specified in 'orderNodesBy').
+  # - Ordering of samples only. We need to calculate the network properties in
+  #   the 'orderSamplesBy' dataset, and in the 'test' dataset (which may or 
+  #   may not be the same as 'orderSamplesBy').
+  # - Ordering of both. We need to calculate the network properties in the
+  #   'orderSamplesBy', 'orderNodesBy', and 'test' datasets.
+  # this vector contains all datasets required for plotting
+  
+  plotDatasets <- list(unique(na.omit(c(ti, orderSamplesBy, orderNodesBy))))
+  names(plotDatasets) <- datasetNames[di]
+  
+  # Calculate the network properties for all datasets required
+  props <- netPropsInternal(
+    network, data, correlation, moduleAssignments, modules, di,
+    plotDatasets, nDatasets, datasetNames, verbose
+  )
+  
+  # Order nodes based on degree
+  if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
+    if (length(orderNodesBy) > 1) {
+      mean <- TRUE
     } else {
-      sampleOrder <- rownames(data[[ti]])
+      mean <- FALSE
     }
-    testProps <- NULL
-  } else {
-    # Scenarios:
-    # - No ordering of nodes + samples. We only need to calculate the network 
-    #   properties for the 'test' dataset.
-    # - Ordering of nodes only. We need to calculate the network properties in
-    #   all datasets specified in 'orderNodesBy' (may be one or more) and in the
-    #   'test' dataset (may or may not be specified in 'orderNodesBy').
-    # - Ordering of samples only. We need to calculate the network properties in
-    #   the 'orderSamplesBy' dataset, and in the 'test' dataset (which may or 
-    #   may not be the same as 'orderSamplesBy').
-    # - Ordering of both. We need to calculate the network properties in the
-    #   'orderSamplesBy', 'orderNodesBy', and 'test' datasets.
-    # this vector contains all datasets required for plotting
     
-    plotDatasets <- list(unique(na.omit(c(ti, orderSamplesBy, orderNodesBy))))
-    names(plotDatasets) <- datasetNames[di]
-    
-    # Calculate the network properties for all datasets required
-    props <- netPropsInternal(
-      network, data, correlation, moduleAssignments, modules, di,
-      plotDatasets, nDatasets, datasetNames, FALSE
+    # nodeOrderInternal will average acros all test datasets, so we need to 
+    # filter just to those specified in 'orderNodesBy' while preserving the
+    # structure of 'props'
+    orderProps <- filterInternalProps(props, orderNodesBy, di)
+    nodeOrder <- nodeOrderInternal(
+      orderProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE, mean
     )
+    nodeOrder <- simplifyList(nodeOrder, depth=3)
     
-    # Order nodes based on degree
-    if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
-      if (length(orderNodesBy) > 1) {
-        mean <- TRUE
-      } else {
-        mean <- FALSE
-      }
-      
-      # nodeOrderInternal will average acros all test datasets, so we need to 
-      # filter just to those specified in 'orderNodesBy' while preserving the
-      # structure of 'props'
-      orderProps <- filterInternalProps(props, orderNodesBy, di)
-      nodeOrder <- nodeOrderInternal(
-        orderProps, orderModules, simplify=FALSE, verbose, na.rm=FALSE, mean
-      )
-      nodeOrder <- simplifyList(nodeOrder, depth=3)
-      
-      # The module order will be the names of the simplified list iff there are
-      # multiple modules to render
-      if (!is.list(nodeOrder)) {
-        moduleOrder <- mods
-        if (is.numeric(moduleOrder))
-          moduleOrder <- as.character(moduleOrder)
-      } else {
-        moduleOrder <- names(nodeOrder)
-      }
-      
-      # Now flatten the node order list
-      nodeOrder <- unlist(nodeOrder)
+    # The module order will be the names of the simplified list iff there are
+    # multiple modules to render
+    if (!is.list(nodeOrder)) {
+      moduleOrder <- mods
+      if (is.numeric(moduleOrder))
+        moduleOrder <- as.character(moduleOrder)
     } else {
-      hasProps <- !sapply(props[[di]][[ti]], is.null) 
-      moduleOrder <- names(props[[di]][[ti]])[hasProps]
-      nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
-        names(props[[di]][[ti]][[mi]]$degree)
-      }
+      moduleOrder <- names(nodeOrder)
     }
     
-    if (is.null(orderSamplesBy)) {
-      sampleOrder <- NULL
-    } else if (!is.na(orderSamplesBy)) {
-      orderProps <- filterInternalProps(props, orderSamplesBy, di, moduleOrder[1])
-      sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
-      sampleOrder <- simplifyList(sampleOrder, depth=3)
-    } else {
-      sampleOrder <- rownames(data[[ti]])
+    # Now flatten the node order list
+    nodeOrder <- unlist(nodeOrder)
+  } else {
+    hasProps <- !sapply(props[[di]][[ti]], is.null) 
+    moduleOrder <- names(props[[di]][[ti]])[hasProps]
+    nodeOrder <- foreach(mi = moduleOrder, .combine=c) %do% {
+      names(props[[di]][[ti]][[mi]]$degree)
     }
-    
-    # Just keep the properties we need for plotting
-    testProps <- simplifyList(props[[di]][[ti]], depth=1)
-    if (length(moduleOrder) == 1) {
-      testProps <- list(testProps)
-      names(testProps) <- moduleOrder
-    }
+  }
+  
+  if (is.null(orderSamplesBy)) {
+    sampleOrder <- NULL
+  } else if (!is.na(orderSamplesBy)) {
+    orderProps <- filterInternalProps(props, orderSamplesBy, di, moduleOrder[1])
+    sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
+    sampleOrder <- simplifyList(sampleOrder, depth=3)
+  } else {
+    sampleOrder <- rownames(data[[ti]])
+  }
+  
+  # Just keep the properties we need for plotting
+  testProps <- simplifyList(props[[di]][[ti]], depth=1)
+  if (length(moduleOrder) == 1) {
+    testProps <- list(testProps)
+    names(testProps) <- moduleOrder
   }
   
   # Unless we are ordering nodes/samples by the discovery dataset, we should 
