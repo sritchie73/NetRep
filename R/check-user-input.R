@@ -704,22 +704,22 @@ processInput <- function(
         stop("some 'modules' specified for dataset ", '"', ii, '"', 
              " are not in 'moduleAssignments' for dataset ", '"', ii, '"')
       }
+      
+      # Check matrices for non-finite values: these will cause the calculation
+      # of network properties and module preservation statistics to hang. 
+      if (!is.null(data_mat))
+        CheckFinite(data_mat)
+      CheckFinite(correlation_mat)
+      CheckFinite(network_mat)
+      
+      # Store the node names for later
+      nodelist[[datasetNames[ii]]] <- colnames(network_mat)
+      
+      # Free up memory if any objects are big matrices.
+      vCat(verbose && anyDM, 1, "Unloading matrices...")
+      rm(data_mat, correlation_mat, network_mat)
+      gc()
     }
-    
-    # Check matrices for non-finite values: these will cause the calculation
-    # of network properties and module preservation statistics to hang. 
-    if (!is.null(data_mat))
-      CheckFinite(data_mat)
-    CheckFinite(correlation_mat)
-    CheckFinite(network_mat)
-    
-    # Store the node names for later
-    nodelist[[datasetNames[ii]]] <- colnames(network_mat)
-    
-    # Free up memory if any objects are big matrices.
-    vCat(verbose && anyDM, 1, "Unloading matrices...")
-    rm(data_mat, correlation_mat, network_mat)
-    gc()
   }
 
   return(list(
