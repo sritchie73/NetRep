@@ -8,8 +8,8 @@
 #' objects in the input list arguments \code{'network'}, \code{'data'}, and 
 #' \code{'correlation'}, which are common to most of \pkg{NetRep}'s functions.
 #' 
-#' @param file for \code{attach.matrix} the file name of a matrix on disk. For
-#'  \code{as.disk.matrix} the file name to save the matrix to. For 
+#' @param file for \code{attach.disk.matrix} the file name of a matrix on disk. 
+#'  For \code{as.disk.matrix} the file name to save the matrix to. For 
 #'  \code{serialize.table} the file name of a matrix in table format on disk.
 #' @param serialized determines how the matrix will be loaded from disk into R
 #'  by \code{as.matrix}. If \code{TRUE}, the \code{readRDS} function 
@@ -31,9 +31,9 @@
 #' \code{\link{readRDS}}. Serialized objects are much faster to load, but 
 #' cannot be read by other programs. 
 #' 
-#' The \code{attach.matrix} function creates a \code{disk.matrix} object from
-#' a file path. The \code{as.matrix} function will load the data from disk into
-#' the R session as a regular \code{\link{matrix}} object.
+#' The \code{attach.disk.matrix} function creates a \code{disk.matrix} object
+#' from a file path. The \code{as.matrix} function will load the data from disk
+#' into the R session as a regular \code{\link{matrix}} object.
 #' 
 #' The \code{as.disk.matrix} function converts a matrix into a 
 #' \code{disk.matrix} by saving its contents to the specified \code{file}. The
@@ -47,11 +47,12 @@
 #' serialized R object with the same file name, but with the ".rds" extension.
 #' 
 #' @section Warning:
-#' \code{attach.matrix} does not check whether the specified file can be read
-#' into R. \code{as.matrix} will fail and throw an error if this is the case.
-#'
+#' \code{attach.disk.matrix} does not check whether the specified file can be
+#' read into R. \code{as.matrix} will fail and throw an error if this is the
+#' case.
+#' 
 #' @return 
-#' A \code{disk.matrix} object (\code{attach.matrix}, \code{as.disk.matrix}),
+#' A \code{disk.matrix} object (\code{attach.disk.matrix}, \code{as.disk.matrix}),
 #' a \code{matrix} (\code{as.matrix}), or the file path to a serialized matrix
 #' (\code{serialize.table}).
 #' 
@@ -90,7 +91,7 @@ setClass("disk.matrix",
 
 #' @rdname disk.matrix
 #' @export
-attach.matrix <- function(file, serialized=TRUE, ...) {
+attach.disk.matrix <- function(file, serialized=TRUE, ...) {
   if (is.na(serialized) || length(serialized) != 1) {
     stop("'serialized' must be 'TRUE' or 'FALSE'")
   }
@@ -143,12 +144,12 @@ setMethod("as.disk.matrix", signature(x="matrix"),
             
             if (serialize) {
               saveRDS(x, file)
-              attach.matrix(file)
+              attach.disk.matrix(file)
             } else {
               write.table(x, file, col.names=!is.null(colnames(x)),
                           row.names=!is.null(rownames(x)), sep="\t",
                           quote=FALSE)
-              attach.matrix(file, FALSE, header=!is.null(colnames(x)),
+              attach.disk.matrix(file, FALSE, header=!is.null(colnames(x)),
                             row.names=ifelse(is.null(rownames(x)), FALSE, 1),
                             sep="\t")
             }

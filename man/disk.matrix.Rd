@@ -7,13 +7,13 @@
 \alias{as.disk.matrix,disk.matrix-method}
 \alias{as.disk.matrix,matrix-method}
 \alias{as.matrix,disk.matrix-method}
-\alias{attach.matrix}
+\alias{attach.disk.matrix}
 \alias{disk.matrix}
 \alias{serialize.table}
 \alias{show,disk.matrix-method}
 \title{The 'disk.matrix' class}
 \usage{
-attach.matrix(file, serialized = TRUE, ...)
+attach.disk.matrix(file, serialized = TRUE, ...)
 
 serialize.table(file, ...)
 
@@ -30,8 +30,8 @@ as.disk.matrix(x, file, serialize = TRUE)
 \S4method{show}{disk.matrix}(object)
 }
 \arguments{
-\item{file}{for \code{attach.matrix} the file name of a matrix on disk. For
-\code{as.disk.matrix} the file name to save the matrix to. For 
+\item{file}{for \code{attach.disk.matrix} the file name of a matrix on disk. 
+For \code{as.disk.matrix} the file name to save the matrix to. For 
 \code{serialize.table} the file name of a matrix in table format on disk.}
 
 \item{serialized}{determines how the matrix will be loaded from disk into R
@@ -53,7 +53,7 @@ tab-separated file using \code{write.table}.}
 \item{object}{a \code{'disk.matrix'} object.}
 }
 \value{
-A \code{disk.matrix} object (\code{attach.matrix}, \code{as.disk.matrix}),
+A \code{disk.matrix} object (\code{attach.disk.matrix}, \code{as.disk.matrix}),
 a \code{matrix} (\code{as.matrix}), or the file path to a serialized matrix
 (\code{serialize.table}).
 }
@@ -72,9 +72,9 @@ Matrices may either be stored as regular table files that can be read by
 \code{\link{readRDS}}. Serialized objects are much faster to load, but 
 cannot be read by other programs. 
 
-The \code{attach.matrix} function creates a \code{disk.matrix} object from
-a file path. The \code{as.matrix} function will load the data from disk into
-the R session as a regular \code{\link{matrix}} object.
+The \code{attach.disk.matrix} function creates a \code{disk.matrix} object
+from a file path. The \code{as.matrix} function will load the data from disk
+into the R session as a regular \code{\link{matrix}} object.
 
 The \code{as.disk.matrix} function converts a matrix into a 
 \code{disk.matrix} by saving its contents to the specified \code{file}. The
@@ -98,7 +98,8 @@ serialized R object with the same file name, but with the ".rds" extension.
 }}
 \section{Warning}{
 
-\code{attach.matrix} does not check whether the specified file can be read
-into R. \code{as.matrix} will fail and throw an error if this is the case.
+\code{attach.disk.matrix} does not check whether the specified file can be
+read into R. \code{as.matrix} will fail and throw an error if this is the
+case.
 }
 
