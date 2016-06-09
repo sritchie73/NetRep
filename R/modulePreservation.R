@@ -456,7 +456,11 @@ modulePreservation <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   nodelist <- finput$nodelist
-
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  correlationLoaded <- finput$correlationLoaded
+  networkLoaded <- finput$networkLoaded
+  
   # If NULL, automatically determine.
   if (is.null(nPerm)) {
     # If missing, set as the required number for Bonferroni correction.
@@ -529,16 +533,28 @@ modulePreservation <- function(
         # These are needed at every permutation, but we can cut runtime by 
         # calculating them once, and cut memory by loading and unloading the
         # the discovery dataset if provided as 'disk.matrix' objects.
-        anyDM <- any.disk.matrix(data[[di]], correlation[[di]], network[[di]])
-        vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
-             datasetNames[di], '" into RAM...', sep="")
-        if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
-          dataLoaded <- loadIntoRAM(data[[di]])
-        } else {
-          dataLoaded <- NULL
+        
+        if (di != loadedIdx) {
+          # Unload previous dataset
+          anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                                   network[[loadedIdx]])
+          vCat(verbose && anyDM, 1, "Unloading matrices...")
+          rm(dataLoaded, correlationLoaded, networkLoaded)
+          gc()
+          
+          anyDM <- any.disk.matrix(data[[di]], correlation[[di]], network[[di]])
+          vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
+               datasetNames[di], '" into RAM...', sep="")
+          if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
+            dataLoaded <- loadIntoRAM(data[[di]])
+          } else {
+            dataLoaded <- NULL
+          }
+          correlationLoaded <- loadIntoRAM(correlation[[di]])
+          networkLoaded <- loadIntoRAM(network[[di]])
+          
+          loadedIdx <- di
         }
-        correlationLoaded <- loadIntoRAM(correlation[[di]])
-        networkLoaded <- loadIntoRAM(network[[di]])
 
         # Calculate the intermediate properties
         vCat(verbose, 1, 'Pre-computing intermediate properties in dataset "',
@@ -554,26 +570,32 @@ modulePreservation <- function(
             nodelist[[ti]], moduleAssignments[[di]], modules[[di]]
           )
         }
-
-        # Free up memory
-        vCat(verbose && anyDM, 1, "Unloading matrices...")
-        rm(dataLoaded, correlationLoaded, networkLoaded)
-        gc()
         
         #----------------------------------------------------------------------
         # Run the permutation procedure
         #----------------------------------------------------------------------
         # Load matrices into RAM if they are 'disk.matrix' objects.
-        anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
-        vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
-             datasetNames[ti], '" into RAM...', sep="")
-        if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
-          dataLoaded <- loadIntoRAM(data[[ti]])
-        } else {
-          dataLoaded <- NULL
+        if (ti != loadedIdx) {
+          # Unload previous dataset
+          anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                                   network[[loadedIdx]])
+          vCat(verbose && anyDM, 1, "Unloading matrices...")
+          rm(dataLoaded, correlationLoaded, networkLoaded)
+          gc()
+          
+          anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+          vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
+               datasetNames[ti], '" into RAM...', sep="")
+          if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
+            dataLoaded <- loadIntoRAM(data[[ti]])
+          } else {
+            dataLoaded <- NULL
+          }
+          correlationLoaded <- loadIntoRAM(correlation[[ti]])
+          networkLoaded <- loadIntoRAM(network[[ti]])
+          
+          loadedIdx <- ti
         }
-        correlationLoaded <- loadIntoRAM(correlation[[ti]])
-        networkLoaded <- loadIntoRAM(network[[ti]])
 
         # Run the permutation procedure
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
@@ -591,11 +613,6 @@ modulePreservation <- function(
         }
         observed <- perms$observed
         nulls <- perms$nulls
-        
-        # Free up memory
-        vCat(verbose && anyDM, 1, "Unloading matrices...")
-        rm(dataLoaded, correlationLoaded, networkLoaded)
-        gc()
         
         #---------------------------------------------------------------------
         # Calculate permutation p-value
@@ -637,6 +654,12 @@ modulePreservation <- function(
       })
     }
   }
+  # Free up memory
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
+  vCat(verbose && anyDM, 1, "Unloading matrices...")
+  rm(dataLoaded, correlationLoaded, networkLoaded)
+  gc()
   
   # Simplify the output data structure where possible
   if (simplify) {

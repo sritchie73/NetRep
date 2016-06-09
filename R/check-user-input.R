@@ -572,13 +572,13 @@ processInput <- function(
   # ----------------------------------------------------------------------------
   # Construct an iterator that includes only the datasets we're analysing:
   if (is.character(discovery)) {
-    iterator <- match(discovery, names(network))
+    iterator <- match(discovery, datasetNames)
   } else {
     iterator <- discovery
   }
   for (tv in test) {
     if (is.character(tv)) {
-      iterator <- c(iterator, match(tv, names(network)))
+      iterator <- c(iterator, match(tv, datasetNames))
     } else {
       iterator <- c(iterator, tv)
     }
@@ -586,18 +586,23 @@ processInput <- function(
   if (plotFunction) {
     if (orderModules) {
       if (is.character(orderNodesBy)) {
-        iterator <- c(iterator, match(orderNodesBy, names(network)))
+        iterator <- c(iterator, match(orderNodesBy, datasetNames))
       } else if (is.numeric(orderNodesBy)) {
         iterator <- c(iterator, orderNodesBy)
       }
     }
     if (is.character(orderSamplesBy)) {
-      iterator <- c(iterator, match(orderSamplesBy, names(network)))
+      iterator <- c(iterator, match(orderSamplesBy, datasetNames))
     } else if (is.numeric(orderSamplesBy)) {
       iterator <- c(iterator, orderSamplesBy)
     }
   }
-  iterator <- unique(iterator)
+  iterator <- datasetNames[unique(iterator)]
+  
+  # We want to iterate over the first discovery dataset last, so that we
+  # can skip loading it in a second time in the calling function
+  tokeep <- discovery[1]
+  iterator <- c(iterator[-which(iterator == tokeep)], tokeep)
   
   # We need a list of nodes present in each dataset independent of having
   # the datasets loaded into RAM.
@@ -734,7 +739,8 @@ processInput <- function(
     test=test, moduleAssignments=moduleAssignments, modules=modules,
     nDatasets=nDatasets, datasetNames=datasetNames,
     orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy,
-    nodelist=nodelist
+    nodelist=nodelist, loadedIdx=tokeep, dataLoaded=dataLoaded, 
+    correlationLoaded=correlationLoaded, networkLoaded=networkLoaded
   ))
 }
 
