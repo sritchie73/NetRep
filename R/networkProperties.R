@@ -223,37 +223,36 @@ netPropsInternal <- function(
   } 
   names(res) <- datasetNames
   
-  foreach(di = discovery) %do% {
-    foreach(ti = test[[di]]) %do% {
-      # Load matrices into RAM if they are 'disk.matrix' objects.
-      anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
-      vCat(verbose && anyDM, 0, "Loading matrices of dataset", 
-           datasetNames[ti], "into RAM...")
-      data_mat <- loadIntoRAM(data[[ti]])
-      network_mat <- loadIntoRAM(network[[ti]])
-
-      vCat(verbose, 0, "Calculating network properties in dataset", 
-           datasetNames[ti], "...")
-      
-      if (is.null(data[[ti]])) {
-        props <- NetworkPropertiesNoData(
-          network_mat, moduleAssignments[[di]], modules[[di]]
-        )
-      } else {
-        props <- NetworkProperties(
-          data_mat, network_mat, moduleAssignments[[di]], modules[[di]]
-        )
+  foreach(ti = unique(unlist(test[discovery]))) %do% {
+    # Load matrices into RAM if they are 'disk.matrix' objects.
+    anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+    vCat(verbose && anyDM, 0, 'Loading matrices of dataset "',
+         datasetNames[ti], '" into RAM...', sep="")
+    data_mat <- loadIntoRAM(data[[ti]])
+    network_mat <- loadIntoRAM(network[[ti]])
+    
+    foreach(di = discovery) %do% {
+      if (ti %in% test[[di]]) {
+        vCat(verbose, 0, 'Calculating network properties in ', 
+             'dataset "', datasetNames[ti], '"...', sep="")
+        if (is.null(data[[ti]])) {
+          props <- NetPropsNoData(
+            network_mat, moduleAssignments[[di]], modules[[di]]
+          )
+        } else {
+          props <- NetProps(
+            data_mat, network_mat, moduleAssignments[[di]], modules[[di]]
+          )
+        }
+        
+        # Insert into correct location
+        res[[di]][[ti]][names(props)] <- props
       }
-      
-      # unload from RAM
-      vCat(verbose && anyDM, 0, "Unloading matrices...")
-      rm(data_mat, network_mat)
-      gc()
-      
-      # Insert into correct location
-      res[[di]][[ti]][names(props)] <- props
-      NULL
     }
+    # unload from RAM
+    vCat(verbose && anyDM, 0, "Unloading matrices...")
+    rm(data_mat, network_mat)
+    gc()
   }
   
   return(res)
