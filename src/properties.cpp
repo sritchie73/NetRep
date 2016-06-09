@@ -35,7 +35,7 @@
 //' @return a list containing the summary profile, node contribution, module
 //'   coherence, weighted degree, and average edge weight for each 'module'.
 // [[Rcpp::export]]
-Rcpp::List NetworkProperties (
+Rcpp::List NetProps (
     Rcpp::NumericMatrix data, Rcpp::NumericMatrix net, 
     Rcpp::CharacterVector moduleAssignments,
     Rcpp::CharacterVector modules
@@ -175,7 +175,7 @@ Rcpp::List NetworkProperties (
 //' @return a list containing the summary profile, node contribution, module
 //'   coherence, weighted degree, and average edge weight for each 'module'.
 // [[Rcpp::export]]
-Rcpp::List NetworkPropertiesNoData (
+Rcpp::List NetPropsNoData (
     Rcpp::NumericMatrix net, 
     Rcpp::CharacterVector moduleAssignments,
     Rcpp::CharacterVector modules

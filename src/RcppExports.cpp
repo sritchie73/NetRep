@@ -89,9 +89,9 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// NetworkProperties
-Rcpp::List NetworkProperties(Rcpp::NumericMatrix data, Rcpp::NumericMatrix net, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
-RcppExport SEXP NetRep_NetworkProperties(SEXP dataSEXP, SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+// NetProps
+Rcpp::List NetProps(Rcpp::NumericMatrix data, Rcpp::NumericMatrix net, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
+RcppExport SEXP NetRep_NetProps(SEXP dataSEXP, SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -99,20 +99,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type net(netSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type moduleAssignments(moduleAssignmentsSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type modules(modulesSEXP);
-    __result = Rcpp::wrap(NetworkProperties(data, net, moduleAssignments, modules));
+    __result = Rcpp::wrap(NetProps(data, net, moduleAssignments, modules));
     return __result;
 END_RCPP
 }
-// NetworkPropertiesNoData
-Rcpp::List NetworkPropertiesNoData(Rcpp::NumericMatrix net, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
-RcppExport SEXP NetRep_NetworkPropertiesNoData(SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+// NetPropsNoData
+Rcpp::List NetPropsNoData(Rcpp::NumericMatrix net, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
+RcppExport SEXP NetRep_NetPropsNoData(SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type net(netSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type moduleAssignments(moduleAssignmentsSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type modules(modulesSEXP);
-    __result = Rcpp::wrap(NetworkPropertiesNoData(net, moduleAssignments, modules));
+    __result = Rcpp::wrap(NetPropsNoData(net, moduleAssignments, modules));
     return __result;
 END_RCPP
 }

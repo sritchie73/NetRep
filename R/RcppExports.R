@@ -232,8 +232,8 @@ PermutationProcedureNoData <- function(discProps, tCorr, tNet, moduleAssignments
 #' 
 #' @return a list containing the summary profile, node contribution, module
 #'   coherence, weighted degree, and average edge weight for each 'module'.
-NetworkProperties <- function(data, net, moduleAssignments, modules) {
-    .Call('NetRep_NetworkProperties', PACKAGE = 'NetRep', data, net, moduleAssignments, modules)
+NetProps <- function(data, net, moduleAssignments, modules) {
+    .Call('NetRep_NetProps', PACKAGE = 'NetRep', data, net, moduleAssignments, modules)
 }
 
 #' Calculate the network properties, data matrix not provided
@@ -265,7 +265,7 @@ NetworkProperties <- function(data, net, moduleAssignments, modules) {
 #' 
 #' @return a list containing the summary profile, node contribution, module
 #'   coherence, weighted degree, and average edge weight for each 'module'.
-NetworkPropertiesNoData <- function(net, moduleAssignments, modules) {
-    .Call('NetRep_NetworkPropertiesNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
+NetPropsNoData <- function(net, moduleAssignments, modules) {
+    .Call('NetRep_NetPropsNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
 }
 
