@@ -228,8 +228,8 @@ netPropsInternal <- function(
     anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
     vCat(verbose && anyDM, 0, 'Loading matrices of dataset "',
          datasetNames[ti], '" into RAM...', sep="")
-    data_mat <- loadIntoRAM(data[[ti]])
-    network_mat <- loadIntoRAM(network[[ti]])
+    dataLoaded <- loadIntoRAM(data[[ti]])
+    networkLoaded <- loadIntoRAM(network[[ti]])
     
     foreach(di = discovery) %do% {
       if (ti %in% test[[di]]) {
@@ -237,11 +237,11 @@ netPropsInternal <- function(
              'dataset "', datasetNames[ti], '"...', sep="")
         if (is.null(data[[ti]])) {
           props <- NetPropsNoData(
-            network_mat, moduleAssignments[[di]], modules[[di]]
+            networkLoaded, moduleAssignments[[di]], modules[[di]]
           )
         } else {
           props <- NetProps(
-            data_mat, network_mat, moduleAssignments[[di]], modules[[di]]
+            dataLoaded, networkLoaded, moduleAssignments[[di]], modules[[di]]
           )
         }
         
@@ -251,7 +251,7 @@ netPropsInternal <- function(
     }
     # unload from RAM
     vCat(verbose && anyDM, 0, "Unloading matrices...")
-    rm(data_mat, network_mat)
+    rm(dataLoaded, networkLoaded)
     gc()
   }
   

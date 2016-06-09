@@ -621,17 +621,17 @@ processInput <- function(
     anyDM <- any.disk.matrix(data[[ii]], correlation[[ii]], network[[ii]])
     vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
          datasetNames[ii], '" into RAM...', sep="")
-    data_mat <- loadIntoRAM(data[[ii]])
-    correlation_mat <- loadIntoRAM(correlation[[ii]])
-    network_mat <- loadIntoRAM(network[[ii]])
+    dataLoaded <- loadIntoRAM(data[[ii]])
+    correlationLoaded <- loadIntoRAM(correlation[[ii]])
+    networkLoaded <- loadIntoRAM(network[[ii]])
     
     vCat(verbose && anyDM, 1, "Checking matrices for problems...")
     
     # If plotting, we need to check that samples from the 'orderSamplesBy' 
     # dataset are present in the 'test' dataset to be drawn.
     if (plotFunction) {
-      if (ii == pIdx) pSamples <- rownames(data_mat)
-      if (ii == sIdx) sSamples <- rownames(data_mat)
+      if (ii == pIdx) pSamples <- rownames(dataLoaded)
+      if (ii == sIdx) sSamples <- rownames(dataLoaded)
       if (!is.null(pSamples) && !is.null(sSamples)) {
         if(length(intersect(pSamples, sSamples)) == 0) {
           stop("no samples in the dataset specified by 'orderSamplesBy' ", 
@@ -642,55 +642,55 @@ processInput <- function(
     
     # Make sure matrices are (a) actually matrices, and (b) contain numeric 
     # data
-    if (class(network_mat) != "matrix" || 
-        typeof(network_mat) %nin% c("double", "integer")) {
+    if (class(networkLoaded) != "matrix" || 
+        typeof(networkLoaded) %nin% c("double", "integer")) {
       stop("'network' for dataset ", '"', ii, '"', 
            " is not a numeric matrix")
     }
-    if (class(correlation_mat) != "matrix" || 
-        typeof(correlation_mat) %nin% c("double", "integer")) {
+    if (class(correlationLoaded) != "matrix" || 
+        typeof(correlationLoaded) %nin% c("double", "integer")) {
       stop("'correlation' for dataset ", '"', ii, '"', 
            " is not a numeric matrix")
     }
     
-    if (!is.null(data_mat) && (class(data_mat) != "matrix" || 
-                               typeof(data_mat) %nin% c("double", "integer"))) {
+    if (!is.null(dataLoaded) && (class(dataLoaded) != "matrix" || 
+                               typeof(dataLoaded) %nin% c("double", "integer"))) {
       stop("'data' for dataset ", '"', ii, '"', " is not a numeric matrix")
     }
     
     # Make sure the 'correlation' and 'network' matrices are square
-    if (nrow(network_mat) != ncol(network_mat)) {
+    if (nrow(networkLoaded) != ncol(networkLoaded)) {
       stop("'network' for dataset ", '"', ii, '"', " is not square")
     }
-    if (nrow(correlation_mat) != ncol(correlation_mat)) {
+    if (nrow(correlationLoaded) != ncol(correlationLoaded)) {
       stop("'correlation' for dataset ", '"', ii, '"', " is not square")
     }
     # And that they have the same dimensions
-    if ((nrow(correlation_mat) != nrow(network_mat)) ||
-        (!is.null(data_mat) && (ncol(data_mat) != ncol(network_mat)))) {
+    if ((nrow(correlationLoaded) != nrow(networkLoaded)) ||
+        (!is.null(dataLoaded) && (ncol(dataLoaded) != ncol(networkLoaded)))) {
       stop("'correlation', 'network', and 'data' have a different number of ",
            'nodes for dataset "', ii, '"')
     }
     
     # Make sure the matrices have dimension names
-    if (is.null(rownames(network_mat)) || is.null(rownames(correlation_mat)) ||
-        (!is.null(data_mat) && is.null(rownames(data_mat)))) {
+    if (is.null(rownames(networkLoaded)) || is.null(rownames(correlationLoaded)) ||
+        (!is.null(dataLoaded) && is.null(rownames(dataLoaded)))) {
       stop("supplied matrices must have row and column names")      
     }
     
     # Make sure the 'correlation' and 'network' matrices are symmetric 
-    if (any(rownames(network_mat) != colnames(network_mat))) {
+    if (any(rownames(networkLoaded) != colnames(networkLoaded))) {
       stop("mismatch between row and column names in 'network' for dataset ", 
            '"', ii, '"')
     }
-    if (any(rownames(correlation_mat) != colnames(correlation_mat))) {
+    if (any(rownames(correlationLoaded) != colnames(correlationLoaded))) {
       stop("mismatch between row and column names in 'network' for dataset ",
            '"', ii, '"')
     }
     # Make sure the ordering of nodes is the same between 'correlation', 
     # 'network' and 'data'.
-    if (any(colnames(network_mat) != colnames(correlation_mat)) |
-        (!is.null(data_mat) && any(colnames(network_mat) != colnames(data_mat)))) {
+    if (any(colnames(networkLoaded) != colnames(correlationLoaded)) |
+        (!is.null(dataLoaded) && any(colnames(networkLoaded) != colnames(dataLoaded)))) {
       stop("mismatch in node order between 'correlation' and 'network' for",
            'dataset "', ii, '"')
     }
@@ -698,7 +698,7 @@ processInput <- function(
     # Make sure the 'moduleAssignments' have the same nodes as the 'correlation'
     # etc.
     if (!is.null(moduleAssignments[[ii]])) {
-      if (any(names(moduleAssignments[[ii]]) %nin% colnames(network_mat))) {
+      if (any(names(moduleAssignments[[ii]]) %nin% colnames(networkLoaded))) {
         stop("module assigments are present for nodes that are not in the",
              " 'network' inferred from dataset ", '"', ii, '"')
       }
@@ -712,18 +712,21 @@ processInput <- function(
     
     # Check matrices for non-finite values: these will cause the calculation
     # of network properties and module preservation statistics to hang. 
-    if (!is.null(data_mat))
-      CheckFinite(data_mat)
-    CheckFinite(correlation_mat)
-    CheckFinite(network_mat)
+    if (!is.null(dataLoaded))
+      CheckFinite(dataLoaded)
+    CheckFinite(correlationLoaded)
+    CheckFinite(networkLoaded)
     
     # Store the node names for later
-    nodelist[[datasetNames[ii]]] <- colnames(network_mat)
+    nodelist[[datasetNames[ii]]] <- colnames(networkLoaded)
     
-    # Free up memory if any objects are big matrices.
-    vCat(verbose && anyDM, 1, "Unloading matrices...")
-    rm(data_mat, correlation_mat, network_mat)
-    gc()
+    # Free up memory if any objects are big matrices, but return the last
+    # dataset to pass to the calling function.
+    if (ii != tokeep) {
+      vCat(verbose && anyDM, 1, "Unloading matrices...")
+      rm(dataLoaded, correlationLoaded, networkLoaded)
+      gc()
+    }
   }
 
   return(list(

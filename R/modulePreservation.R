@@ -533,31 +533,31 @@ modulePreservation <- function(
         vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
              datasetNames[di], '" into RAM...', sep="")
         if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
-          discovery_data <- loadIntoRAM(data[[di]])
+          dataLoaded <- loadIntoRAM(data[[di]])
         } else {
-          discovery_data <- NULL
+          dataLoaded <- NULL
         }
-        discovery_correlation <- loadIntoRAM(correlation[[di]])
-        discovery_network <- loadIntoRAM(network[[di]])
+        correlationLoaded <- loadIntoRAM(correlation[[di]])
+        networkLoaded <- loadIntoRAM(network[[di]])
 
         # Calculate the intermediate properties
         vCat(verbose, 1, 'Pre-computing intermediate properties in dataset "',
              datasetNames[di], '"...', sep="")
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           discProps <- IntermediatePropertiesNoData(
-            discovery_correlation, discovery_network, nodelist[[ti]],
+            correlationLoaded, networkLoaded, nodelist[[ti]],
             moduleAssignments[[di]], modules[[di]]
           )
         } else {
           discProps <- IntermediateProperties(
-            discovery_data, discovery_correlation, discovery_network,
+            dataLoaded, correlationLoaded, networkLoaded,
             nodelist[[ti]], moduleAssignments[[di]], modules[[di]]
           )
         }
 
         # Free up memory
         vCat(verbose && anyDM, 1, "Unloading matrices...")
-        rm(discovery_data, discovery_correlation, discovery_network)
+        rm(dataLoaded, correlationLoaded, networkLoaded)
         gc()
         
         #----------------------------------------------------------------------
@@ -568,22 +568,23 @@ modulePreservation <- function(
         vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
              datasetNames[ti], '" into RAM...', sep="")
         if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
-          test_data <- loadIntoRAM(data[[ti]])
+          dataLoaded <- loadIntoRAM(data[[ti]])
         } else {
-          test_data <- NULL
+          dataLoaded <- NULL
         }
-        test_correlation <- loadIntoRAM(correlation[[ti]])
-        test_network <- loadIntoRAM(network[[ti]])
+        correlationLoaded <- loadIntoRAM(correlation[[ti]])
+        networkLoaded <- loadIntoRAM(network[[ti]])
 
         # Run the permutation procedure
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           perms <- PermutationProcedureNoData(
-            discProps, test_correlation, test_network, moduleAssignments[[di]], 
-            modules[[di]], nPerm, nThreads, model, verbose, vCat
+            discProps, correlationLoaded, networkLoaded, 
+            moduleAssignments[[di]], modules[[di]], nPerm, nThreads, model, 
+            verbose, vCat
           )
         } else {
           perms <- PermutationProcedure(
-            discProps, test_data, test_correlation, test_network, 
+            discProps, dataLoaded, correlationLoaded, networkLoaded, 
             moduleAssignments[[di]], modules[[di]], nPerm, nThreads, model, 
             verbose, vCat
           )
@@ -591,9 +592,9 @@ modulePreservation <- function(
         observed <- perms$observed
         nulls <- perms$nulls
         
-        vCat(verbose && anyDM, 1, "Unloading matrices...")
         # Free up memory
-        rm(test_data, test_correlation, test_network)
+        vCat(verbose && anyDM, 1, "Unloading matrices...")
+        rm(dataLoaded, correlationLoaded, networkLoaded)
         gc()
         
         #---------------------------------------------------------------------
