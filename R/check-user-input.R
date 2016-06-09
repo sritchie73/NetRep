@@ -11,7 +11,7 @@
 #' @param modules user input for the 'modules' argument.
 #' @param backgroundLabel user input for the 'backgroundLabel' argument.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param plotFunction logical; are we checking for a plot function?
+#' @param funcType one of "preservation", "properties" or "plot".
 #' @param orderNodesBy user input for the 'orderNodesBy' argument in the 
 #'  plotting functions.
 #' @param orderSamplesBy user input for the 'orderSamplesBy' argument in the 
@@ -27,7 +27,7 @@
 #' @return a list of containing the formatted user input
 processInput <- function(
   discovery, test, network, correlation, data, moduleAssignments, modules, 
-  backgroundLabel, verbose, plotFunction=FALSE, orderNodesBy=NA, 
+  backgroundLabel, verbose, funcType, orderNodesBy=NA, 
   orderSamplesBy=NA, orderModules=NULL
 ) {
   # Where do we want to get:
@@ -163,7 +163,7 @@ processInput <- function(
     test <- test[names(discovery)]
   
   # Plots can only be generated within a single dataset at a time
-  if (plotFunction) { 
+  if (funcType == "plot") { 
     if ((!is.vector(discovery) || length(discovery) > 1) ||
         (!is.vector(test[[discovery]]) || length(test[[discovery]]) > 1)) {
       stop("only one 'discovery' and 'test' dataset can be specified when plotting")
@@ -461,7 +461,7 @@ processInput <- function(
   # Next, process the plot function arguments
   # ----------------------------------------------------------------------------
   
-  if (plotFunction) {
+  if (funcType == "plot") {
     if (!(
       is.null(orderNodesBy) ||
       is.vector(orderNodesBy) && is.numeric(orderNodesBy) ||
@@ -557,8 +557,21 @@ processInput <- function(
   }
   names(datasetNames) <- datasetNames
   
-  # Convert indices to dataset names for the plot functions
-  if (plotFunction) {
+  # Convert indices to dataset names
+  if (is.numeric(discovery)) {
+    discovery <- datasetNames[discovery]
+  }
+  test <- lapply(test, function(ti) {
+    if(is.numeric(ti)) {
+      datasetNames[ti]
+    } else {
+      ti
+    }
+  })
+  if (is.null(names(test))) {
+    names(test) <- datasetNames[1:length(test)]
+  }
+  if (funcType == "plot") {
     if (is.numeric(orderNodesBy)) {
       orderNodesBy <- datasetNames[orderNodesBy]
     }
@@ -566,42 +579,62 @@ processInput <- function(
       orderSamplesBy <- datasetNames[orderSamplesBy]
     }
   }
-
+  
   # ----------------------------------------------------------------------------
   # Check for data consistency
   # ----------------------------------------------------------------------------
   # Construct an iterator that includes only the datasets we're analysing:
-  if (is.character(discovery)) {
-    iterator <- match(discovery, datasetNames)
-  } else {
+  if (funcType == "preservation") {
     iterator <- discovery
+  } else {
+    iterator <- NULL
   }
   for (tv in test) {
-    if (is.character(tv)) {
-      iterator <- c(iterator, match(tv, datasetNames))
-    } else {
-      iterator <- c(iterator, tv)
-    }
+    iterator <- c(iterator, tv)
   }
-  if (plotFunction) {
+  if (funcType == "plot") {
     if (orderModules) {
-      if (is.character(orderNodesBy)) {
-        iterator <- c(iterator, match(orderNodesBy, datasetNames))
-      } else if (is.numeric(orderNodesBy)) {
-        iterator <- c(iterator, orderNodesBy)
-      }
+      iterator <- c(iterator, orderNodesBy)
     }
-    if (is.character(orderSamplesBy)) {
-      iterator <- c(iterator, match(orderSamplesBy, datasetNames))
-    } else if (is.numeric(orderSamplesBy)) {
-      iterator <- c(iterator, orderSamplesBy)
-    }
+    iterator <- c(iterator, orderSamplesBy)
   }
-  iterator <- datasetNames[unique(iterator)]
+  iterator <- unique(iterator)
   
-  # We want to iterate over the first discovery dataset last, so that we
-  # can skip loading it in a second time in the calling function
-  tokeep <- discovery[1]
+  if (funcType == "preservation") {
+    # We want to iterate over the first discovery dataset last, so that we
+    # can skip loading it in a second time when we calculate module 
+    # preservation.
+    tokeep <- discovery[1]
+    
+    # We also want to make sure that each set of test datasets is ordered
+    # such that, if we are comparing the discovery dataset to itself, this 
+    # happens first.
+    oldtest <- test
+    test <- lapply(seq_along(test), function(ii) {
+      di <- names(test)[ii]
+      ti <- test[[ii]]
+      if (di %in% ti) {
+        ti <- c(di, ti[-which(ti == di)])
+      }
+      ti
+    })
+    names(test) <- names(oldtest)
+  } else if (funcType == "props") {
+    # We want to iterate over the first test dataset last, so that we can skip 
+    # loading it in a second time when we calculate the network properties.
+    tokeep <- test[discovery][[1]][1]
+  } else if (funcType == "plot") {
+    # We want to iterate over the first plotDataset last so that we can
+    # skip loading it in a second time when we calculate the network 
+    # properties.
+    ti <- test[[discovery]][1]
+    # The test dataset is the last plotDataset: this is so we don't have to
+    # load it again after calculating the network properties
+    plotDatasets <- unique(na.omit(c(orderSamplesBy, orderNodesBy, ti)))
+    plotDatasets <- c(plotDatasets[-which(plotDatasets == ti)], ti)
+    tokeep <- plotDatasets[1]
+  }
+  
   iterator <- c(iterator[-which(iterator == tokeep)], tokeep)
   
   # We need a list of nodes present in each dataset independent of having
@@ -611,7 +644,7 @@ processInput <- function(
   
   # If plotting, we need to check that samples from the 'orderSamplesBy' 
   # dataset are present in the 'test' dataset to be drawn.
-  if (plotFunction) {
+  if (funcType == "plot") {
     pIdx <- test[[discovery]]
     sIdx <- orderSamplesBy
     pSamples <- NULL
@@ -634,7 +667,7 @@ processInput <- function(
     
     # If plotting, we need to check that samples from the 'orderSamplesBy' 
     # dataset are present in the 'test' dataset to be drawn.
-    if (plotFunction) {
+    if (funcType == "plot") {
       if (ii == pIdx) pSamples <- rownames(dataLoaded)
       if (ii == sIdx) sSamples <- rownames(dataLoaded)
       if (!is.null(pSamples) && !is.null(sSamples)) {
@@ -647,19 +680,19 @@ processInput <- function(
     
     # Make sure matrices are (a) actually matrices, and (b) contain numeric 
     # data
-    if (class(networkLoaded) != "matrix" || 
+    if (!is.matrix(networkLoaded) || 
         typeof(networkLoaded) %nin% c("double", "integer")) {
       stop("'network' for dataset ", '"', ii, '"', 
            " is not a numeric matrix")
     }
-    if (class(correlationLoaded) != "matrix" || 
+    if (!is.matrix(correlationLoaded) ||
         typeof(correlationLoaded) %nin% c("double", "integer")) {
       stop("'correlation' for dataset ", '"', ii, '"', 
            " is not a numeric matrix")
     }
     
-    if (!is.null(dataLoaded) && (class(dataLoaded) != "matrix" || 
-                               typeof(dataLoaded) %nin% c("double", "integer"))) {
+    if (!is.null(dataLoaded) && (!is.matrix(dataLoaded) || 
+                            typeof(dataLoaded) %nin% c("double", "integer"))) {
       stop("'data' for dataset ", '"', ii, '"', " is not a numeric matrix")
     }
     
@@ -779,7 +812,7 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
 #' @return 
 #'   throws an error or returns silently
 checkIsMatrix <- function(object) {
-  if (!is.null(object) && !is.matrix(object) && class(object) != "disk.matrix") { 
+  if (!is.null(object) && !is.matrix(object) && !is.disk.matrix(object)) { 
     stop('Input data must be a "matrix" or "disk.matrix"')
   }
 }

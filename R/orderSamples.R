@@ -129,11 +129,21 @@ sampleOrder <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose)
+                         verbose, "props")
   
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
+  
+  anyDM <- with(finput, {
+    any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                    network[[loadedIdx]])
+  })
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(finput)
+    gc()
+  }, add=TRUE)
   
   # We need to make sure that there is data in each 'test' dataset.
   for (di in discovery) {
@@ -146,12 +156,14 @@ sampleOrder <- function(
   
   vCat(verbose, 0, "User input ok!")
   
-  # Calculate the network properties.
+  # Calculate the network properties
   props <- with(finput, {
-    netPropsInternal(network, data, correlation, moduleAssignments, 
-                     modules, discovery, test, nDatasets, datasetNames, verbose)
+    netPropsInternal(network, data, moduleAssignments, modules, discovery, 
+                     test, nDatasets, datasetNames, verbose, loadedIdx, 
+                     dataLoaded, networkLoaded, FALSE)
   })
-
+  anyDM <- FALSE
+  
   res <- sampleOrderInternal(props, verbose, na.rm)
 
   # Simplify the output data structure where possible

@@ -445,7 +445,7 @@ modulePreservation <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose)
+                         verbose, "preservation")
   data <- finput$data
   correlation <- finput$correlation
   network <- finput$network

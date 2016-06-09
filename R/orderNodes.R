@@ -169,7 +169,16 @@ nodeOrder <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose)
+                         verbose, "props")
+  anyDM <- with(finput, {
+    any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                    network[[loadedIdx]])
+  })
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(finput)
+    gc()
+  }, add=TRUE)
   
   # If 'orderModules' is TRUE we need to make sure that there is data in each 
   # test dataset if there is more than one 'module'
@@ -191,22 +200,23 @@ nodeOrder <- function(
   # Similarly when 'orderModules = TRUE' but there is only one module (per test)
   # Then we can save time by not calculating the data-based network properties.
   # We can't detect this without sanity checking the user input first though, so
-  # unnecessary scaled datasets may have been created
+  # datasets may have been loaded
   with(finput, {
     for (di in discovery) {
       if (length(modules[[di]]) == 1) {
         data[di] <- list(NULL)
+        dataLoaded <- NULL
       }
     }
   })
   
   # Calculate the network properties
-  props <- with(finput, { 
-    netPropsInternal(
-      network, data, correlation, moduleAssignments, 
-      modules, discovery, test, nDatasets, datasetNames, verbose
-    ) 
+  props <- with(finput, {
+    netPropsInternal(network, data, moduleAssignments, modules, discovery, 
+                     test, nDatasets, datasetNames, verbose, loadedIdx, 
+                     dataLoaded, networkLoaded, FALSE)
   })
+  anyDM <- FALSE
   
   res <- nodeOrderInternal(
     props, orderModules, simplify, verbose, na.rm, mean

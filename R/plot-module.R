@@ -379,8 +379,8 @@ plotModule <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules)
+                         verbose, "plot", orderNodesBy, orderSamplesBy, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -392,18 +392,24 @@ plotModule <- function(
   datasetNames <- finput$datasetNames
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  correlationLoaded <- finput$correlationLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
+  
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, correlationLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
   
   # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
-
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
   
   # Create empty plot windows so that we fail quickly if the margins are too
   # large
@@ -449,9 +455,9 @@ plotModule <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
-    nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+    orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
+    verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -460,7 +466,21 @@ plotModule <- function(
   na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
-
+  dataLoaded <- plotProps$dataLoaded
+  networkLoaded <- plotProps$networkLoaded
+  anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
+  
+  if (ti != loadedIdx) {
+    vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
+         'Loading correlation matrix of dataset "', ti, '" into RAM...', 
+         sep="")
+    correlationLoaded <- loadIntoRAM(correlation[[ti]])
+  }
+  
   #-----------------------------------------------------------------------------
   # Get the data to be shown on the plot
   #-----------------------------------------------------------------------------
@@ -470,7 +490,7 @@ plotModule <- function(
     # placehold vectors so that the plot functions work
     wDegreeVec <- rep(0, length(nodeOrder))
     names(wDegreeVec) <- nodeOrder
-    if (!is.null(data[[ti]])) {
+    if (!is.null(dataLoaded)) {
       nodeContribVec <- rep(0, length(nodeOrder))
       names(nodeContribVec) <- nodeOrder
       
@@ -533,7 +553,7 @@ plotModule <- function(
       dataRange <- c(-1, 1)
     }
   } else {
-    dat <- data[[ti]][presentSamples, presentNodes] # also used for actual plot
+    dat <- dataLoaded[presentSamples, presentNodes] # also used for actual plot
     if (is.null(dataRange)) {
       dataRange <- range(dat)
       # Make sure the gradient is balanced around 0 if the default colors are
@@ -564,7 +584,7 @@ plotModule <- function(
   # Plot correlation
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    correlation[[ti]][presentNodes, presentNodes], 
+    correlationLoaded[presentNodes, presentNodes], 
     corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main=main, main.line=main.line, legend.main="Correlation", 
     plotModuleNames=FALSE, laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
@@ -575,7 +595,7 @@ plotModule <- function(
   # Plot network
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    network[[ti]][presentNodes, presentNodes], netCols, netRange,
+    networkLoaded[presentNodes, presentNodes], netCols, netRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, main="", 
     legend.main="Edge weights", plotModuleNames=FALSE, 
     laxt.tck=laxt.tck, na.col=naCol, legend.main.line=legend.main.line,
@@ -585,7 +605,7 @@ plotModule <- function(
   
   # Plot weighted degree
   par(mar=c(1,1,1,1))
-  if (is.null(data[[ti]])) {
+  if (is.null(dataLoaded)) {
     plotBar(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
@@ -603,7 +623,7 @@ plotModule <- function(
     )
   }
   
-  if (!is.null(data[[ti]])) {
+  if (!is.null(dataLoaded)) {
     # Plot Module Membership
     par(mar=c(1, 1, 1, 1))
     plotBar(

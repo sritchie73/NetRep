@@ -249,7 +249,7 @@ loadIntoRAM <- function(x) {
 #'  \code{TRUE} if the class of any object in the list of input 
 #'  arguments is a "disk.matrix".
 any.disk.matrix <- function(...) {
-  "disk.matrix" %in% sapply(list(...), class)
+  any(unlist(sapply(list(...), is.disk.matrix)))
 }
 
 #' Silently check and load a package into the namespace

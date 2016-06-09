@@ -16,7 +16,8 @@
 #'  will be used. If \code{FALSE}, the \code{read.table} function will 
 #'  be used. 
 #' @param x for \code{as.matrix} a \code{disk.matrix} object to load into R. 
-#'  For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}.
+#'  For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}. For 
+#'  \code{is.disk.matrix} an object to check if its a \code{disk.matrix}.
 #' @param object a \code{'disk.matrix'} object. 
 #' @param serialize determines how the matrix is saved to disk by 
 #'  \code{as.disk.matrix}. If \code{TRUE} it will be stored as a serialized R 
@@ -53,8 +54,9 @@
 #' 
 #' @return 
 #' A \code{disk.matrix} object (\code{attach.disk.matrix}, \code{as.disk.matrix}),
-#' a \code{matrix} (\code{as.matrix}), or the file path to a serialized matrix
-#' (\code{serialize.table}).
+#' a \code{matrix} (\code{as.matrix}), the file path to a serialized matrix
+#' (\code{serialize.table}), or a \code{TRUE} or \code{FALSE} indicating 
+#' whether an object is a \code{disk.matrix} (\code{is.disk.matrix}).
 #' 
 #' @slot file the name of the file where the matrix is saved.
 #' @slot read.func either \code{"read.table"} or \code{"readRDS"}.
@@ -117,6 +119,12 @@ serialize.table <- function(file, ...) {
   m <- as.matrix(read.table(file, ...))
   saveRDS(m, serialized.file)
   serialized.file
+}
+
+#' @rdname disk.matrix
+#' @export
+is.disk.matrix <- function(x) {
+  class(x) == "disk.matrix"
 }
 
 #' @rdname disk.matrix

@@ -4,16 +4,14 @@
 \alias{netPropsInternal}
 \title{Internal function for calculating 'networkProperties'}
 \usage{
-netPropsInternal(network, data, correlation, moduleAssignments, modules,
-  discovery, test, nDatasets, datasetNames, verbose)
+netPropsInternal(network, data, moduleAssignments, modules, discovery, test,
+  nDatasets, datasetNames, verbose, loadedIdx, dataLoaded, networkLoaded,
+  keepLast = FALSE)
 }
 \arguments{
 \item{network}{\code{'network'} after processing by \code{'processInput'}.}
 
 \item{data}{\code{'data'} after processing by \code{'processInput'}.}
-
-\item{correlation}{\code{'correlation'} after processing by
-\code{'processInput'}.}
 
 \item{moduleAssignments}{\code{'moduleAssignments'} after processing by
 \code{'processInput'}.}
@@ -32,6 +30,18 @@ returned by \code{'processInput'}.}
 \code{'processInput'}.}
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
+
+\item{loadedIdx}{index of the currently loaded dataset.}
+
+\item{dataLoaded}{currently loaded data matrix (may be NULL).}
+
+\item{networkLoaded}{currently loaded network matrix.}
+
+\item{keepLast}{logical; should the dataset processed last be kept in RAM?}
+}
+\value{
+A list of network properties, and also the currently loaded dataset if
+ keepLast is TRUE.
 }
 \description{
 This function is used by several package functions. It assumes that all user

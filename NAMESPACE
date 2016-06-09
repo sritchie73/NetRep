@@ -3,6 +3,7 @@
 export(as.disk.matrix)
 export(attach.disk.matrix)
 export(combineAnalyses)
+export(is.disk.matrix)
 export(load.bigMatrix)
 export(modulePreservation)
 export(networkProperties)

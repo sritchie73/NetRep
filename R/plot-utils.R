@@ -151,7 +151,6 @@ areColors <- function(colvec) {
 #'
 #' @param network list returned by \code{'processInput'}.
 #' @param data data returned by \code{'processInput'}.
-#' @param correlation list returned by \code{'processInput'}.
 #' @param moduleAssignments list returned by \code{'processInput'}.
 #' @param modules vector of modules to show on the plot.
 #' @param di name of the discovery dataset.
@@ -162,11 +161,14 @@ areColors <- function(colvec) {
 #' @param datasetNames vector returned by \code{'processInput'}.
 #' @param nDatasets vector returned by \code{'processInput'}.
 #' @param verbose logical; turn on verbose printing.
+#' @param loadedIdx index of the currently loaded dataset.
+#' @param dataLoaded currently loaded data matrix (may be NULL).
+#' @param networkLoaded currently loaded network matrix.
 #'
 plotProps <- function(
-  network, data, correlation, moduleAssignments, modules, di,
-  ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-  verbose
+  network, data, moduleAssignments, modules, di, ti, orderNodesBy, 
+  orderSamplesBy, orderModules, datasetNames, nDatasets, verbose, loadedIdx, 
+  dataLoaded, networkLoaded
 ) {
   mods <- modules[[di]]
   mi <- NULL # suppresses CRAN note
@@ -184,14 +186,21 @@ plotProps <- function(
   #   'orderSamplesBy', 'orderNodesBy', and 'test' datasets.
   # this vector contains all datasets required for plotting
   
-  plotDatasets <- list(unique(na.omit(c(ti, orderSamplesBy, orderNodesBy))))
+  plotDatasets <- unique(na.omit(c(orderSamplesBy, orderNodesBy, ti)))
+  # The test dataset is the last plotDataset: this is so we don't have to
+  # load it again after calculating the network properties
+  plotDatasets <- c(plotDatasets[-which(plotDatasets == ti)], ti)
+  plotDatasets <- list(plotDatasets)
   names(plotDatasets) <- datasetNames[di]
   
   # Calculate the network properties for all datasets required
-  props <- netPropsInternal(
-    network, data, correlation, moduleAssignments, modules, di,
-    plotDatasets, nDatasets, datasetNames, verbose
-  )
+  res <- netPropsInternal(network, data, moduleAssignments, modules, di, 
+                          plotDatasets, nDatasets, datasetNames, verbose, 
+                          loadedIdx, dataLoaded, networkLoaded, TRUE)
+  props <- res$props
+  loadedIdx <- res$loadedIdx
+  dataLoaded <- res$dataLoaded
+  networkLoaded <- res$networkLoaded
   
   # Order nodes based on degree
   if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
@@ -237,7 +246,7 @@ plotProps <- function(
     sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
     sampleOrder <- simplifyList(sampleOrder, depth=3)
   } else {
-    sampleOrder <- rownames(data[[ti]])
+    sampleOrder <- rownames(dataLoaded)
   }
   
   # Just keep the properties we need for plotting
@@ -247,23 +256,12 @@ plotProps <- function(
     names(testProps) <- moduleOrder
   }
   
-  # Unless we are ordering nodes/samples by the discovery dataset, we should 
-  # only show nodes or samples present in the current dataset.
-  if (length(orderNodesBy) == 1 && (is.na(orderNodesBy) || orderNodesBy != di)) {
-    nodeOrder <- intersect(nodeOrder, colnames(network[[orderNodesBy]]))
-  }
-  
-  if (!is.null(sampleOrder) && (is.na(orderSamplesBy) || orderSamplesBy != di)) {
-    samplesInBoth <- intersect(rownames(data[[orderSamplesBy]]), rownames(data[[ti]]))
-    sampleOrder <- intersect(sampleOrder, samplesInBoth)
-  }
-  
   #-----------------------------------------------------------------------------
   # Identify nodes and samples from the 'discovery' dataset not present in the 
   # 'test' dataset.
   #-----------------------------------------------------------------------------
   
-  na.pos.x <- which(nodeOrder %nin% colnames(network[[ti]]))
+  na.pos.x <- which(nodeOrder %nin% colnames(networkLoaded))
   if (length(na.pos.x) > 0) {
     presentNodes <- nodeOrder[-na.pos.x]
   } else {
@@ -274,7 +272,7 @@ plotProps <- function(
     na.pos.y <- NULL
     presentSamples <- NULL
   } else if (!is.numeric(sampleOrder)) {
-    na.pos.y <- which(sampleOrder %nin% rownames(data[[ti]]))
+    na.pos.y <- which(sampleOrder %nin% rownames(dataLoaded))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
     } else {
@@ -285,12 +283,28 @@ plotProps <- function(
     presentSamples <- sampleOrder
   }
   
+  #-----------------------------------------------------------------------------
+  # Filter nodes and samples to display on the plot
+  #-----------------------------------------------------------------------------
+  # Unless we are ordering nodes/samples by the discovery dataset, we should 
+  # only show nodes or samples present in the current dataset.
+  if (length(orderNodesBy) == 1 && (is.na(orderNodesBy) || orderNodesBy != di)) {
+    nodeOrder <- presentNodes
+    na.pos.x <- NULL
+  }
+  
+  if (!is.null(sampleOrder) && (is.na(orderSamplesBy) || orderSamplesBy != di)) {
+    sampleOrder <- presentSamples
+    na.pos.y <- NULL
+  }
+  
   
   # Returned processed results
   return(list(
     testProps=testProps, nodeOrder=nodeOrder, moduleOrder=moduleOrder,
     sampleOrder=sampleOrder, na.pos.x=na.pos.x, na.pos.y=na.pos.y,
-    presentNodes=presentNodes, presentSamples=presentSamples
+    presentNodes=presentNodes, presentSamples=presentSamples,
+    dataLoaded=dataLoaded, networkLoaded=networkLoaded
   ))
 }
 

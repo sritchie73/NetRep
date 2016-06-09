@@ -412,8 +412,8 @@ plotData <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules)
+                         verbose, "plot", orderNodesBy, orderSamplesBy, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -425,18 +425,22 @@ plotData <- function(
   datasetNames <- finput$datasetNames
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
   
   # Indexes for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
-  
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
 
   vCat(verbose, 0, "User input ok!")
   
@@ -445,9 +449,9 @@ plotData <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
-    nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+    orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
+    verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -456,6 +460,12 @@ plotData <- function(
   na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
+  dataLoaded <- plotProps$dataLoaded
+  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -474,7 +484,7 @@ plotData <- function(
       dataRange <- c(-1, 1)
     }
   } else {
-    dat <- data[[ti]][presentSamples, presentNodes] # also used for actual plot
+    dat <- dataLoaded[presentSamples, presentNodes] # also used for actual plot
     if (is.null(dataRange)) {
       dataRange <- range(dat)
       # Make sure the gradient is balanced around 0 if the default colors are
@@ -580,8 +590,8 @@ plotCorrelation <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy=NA, orderModules)
+                         verbose, "plot", orderNodesBy, NULL, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -592,19 +602,25 @@ plotCorrelation <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   orderNodesBy <- finput$orderNodesBy
+  orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  correlationLoaded <- finput$correlationLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   
-  # Indexes for this function
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, correlationLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
+  
+  # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
-  
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
-  
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
@@ -612,14 +628,26 @@ plotCorrelation <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+    orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
+    verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
   na.pos.x <- plotProps$na.pos.x
   presentNodes <- plotProps$presentNodes
+  anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
+  
+  if (ti != loadedIdx) {
+    vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
+         'Loading correlation matrix of dataset "', ti, '" into RAM...', 
+         sep="")
+    correlationLoaded <- loadIntoRAM(correlation[[ti]])
+  }
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -669,7 +697,7 @@ plotCorrelation <- function(
     }
     
     plotSquareHeatmap(
-      correlation[[ti]][presentNodes, presentNodes], corCols, corRange, 
+      correlationLoaded[presentNodes, presentNodes], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -680,7 +708,7 @@ plotCorrelation <- function(
     )
   } else {
     plotTriangleHeatmap(
-      correlation[[ti]][presentNodes, presentNodes], corCols, corRange, 
+      correlationLoaded[presentNodes, presentNodes], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
@@ -742,8 +770,8 @@ plotNetwork <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy=NA, orderModules)
+                         verbose, "plot", orderNodesBy, NULL, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -754,18 +782,24 @@ plotNetwork <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   orderNodesBy <- finput$orderNodesBy
+  orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   
-  # Indexes for this function
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
+  
+  # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
-  
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
   
   vCat(verbose, 0, "User input ok!")
   
@@ -774,14 +808,20 @@ plotNetwork <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+    orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
+    verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
   na.pos.x <- plotProps$na.pos.x
   presentNodes <- plotProps$presentNodes
+  networkLoaded <- plotProps$networkLoaded
+  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -831,7 +871,7 @@ plotNetwork <- function(
     }
     
     plotSquareHeatmap(
-      network[[ti]][presentNodes, presentNodes], netCols, netRange, 
+      networkLoaded[presentNodes, presentNodes], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -842,7 +882,7 @@ plotNetwork <- function(
     )
   } else {
     plotTriangleHeatmap(
-      network[[ti]][presentNodes, presentNodes], netCols, netRange, 
+      networkLoaded[presentNodes, presentNodes], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
@@ -904,8 +944,8 @@ plotContribution <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy=NA, orderModules)
+                         verbose, "plot", orderNodesBy, NULL, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -916,18 +956,25 @@ plotContribution <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   orderNodesBy <- finput$orderNodesBy
+  orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   
-  # Indexes for this function
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
+  
+  # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
   
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
   
   vCat(verbose, 0, "User input ok!")
   
@@ -936,14 +983,17 @@ plotContribution <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+    orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
+    verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
-  na.pos.x <- plotProps$na.pos.x
-  presentNodes <- plotProps$presentNodes
+  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1028,8 +1078,8 @@ plotDegree <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy=NA, orderModules)
+                         verbose, "plot", orderNodesBy, NULL, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -1040,19 +1090,25 @@ plotDegree <- function(
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
   orderNodesBy <- finput$orderNodesBy
+  orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   
-  # Indexes for this function
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
+  
+  # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
   
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
-
   vCat(verbose, 0, "User input ok!")
   
   #-----------------------------------------------------------------------------
@@ -1060,14 +1116,18 @@ plotDegree <- function(
   # get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy=NULL, orderModules, 
-    datasetNames, nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
+     verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
-  na.pos.x <- plotProps$na.pos.x
-  presentNodes <- plotProps$presentNodes
+  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
+  
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1157,8 +1217,8 @@ plotSummary <- function(
   # Now try to make sense of the rest of the input
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
-                         verbose, plotFunction=TRUE, orderNodesBy, 
-                         orderSamplesBy, orderModules)
+                         verbose, "plot", orderNodesBy, orderSamplesBy, 
+                         orderModules)
   discovery <- finput$discovery
   test <- finput$test
   data <- finput$data
@@ -1168,20 +1228,25 @@ plotSummary <- function(
   modules <- finput$modules
   nDatasets <- finput$nDatasets
   datasetNames <- finput$datasetNames
-  orderSamplesBy <- finput$orderSamplesBy
   orderNodesBy <- finput$orderNodesBy
+  orderSamplesBy <- finput$orderSamplesBy
+  loadedIdx <- finput$loadedIdx
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   
-  # Indexes for this function
+  on.exit({
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
+    rm(dataLoaded, networkLoaded, finput)
+    gc()
+  }, add=TRUE)
+  
+  # Indices for this function
   di <- finput$discovery
   ti <- finput$test[[di]]
   mods <- modules[[di]]
   mi <- NULL # initialise to suppress CRAN NOTE
-  
-  # Convert dataset indices to dataset names
-  if (is.numeric(di))
-    di <- datasetNames[di]
-  if (is.numeric(ti))
-    ti <- datasetNames[ti]
   
   vCat(verbose, 0, "User input ok!")
   
@@ -1190,17 +1255,20 @@ plotSummary <- function(
   # samples on the plot, and get the network properties to be shown on the plot.
   #-----------------------------------------------------------------------------
   
-  plotProps <- plotProps(network, data, correlation, moduleAssignments,
-    modules, di, ti, orderNodesBy, orderSamplesBy, orderModules, datasetNames, 
-    nDatasets, verbose)
+  plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
+    orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
+    verbose, loadedIdx, dataLoaded, networkLoaded)
   testProps <- plotProps$testProps
-  nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
   sampleOrder <- plotProps$sampleOrder
-  na.pos.x <- plotProps$na.pos.x
-  na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
+  na.pos.y <- plotProps$na.pos.y
+  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  on.exit({ 
+    rm(plotProps)
+    gc()
+  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments

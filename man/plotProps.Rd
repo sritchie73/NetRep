@@ -4,15 +4,14 @@
 \alias{plotProps}
 \title{Get the network properties and order for a plot}
 \usage{
-plotProps(network, data, correlation, moduleAssignments, modules, di, ti,
-  orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, verbose)
+plotProps(network, data, moduleAssignments, modules, di, ti, orderNodesBy,
+  orderSamplesBy, orderModules, datasetNames, nDatasets, verbose, loadedIdx,
+  dataLoaded, networkLoaded)
 }
 \arguments{
 \item{network}{list returned by \code{'processInput'}.}
 
 \item{data}{data returned by \code{'processInput'}.}
-
-\item{correlation}{list returned by \code{'processInput'}.}
 
 \item{moduleAssignments}{list returned by \code{'processInput'}.}
 
@@ -33,6 +32,12 @@ plotProps(network, data, correlation, moduleAssignments, modules, di, ti,
 \item{nDatasets}{vector returned by \code{'processInput'}.}
 
 \item{verbose}{logical; turn on verbose printing.}
+
+\item{loadedIdx}{index of the currently loaded dataset.}
+
+\item{dataLoaded}{currently loaded data matrix (may be NULL).}
+
+\item{networkLoaded}{currently loaded network matrix.}
 }
 \description{
 Get the network properties and order for a plot

@@ -9,6 +9,7 @@
 \alias{as.matrix,disk.matrix-method}
 \alias{attach.disk.matrix}
 \alias{disk.matrix}
+\alias{is.disk.matrix}
 \alias{serialize.table}
 \alias{show,disk.matrix-method}
 \title{The 'disk.matrix' class}
@@ -16,6 +17,8 @@
 attach.disk.matrix(file, serialized = TRUE, ...)
 
 serialize.table(file, ...)
+
+is.disk.matrix(x)
 
 as.disk.matrix(x, file, serialize = TRUE)
 
@@ -43,7 +46,8 @@ be used.}
 data from a file in table format.}
 
 \item{x}{for \code{as.matrix} a \code{disk.matrix} object to load into R. 
-For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}.}
+For \code{as.disk.matrix} an object to convert to a \code{disk.matrix}. For 
+\code{is.disk.matrix} an object to check if its a \code{disk.matrix}.}
 
 \item{serialize}{determines how the matrix is saved to disk by 
 \code{as.disk.matrix}. If \code{TRUE} it will be stored as a serialized R 
@@ -54,8 +58,9 @@ tab-separated file using \code{write.table}.}
 }
 \value{
 A \code{disk.matrix} object (\code{attach.disk.matrix}, \code{as.disk.matrix}),
-a \code{matrix} (\code{as.matrix}), or the file path to a serialized matrix
-(\code{serialize.table}).
+a \code{matrix} (\code{as.matrix}), the file path to a serialized matrix
+(\code{serialize.table}), or a \code{TRUE} or \code{FALSE} indicating 
+whether an object is a \code{disk.matrix} (\code{is.disk.matrix}).
 }
 \description{
 A \code{'disk.matrix'} contains a file path to a matrix stored on disk,

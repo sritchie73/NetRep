@@ -5,8 +5,8 @@
 \title{Process, check, and format input}
 \usage{
 processInput(discovery, test, network, correlation, data, moduleAssignments,
-  modules, backgroundLabel, verbose, plotFunction = FALSE,
-  orderNodesBy = NA, orderSamplesBy = NA, orderModules = NULL)
+  modules, backgroundLabel, verbose, funcType, orderNodesBy = NA,
+  orderSamplesBy = NA, orderModules = NULL)
 }
 \arguments{
 \item{discovery}{user input for the 'discovery' argument.}
@@ -27,7 +27,7 @@ processInput(discovery, test, network, correlation, data, moduleAssignments,
 
 \item{verbose}{logical; should progress be reported? Default is \code{TRUE}.}
 
-\item{plotFunction}{logical; are we checking for a plot function?}
+\item{funcType}{one of "preservation", "properties" or "plot".}
 
 \item{orderNodesBy}{user input for the 'orderNodesBy' argument in the 
 plotting functions.}
