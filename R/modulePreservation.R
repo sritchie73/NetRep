@@ -538,7 +538,7 @@ modulePreservation <- function(
           # Unload previous dataset
           anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                                    network[[loadedIdx]])
-          vCat(verbose && anyDM, 1, "Unloading matrices...")
+          vCat(verbose && anyDM, 1, "Unloading dataset from RAM...")
           rm(dataLoaded, correlationLoaded, networkLoaded)
           gc()
           
@@ -579,7 +579,7 @@ modulePreservation <- function(
           # Unload previous dataset
           anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                                    network[[loadedIdx]])
-          vCat(verbose && anyDM, 1, "Unloading matrices...")
+          vCat(verbose && anyDM, 1, "Unloading dataset from RAM...")
           rm(dataLoaded, correlationLoaded, networkLoaded)
           gc()
           
@@ -657,7 +657,7 @@ modulePreservation <- function(
   # Free up memory
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
-  vCat(verbose && anyDM, 1, "Unloading matrices...")
+  vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
   rm(dataLoaded, correlationLoaded, networkLoaded)
   gc()
   

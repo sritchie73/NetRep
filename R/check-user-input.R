@@ -728,7 +728,7 @@ processInput <- function(
     # Free up memory if any objects are big matrices, but return the last
     # dataset to pass to the calling function.
     if (ii != tokeep) {
-      vCat(verbose && anyDM, 1, "Unloading matrices...")
+      vCat(verbose && anyDM, 1, "Unloading dataset from RAM...")
       rm(dataLoaded, correlationLoaded, networkLoaded)
       gc()
     }

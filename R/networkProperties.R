@@ -250,7 +250,7 @@ netPropsInternal <- function(
       }
     }
     # unload from RAM
-    vCat(verbose && anyDM, 0, "Unloading matrices...")
+    vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
     rm(dataLoaded, networkLoaded)
     gc()
   }
