@@ -598,7 +598,7 @@ processInput <- function(
     }
     iterator <- c(iterator, orderSamplesBy)
   }
-  iterator <- unique(iterator)
+  iterator <- unique(na.omit(iterator))
   
   if (funcType == "preservation") {
     # We want to iterate over the first discovery dataset last, so that we
@@ -646,7 +646,7 @@ processInput <- function(
   # dataset are present in the 'test' dataset to be drawn.
   if (funcType == "plot") {
     pIdx <- test[[discovery]]
-    sIdx <- orderSamplesBy
+    sIdx <- ifelse(is.na(orderSamplesBy), test[[discovery]], orderSamplesBy)
     pSamples <- NULL
     sSamples <- NULL
   }
