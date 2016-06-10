@@ -8,7 +8,7 @@ IntermediateProperties(dData, dCorr, dNet, tNodeNames, moduleAssignments,
   modules)
 }
 \arguments{
-\item{dData}{data matrix from the \emph{discovery} dataset.}
+\item{dData}{scaled data matrix from the \emph{discovery} dataset.}
 
 \item{dCorr}{matrix of correlation coefficients between all pairs of 
 variables/nodes in the \emph{discovery} dataset.}
@@ -43,6 +43,7 @@ once.
   \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
         consistent.}
   \item{The columns of 'dData' are the nodes.}
+  \item{'dData' has been scaled by 'Scale'.}
   \item{'dCorr' and 'dNet'  are square matrices, and their rownames are 
         identical to their column names.}
   \item{'moduleAssigments' is a named character vector, where the names

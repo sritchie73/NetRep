@@ -11,7 +11,7 @@ PermutationProcedure(discProps, tData, tCorr, tNet, moduleAssignments, modules,
 \item{discProps}{a list of intermediate properties calculated in the 
 discovery dataset by \code{\link{IntermediateProperties}}.}
 
-\item{tData}{data matrix from the \emph{test} dataset.}
+\item{tData}{scaled data matrix from the \emph{test} dataset.}
 
 \item{tCorr}{matrix of correlation coefficients between all pairs of 
 variables/nodes in the \emph{test} dataset.}
@@ -54,6 +54,7 @@ Multithreaded permutation procedure for module preservation statistics
   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
         consistent.}
   \item{The columns of 'tData' are the nodes.}
+  \item{'tData' has been scaled by 'Scale'.}
   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
         identical to their column names.}
   \item{'moduleAssigments' is a named character vector, where the names

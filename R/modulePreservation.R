@@ -472,6 +472,10 @@ modulePreservation <- function(
 
   vCat(verbose, 0, "Input ok!")
   
+  if (!is.null(dataLoaded)) {
+    dataLoaded <- Scale(dataLoaded)
+  }
+  
   # Set up return list
   res <- foreach(di = seq_len(nDatasets)) %do% {
     res2 <- foreach(ti = seq_len(nDatasets)) %do% {}
@@ -545,8 +549,9 @@ modulePreservation <- function(
           anyDM <- any.disk.matrix(data[[di]], correlation[[di]], network[[di]])
           vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
                datasetNames[di], '" into RAM...', sep="")
-          if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
-            dataLoaded <- loadIntoRAM(data[[di]])
+          if (!is.null(data[[di]])) {
+            dataLoaded <- Scale(loadIntoRAM(data[[di]]))
+            gc()
           } else {
             dataLoaded <- NULL
           }
@@ -586,8 +591,9 @@ modulePreservation <- function(
           anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
           vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
                datasetNames[ti], '" into RAM...', sep="")
-          if (!is.null(data[[di]]) && !is.null(data[[ti]])) {
-            dataLoaded <- loadIntoRAM(data[[ti]])
+          if (!is.null(data[[ti]])) {
+            dataLoaded <- Scale(loadIntoRAM(data[[ti]]))
+            gc()
           } else {
             dataLoaded <- NULL
           }

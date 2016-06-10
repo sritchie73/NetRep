@@ -16,6 +16,7 @@
 //'   \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
 //'         consistent.}
 //'   \item{The columns of 'dData' are the nodes.}
+//'   \item{'dData' has been scaled by 'Scale'.}
 //'   \item{'dCorr' and 'dNet'  are square matrices, and their rownames are 
 //'         identical to their column names.}
 //'   \item{'moduleAssigments' is a named character vector, where the names
@@ -23,7 +24,7 @@
 //'   }
 //' }
 //' 
-//' @param dData data matrix from the \emph{discovery} dataset.
+//' @param dData scaled data matrix from the \emph{discovery} dataset.
 //' @param dCorr matrix of correlation coefficients between all pairs of 
 //'   variables/nodes in the \emph{discovery} dataset.
 //' @param dNet adjacency matrix of network edge weights between all pairs of 
@@ -47,7 +48,6 @@ Rcpp::List IntermediateProperties (
   // First, scale the matrix data
   unsigned int nSamples = dData.nrow();
   unsigned int nNodes = dData.ncol();
-  arma::mat dScaledData = Scale(dData.begin(), nSamples, nNodes);
 
   R_CheckUserInterrupt(); 
   
@@ -106,10 +106,10 @@ Rcpp::List IntermediateProperties (
     dWD = dWD(dRank); // reorder
     R_CheckUserInterrupt(); 
     
-    dSP = SummaryProfile(dScaledData.memptr(), nSamples, nNodes, dIdx.memptr(), mNodes);
+    dSP = SummaryProfile(dData.begin(), nSamples, nNodes, dIdx.memptr(), mNodes);
     R_CheckUserInterrupt(); 
     
-    dNC = NodeContribution(dScaledData.memptr(), nSamples, nNodes, 
+    dNC = NodeContribution(dData.begin(), nSamples, nNodes, 
                            dIdx.memptr(), mNodes, dSP.memptr());
     dNC = dNC(dRank); // reorder results
     R_CheckUserInterrupt(); 

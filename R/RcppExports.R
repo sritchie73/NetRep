@@ -31,6 +31,7 @@ CheckFinite <- function(matPtr) {
 #'   \item{The ordering of node names across 'dData', 'dCorr', and 'dNet' is
 #'         consistent.}
 #'   \item{The columns of 'dData' are the nodes.}
+#'   \item{'dData' has been scaled by 'Scale'.}
 #'   \item{'dCorr' and 'dNet'  are square matrices, and their rownames are 
 #'         identical to their column names.}
 #'   \item{'moduleAssigments' is a named character vector, where the names
@@ -38,7 +39,7 @@ CheckFinite <- function(matPtr) {
 #'   }
 #' }
 #' 
-#' @param dData data matrix from the \emph{discovery} dataset.
+#' @param dData scaled data matrix from the \emph{discovery} dataset.
 #' @param dCorr matrix of correlation coefficients between all pairs of 
 #'   variables/nodes in the \emph{discovery} dataset.
 #' @param dNet adjacency matrix of network edge weights between all pairs of 
@@ -108,6 +109,7 @@ IntermediatePropertiesNoData <- function(dCorr, dNet, tNodeNames, moduleAssignme
 #'   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
 #'         consistent.}
 #'   \item{The columns of 'tData' are the nodes.}
+#'   \item{'tData' has been scaled by 'Scale'.}
 #'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
 #'         identical to their column names.}
 #'   \item{'moduleAssigments' is a named character vector, where the names
@@ -126,7 +128,7 @@ IntermediatePropertiesNoData <- function(dCorr, dNet, tNodeNames, moduleAssignme
 #' 
 #' @param discProps a list of intermediate properties calculated in the 
 #'   discovery dataset by \code{\link{IntermediateProperties}}.
-#' @param tData data matrix from the \emph{test} dataset.
+#' @param tData scaled data matrix from the \emph{test} dataset.
 #' @param tCorr matrix of correlation coefficients between all pairs of 
 #'   variables/nodes in the \emph{test} dataset.
 #' @param tNet adjacency matrix of network edge weights between all pairs of 
@@ -267,5 +269,18 @@ NetProps <- function(data, net, moduleAssignments, modules) {
 #'   coherence, weighted degree, and average edge weight for each 'module'.
 NetPropsNoData <- function(net, moduleAssignments, modules) {
     .Call('NetRep_NetPropsNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
+}
+
+#' Scale data across all nodes
+#' 
+#' Each node is centered by its mean and scaled by it standard deviation.
+#' 
+#' @param data matrix to scale.
+#' 
+#' @return
+#'  A scaled data matrix.
+#'
+Scale <- function(data) {
+    .Call('NetRep_Scale', PACKAGE = 'NetRep', data)
 }
 

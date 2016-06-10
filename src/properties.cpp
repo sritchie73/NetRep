@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "netStats.h"
+#include "scale.h"
 
 //' Calculate the network properties 
 //' 

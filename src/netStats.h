@@ -10,7 +10,6 @@
 #include <RcppArmadillo.h>
 
 // Utility functions
-arma::mat Scale (double *, unsigned int, unsigned int);
 arma::uvec SortNodes (unsigned int *, unsigned int);
 double Correlation (double *, double *, unsigned int);
 double SignAwareMean (double *, double *, unsigned int);

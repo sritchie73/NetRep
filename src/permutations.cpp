@@ -116,6 +116,7 @@ void calculateNulls(
 //'   \item{The ordering of node names across 'tData', 'tCorr', and 'tNet' is
 //'         consistent.}
 //'   \item{The columns of 'tData' are the nodes.}
+//'   \item{'tData' has been scaled by 'Scale'.}
 //'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
 //'         identical to their column names.}
 //'   \item{'moduleAssigments' is a named character vector, where the names
@@ -134,7 +135,7 @@ void calculateNulls(
 //' 
 //' @param discProps a list of intermediate properties calculated in the 
 //'   discovery dataset by \code{\link{IntermediateProperties}}.
-//' @param tData data matrix from the \emph{test} dataset.
+//' @param tData scaled data matrix from the \emph{test} dataset.
 //' @param tCorr matrix of correlation coefficients between all pairs of 
 //'   variables/nodes in the \emph{test} dataset.
 //' @param tNet adjacency matrix of network edge weights between all pairs of 
@@ -161,17 +162,11 @@ Rcpp::List PermutationProcedure (
   Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, 
   Rcpp::LogicalVector verbose, Rcpp::Function vCat
 ) {
-  
-  // First, scale the matrix data
-  unsigned int nSamples = tData.nrow();
-  unsigned int nNodes = tData.ncol();
-  arma::mat tScaledData = Scale(tData.begin(), nSamples, nNodes);
-  
-  R_CheckUserInterrupt(); 
-  
   // convert the colnames / rownames to C++ equivalents
   const std::vector<std::string> dNames (Rcpp::as<std::vector<std::string>>(moduleAssignments.names()));
   const std::vector<std::string> tNames (Rcpp::as<std::vector<std::string>>(colnames(tNet)));
+  unsigned int nSamples = tData.nrow();
+  unsigned int nNodes = tData.ncol();
   
   /* Next, we need to create three mappings:
    *  - From node IDs to indices in the test dataset.
@@ -281,11 +276,11 @@ Rcpp::List PermutationProcedure (
     tWD = tWD(tRank); // reorder results
     R_CheckUserInterrupt(); 
     
-    tSP = SummaryProfile(tScaledData.memptr(), nSamples, nNodes, tIdx.memptr(), 
+    tSP = SummaryProfile(tData.begin(), nSamples, nNodes, tIdx.memptr(), 
                          mNodes);
     R_CheckUserInterrupt(); 
     
-    tNC = NodeContribution(tScaledData.memptr(), nSamples, nNodes, 
+    tNC = NodeContribution(tData.begin(), nSamples, nNodes, 
                            tIdx.memptr(), mNodes, tSP.memptr());
     tNC = tNC(tRank); // reorder results
     R_CheckUserInterrupt(); 
@@ -343,7 +338,7 @@ Rcpp::List PermutationProcedure (
   // Spawn the threads
   for (unsigned int ii = 0; ii < nThreads; ++ii) {
     tt[ii] = std::thread(
-      calculateNulls, tScaledData.memptr(), tCorr.begin(),
+      calculateNulls, tData.begin(), tCorr.begin(),
       tNet.begin(), nSamples, nNodes, std::ref(addrWD), std::ref(addrNC), 
       std::ref(addrCV),modsPresent, modNodePresentMap, modIdxMap, nullIdx, 
       nullMap, nulls.memptr(), nPerm, chunkPerms.at(ii), startIdx.at(ii), 

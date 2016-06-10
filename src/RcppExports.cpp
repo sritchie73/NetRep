@@ -116,3 +116,14 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// Scale
+Rcpp::NumericMatrix Scale(Rcpp::NumericMatrix data);
+RcppExport SEXP NetRep_Scale(SEXP dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type data(dataSEXP);
+    __result = Rcpp::wrap(Scale(data));
+    return __result;
+END_RCPP
+}
