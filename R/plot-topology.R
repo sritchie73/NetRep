@@ -426,13 +426,21 @@ plotData <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+  
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   networkLoaded <- finput$networkLoaded
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
-                           network[[loadedIdx]])
+  
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded, finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
   
@@ -451,7 +459,7 @@ plotData <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, dataLoaded, networkLoaded)
+    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -460,12 +468,9 @@ plotData <- function(
   na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
-  dataLoaded <- plotProps$dataLoaded
+  
+  # flag for previous on.exit
   anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -604,17 +609,28 @@ plotCorrelation <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+  
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   correlationLoaded <- finput$correlationLoaded
   networkLoaded <- finput$networkLoaded
+  
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, correlationLoaded, networkLoaded, finput)
+    rm(dataLoaded, correlationLoaded, networkLoaded)
     gc()
   }, add=TRUE)
+  
   
   # Indices for this function
   di <- finput$discovery
@@ -630,22 +646,22 @@ plotCorrelation <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, dataLoaded, networkLoaded)
+    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
   na.pos.x <- plotProps$na.pos.x
   presentNodes <- plotProps$presentNodes
+  
+  # flag for on.exit
   anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
   
   if (ti != loadedIdx) {
     vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
          'Loading correlation matrix of dataset "', ti, '" into RAM...', 
          sep="")
+    rm(correlationLoaded)
+    gc()
     correlationLoaded <- loadIntoRAM(correlation[[ti]])
   }
   
@@ -784,16 +800,27 @@ plotNetwork <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+  
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   networkLoaded <- finput$networkLoaded
+  
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded, finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
+  
   
   # Indices for this function
   di <- finput$discovery
@@ -810,19 +837,16 @@ plotNetwork <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, dataLoaded, networkLoaded)
+    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
   na.pos.x <- plotProps$na.pos.x
   presentNodes <- plotProps$presentNodes
-  networkLoaded <- plotProps$networkLoaded
+
+  # flag for on.exit  
   anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
-  
+
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
   #-----------------------------------------------------------------------------
@@ -958,16 +982,27 @@ plotContribution <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   networkLoaded <- finput$networkLoaded
+  
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded, finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
+  
   
   # Indices for this function
   di <- finput$discovery
@@ -985,15 +1020,13 @@ plotContribution <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, dataLoaded, networkLoaded)
+    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
+  
+  # flag for on.exit
   anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1092,16 +1125,27 @@ plotDegree <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+  
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   networkLoaded <- finput$networkLoaded
+  
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded, finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
+  
   
   # Indices for this function
   di <- finput$discovery
@@ -1118,16 +1162,13 @@ plotDegree <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
      orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-     verbose, loadedIdx, dataLoaded, networkLoaded)
+     verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
-  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
   
+  # flag for on.exit
+  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1231,16 +1272,27 @@ plotSummary <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+  
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   networkLoaded <- finput$networkLoaded
+  
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded, finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
+  
   
   # Indices for this function
   di <- finput$discovery
@@ -1257,18 +1309,16 @@ plotSummary <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, dataLoaded, networkLoaded)
+    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   moduleOrder <- plotProps$moduleOrder
   sampleOrder <- plotProps$sampleOrder
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
   na.pos.y <- plotProps$na.pos.y
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments

@@ -199,8 +199,6 @@ plotProps <- function(
                           loadedIdx, dataLoaded, networkLoaded, TRUE)
   props <- res$props
   loadedIdx <- res$loadedIdx
-  dataLoaded <- res$dataLoaded
-  networkLoaded <- res$networkLoaded
   
   # Order nodes based on degree
   if (length(orderNodesBy) > 1 || !is.na(orderNodesBy)) {
@@ -246,7 +244,7 @@ plotProps <- function(
     sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
     sampleOrder <- simplifyList(sampleOrder, depth=3)
   } else {
-    sampleOrder <- rownames(dataLoaded)
+    sampleOrder <- rownames(deref(dataLoaded))
   }
   
   # Just keep the properties we need for plotting
@@ -261,7 +259,7 @@ plotProps <- function(
   # 'test' dataset.
   #-----------------------------------------------------------------------------
   
-  na.pos.x <- which(nodeOrder %nin% colnames(networkLoaded))
+  na.pos.x <- which(nodeOrder %nin% colnames(deref(networkLoaded)))
   if (length(na.pos.x) > 0) {
     presentNodes <- nodeOrder[-na.pos.x]
   } else {
@@ -272,7 +270,7 @@ plotProps <- function(
     na.pos.y <- NULL
     presentSamples <- NULL
   } else if (!is.numeric(sampleOrder)) {
-    na.pos.y <- which(sampleOrder %nin% rownames(dataLoaded))
+    na.pos.y <- which(sampleOrder %nin% rownames(deref(dataLoaded)))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
     } else {
@@ -303,8 +301,7 @@ plotProps <- function(
   return(list(
     testProps=testProps, nodeOrder=nodeOrder, moduleOrder=moduleOrder,
     sampleOrder=sampleOrder, na.pos.x=na.pos.x, na.pos.y=na.pos.y,
-    presentNodes=presentNodes, presentSamples=presentSamples,
-    dataLoaded=dataLoaded, networkLoaded=networkLoaded
+    presentNodes=presentNodes, presentSamples=presentSamples
   ))
 }
 

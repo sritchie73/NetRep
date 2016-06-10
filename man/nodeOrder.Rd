@@ -2,7 +2,8 @@
 % Please edit documentation in R/orderNodes.R
 \name{nodeOrder}
 \alias{nodeOrder}
-\title{Order nodes and modules within a network.}
+\title{Order nodes in descending order of \emph{weighted degree} and order 
+modules by the similarity of their summary vectors.}
 \usage{
 nodeOrder(network, data, correlation, moduleAssignments = NULL,
   modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,

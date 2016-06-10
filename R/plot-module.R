@@ -393,15 +393,24 @@ plotModule <- function(
   orderNodesBy <- finput$orderNodesBy
   orderSamplesBy <- finput$orderSamplesBy
   loadedIdx <- finput$loadedIdx
+  
+  # Get the loaded datasets
   dataLoaded <- finput$dataLoaded
   correlationLoaded <- finput$correlationLoaded
   networkLoaded <- finput$networkLoaded
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, correlationLoaded, networkLoaded, finput)
+    rm(dataLoaded, correlationLoaded, networkLoaded)
     gc()
   }, add=TRUE)
   
@@ -457,7 +466,7 @@ plotModule <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, dataLoaded, networkLoaded)
+    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -466,18 +475,16 @@ plotModule <- function(
   na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
-  dataLoaded <- plotProps$dataLoaded
-  networkLoaded <- plotProps$networkLoaded
+  
+  # flag for on.exit
   anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
-  on.exit({ 
-    rm(plotProps)
-    gc()
-  }, add=TRUE)
   
   if (ti != loadedIdx) {
     vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
          'Loading correlation matrix of dataset "', ti, '" into RAM...', 
          sep="")
+    rm(correlationLoaded)
+    gc()
     correlationLoaded <- loadIntoRAM(correlation[[ti]])
   }
   

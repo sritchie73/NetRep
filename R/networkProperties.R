@@ -141,6 +141,7 @@
 #'   \link[=sampleOrder]{Ordering samples by module summary}
 #' 
 #' @rdname networkProperties
+#' @import ref
 #' @export
 networkProperties <- function(
   network, data, correlation, moduleAssignments=NULL, modules=NULL,
@@ -156,6 +157,16 @@ networkProperties <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, "props")
+  # Get the loaded datasets
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
+  
   vCat(verbose, 0, "User input ok!")
   anyDM <- with(finput, {
     any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -163,7 +174,7 @@ networkProperties <- function(
   })
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
   
@@ -171,7 +182,7 @@ networkProperties <- function(
   res <- with(finput, {
     netPropsInternal(network, data, moduleAssignments, modules, discovery, 
                      test, nDatasets, datasetNames, verbose, loadedIdx, 
-                     dataLoaded, networkLoaded, FALSE)
+                     as.ref(dataLoaded), as.ref(networkLoaded), FALSE)
   })
   anyDM <- FALSE
   
@@ -205,8 +216,8 @@ networkProperties <- function(
 #'   \code{'processInput'}.
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' @param loadedIdx index of the currently loaded dataset.
-#' @param dataLoaded currently loaded data matrix (may be NULL).
-#' @param networkLoaded currently loaded network matrix.
+#' @param dataLoaded reference to currently loaded data matrix (may be NULL).
+#' @param networkLoaded reference to currently loaded network matrix.
 #' @param keepLast logical; should the dataset processed last be kept in RAM?
 #'   
 #' @return
@@ -249,15 +260,16 @@ netPropsInternal <- function(
       # unload previous dataset from RAM
       anyDM <- any.disk.matrix(data[[loadedIdx]], network[[loadedIdx]])
       vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-      rm(dataLoaded, networkLoaded)
+      deref(dataLoaded) <- NULL 
+      deref(networkLoaded) <- NULL
       gc()
       
       # Load matrices into RAM if they are 'disk.matrix' objects.
       anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
       vCat(verbose && anyDM, 0, 'Loading matrices of dataset "',
            datasetNames[ti], '" into RAM...', sep="")
-      dataLoaded <- loadIntoRAM(data[[ti]])
-      networkLoaded <- loadIntoRAM(network[[ti]])
+      deref(dataLoaded) <- loadIntoRAM(data[[ti]])
+      deref(networkLoaded) <- loadIntoRAM(network[[ti]])
       loadedIdx <- ti
     }
     
@@ -267,11 +279,12 @@ netPropsInternal <- function(
              'dataset "', datasetNames[ti], '"...', sep="")
         if (is.null(data[[ti]])) {
           props <- NetPropsNoData(
-            networkLoaded, moduleAssignments[[di]], modules[[di]]
+            deref(networkLoaded), moduleAssignments[[di]], modules[[di]]
           )
         } else {
           props <- NetProps(
-            dataLoaded, networkLoaded, moduleAssignments[[di]], modules[[di]]
+            deref(dataLoaded), deref(networkLoaded), moduleAssignments[[di]], 
+            modules[[di]]
           )
         }
         
@@ -285,13 +298,13 @@ netPropsInternal <- function(
     # unload previous dataset from RAM
     anyDM <- any.disk.matrix(data[[loadedIdx]], network[[loadedIdx]])
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    deref(dataLoaded) <- NULL
+    deref(networkLoaded) <- NULL
     gc()
     return(res)
   }
   
-  return(list(props=res, loadedIdx=loadedIdx, dataLoaded=dataLoaded,
-              networkLoaded=networkLoaded))
+  return(list(props=res, loadedIdx=loadedIdx))
 }
 
 

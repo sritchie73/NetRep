@@ -130,6 +130,14 @@ sampleOrder <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, "props")
+  # Get the loaded datasets
+  dataLoaded <- finput$dataLoaded
+  networkLoaded <- finput$networkLoaded
+  # remove from the finput list so that when we re-assign a new dataset the
+  # memory is freed.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
   
   discovery <- finput$discovery
   test <- finput$test
@@ -141,7 +149,7 @@ sampleOrder <- function(
   })
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(finput)
+    rm(dataLoaded, networkLoaded)
     gc()
   }, add=TRUE)
   
@@ -160,7 +168,7 @@ sampleOrder <- function(
   props <- with(finput, {
     netPropsInternal(network, data, moduleAssignments, modules, discovery, 
                      test, nDatasets, datasetNames, verbose, loadedIdx, 
-                     dataLoaded, networkLoaded, FALSE)
+                     as.ref(dataLoaded), as.ref(networkLoaded), FALSE)
   })
   anyDM <- FALSE
   

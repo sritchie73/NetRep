@@ -461,6 +461,11 @@ modulePreservation <- function(
   correlationLoaded <- finput$correlationLoaded
   networkLoaded <- finput$networkLoaded
   
+  # We don't want a second copy when we start swapping datasets.
+  finput$dataLoaded <- NULL
+  finput$correlationLoaded <- NULL
+  finput$networkLoaded <- NULL
+  
   # If NULL, automatically determine.
   if (is.null(nPerm)) {
     # If missing, set as the required number for Bonferroni correction.

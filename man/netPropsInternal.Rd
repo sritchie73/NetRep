@@ -33,9 +33,9 @@ returned by \code{'processInput'}.}
 
 \item{loadedIdx}{index of the currently loaded dataset.}
 
-\item{dataLoaded}{currently loaded data matrix (may be NULL).}
+\item{dataLoaded}{reference to currently loaded data matrix (may be NULL).}
 
-\item{networkLoaded}{currently loaded network matrix.}
+\item{networkLoaded}{reference to currently loaded network matrix.}
 
 \item{keepLast}{logical; should the dataset processed last be kept in RAM?}
 }
