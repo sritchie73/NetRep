@@ -5,100 +5,26 @@ options(width = 100)
 library("NetRep")
 data("NetRep")
 
-## ---- message=FALSE, echo=FALSE-------------------------------------------------------------------
-# This is hidden so the script will run. The other code blocks are demonstrative:
-# they show the user how to use the 'backingfile' argument. This is primarily for
-# people who are going to copy code from the vignette and modify it to their 
-# data (e.g. most people), however the vignette should not save things to the
-# user's current directory when they build the vignette 
-discovery_data <- as.bigMatrix(discovery_data)
-discovery_correlation <- as.bigMatrix(discovery_correlation)
-discovery_network <- as.bigMatrix(discovery_network)
-test_data <- as.bigMatrix(test_data)
-test_correlation <- as.bigMatrix(test_correlation)
-test_network <- as.bigMatrix(test_network)
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # Save data in the 'bigMatrix' format in your current directory.
-#  save.as.bigMatrix(discovery_data, backingfile="discovery_data.bm")
-#  save.as.bigMatrix(discovery_correlation, backingfile="discovery_correlation.bm")
-#  save.as.bigMatrix(discovery_network, backingfile="discovery_network.bm")
-#  save.as.bigMatrix(test_data, backingfile="test_data.bm")
-#  save.as.bigMatrix(test_correlation, backingfile="test_correlation.bm")
-#  save.as.bigMatrix(test_network, backingfile="test_network.bm")
-#  
-#  # Write out the module assignments vector to file to be read in by the module
-#  # preservation script we write later.
-#  write.csv(module_labels, file="discovery_modules.csv")
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  discovery_network <- load.bigMatrix(backingfile="discovery_network.bm")
-
 ## -------------------------------------------------------------------------------------------------
-discovery_network[1:5, 1:5]
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # This converts a `bigMatrix` to a `matrix` in R, but leaves the
-#  # backingfile on disk so you can still instantly load it in other
-#  # R sessions using 'load.bigMatrix'
-#  as.matrix(discovery_network)
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # First, we need to load in the data we previously saved in
-#  # the `bigMatrix` format:
-#  discovery_data <- load.bigMatrix("discovery_data.bm")
-#  discovery_correlation <- load.bigMatrix("discovery_correlation.bm")
-#  discovery_network <- load.bigMatrix("discovery_network.bm")
-#  test_data <- load.bigMatrix("test_data.bm")
-#  test_correlation <- load.bigMatrix("test_correlation.bm")
-#  test_network <- load.bigMatrix("test_network.bm")
-#  
-#  # As well as read in the module labels:
-#  module_labels <- read.csv("module_labels.csv", stringsAsFactors=FALSE)
-#  # Convert the 'data.frame' to a 'vector'
-#  module_labels <- structure(module_labels[,2], names=module_labels[,1])
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # Set up the input data structures for NetRep.
-#  data_list <- list(cohort1=discovery_data, cohort2=test_data)
-#  correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
-#  network_list <- list(cohort1=discovery_network, cohort2=test_network)
-#  
-#  # We do not need to set up a list for containing the 'module_labels' because
-#  # there is only one "discovery" dataset.
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # Assess the preservation of modules in the test dataset
-#  preservation <- modulePreservation(
-#   data=data_list, correlation=correlation_list, network=network_list,
-#   moduleAssignments=module_labels, nPerm=10000, discovery="cohort1",
-#   test="cohort2"
-#  )
-#  
-#  # Write out the results object:
-#  saveRDS(preservation, "preservation-analysis-results.rds")
-
-## ---- echo=FALSE, hold=TRUE-----------------------------------------------------------------------
-# This is the code that actually gets run in the Rmarkdown document
+# Set up the input data structures for NetRep. We will call these datasets 
+# "cohort1" and "cohort2" to avoid confusion with the "discovery" and "test"
+# arguments in NetRep's functions:
 data_list <- list(cohort1=discovery_data, cohort2=test_data)
 correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
 network_list <- list(cohort1=discovery_network, cohort2=test_network)
 
+# We do not need to set up a list for containing the 'module_labels' because
+# there is only one "discovery" dataset.
+
+## -------------------------------------------------------------------------------------------------
+# Assess the preservation of modules in the test dataset.
 preservation <- modulePreservation(
- data=data_list, correlation=correlation_list, network=network_list,
- moduleAssignments=module_labels, nPerm=100, discovery="cohort1", 
- test="cohort2", verbose=TRUE
+ network=network_list, data=data_list, correlation=correlation_list, 
+ moduleAssignments=module_labels, discovery="cohort1", test="cohort2", 
+ nPerm=10000, nThreads=2
 )
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  preservation <- readRDS("preservation-analysis-results.rds")
-#  
-#  # The results are stored as a list. The table of permutation test p-values is
-#  # stored in the element named "p.value".
-#  preservation$p.value
-
-## ---- echo=FALSE----------------------------------------------------------------------------------
-# This is the code that actually gets run in the Rmarkdown document
+## -------------------------------------------------------------------------------------------------
 preservation$p.value
 
 ## -------------------------------------------------------------------------------------------------
@@ -106,41 +32,21 @@ preservation$p.value
 max_pval <- apply(preservation$p.value, 1, max)
 max_pval
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # First, we need to load in the data we previously saved in
-#  # the `bigMatrix` format:
-#  discovery_data <- load.bigMatrix("discovery_data.bm")
-#  discovery_correlation <- load.bigMatrix("discovery_correlation.bm")
-#  discovery_network <- load.bigMatrix("discovery_network.bm")
-#  test_data <- load.bigMatrix("test_data.bm")
-#  test_correlation <- load.bigMatrix("test_correlation.bm")
-#  test_network <- load.bigMatrix("test_network.bm")
-#  
-#  # As well as read in the module labels:
-#  module_labels <- read.csv("module_labels.csv", stringsAsFactors=FALSE)
-#  # Convert the 'data.frame' to a 'vector'
-#  module_labels <- structure(module_labels[,2], names=module_labels[,1])
-#  
-#  # Set up the input data structures for NetRep.
-#  data_list <- list(cohort1=discovery_data, cohort2=test_data)
-#  correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
-#  network_list <- list(cohort1=discovery_network, cohort2=test_network)
-
-## ----modules_in_discovery, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----modules_in_discovery, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="cohort1", test="cohort1"
 )
 
-## ----modules_in_test, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----modules_in_test, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="cohort1", test="cohort2"
 )
 
-## ----mean_degree, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----mean_degree, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4), # only the preserved modules
@@ -148,7 +54,7 @@ plotModule(
   orderNodesBy=c("cohort1", "cohort2") # this can be any number of datasets
 )
 
-## ----dry_run, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----dry_run, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4),
@@ -157,7 +63,7 @@ plotModule(
   dryRun=TRUE
 )
 
-## ----dry_run_customised, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----dry_run_customised, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 # Change the margins so the plot is more compressed. Alternatively we could 
 # change the device window.
 par(mar=c(3,10,3,10)) # bottom, left, top, right margin sizes
@@ -180,7 +86,7 @@ plotModule(
   legend.main.line=2
 )
 
-## ----mean_degree_customised, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----mean_degree_customised, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 par(mar=c(3,10,3,10)) 
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -191,33 +97,13 @@ plotModule(
   maxt.line=0, legend.main.line=2
 )
 
-## ----correlation_heatmap, dev="png", fig.height=6, fig.width=6, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
-par(mar=c(5,5,3,3)) 
+## ----correlation_heatmap, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+par(mar=c(5,5,4,4)) 
 plotCorrelation(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=0:4, discovery="cohort1",
   test="cohort1", symmetric=TRUE, orderModules=FALSE
 )
-
-## ---- eval=FALSE----------------------------------------------------------------------------------
-#  # First, we need to load in the data we previously saved in
-#  # the `bigMatrix` format:
-#  discovery_data <- load.bigMatrix("discovery_data.bm")
-#  discovery_correlation <- load.bigMatrix("discovery_correlation.bm")
-#  discovery_network <- load.bigMatrix("discovery_network.bm")
-#  test_data <- load.bigMatrix("test_data.bm")
-#  test_correlation <- load.bigMatrix("test_correlation.bm")
-#  test_network <- load.bigMatrix("test_network.bm")
-#  
-#  # As well as read in the module labels:
-#  module_labels <- read.csv("module_labels.csv", stringsAsFactors=FALSE)
-#  # Convert the 'data.frame' to a 'vector'
-#  module_labels <- structure(module_labels[,2], names=module_labels[,1])
-#  
-#  # Set up the input data structures for NetRep.
-#  data_list <- list(cohort1=discovery_data, cohort2=test_data)
-#  correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
-#  network_list <- list(cohort1=discovery_network, cohort2=test_network)
 
 ## -------------------------------------------------------------------------------------------------
 properties <- networkProperties(
@@ -240,4 +126,136 @@ properties[["cohort1"]][["1"]][["coherence"]]
 # The same information in the test dataset:
 properties[["cohort2"]][["1"]][["summary"]]
 properties[["cohort2"]][["1"]][["coherence"]]
+
+## ---- echo=FALSE, message=FALSE, results="hide"---------------------------------------------------
+# This is the code necessary for the later part of this section to run.
+# The vignette doesnt actually save the data.
+discovery_data <- as.disk.matrix(discovery_data, tempfile())
+discovery_correlation <- as.disk.matrix(discovery_correlation, tempfile())
+discovery_network <- as.disk.matrix(discovery_network, tempfile())
+test_data <- as.disk.matrix(test_data, tempfile())
+test_correlation <- as.disk.matrix(test_correlation, tempfile())
+test_network <- as.disk.matrix(test_network, tempfile())
+
+## ---- eval=FALSE----------------------------------------------------------------------------------
+#  # serialize=TRUE will save the data using 'saveRDS'.
+#  # serialize=FALSE will save the data as a tab-separated file ('sep="\t"').
+#  discovery_data <- as.disk.matrix(
+#    x=discovery_data,
+#    file="discovery_data.rds",
+#    serialize=TRUE)
+#  discovery_correlation <- as.disk.matrix(
+#    x=discovery_correlation,
+#    file="discovery_correlation.rds",
+#    serialize=TRUE)
+#  discovery_network <- as.disk.matrix(
+#    x=discovery_network,
+#    file="discovery_network.rds",
+#    serialize=TRUE)
+#  test_data <- as.disk.matrix(
+#    x=test_data,
+#    file="test_data.rds",
+#    serialize=TRUE)
+#  test_correlation <- as.disk.matrix(
+#    x=test_correlation,
+#    file="test_correlation.rds",
+#    serialize=TRUE)
+#  test_network <- as.disk.matrix(
+#    x=test_network,
+#    file="test_network.rds",
+#    serialize=TRUE)
+
+## ---- eval=FALSE----------------------------------------------------------------------------------
+#  test_network
+
+## ---- echo=FALSE----------------------------------------------------------------------------------
+cat("Pointer to matrix stored at test_network.rds\n")
+
+## -------------------------------------------------------------------------------------------------
+as.matrix(test_network)[1:5, 1:5]
+
+## ---- eval=FALSE----------------------------------------------------------------------------------
+#  # If files are saved as tables, set 'serialized=FALSE' and specify arguments
+#  # that would normally be provided to 'read.table'. Note: this function doesnt
+#  # check whether the file can actually be read in as a matrix!
+#  discovery_data <- attach.disk.matrix("discovery_data.rds")
+#  discovery_correlation <- attach.disk.matrix("discovery_correlation.rds")
+#  discovery_network <- attach.disk.matrix("discovery_network.rds")
+#  test_data <- attach.disk.matrix("test_data.rds")
+#  test_correlation <- attach.disk.matrix("test_correlation.rds")
+#  test_network <- attach.disk.matrix("test_network.rds")
+
+## -------------------------------------------------------------------------------------------------
+data_list <- list(cohort1=discovery_data, cohort2=test_data)
+correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
+network_list <- list(cohort1=discovery_network, cohort2=test_network)
+
+## -------------------------------------------------------------------------------------------------
+# Assess the preservation of modules in the test dataset.
+preservation <- modulePreservation(
+ network=network_list, data=data_list, correlation=correlation_list, 
+ moduleAssignments=module_labels, discovery="cohort1", test="cohort2", 
+ nPerm=10000, nThreads=2
+)
+
+## -------------------------------------------------------------------------------------------------
+# Determine the nodes and samples on a plot in advance:
+nodesToPlot <- nodeOrder(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, modules=c(1,4), discovery="cohort1", 
+  test=c("cohort1", "cohort2"), mean=TRUE
+)
+# We need to know which module will appear left-most on the plot:
+firstModule <- module_labels[nodesToPlot[1]]
+
+samplesToPlot <- sampleOrder(
+  data=data_list, correlation=correlation_list, network=network_list, 
+  moduleAssignments=module_labels, modules=firstModule, discovery="cohort1",
+  test="cohort2"
+)
+
+# Load in the dataset we are plotting:
+test_data <- as.matrix(test_data)
+test_correlation <- as.matrix(test_correlation)
+test_network <- as.matrix(test_network)
+
+## ----disk_matrix_dry_run, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+# Now we can use 'dryRun=TRUE' quickly:
+plotModule(
+  data=test_data[samplesToPlot, nodesToPlot], 
+  correlation=test_correlation[nodesToPlot, nodesToPlot], 
+  network=test_network[nodesToPlot, nodesToPlot],
+  moduleAssignments=module_labels[nodesToPlot],
+  orderNodesBy=NA, orderSamplesBy=NA, dryRun=TRUE
+)
+
+## ----disk_matrix_plot, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+# And draw the final plot once we determine the plot parameters 
+par(mar=c(3,10,3,10)) 
+plotModule(
+  data=test_data[samplesToPlot, nodesToPlot], 
+  correlation=test_correlation[nodesToPlot, nodesToPlot], 
+  network=test_network[nodesToPlot, nodesToPlot],
+  moduleAssignments=module_labels[nodesToPlot],
+  orderNodesBy=NA, orderSamplesBy=NA
+)
+
+## ---- echo=FALSE, hold=TRUE-----------------------------------------------------------------------
+cat(
+"[2016-06-06 15:56:18 AEST] Validating user input...\n",
+"[2016-06-06 15:56:18 AEST]   Checking matrices for non-finite values...\n",
+"[2016-06-06 15:57:07 AEST] Input ok!\n",
+"[2016-06-06 15:57:07 AEST] Calculating preservation of network subsets from\n",
+"                           dataset \"adipose\" in dataset \"liver\".\n",
+"[2016-06-06 15:57:07 AEST]   Loading 'big.matrix' data into RAM...\n",
+"[2016-06-06 15:57:27 AEST]   Calculating observed test statistics...\n",
+"[2016-06-06 15:57:33 AEST]   Generating null distributions from 320\n",
+"                             permutations using 32 threads...\n",
+"\n",
+"  100% completed.\n",
+"\n",
+"[2016-06-06 15:59:42 AEST]   Calculating P-values...\n",
+"[2016-06-06 15:59:42 AEST]   Collating results...\n",
+"[2016-06-06 15:59:42 AEST] Done!\n", sep=""
+)
 
