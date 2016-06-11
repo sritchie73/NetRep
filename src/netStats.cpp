@@ -139,7 +139,7 @@ arma::vec CorrVector (
   arma::uvec nodeIdx = arma::uvec(idxAddr, mNodes, false, true);
   
   // Number of nodes in the requested sub-matrix
-  int n = nodeIdx.n_elem;
+  unsigned int n = nodeIdx.n_elem;
   
   // We need to flatten the matrices to a vector, ignoring the diagonals.
   unsigned int flatsize = (n*n - n)/2;
