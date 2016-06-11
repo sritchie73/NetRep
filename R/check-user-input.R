@@ -748,6 +748,12 @@ processInput <- function(
            " are not in 'moduleAssignments' for dataset ", '"', ii, '"')
     }
     
+    # Make sure each module is only specified once:
+    if (length(modules[[ii]]) > length(table(moduleAssignments[[ii]]))) {
+      stop("some modules from dataset ", '"', ii, '"', "appear multiple",
+           " times in the 'modules' argument")
+    }
+    
     # Check matrices for non-finite values: these will cause the calculation
     # of network properties and module preservation statistics to hang. 
     if (!is.null(dataLoaded))
