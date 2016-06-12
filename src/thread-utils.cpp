@@ -8,18 +8,21 @@
 
 // header files for sleeping a thread
 #if defined (_WIN32) || defined (_WIN64)
-  #include <windows.h>
+  // <thread> requires Rtools33 (R 3.3.0) which uses GCC 4.9.3, which supports 
+  // <chrono>
+  #include <chrono>
 #else
+  // But for linux/osx we need to handle older versions of GCC which have 
+  // <thread> but not <chrono> support
   #include <unistd.h>
 #endif
 
 #include "thread-utils.h"
 
-
 // Sleep this thread for N seconds
 void sleep(int secs) {
-#if defined (_WIN32) || defined (_WIN64)
-    Sleep(secs * 1000);
+  #if defined (_WIN32) || defined (_WIN64)
+    std::this_thread::sleep_for(std::chrono::seconds(secs));
   #else
     usleep(secs * 1000000);  
   #endif

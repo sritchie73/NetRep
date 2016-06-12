@@ -9,12 +9,12 @@ Description: Functions for assessing the replication/preservation of a network
   module's topology across datasets through permutation testing.
 License: GPL-2
 Depends:
-    R (>= 3.0.0),
+    R (>= 3.3.0),
     methods
 Imports:
     foreach,
-    Rcpp (>= 0.11),
-    RcppArmadillo (>= 0.4),
+    Rcpp,
+    RcppArmadillo,
     statmod,
     BH,
     RhpcBLASctl,
