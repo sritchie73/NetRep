@@ -567,7 +567,7 @@ modulePreservation <- function(
         }
 
         # Calculate the intermediate properties
-        vCat(verbose, 1, 'Pre-computing intermediate properties in dataset "',
+        vCat(verbose, 1, 'Pre-computing network properties in dataset "',
              datasetNames[di], '"...', sep="")
         if (is.null(data[[di]]) || is.null(data[[ti]])) {
           discProps <- IntermediatePropertiesNoData(
