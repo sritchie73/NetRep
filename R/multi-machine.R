@@ -8,10 +8,9 @@
 #' @param pres1,pres2 lists returned by \code{\link{modulePreservation}}.
 #' 
 #' @details
-#'  The input arguments must be for a single dataset comparison, i.e. the list
-#'  must contain the elements \code{nulls} for the null distributions. If 
-#'  multiple \code{discovery} or \code{test} datasets have been specified, you
-#'  will need to extract the relevant list elements 
+#'  The calls to 'modulePreservation' must have been identical for both input
+#'  lists, with the exception of the number of threads used and the number of
+#'  permutations calculated.
 #' 
 #' @return
 #'  A nested list containing the same elements as 
@@ -45,8 +44,48 @@
 #' @importFrom abind abind
 #' @export
 combineAnalyses <- function(pres1, pres2) {
-  # Validate use input
   msg <- "module preservation analyses differ between 'pres1' and 'pres2'"
+  
+  if ("observed" %in% names(pres1)) {
+    pres1 <- combineAnalysesInternal(pres1, pres2)
+  } else {
+    for (ii in seq_along(pres1)) {
+      if ("observed" %in% names(pres1[[ii]])) {
+        if (!is.null(pres1[[ii]]) && !is.null(pres2[[ii]])) {
+          pres1[[ii]] <- combineAnalysesInternal(pres1[[ii]], pres2[[ii]])
+        } else if (xor(is.null(pres1[[ii]]), is.null(pres2[[ii]]))) {
+          stop(msg)
+        }
+        
+      } else {
+        for (jj in seq_along(pres1[[ii]])) {
+          if (!is.null(pres1[[ii]][[jj]]) && !is.null(pres2[[ii]][[jj]])) {
+            pres1[[ii]][[jj]] <- combineAnalysesInternal(pres1[[ii]][[jj]], pres2[[ii]][[jj]])
+          } else if (xor(is.null(pres1[[ii]][[jj]]), is.null(pres2[[ii]][[jj]]))) {
+            stop(msg)
+          }
+        }
+      }
+    }
+  }
+  
+  return(pres1)
+}
+
+#' Combine results of multiple permutation procedures
+#' 
+#' This function takes the module preservation analyses for two dataset 
+#' comparisons and combines them.
+#' 
+#' @param pres1 input from 'combineAnalyses'
+#' @param pres2 input from 'combineAnalyses'
+#' 
+#' @return
+#'  A combined module preservation analysis.
+#' 
+combineAnalysesInternal <- function(pres1, pres2) {
+  msg <- "module preservation analyses differ between 'pres1' and 'pres2'"
+  badInput <- FALSE
   tryCatch({
     if (nrow(pres1$observed) != nrow(pres2$observed) ||
         ncol(pres1$observed) != ncol(pres2$observed) ||
@@ -59,12 +98,15 @@ combineAnalyses <- function(pres1, pres2) {
         (!is.null(pres1$contingency) && !is.null(pres1$contingency) && 
          !all.equal(pres1$contingency, pres2$contingency)) &&
         !all.equal(pres1$observed, pres2$observed)) {
-      stop("module preservation analysis performed in 'pres1' and 'pres2'",
-           " are not comparable")
+      badInput <- TRUE
     }
   }, error=function(e) {
     stop("'pres1' and 'pres2' do not appear to be output from 'modulePreservation'")
   })
+  if (badInput) {
+    stop("module preservation analysis performed in 'pres1' and 'pres2'",
+         " are not comparable")
+  }
   
   res <- pres1
   res$nulls <- abind::abind(pres1$nulls, pres2$nulls, along=3)

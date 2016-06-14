@@ -20,10 +20,9 @@ set of permutation test P-values. This is useful for parallelising
 calculations across multiple machines.
 }
 \details{
-The input arguments must be for a single dataset comparison, i.e. the list
- must contain the elements \code{nulls} for the null distributions. If 
- multiple \code{discovery} or \code{test} datasets have been specified, you
- will need to extract the relevant list elements
+The calls to 'modulePreservation' must have been identical for both input
+ lists, with the exception of the number of threads used and the number of
+ permutations calculated.
 }
 \examples{
 data("NetRep")
