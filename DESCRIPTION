@@ -9,7 +9,7 @@ Description: Functions for assessing the replication/preservation of a network
   module's topology across datasets through permutation testing.
 License: GPL-2
 Depends:
-    R (>= 3.3.0),
+    R (>= 3.1.0),
     methods
 Imports:
     foreach,
@@ -32,6 +32,8 @@ Suggests:
     knitr,
     rmarkdown
 LinkingTo: Rcpp, BH, RcppArmadillo
-SystemRequirements: C++11
+SystemRequirements:
+  A compiler with C++11 support for the thread library,
+  Rtools (>= 33) on Windows
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
