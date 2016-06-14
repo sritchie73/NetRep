@@ -40,30 +40,8 @@ But can otherwise be read online at [vignettes/NetRep.md](vignettes/NetRep.md)
 Older versions of NetRep can be installed by specifying the version number in the `ref` argument:
 
 ```{r}
-install_github("InouyeLab/NetRep", ref="v0.55.0")
+install_github("InouyeLab/NetRep", ref="v0.60.0")
 ```
-
-Versions prior to 0.55.0 should be treated as unstable (they contain bugs and are inaccurately documented). 
-Versions prior to 0.21.1 cannot be installed via this command. 
-
-
-### Additional installation steps
-
-An additional package is required to enable parallelisation. 
-**Linux or Mac users** should install the `doMC` package:
-
-```{r}
-# Install the package required for parallisation for Linux or Mac users:
-install.packages("doMC")
-```
-
-Windows users will need a different package, `doParallel`:
-
-```{r}
-# Install the package required for parallisation for Windows users:
-install.packages("doParallel")
-```
-
 ### Testing the package installation
 
 To ensure the package has installed correctly and will run on your system, run the following:
@@ -78,8 +56,8 @@ test_package("NetRep")
 `NetRep` and its dependencies require several third party libraries to be
 installed. If not found, installation of the package will fail.
 
- 1. A compiler with `C++11` support
- 2. A compiler with `fortran` support
+ 1. A compiler with `C++11` support for the \<thread\> libary.
+ 2. A compiler with `fortran` support.
  3. `BLAS` and `LAPACK` libraries.
 
 ### OSX
@@ -108,4 +86,5 @@ appropriate package manager for your operating system (e.g. `apt-get` for
 Ubuntu). `BLAS` and `LAPACK` libraries can be installed by installing 
 `libblas-dev` and `liblapack-dev`. Note that these libraries **must** be
 installed prior to installation of R.
+
 
