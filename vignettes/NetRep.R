@@ -32,6 +32,23 @@ preservation$p.value
 max_pval <- apply(preservation$p.value, 1, max)
 max_pval
 
+## ---- eval=FALSE----------------------------------------------------------------------------------
+#  # Handling NA entries in the 'cor.degree' null distribution for sparse networks
+#  
+#  # Get the entries in the null distribution where there were no edges in the
+#  # permuted module
+#  na.entries <- which(is.na(preservation$nulls[,'cor.degree',]))
+#  no.edges <- which(preservation$nulls[,'avg.weight',][na.entries] == 0)
+#  
+#  # Set those entries to 0
+#  preservation$nulls[,'cor.degree',][no.edges] <- 0
+#  
+#  # Recalculate the permutation test p-values
+#  preservation$p.values <- permutationTest(
+#    preservation$nulls, preservation$observed, preservation$nVarsPresent,
+#    preservation$totalSize, preservation$alternative
+#  )
+
 ## ----modules_in_discovery, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -242,20 +259,28 @@ plotModule(
 
 ## ---- echo=FALSE, hold=TRUE-----------------------------------------------------------------------
 cat(
-"[2016-06-06 15:56:18 AEST] Validating user input...\n",
-"[2016-06-06 15:56:18 AEST]   Checking matrices for non-finite values...\n",
-"[2016-06-06 15:57:07 AEST] Input ok!\n",
-"[2016-06-06 15:57:07 AEST] Calculating preservation of network subsets from\n",
-"                           dataset \"adipose\" in dataset \"liver\".\n",
-"[2016-06-06 15:57:07 AEST]   Loading 'big.matrix' data into RAM...\n",
-"[2016-06-06 15:57:27 AEST]   Calculating observed test statistics...\n",
-"[2016-06-06 15:57:33 AEST]   Generating null distributions from 320\n",
+"[2016-06-14 17:25:16 AEST] Validating user input...\n",
+"[2016-06-14 17:25:16 AEST]   Loading matrices of dataset \"liver\" into RAM...\n",
+"[2016-06-14 17:26:29 AEST]   Checking matrices for problems...\n",
+"[2016-06-14 17:26:31 AEST]   Unloading dataset from RAM...\n",
+"[2016-06-14 17:26:31 AEST]   Loading matrices of dataset \"brain\" into RAM...\n",
+"[2016-06-14 17:27:45 AEST]   Checking matrices for problems...\n",
+"[2016-06-14 17:27:47 AEST] Input ok!\n",
+"[2016-06-14 17:27:47 AEST] Calculating preservation of network subsets from\n",
+"                           dataset \"brain\" in dataset \"liver\".\n",
+"[2016-06-14 17:27:47 AEST]   Pre-computing intermediate properties in dataset\n",
+"                             \"brain\"...\n",
+"[2016-06-14 17:27:48 AEST]   Unloading dataset from RAM...\n",
+"[2016-06-14 17:27:48 AEST]   Loading matrices of dataset \"liver\" into RAM...\n",
+"[2016-06-14 17:29:01 AEST]   Calculating observed test statistics...\n",
+"[2016-06-14 17:29:02 AEST]   Generating null distributions from 320\n",
 "                             permutations using 32 threads...\n",
 "\n",
 "  100% completed.\n",
 "\n",
-"[2016-06-06 15:59:42 AEST]   Calculating P-values...\n",
-"[2016-06-06 15:59:42 AEST]   Collating results...\n",
-"[2016-06-06 15:59:42 AEST] Done!\n", sep=""
+"[2016-06-14 17:29:24 AEST]   Calculating P-values...\n",
+"[2016-06-14 17:29:24 AEST]   Collating results...\n",
+"[2016-06-14 17:29:24 AEST] Unloading dataset from RAM...\n",
+"[2016-06-14 17:29:25 AEST] Done!\n", sep=""
 )
 

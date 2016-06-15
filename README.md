@@ -40,7 +40,7 @@ But can otherwise be read online at [vignettes/NetRep.md](vignettes/NetRep.md)
 Older versions of NetRep can be installed by specifying the version number in the `ref` argument:
 
 ```{r}
-install_github("InouyeLab/NetRep", ref="v0.60.0")
+install_github("InouyeLab/NetRep", ref="v0.61.0")
 ```
 ### Testing the package installation
 
@@ -53,38 +53,53 @@ test_package("NetRep")
 
 ## Installation troubleshooting
 
-`NetRep` and its dependencies require several third party libraries to be
+**NetRep** and its dependencies require several third party libraries to be
 installed. If not found, installation of the package will fail.
 
- 1. A compiler with `C++11` support for the \<thread\> libary.
- 2. A compiler with `fortran` support.
+ 1. A compiler with `C++11` support for the `<thread>` libary.
+ 2. A `fortran` compiler.
  3. `BLAS` and `LAPACK` libraries.
-
+ 
 ### OSX
 
 The necessary `fortran` and `C++11` compilers are provided with the `Xcode` 
 application and subsequent installation of `Command line tools`. The most
 recent version of OSX should prompt you to install these tools when 
-installing the `devtools` package. Those with older versions of OSX should
-be able to install these tools by typing the following command into their
-Terminal application: `xcode-select --install`.
+installing the `devtools` package from RStudio. Those with older versions of 
+OSX should be able to install these tools by typing the following command into 
+their Terminal application: `xcode-select --install`.
+
+Some users on OSX Mavericks have reported that even after this step they 
+receive errors relating to `-lgfortran` or `-lquadmath`. This is reportedly 
+solved by installing the version of `gfortran` used to compile the R binary for
+your system: `gfortran-4.8.2`, using the following commands in your `Terminal` 
+application
+
+```{r, engine="bash", eval=FALSE}
+curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
+sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
+```
 
 ### Windows
 
-The necessary `fortran` and `C++11` compilers are provided with the `Rtools`
-program. We recommend installation of `NetRep` through `RStudio`, which 
-should prompt the user and install these tools when running 
-`devtools::install_github("InouyeLab/NetRep")`. This command may need to be
-run again after `Rtools` finishes installing.
+**NetRep** can be installed on Windows in R version 3.3.0 or later. The 
+necessary `fortran` and `C++11` compilers are provided with the `Rtools` 
+program. We recommend installation of `NetRep` through `RStudio`, which should
+prompt the user and install these tools when running 
+`devtools::install_github("InouyeLab/NetRep")`. You may need to run this 
+command again after Rtools finishes installing.
 
 ### Linux
 
-If installation fails on linux it is likely that you will need to install
+If installation fails when compiling **NetRep** at `permutations.cpp` with an 
+error about `namespace thread`, you will need to install a newer version of 
+your compiler that supports this `C++11` feature. We have found that this works
+on versions of `gcc` as old as `gcc-4.6.3`.
+
+If installation fails prior to this it is likely that you will need to install
 the necessary compilers and libraries, then reinstall R. For `C++` and 
 `fortran` compilers we recommend installing `g++` and `gfortran` from the
 appropriate package manager for your operating system (e.g. `apt-get` for 
 Ubuntu). `BLAS` and `LAPACK` libraries can be installed by installing 
 `libblas-dev` and `liblapack-dev`. Note that these libraries **must** be
 installed prior to installation of R.
-
-
