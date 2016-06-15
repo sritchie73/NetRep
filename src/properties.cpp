@@ -122,9 +122,16 @@ Rcpp::List NetProps (
       NC = NC(nodeRank); // reorder results
       
       coherence = ModuleCoherence(NC.memptr(), mNodesPresent);
-      R_CheckUserInterrupt(); 
+      R_CheckUserInterrupt();
       
-      // Fill the results vectors appropriately
+      // Convert NaNs to NAs
+      SP.elem(arma::find_nonfinite(SP)).fill(NA_REAL);
+      NC.elem(arma::find_nonfinite(NC)).fill(NA_REAL);
+      if (!arma::is_finite(coherence)) {
+        coherence = NA_REAL;
+      }
+
+      // Fill results vectors
       Fill(degree, WD.memptr(), mNodesPresent, propIdx.memptr(), mNodes);
       Fill(contribution, NC.memptr(), mNodesPresent, propIdx.memptr(), mNodes);
       summary = Rcpp::NumericVector(SP.begin(), SP.end());

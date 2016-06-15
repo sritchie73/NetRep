@@ -31,6 +31,36 @@ arma::uvec SortNodes (unsigned int * idxAddr, unsigned int mNodes) {
   return rank;
 }
 
+/* Get the complete cases for two vectors
+ * 
+ * Returns all indices where the element is finite in both vectors
+ *
+ * @param v1addr memory address of a vector.
+ * @param v2addr memory address of a vector.
+ * @param size size of the two vectors
+ * 
+ */
+arma::uvec CompleteCases(double * v1addr, double * v2addr, unsigned int size) {
+  arma::vec v1 = arma::vec(v1addr, size, false, true);
+  arma::vec v2 = arma::vec(v2addr, size, false, true);
+  
+  arma::uvec finites (size);
+  
+  unsigned int counter = 0;
+  for (unsigned int ii = 0; ii < size; ++ii) {
+    if (arma::is_finite(v1.at(ii)) && arma::is_finite(v2.at(ii))) {
+      finites.at(counter) = ii;
+      counter++;
+    }
+  }
+  if (counter < size) {
+    finites.resize(counter);
+  }
+  
+  return finites; 
+}
+
+
 /* Calculate the correlation between two vectors
 * @param v1addr memory address of a vector.
 * @param v2addr memory address of a vector.
@@ -42,7 +72,14 @@ double Correlation (double * v1addr, double * v2addr, unsigned int size) {
   arma::vec v1 = arma::vec(v1addr, size, false, true);
   arma::vec v2 = arma::vec(v2addr, size, false, true);
   
-  return arma::as_scalar(arma::cor(v1, v2));
+  // Get the complete cases
+  arma::uvec cc = CompleteCases(v1addr, v2addr, size);
+  
+  if (cc.n_elem > 0) {
+    return arma::as_scalar(arma::cor(v1(cc), v2(cc)));
+  } else {
+    return arma::datum::nan;
+  }
 }
 
 /* Calculate the sign-aware mean of two vectors
@@ -61,7 +98,14 @@ double SignAwareMean (double * v1addr, double * v2addr, unsigned int size) {
   arma::vec v1 = arma::vec(v1addr, size, false, true);
   arma::vec v2 = arma::vec(v2addr, size, false, true);
   
-  return arma::mean(arma::sign(v1) % v2);
+  // Get the complete cases
+  arma::uvec cc = CompleteCases(v1addr, v2addr, size);
+  
+  if (cc.n_elem > 0) {
+    return arma::mean(arma::sign(v1(cc)) % v2(cc));
+  } else {
+    return arma::datum::nan;
+  }
 }
 
 /* Calculate the weighted degree of a module
@@ -185,7 +229,7 @@ arma::vec SummaryProfile (
   bool success = arma::svd_econ(U, S, V, data.cols(nodeIdx), "left", "dc");
   
   if (!success) {
-    arma::vec summary (1);
+    arma::vec summary (nSamples);
     summary.fill(arma::datum::nan);
     return summary;
   }
@@ -251,7 +295,13 @@ double ModuleCoherence (double * ncAddr, unsigned int mNodes) {
   // provided sizes
   arma::vec contribution = arma::vec(ncAddr, mNodes, false, true);
   
-  return arma::mean(arma::square(contribution));
+  arma::uvec cc = arma::find_finite(contribution);
+  
+  if (cc.n_elem > 0) {
+    return arma::mean(arma::square(contribution(cc)));
+  } else {
+    return arma::datum::nan;
+  }
 }
 
 
