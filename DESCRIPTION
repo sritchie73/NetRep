@@ -9,17 +9,16 @@ Description: Functions for assessing the replication/preservation of a network
   module's topology across datasets through permutation testing.
 License: GPL-2
 Depends:
-    R (>= 3.1.0),
+    R (>= 3.0.0),
     methods
 Imports:
     foreach,
-    Rcpp,
-    RcppArmadillo,
+    Rcpp (>= 0.11),
+    RcppArmadillo (>= 0.4),
     statmod,
     BH,
     RhpcBLASctl,
     abind,
-    parallel,
     RColorBrewer,
     utils,
     stats,
@@ -34,6 +33,6 @@ Suggests:
 LinkingTo: Rcpp, BH, RcppArmadillo
 SystemRequirements:
   A compiler with C++11 support for the thread library,
-  Rtools (>= 33) on Windows
+  Requires Rtools >= 33 (i.e. R >= 3.3.0) to build on Windows.
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
