@@ -22,12 +22,6 @@ library(devtools)
 install_github("InouyeLab/NetRep")
 ```
 
-The latest developmental version can be installed by:
-
-```{r}
-install_github("InouyeLab/NetRep", ref="devel")
-```
-
 If you have `rmarkdown` installed, a package vignette (tutorial) is also 
 available to install:
 
