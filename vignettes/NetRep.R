@@ -6,6 +6,9 @@ library("NetRep")
 data("NetRep")
 
 ## -------------------------------------------------------------------------------------------------
+# Read in the data:
+data("NetRep")
+
 # Set up the input data structures for NetRep. We will call these datasets 
 # "cohort1" and "cohort2" to avoid confusion with the "discovery" and "test"
 # arguments in NetRep's functions:
@@ -13,8 +16,8 @@ data_list <- list(cohort1=discovery_data, cohort2=test_data)
 correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
 network_list <- list(cohort1=discovery_network, cohort2=test_network)
 
-# We do not need to set up a list for containing the 'module_labels' because
-# there is only one "discovery" dataset.
+# We do not need to set up a list for the 'moduleAssignments', 'modules', or 
+# 'test' arguments because there is only one "discovery" dataset.
 
 ## -------------------------------------------------------------------------------------------------
 # Assess the preservation of modules in the test dataset.
@@ -25,6 +28,7 @@ preservation <- modulePreservation(
 )
 
 ## -------------------------------------------------------------------------------------------------
+preservation$observed
 preservation$p.value
 
 ## -------------------------------------------------------------------------------------------------
@@ -48,6 +52,11 @@ max_pval
 #    preservation$nulls, preservation$observed, preservation$nVarsPresent,
 #    preservation$totalSize, preservation$alternative
 #  )
+
+## ---- eval=FALSE----------------------------------------------------------------------------------
+#  not.present <- which(discovery_data == 0)
+#  nSamples <- nrow(discovery_data)
+#  discovery_data[not.present] <- runif(length(not.present), min=0, max=1/nSamples)
 
 ## ----modules_in_discovery, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(

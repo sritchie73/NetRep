@@ -29,29 +29,29 @@ Application of this method can answer questions such as:
 A typical workflow for a **NetRep** analysis will usually contain the following 
 steps, usually as separate scripts.
 
-1. Calculate correlation structure and network edges in each dataset 
+1. Calculate the correlation structure and network edges in each dataset 
    using some network inference algorithm.
-2. Load these matrices into R and set up the input lists for NetRep's 
+2. Load these matrices into R and set up the input lists for **NetRep**'s 
    functions.
-3. Run the `modulePreservation` analysis to determine which modules are 
+3. Run the permutation test procedure to determine which modules are 
    preserved in your test dataset(s).
 4. Visualise your modules of interest.
 5. Calculate the network properties in your modules of interest
-   for downstream analysis. 
-
-We recommend familiarising yourself with the **NetRep** workflow
-before modifying the code for your own data since each step can take a 
-substantial amount of time on large datasets, for which **NetRep** should not be 
-run interactively.
+   for downstream analyses. 
 
 ## System requirements and installation troubleshooting
 
 **NetRep** and its dependencies require several third party libraries to be
 installed. If not found, installation of the package will fail.
 
+**NetRep** requires:
+
  1. A compiler with `C++11` support for the `<thread>` libary.
  2. A `fortran` compiler.
  3. `BLAS` and `LAPACK` libraries.
+ 
+The following sections provide operating system specific advice for getting
+**NetRep** working if installation through R fails.
  
 ### OSX
 
@@ -65,8 +65,8 @@ their Terminal application: `xcode-select --install`.
 Some users on OSX Mavericks have reported that even after this step they 
 receive errors relating to `-lgfortran` or `-lquadmath`. This is reportedly 
 solved by installing the version of `gfortran` used to compile the R binary for
-your system: `gfortran-4.8.2`, using the following commands in your `Terminal` 
-application
+OSX: `gfortran-4.8.2`. This can be done using the following commands in your 
+`Terminal` application: 
 
 
 ```bash
@@ -76,12 +76,12 @@ sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 
 ### Windows
 
-**NetRep** can be installed on Windows in R version 3.3.0 or later. The 
+For Windows users **NetRep** requires R version 3.3.0 or later. The 
 necessary `fortran` and `C++11` compilers are provided with the `Rtools` 
 program. We recommend installation of `NetRep` through `RStudio`, which should
 prompt the user and install these tools when running 
 `devtools::install_github("InouyeLab/NetRep")`. You may need to run this 
-command again after Rtools finishes installing.
+command again after `Rtools` finishes installing.
 
 ### Linux
 
@@ -90,14 +90,13 @@ error about `namespace thread`, you will need to install a newer version of
 your compiler that supports this `C++11` feature. We have found that this works
 on versions of `gcc` as old as `gcc-4.6.3`.
 
-If installation fails prior to this it is likely that you will need to install
-the necessary compilers and libraries, then reinstall R. For `C++` and 
+If installation fails prior to this step it is likely that you will need to 
+install the necessary compilers and libraries, then reinstall R. For `C++` and 
 `fortran` compilers we recommend installing `g++` and `gfortran` from the
 appropriate package manager for your operating system (e.g. `apt-get` for 
 Ubuntu). `BLAS` and `LAPACK` libraries can be installed by installing 
 `libblas-dev` and `liblapack-dev`. Note that these libraries **must** be
 installed prior to installation of R.
-
 
 ## Data required for a NetRep analysis
 
@@ -109,21 +108,18 @@ pre-computed for each dataset:
  - A matrix whose entries contain the correlation coefficient between each pair
    of nodes in the network.
  - a vector containing the module/group label for each node in the network
-   is required for each discovery dataset.
+   for each discovery dataset.
  - Optionally, a "data matrix", which contains the data used to calculate the 
-   correlation structure and infer the network, e.g. gene expression data.
+   correlation structure and infer the network, *e.g.* gene expression data.
 
 There are many different approaches to network inference and module detection.
 For gene expression data, we recommend using Weighted Gene Coexpression Network
-Analysis through the [WGCNA][1] package. 
+Analysis through the [WGCNA][1] package. For microbial abundance data we 
+recommend the Python program [SparCC][2]. Microbial communities (modules) can
+then be defined as any group of significantly co-occuring microbes.
 
 [1]: https://cran.r-project.org/web/packages/WGCNA/index.html
-
-**NetRep** will also work with other types of data and networks defined through 
-other algorithms, however you should read the sections on the module 
-preservation statistics, sparse data, proportional data, and hypothesis testing 
-in the details section of the help file for the `modulePreservation` function 
-to determine the correct runtime parameters for your analysis.
+[2]: http://dx.doi.org/10.1371/journal.pcbi.1002687
 
 ### Tutorial data
 
@@ -143,7 +139,7 @@ library("NetRep")
 data("NetRep")
 ```
 
-Seven objects were loaded into the R session:
+This command loads seven objects into the R session:
 
   - `discovery_data`: a matrix with 150 columns (genes) and 30 rows (samples) 
      whose entries correspond to the expression level of each gene in each 
@@ -180,7 +176,8 @@ in the **NetRep** package take the following arguments:
  - `moduleAssignments`: a list of vectors, one for each *discovery* dataset, 
     containing the module assignments for each node in that dataset.
  - `modules`: a list of vectors, one vector for each *discovery* dataset, 
-    containing the names of the modules from that dataset to analyse.
+    containing the names of the modules from that dataset to run the function 
+    on.
  - `discovery`: a vector indicating the names or indices to use as the 
    *discovery* datasets in the `network`, `data`, `correlation`, 
    `moduleAssignments`, and `modules` arguments.
@@ -195,8 +192,16 @@ datasets to compare. More than one  dataset can be specified in each of these
 arguments, for example when performing a pairwise analysis of gene coexpression
 modules identified in multiple tissues.
 
+Typically we would put the code that reads in our data and sets up the input
+lists in its own script. This loading script can then be called from our 
+scripts where we calculate the module preservation, visualise our networks, 
+and calculate the network properties:
+
 
 ```r
+# Read in the data:
+data("NetRep")
+
 # Set up the input data structures for NetRep. We will call these datasets 
 # "cohort1" and "cohort2" to avoid confusion with the "discovery" and "test"
 # arguments in NetRep's functions:
@@ -204,16 +209,14 @@ data_list <- list(cohort1=discovery_data, cohort2=test_data)
 correlation_list <- list(cohort1=discovery_correlation, cohort2=test_correlation)
 network_list <- list(cohort1=discovery_network, cohort2=test_network)
 
-# We do not need to set up a list for containing the 'module_labels' because
-# there is only one "discovery" dataset.
+# We do not need to set up a list for the 'moduleAssignments', 'modules', or 
+# 'test' arguments because there is only one "discovery" dataset.
 ```
 
-Typically we would put the code that reads in our data and sets up the input
-lists in its own script. This loading script can then be called from our 
-scripts where we calculate the module preservation, visualise our networks, 
-and calculate the network properties.
+We will call these "cohort1" and "cohort2" to avoid confusion with the 
+arguments "discovery" and "test" common to **NetRep**'s functions.
 
-## Running the module preservation analysis
+## Running the permutation procedure to test module preservation
 
 Now we will use **NetRep** to permutation test whether the network topology of 
 each module is preserved in our test dataset using the `modulePreservation` 
@@ -224,7 +227,9 @@ the test dataset to determine whether these statistics are significant.
 We will run 10,000 permutations, and split calculation across 2 threads so that
 calculations are run in parallel. By default, `modulePreservaton` will test the
 preservation of all modules, excluding the network background which is assumed
-to have the label "0":
+to have the label "0". This of course can be changed: there are many more 
+arguments than shown here which control how `modulePreservation` runs. See
+`help("modulePreservation")` for a full list of arguments.
 
 
 ```r
@@ -237,38 +242,34 @@ preservation <- modulePreservation(
 ```
 
 ```
-## [2016-06-15 21:05:08 AEST] Validating user input...
-## [2016-06-15 21:05:08 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:08 AEST] Input ok!
-## [2016-06-15 21:05:08 AEST] Calculating preservation of network subsets from dataset "cohort1" in
+## [2016-06-16 19:20:52 AEST] Validating user input...
+## [2016-06-16 19:20:52 AEST]   Checking matrices for problems...
+## [2016-06-16 19:20:52 AEST] Input ok!
+## [2016-06-16 19:20:52 AEST] Calculating preservation of network subsets from dataset "cohort1" in
 ##                            dataset "cohort2".
-## [2016-06-15 21:05:08 AEST]   Pre-computing network properties in dataset "cohort1"...
-## [2016-06-15 21:05:08 AEST]   Calculating observed test statistics...
-## [2016-06-15 21:05:08 AEST]   Generating null distributions from 10000 permutations using 2
+## [2016-06-16 19:20:52 AEST]   Pre-computing network properties in dataset "cohort1"...
+## [2016-06-16 19:20:52 AEST]   Calculating observed test statistics...
+## [2016-06-16 19:20:52 AEST]   Generating null distributions from 10000 permutations using 2
 ##                              threads...
 ## 
 ## 
     0% completed.
-   16% completed.
-   33% completed.
-   49% completed.
-   65% completed.
-   81% completed.
-   97% completed.
+   17% completed.
+   35% completed.
+   52% completed.
+   69% completed.
+   87% completed.
   100% completed.
 ## 
-## [2016-06-15 21:05:15 AEST]   Calculating P-values...
-## [2016-06-15 21:05:15 AEST]   Collating results...
-## [2016-06-15 21:05:15 AEST] Done!
+## [2016-06-16 19:20:58 AEST]   Calculating P-values...
+## [2016-06-16 19:20:58 AEST]   Collating results...
+## [2016-06-16 19:20:58 AEST] Done!
 ```
-
-There are many arguments to control how `modulePreservation` runs, for a full
-list see its helpfile: `help("modulePreservation")`.
 
 The results returned by `modulePreservation` for each dataset comparison are a 
 list containing seven elements:
 
- - `nulls` the null distribution for each statstic and module generated by the
+ - `nulls` the null distribution for each statistic and module generated by the
     permutation procedure.
  - `observed` the observed value of each module preservation statistic for each
    module.
@@ -290,14 +291,26 @@ Let's take a look at our results:
 
 
 ```r
+preservation$observed
+```
+
+```
+##    avg.weight coherence    cor.cor  cor.degree cor.contrib      avg.cor avg.contrib
+## 1 0.161069393 0.6187688 0.78448573  0.90843993   0.8795006  0.550004272  0.76084777
+## 2 0.001872928 0.1359063 0.17270312 -0.03542772   0.5390504  0.034040922  0.23124826
+## 3 0.001957475 0.1263280 0.01121223 -0.17179855  -0.1074944 -0.007631867  0.05412794
+## 4 0.046291489 0.4871179 0.32610667  0.68122446   0.5251965  0.442614173  0.68239136
+```
+
+```r
 preservation$p.value
 ```
 
 ```
 ##   avg.weight  coherence    cor.cor cor.degree cor.contrib    avg.cor avg.contrib
 ## 1 0.00009999 0.00009999 0.00009999 0.00009999  0.00009999 0.00009999  0.00009999
-## 2 0.97840216 0.96710329 0.00939906 0.55464454  0.00309969 0.01799820  0.00699930
-## 3 0.98740126 0.98410159 0.40905909 0.80631937  0.71512849 0.99350065  0.87751225
+## 2 0.97750225 0.96700330 0.00869913 0.56754325  0.00219978 0.01789821  0.00649935
+## 3 0.98880112 0.98200180 0.41645835 0.81281872  0.71492851 0.99230077  0.88271173
 ## 4 0.00009999 0.00009999 0.00009999 0.00009999  0.00029997 0.00009999  0.00009999
 ```
 
@@ -314,7 +327,7 @@ max_pval
 
 ```
 ##          1          2          3          4 
-## 0.00009999 0.97840216 0.99350065 0.00029997
+## 0.00009999 0.97750225 0.99230077 0.00029997
 ```
 
 Only modules 1 and 4 are reproducible at this significance threshold.
@@ -322,7 +335,7 @@ Only modules 1 and 4 are reproducible at this significance threshold.
 ## The module preservation statistics
 
 So what do these statistics measure? Let's take a look at the network topology
-of module 1 in the discovery dataset:
+of Module 1 in the discovery dataset, "cohort1":
 
 ![](NetRep_files/img/mod1.png)
 
@@ -351,25 +364,25 @@ test datasets side by side along with the module preservation statistics:
 
 There are seven module preservation statistics:
 
- 1. **'cor.cor'** measures the concordance of the correlation structure: or, how
-    similar the correlation heatmaps are between the two datasets.
- 2. **'avg.cor'** measures the average magnitude of the correlation coefficients
+ 1. **'cor.cor'** measures the *concordance of the correlation structure*: or, 
+    how similar the correlation heatmaps are between the two datasets.
+ 2. **'avg.cor'** measures the *average magnitude of the correlation coefficients*
     of the module in the test dataset: or, how tightly correlated the module 
-    is on average. This score is penalised where the correlation coefficients
-    change in sign between the two datasets.
- 3. **'avg.weight'** measures the average magnitude of edge weights in the 
+    is on average in the test dataset. This score is penalised where the 
+    correlation coefficients change in sign between the two datasets.
+ 3. **'avg.weight'** measures the *average magnitude of edge weights* in the 
     test dataset: or how connected nodes in the module are to each other on 
     average.
- 4. **'cor.degree'** measures the correlation of the weighted degree of 
+ 4. **'cor.degree'** measures the *concordance of the weighted degree* of 
     nodes between the two datasets: or, whether the nodes that are most 
     strongly connected in the discovery dataset remain the most strongly 
     connected in the test dataset.
- 5. **'cor.contrib'** measures the correlation of the node contribution between
-    the two datasets: this measures whether the summary profile summarises the
-    data in the same way in both datasets.
- 6. **'avg.contrib'** measures the average magnitude of the node contribution in
-    the test dataset: this is a measure of how coherent the data is in the test
-    dataset. This score is penalised where the node contribution changes in 
+ 5. **'cor.contrib'** measures the *concordance of the node contribution* between
+    the two datasets: this measures whether the module's summary profile 
+    summarises the data in the same way in both datasets.
+ 6. **'avg.contrib'** measures the *average magnitude of the node contribution* 
+    in the test dataset: this is a measure of how coherent the data is in the 
+    test dataset. This score is penalised where the node contribution changes in 
     sign between the two datasets: for example, where a gene is differentially
     expressed between the two datasets.
  7. **'coherence'** measures the proportion of variance in the module data 
@@ -378,20 +391,21 @@ There are seven module preservation statistics:
 A permutation procedure is necessary to determine whether the value of each
 statistic is significant: *e.g.* whether they are higher than expected by 
 chance, *i.e.* when measuring the statistics between the module in the 
-discovery dataset, and random sets of nodes in the test dataset. You can also 
-test whether these statistics are smaller than expected by chance
-by changing the alternative hypothesis in the `modulePreservation` function 
-(e.g. `alternative="lower"`)
+discovery dataset, and random sets of nodes in the test dataset. 
 
 By default, the permutation procedure will sample from only nodes that are
 present in both datasets. This is appropriate where the assumption is that any
 nodes that are present in the test dataset but not the discovery dataset are 
-unobserved in the discovery dataset: they may very well fall in one of your
-modules of interest. This is appropriate for microarray data. Alternatively,
+unobserved in the discovery dataset: *i.e.* they may very well fall in one of 
+your modules of interest. This is appropriate for microarray data. Alternatively,
 you may set `null="all"`, in which case the permutation procedure will sample
 from all variables in the test dataset. This is appropriate where the variable
 can be assumed not present in the discovery dataset: for example microbial 
 abundance or RNA-seq data.
+
+You can also test whether these statistics are smaller than expected by chance
+by changing the alternative hypothesis in the `modulePreservation` function 
+(e.g. `alternative="lower"`).
 
 ### Choosing the right statistics
 
@@ -404,7 +418,7 @@ coexpressed.
 For other types of networks, some statistics may be more suitable than others 
 when assessing module preservation. Here, we provide some guidelines and 
 pitfalls to be aware of when interpreting the network properties and module 
-preservation statistcs in other types of networks.
+preservation statistics in other types of networks.
 
 #### Sparse networks
 
@@ -425,7 +439,7 @@ connections each node has to any other node in the module.
 If the network is sparse the permutation tests for the 
 *correlation of weighted degree* may be underpowered. Entries in the null 
 distribution will be `NA` where there were no edges between any nodes in the 
-permuted module in the test dataset. This is because the *weighted degree* will
+permuted module. This is because the *weighted degree* will
 be 0 for all nodes, and the correlation coefficient cannot be calculated 
 between two vectors if all entries are the same in either vector. This reduces
 the effective number of permutations for that test: the permutation P-values
@@ -437,6 +451,10 @@ calculating the permutation test P-values. Note that an `NA` entry does not
 necessarily mean that all edges in the permuted module were 0: it can also mean 
 that all edges are present and have identical weights. To distinguish between
 these cases you should check whether the `avg.weight` is also 0.
+
+The following code snippet shows how to identify these entries in the null 
+distribution, replace them with zeros, and recalculate the permutation test
+P-values:
 
 
 ```r
@@ -462,11 +480,12 @@ preservation$p.values <- permutationTest(
 For networks where the edges are directed, the user should be aware that the 
 *weighted degree* is calculated as the column sum of the module within the
 supplied `network` matrix. This usually means that the result will be the 
-*in*-degree: the number and combined weight of edges ending in that node. To
-calculate the *out*-degree the user will need to transpose the matrix supplied
-to the `network` argument.
+*in*-degree: the number and combined weight of edges ending in each node. To
+calculate the *out*-degree you will need to transpose the matrix supplied
+to the `network` argument (*i.e.* using the `t()` function).
 
-Note that directed networks may also have the same pitfalls as sparse networks.
+Note that directed networks are typically sparse, and have the same pitfalls 
+as sparse networks described above.
 
 #### Sparse data
 
@@ -478,22 +497,22 @@ Users should be aware that  the *average node contribution* (**'avg.contrib'**),
 *module coherence* (**'coherence'**) will be systematically underestimated.
 They are all calculated from the *node contribution*,  which measures the 
 Pearson correlation coefficient between each node and the *module summary*. 
-Pearson correlation coefficinets are innapropriate when data is sparse: their
-value will be underestimated when calculated between two vectors where the 
+Pearson correlation coefficinets are inappropriate when data is sparse: their
+value will be underestimated when calculated between two vectors where 
 many observations in either vector are equal to 0. However, this should not 
 affect the permutation test P-values since observations in their null 
 distributions will be similarly underestimated.
 
-The bigger problem with sparse data is with variables where all observations
-are zero in either dataset. These will result in `NA` values for their
-*node contribution* to a module (or permuted module). These will be ignored 
-by the *average node contribution* (**'avg.contrib'**),
+The biggest problem with sparse data is how to handle variables where all 
+observations are zero in either dataset. These will result in `NA` values for 
+their *node contribution* to a module (or permuted module). These will be 
+ignored by the *average node contribution* (**'avg.contrib'**),
 *concordance of node contribution* (**'cor.contrib'**), and *module coherence* 
 (**'coherence'**) statistics: which only take complete cases. This is 
-problematic if many node have `NA` values, since observations in their null 
-distributions will be for permuted modules of varying size. 
+problematic if many nodes have `NA` values, since observations in their null 
+distributions will be for permuted modules of different sizes. 
 
-Their are two approaches to avoiding this issue: 
+Their are two approaches to dealing with this issue: 
 
 1. Filtering both datasets to contain only variables which are present in both 
    datasets. For examples, microbes that are abundant in at least one sample 
@@ -501,9 +520,18 @@ Their are two approaches to avoiding this issue:
 2. Setting observations that are zero to a very small randomly generated 
    number. The goal is for *node contribution* values to be close to 0 where
    they would otherwise be set to `NA`. For microbial abundance data we 
-   recommend generating numbers between 0 and 1 divided by the number of 
+   recommend generating numbers between 0 and 1/the number of 
    samples: the noise values should be small enough that the do not change the
-   *node contribution* where a microbe is present.
+   *node contribution* for microbes which are present in one or more samples.
+   
+For the latter, code to generate noise would look something like:
+
+
+```r
+not.present <- which(discovery_data == 0)
+nSamples <- nrow(discovery_data)
+discovery_data[not.present] <- runif(length(not.present), min=0, max=1/nSamples)
+```
 
 #### Proportional data
 
@@ -521,13 +549,14 @@ proportional data. This should not affect the permutation test P-values since
 the null distribution observations will be similarly overestimated. 
 
 Users should also be aware of this when calculating the correlation structure 
-between all nodes for the `correlation` matrix input. 
+between all nodes for the `correlation` matrix input, and use an appropriate
+method for calculating these relationships.
 
 #### Homogenous modules
 
 Homogenous modules are modules where all nodes are similarly correlated or 
 similarly connected: differences in edge weights, correlation coefficients,
-and node contributions amount to noise. 
+and node contributions are due to noise. 
 
 For these modules, the *concordance of correlation* (**'cor.cor'**), 
 *concordance of node contribution* (**'cor.contrib'**), and
@@ -543,8 +572,8 @@ P-values, and the *module coherence* is high, then the module should be
 investigated further. 
 
 Module homogeneity can be investigated through plotting their network topology 
-in both datasets (see next section). The smaller the module, the more likely it
-is to be homogenous.
+in both datasets (see next section). In our experience, the smaller the module, 
+the more likely it is to be topologically homogenous.
 
 #### Small network modules
 
@@ -584,21 +613,21 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:15 AEST] Validating user input...
-## [2016-06-15 21:05:15 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:15 AEST] User input ok!
-## [2016-06-15 21:05:16 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:16 AEST] Ordering nodes...
-## [2016-06-15 21:05:16 AEST] Ordering samples...
-## [2016-06-15 21:05:16 AEST] rendering plot components...
-## [2016-06-15 21:05:19 AEST] Done!
+## [2016-06-16 19:20:58 AEST] Validating user input...
+## [2016-06-16 19:20:58 AEST]   Checking matrices for problems...
+## [2016-06-16 19:20:58 AEST] User input ok!
+## [2016-06-16 19:20:58 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:20:58 AEST] Ordering nodes...
+## [2016-06-16 19:20:58 AEST] Ordering samples...
+## [2016-06-16 19:20:58 AEST] rendering plot components...
+## [2016-06-16 19:21:01 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/modules_in_discovery-1.png" style="display: block; margin: auto;" />
 
 By default, nodes are ordered from left to right in decreasing order of 
-*weighted degree*: the sum of edge weights within each module, i.e. how strongly
-connected each node is within a module. For visualisation, the *weighted degree* 
+*weighted degree*: the sum of edge weights within each module, *i.e.* how strongly
+connected each node is within its module. For visualisation, the *weighted degree* 
 is normalised within each module by the maximum value since the *weighted degree* 
 of nodes can be dramatically different for modules of different sizes.
 
@@ -606,8 +635,9 @@ Samples are ordered from top to bottom in descending order of the module summary
 profile of the left-most shown module.
 
 When we plot the four modules in the test dataset, the nodes remain in the same
-order: that is, in decreasing order of *weighted degree* in the *test* dataset.
-This allows you to directly compare topology plots in each dataset of interest:
+order: that is, in decreasing order of *weighted degree* in the *discovery* 
+dataset. This allows you to directly compare topology plots in each dataset of 
+interest:
 
 
 ```r
@@ -619,21 +649,21 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:20 AEST] Validating user input...
-## [2016-06-15 21:05:20 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:20 AEST] User input ok!
-## [2016-06-15 21:05:20 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:21 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:21 AEST] Ordering nodes...
-## [2016-06-15 21:05:21 AEST] Ordering samples...
-## [2016-06-15 21:05:21 AEST] rendering plot components...
-## [2016-06-15 21:05:23 AEST] Done!
+## [2016-06-16 19:21:03 AEST] Validating user input...
+## [2016-06-16 19:21:03 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:03 AEST] User input ok!
+## [2016-06-16 19:21:03 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:03 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:03 AEST] Ordering nodes...
+## [2016-06-16 19:21:03 AEST] Ordering samples...
+## [2016-06-16 19:21:03 AEST] rendering plot components...
+## [2016-06-16 19:21:06 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/modules_in_test-1.png" style="display: block; margin: auto;" />
 
 Here we can clearly see from the correlation structure and network edge weight
-heatmaps that modules 1 and 4 replicate.
+heatmaps that Modules 1 and 4 replicate.
 
 By default, samples in this new plot are orderded in descending order of the 
 left most module's summary profile, as calculated in the `test` dataset. If 
@@ -643,12 +673,12 @@ per the `discovery` dataset by setting `orderSamplesBy = "cohort1"`. We won't
 do this here, since our two datasets have different samples.
 
 We can change the order of nodes on the plot by setting `orderNodesBy`. If we
-want to order nodes instead by our test dataset, we can set 
+want to order nodes instead by our *test* dataset, we can set 
 `orderNodesBy = "cohort2"`. However, a more informative setting is to tell 
 `plotModule` to order the nodes by the average *weighted degree* across our
 datasets. For preserved modules, this provides a more robust estimate of
 the *weighted degree* and a more robust ordering of nodes by relative importance
-to their module, so we will plot just modules 1 and 4
+to their module, so we will plot just Modules 1 and 4. 
 
 
 ```r
@@ -661,15 +691,15 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:25 AEST] Validating user input...
-## [2016-06-15 21:05:25 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:25 AEST] User input ok!
-## [2016-06-15 21:05:25 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:25 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:25 AEST] Ordering nodes...
-## [2016-06-15 21:05:25 AEST] Ordering samples...
-## [2016-06-15 21:05:25 AEST] rendering plot components...
-## [2016-06-15 21:05:26 AEST] Done!
+## [2016-06-16 19:21:07 AEST] Validating user input...
+## [2016-06-16 19:21:07 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:07 AEST] User input ok!
+## [2016-06-16 19:21:07 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:07 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:07 AEST] Ordering nodes...
+## [2016-06-16 19:21:07 AEST] Ordering samples...
+## [2016-06-16 19:21:07 AEST] rendering plot components...
+## [2016-06-16 19:21:08 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/mean_degree-1.png" style="display: block; margin: auto;" />
@@ -685,8 +715,7 @@ individual elements. A list and description of these can be found in the
 
 When tweaking these parameters, you should set the `dryRun` argument to `TRUE`.
 When `dryRun = TRUE`, only the axes and labels will be drawn, avoiding the
-computation time for the network properties, and the drawing time for the 
-heatmaps, both of which may take some time for large modules. 
+drawing time for the heatmaps, which may take some time for large modules. 
 
 Let's tweak the previous plot:
 
@@ -702,21 +731,18 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:27 AEST] Validating user input...
-## [2016-06-15 21:05:27 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:27 AEST] User input ok!
-## [2016-06-15 21:05:27 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:27 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:27 AEST] Ordering nodes...
-## [2016-06-15 21:05:27 AEST] Ordering samples...
-## [2016-06-15 21:05:27 AEST] rendering plot components...
-## [2016-06-15 21:05:27 AEST] Done!
+## [2016-06-16 19:21:09 AEST] Validating user input...
+## [2016-06-16 19:21:09 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:09 AEST] User input ok!
+## [2016-06-16 19:21:09 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:09 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:09 AEST] Ordering nodes...
+## [2016-06-16 19:21:09 AEST] Ordering samples...
+## [2016-06-16 19:21:09 AEST] rendering plot components...
+## [2016-06-16 19:21:10 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/dry_run-1.png" style="display: block; margin: auto;" />
-
-Note, since calculation of the network properties is skipped, the modules are
-ordered as specified in the `modules` argument.
 
 Now we can quickly iterate over parameters until we're happy with the plot:
 
@@ -746,15 +772,15 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:28 AEST] Validating user input...
-## [2016-06-15 21:05:28 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:28 AEST] User input ok!
-## [2016-06-15 21:05:28 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:28 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:28 AEST] Ordering nodes...
-## [2016-06-15 21:05:28 AEST] Ordering samples...
-## [2016-06-15 21:05:28 AEST] rendering plot components...
-## [2016-06-15 21:05:28 AEST] Done!
+## [2016-06-16 19:21:10 AEST] Validating user input...
+## [2016-06-16 19:21:10 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:10 AEST] User input ok!
+## [2016-06-16 19:21:10 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:10 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:10 AEST] Ordering nodes...
+## [2016-06-16 19:21:10 AEST] Ordering samples...
+## [2016-06-16 19:21:10 AEST] rendering plot components...
+## [2016-06-16 19:21:11 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/dry_run_customised-1.png" style="display: block; margin: auto;" />
@@ -775,15 +801,15 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:28 AEST] Validating user input...
-## [2016-06-15 21:05:28 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:28 AEST] User input ok!
-## [2016-06-15 21:05:28 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:28 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:29 AEST] Ordering nodes...
-## [2016-06-15 21:05:29 AEST] Ordering samples...
-## [2016-06-15 21:05:29 AEST] rendering plot components...
-## [2016-06-15 21:05:30 AEST] Done!
+## [2016-06-16 19:21:11 AEST] Validating user input...
+## [2016-06-16 19:21:11 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:11 AEST] User input ok!
+## [2016-06-16 19:21:11 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:11 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:11 AEST] Ordering nodes...
+## [2016-06-16 19:21:11 AEST] Ordering samples...
+## [2016-06-16 19:21:11 AEST] rendering plot components...
+## [2016-06-16 19:21:12 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/mean_degree_customised-1.png" style="display: block; margin: auto;" />
@@ -804,13 +830,13 @@ plotCorrelation(
 ```
 
 ```
-## [2016-06-15 21:05:30 AEST] Validating user input...
-## [2016-06-15 21:05:30 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:30 AEST] User input ok!
-## [2016-06-15 21:05:30 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:30 AEST] Ordering nodes...
-## [2016-06-15 21:05:30 AEST] rendering plot components...
-## [2016-06-15 21:05:34 AEST] Done!
+## [2016-06-16 19:21:12 AEST] Validating user input...
+## [2016-06-16 19:21:12 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:12 AEST] User input ok!
+## [2016-06-16 19:21:12 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:13 AEST] Ordering nodes...
+## [2016-06-16 19:21:13 AEST] rendering plot components...
+## [2016-06-16 19:21:16 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/correlation_heatmap-1.png" style="display: block; margin: auto;" />
@@ -827,8 +853,8 @@ use in other downstream analyses. Possible downstream analyses include:
    using the module summary profile.
  - Ranking nodes by relative importance using the weighted node degree
  
-To do this, we use the `networkProperties` function, which takes the same 
-input data as the `modulePreservation` function. We will calculate the network 
+To do this, we use the `networkProperties` function, which has the same 
+arguments as the `modulePreservation` function. We will calculate the network 
 properties of modules 1 and 4, which were preserved in "cohort2", in both 
 datasets:
 
@@ -847,12 +873,12 @@ properties <- networkProperties(
 ```
 
 ```
-## [2016-06-15 21:05:36 AEST] Validating user input...
-## [2016-06-15 21:05:36 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:36 AEST] User input ok!
-## [2016-06-15 21:05:36 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:37 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:37 AEST] Done!
+## [2016-06-16 19:21:19 AEST] Validating user input...
+## [2016-06-16 19:21:19 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:19 AEST] User input ok!
+## [2016-06-16 19:21:19 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:19 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:19 AEST] Done!
 ```
 
 ```r
@@ -913,18 +939,19 @@ properties[["cohort2"]][["1"]][["coherence"]]
 
 
 
-**NetRep** provides an additional class, `disk.matrix`, which stores a file 
-path to a matrix on disk, along with meta-data on how to read that file. This
-allows **NetRep**'s functions to load matrices into RAM only when required, so
-that only one dataset is kept in memory at any point in time. This is useful
-when working on systems with limited RAM.
+When analysing large datasets, *e.g.* transcriptome-wide gene coexpression 
+networks, it may not be possible to fit all matrices for both datasets in
+memory. **NetRep** provides an additional class, `disk.matrix`, which stores a 
+filepath to a matrix on disk, along with meta-data on how to read that file. 
+This allows **NetRep**'s functions to load matrices into RAM only when 
+required, so that only one dataset is kept in memory at any point in time.
 
 The `disk.matrix` class recognises two types of files: matrix data saved in 
 table format (i.e. a file that is normally read in by `read.table` or 
 `read.csv`), and serialized R objects saved through `saveRDS`. Serialized R 
 objects are much faster to load into R than files in table format, but cannot 
 be read by other programs. We recommend storing your files in both formats 
-unless you are low on disk space. 
+unless you are low on disk space.
 
 First, we need to make sure our matrices are saved to disk. Matrices can be
 converted to `disk.matrix` objects directly through the `as.disk.matrix` 
@@ -1028,36 +1055,36 @@ preservation <- modulePreservation(
 ```
 
 ```
-## [2016-06-15 21:05:37 AEST] Validating user input...
-## [2016-06-15 21:05:37 AEST]   Loading matrices of dataset "cohort2" into RAM...
-## [2016-06-15 21:05:37 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:37 AEST]   Unloading dataset from RAM...
-## [2016-06-15 21:05:37 AEST]   Loading matrices of dataset "cohort1" into RAM...
-## [2016-06-15 21:05:37 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:37 AEST] Input ok!
-## [2016-06-15 21:05:37 AEST] Calculating preservation of network subsets from dataset "cohort1" in
+## [2016-06-16 19:21:19 AEST] Validating user input...
+## [2016-06-16 19:21:19 AEST]   Loading matrices of dataset "cohort2" into RAM...
+## [2016-06-16 19:21:19 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:19 AEST]   Unloading dataset from RAM...
+## [2016-06-16 19:21:19 AEST]   Loading matrices of dataset "cohort1" into RAM...
+## [2016-06-16 19:21:19 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:19 AEST] Input ok!
+## [2016-06-16 19:21:19 AEST] Calculating preservation of network subsets from dataset "cohort1" in
 ##                            dataset "cohort2".
-## [2016-06-15 21:05:37 AEST]   Pre-computing network properties in dataset "cohort1"...
-## [2016-06-15 21:05:37 AEST]   Unloading dataset from RAM...
-## [2016-06-15 21:05:37 AEST]   Loading matrices of dataset "cohort2" into RAM...
-## [2016-06-15 21:05:37 AEST]   Calculating observed test statistics...
-## [2016-06-15 21:05:37 AEST]   Generating null distributions from 10000 permutations using 2
+## [2016-06-16 19:21:19 AEST]   Pre-computing network properties in dataset "cohort1"...
+## [2016-06-16 19:21:19 AEST]   Unloading dataset from RAM...
+## [2016-06-16 19:21:19 AEST]   Loading matrices of dataset "cohort2" into RAM...
+## [2016-06-16 19:21:19 AEST]   Calculating observed test statistics...
+## [2016-06-16 19:21:19 AEST]   Generating null distributions from 10000 permutations using 2
 ##                              threads...
 ## 
 ## 
     0% completed.
    16% completed.
    33% completed.
-   50% completed.
+   49% completed.
    66% completed.
    82% completed.
-   97% completed.
+   98% completed.
   100% completed.
 ## 
-## [2016-06-15 21:05:44 AEST]   Calculating P-values...
-## [2016-06-15 21:05:44 AEST]   Collating results...
-## [2016-06-15 21:05:44 AEST] Unloading dataset from RAM...
-## [2016-06-15 21:05:44 AEST] Done!
+## [2016-06-16 19:21:26 AEST]   Calculating P-values...
+## [2016-06-16 19:21:27 AEST]   Collating results...
+## [2016-06-16 19:21:27 AEST] Unloading dataset from RAM...
+## [2016-06-16 19:21:27 AEST] Done!
 ```
 
 You can now see that `modulePreservation` loads and unloads the two datasets
@@ -1086,20 +1113,20 @@ nodesToPlot <- nodeOrder(
 ```
 
 ```
-## [2016-06-15 21:05:44 AEST] Validating user input...
-## [2016-06-15 21:05:44 AEST]   Loading matrices of dataset "cohort2" into RAM...
-## [2016-06-15 21:05:44 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:44 AEST]   Unloading dataset from RAM...
-## [2016-06-15 21:05:44 AEST]   Loading matrices of dataset "cohort1" into RAM...
-## [2016-06-15 21:05:44 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:44 AEST] User input ok!
-## [2016-06-15 21:05:44 AEST] Calculating network properties in dataset "cohort1"...
-## [2016-06-15 21:05:44 AEST] Unloading dataset from RAM...
-## [2016-06-15 21:05:44 AEST] Loading matrices of dataset "cohort2" into RAM...
-## [2016-06-15 21:05:44 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:44 AEST] Unloading dataset from RAM...
-## [2016-06-15 21:05:44 AEST] Ordering nodes...
-## [2016-06-15 21:05:45 AEST] Done!
+## [2016-06-16 19:21:27 AEST] Validating user input...
+## [2016-06-16 19:21:27 AEST]   Loading matrices of dataset "cohort2" into RAM...
+## [2016-06-16 19:21:27 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:27 AEST]   Unloading dataset from RAM...
+## [2016-06-16 19:21:27 AEST]   Loading matrices of dataset "cohort1" into RAM...
+## [2016-06-16 19:21:27 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:27 AEST] User input ok!
+## [2016-06-16 19:21:27 AEST] Calculating network properties in dataset "cohort1"...
+## [2016-06-16 19:21:27 AEST] Unloading dataset from RAM...
+## [2016-06-16 19:21:27 AEST] Loading matrices of dataset "cohort2" into RAM...
+## [2016-06-16 19:21:27 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:27 AEST] Unloading dataset from RAM...
+## [2016-06-16 19:21:27 AEST] Ordering nodes...
+## [2016-06-16 19:21:27 AEST] Done!
 ```
 
 ```r
@@ -1114,14 +1141,14 @@ samplesToPlot <- sampleOrder(
 ```
 
 ```
-## [2016-06-15 21:05:45 AEST] Validating user input...
-## [2016-06-15 21:05:45 AEST]   Loading matrices of dataset "cohort2" into RAM...
-## [2016-06-15 21:05:45 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:45 AEST] User input ok!
-## [2016-06-15 21:05:45 AEST] Calculating network properties in dataset "cohort2"...
-## [2016-06-15 21:05:45 AEST] Unloading dataset from RAM...
-## [2016-06-15 21:05:45 AEST] Ordering samples...
-## [2016-06-15 21:05:45 AEST] Done!
+## [2016-06-16 19:21:27 AEST] Validating user input...
+## [2016-06-16 19:21:27 AEST]   Loading matrices of dataset "cohort2" into RAM...
+## [2016-06-16 19:21:27 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:27 AEST] User input ok!
+## [2016-06-16 19:21:27 AEST] Calculating network properties in dataset "cohort2"...
+## [2016-06-16 19:21:27 AEST] Unloading dataset from RAM...
+## [2016-06-16 19:21:27 AEST] Ordering samples...
+## [2016-06-16 19:21:27 AEST] Done!
 ```
 
 ```r
@@ -1144,12 +1171,12 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:45 AEST] Validating user input...
-## [2016-06-15 21:05:45 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:45 AEST] User input ok!
-## [2016-06-15 21:05:45 AEST] Calculating network properties in dataset "Dataset1"...
-## [2016-06-15 21:05:45 AEST] rendering plot components...
-## [2016-06-15 21:05:45 AEST] Done!
+## [2016-06-16 19:21:27 AEST] Validating user input...
+## [2016-06-16 19:21:27 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:27 AEST] User input ok!
+## [2016-06-16 19:21:27 AEST] Calculating network properties in dataset "Dataset1"...
+## [2016-06-16 19:21:27 AEST] rendering plot components...
+## [2016-06-16 19:21:28 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/disk_matrix_dry_run-1.png" style="display: block; margin: auto;" />
@@ -1167,19 +1194,19 @@ plotModule(
 ```
 
 ```
-## [2016-06-15 21:05:45 AEST] Validating user input...
-## [2016-06-15 21:05:45 AEST]   Checking matrices for problems...
-## [2016-06-15 21:05:45 AEST] User input ok!
-## [2016-06-15 21:05:45 AEST] Calculating network properties in dataset "Dataset1"...
-## [2016-06-15 21:05:45 AEST] rendering plot components...
-## [2016-06-15 21:05:46 AEST] Done!
+## [2016-06-16 19:21:28 AEST] Validating user input...
+## [2016-06-16 19:21:28 AEST]   Checking matrices for problems...
+## [2016-06-16 19:21:28 AEST] User input ok!
+## [2016-06-16 19:21:28 AEST] Calculating network properties in dataset "Dataset1"...
+## [2016-06-16 19:21:28 AEST] rendering plot components...
+## [2016-06-16 19:21:29 AEST] Done!
 ```
 
 <img src="NetRep_files/figure-html/disk_matrix_plot-1.png" style="display: block; margin: auto;" />
 
 ## Running NetRep on a cluster
 
-Module preservation analyses are typically too computationally intense to run
+The permutation procedure is typically too computationally intense to run
 interactively on the head node of a cluster. We recommend splitting your 
 analysis into the following scripts:
 
@@ -1187,7 +1214,7 @@ analysis into the following scripts:
     matrices as `disk.matrix` format if all your datasets will not fit in 
     memory at once.
  2. A script to load in the matrix data and set up the input lists used by 
-    NetRep's functions.
+    **NetRep**'s functions.
  3. A script that runs the `modulePreservation` analysis for your modules of
     interest.
  4. A script that visualises your modules of interest.
@@ -1228,7 +1255,7 @@ size of the network, the size of the modules, the number of samples in each
 dataset, the number of modules, and the number of permutations.
 
 The required Wall time can be estimated by running `modulePreservation` with 
-a few permutations *per core* and setting the `verbose` flag to `TRUE`. The 
+a few permutations **per core** and setting the `verbose` flag to `TRUE`. The 
 required Wall time can then be estimated from the time stamps of the output.
 
 For example, consider the following output from our cluster: 
@@ -1264,17 +1291,17 @@ For example, consider the following output from our cluster:
 Here, we are running `modulePreservation` to test whether all gene coexpression 
 network modules discovery in the adiposed tissue are preserved in the liver 
 tissue of the same samples. These datasets consist of roughly 22,000 genes and
-300 samples. We have run 320 permutations on 32 cores: i.e. 10 permutations per 
-core.
+300 samples. We have run 320 permutations on 32 cores: *i.e.* 10 permutations 
+per core.
 
 We can use the timestamps surrounding the progress report ("100% completed") 
 in the output to estimate the total runtime for an arbitrary number of 
 permutations. It took 22 seconds to run 10 permutations per core, so 2.2
 seconds per permutation per core. If we want to run 20,000 permutations, this
 will take approximately 23 minutes. Adding the time taken to check the input
-and swap datasets (\~ 4 minutes), we would allocate 30 minutes for the job. 
-It is always better to provide an overly cautious estimate of the job runtime
-so that the cluster does not cancel the job just as it is finishing.
+and swap datasets (approximately 4 minutes), we would allocate 30 minutes for 
+the job. It is always better to provide an overly cautious estimate of the job 
+runtime so that the cluster does not cancel the job just as it is finishing.
 
 ### Estimating memory usage
 
@@ -1286,9 +1313,9 @@ at any point in time. Each thread requires additional memory to store the
 network properties of each permuted module at each permutation. The additional
 memory usage of each thread depends on the sizes of the modules to be tested. 
 
-The simplest way to run **NetRep** is to use a full node for your job: that is,
-set the number of threads to the number of cores on that node, and request all
-the memory of that node. 
+The simplest way to run the permutation procedure is to allocate a full node 
+for your job: that is, set the number of threads to the number of cores on 
+that node, and request all the memory of that node. 
 
 If you wish to allocate less memory, you can estimate the memory requirements 
 of **NetRep** through the same job we used to estimate runtime. You could then 
@@ -1296,7 +1323,8 @@ allocate the maximum memory used by this job (plus 10%).
 
 ## Optimising runtime
 
-There are several approaches that can be used to reduce runtime.
+There are several approaches that can be used to reduce runtime of the 
+permutation procedure.
 
 If your system has sufficient memory, you may see a performance improvement by
 running multiple instances of **NetRep** rather than parallelising over 
@@ -1307,6 +1335,8 @@ performance between a single threaded instance vs. a multi thread instance.
 Performance may also improve by compiling R against different `BLAS` and 
 `LAPACK` libraries prior to installation of **NetRep**. This requires some 
 experimentation as different libraries will work better for different systems.
+Note however that changing these typically means recompiling all of R from 
+source.
 
 The runtime of the permutation procedure is primarily influenced by the size of
 the modules and the number of samples in each test dataset. Permutation testing
