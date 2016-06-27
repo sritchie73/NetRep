@@ -388,7 +388,7 @@ absence is significant. In these networks, edges may simply indicate presence
 or absence, or they may also carry a weight indicating the strength of the 
 relationship. 
 
-For networks with unewighted edges, the *average edge weight* 
+For networks with unweighted edges, the *average edge weight* 
 (**'avg.weight'**) measures the proportion of nodes that are connected to each
 other. The *weighted degree* simply becomes the node *degree*: the number of 
 connections each node has to any other node in the module.
