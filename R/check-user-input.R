@@ -729,7 +729,7 @@ processInput <- function(
     # 'network' and 'data'.
     if (any(colnames(networkLoaded) != colnames(correlationLoaded)) |
         (!is.null(dataLoaded) && any(colnames(networkLoaded) != colnames(dataLoaded)))) {
-      stop("mismatch in node order between 'correlation' and 'network' for",
+      stop("mismatch in node order between 'correlation' and 'network' for ",
            'dataset "', ii, '"')
     }
     
