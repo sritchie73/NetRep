@@ -29,13 +29,13 @@
 #' 
 #' pres1 <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list,
-#'  moduleAssignments=labels_list, nPerm=5000, discovery="discovery", 
+#'  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
 #'  test="test", nThreads=2
 #' )
 #' 
 #' pres2 <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list, 
-#'  moduleAssignments=labels_list, nPerm=5000, discovery="discovery", 
+#'  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
 #'  test="test", nThreads=2
 #' )
 #' 

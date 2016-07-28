@@ -129,7 +129,7 @@ Analysis through the [WGCNA][1] package. For microbial abundance data we
 recommend the Python program [SparCC][2]. Microbial communities (modules) can
 then be defined as any group of significantly co-occuring microbes.
 
-[1]: https://cran.r-project.org/web/packages/WGCNA/index.html
+[1]: https://cran.r-project.org/package=WGCNA
 [2]: http://dx.doi.org/10.1371/journal.pcbi.1002687
 
 ### Tutorial data

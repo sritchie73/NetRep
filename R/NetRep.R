@@ -24,8 +24,6 @@
 #' @name NetRep
 #' @useDynLib NetRep
 #' @importFrom Rcpp evalCpp
-#' @import RcppArmadillo
-#' @import BH
 NULL
 
 .onUnload <- function (libpath) {

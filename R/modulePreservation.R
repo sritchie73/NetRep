@@ -360,10 +360,10 @@
 #' correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 #' labels_list <- list(discovery=module_labels)
 #' 
-#' # Assess module preservation.
+#' # Assess module preservation: you should run at least 10,000 permutations
 #' preservation <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list, 
-#'  moduleAssignments=labels_list, nPerm=10000, discovery="discovery", 
+#'  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
 #'  test="test", nThreads=2
 #' )
 #' 
