@@ -1,15 +1,18 @@
 note <- sprintf("R package version %s", meta$Version)
 bibentry(
   bibtype = "Article",
-  title = "A scalable permutation approach reveals replication and preservation patterns of gene coexpression modules",
+  title = "A scalable permutation approach reveals replication and preservation patterns of network modules in large datasets",
   author = c(person("Scott C.", "Ritchie"),
+             person("Stephen", "Watts"),
              person("Liam G.", "Fearnley"),
+             person("Kathryn E.", "Holt"),
              person("Gad", "Abraham"),
              person("Michael", "Inouye")),
-  journal = "bioRxiv",
-  publisher = "Cold Spring Harbor Labs Journals",
-  year = 2015,
-  note = note,
-  url = "http://biorxiv.org/content/early/2015/10/21/029553",
-  doi = "10.1101/029553"
+  journal = "Cell Systems",
+  year = 2016,
+  volume = 3,
+  number = 1,
+  pages = "71--82",
+  month = "July",
+  doi = "10.1016/j.cels.2016.06.012"
 )

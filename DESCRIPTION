@@ -1,8 +1,8 @@
 Package: NetRep
 Type: Package
 Title: Permutation testing network module preservation across datasets
-Version: 0.61.4
-Date: 2013-08-26
+Version: 0.61.5
+Date: 2016-07-28
 Authors@R: 'Scott Ritchie <sritchie73@gmail.com> [aut, cre]'
 BugReports: https://github.com/InouyeLab/NetRep/issues
 Description: Functions for assessing the replication/preservation of a network 

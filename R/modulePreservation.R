@@ -267,9 +267,9 @@
 #' @references 
 #'   \enumerate{
 #'     \item{
-#'      Ritchie, S.C., \emph{et al.}, \emph{A scalable permutation approach
-#'      reveals replication and preservation patterns of gene coexpression
-#'      modules}. bioRxiv. 029553 (2015).
+#'      Ritchie, S.C., \emph{et al.}, \emph{A scalable permutation approach 
+#'      reveals replication and preservation patterns of network modules in 
+#'      large datasets}. Cell Systems. \strong{3}, 71–82 (2016).
 #'     }
 #'     \item{
 #'       Langfelder, P., Luo, R., Oldham, M. C. & Horvath, S. \emph{Is my
