@@ -12,7 +12,7 @@
 #' questions such as; (1) do the relationships between genes in a module 
 #' replicate in an independent cohort? (2) are these gene coexpression modules
 #' preserved across tissues or tissue specific? (3) are these modules conserved
-#' across species? (4) are microbial communities preseved across multiple spatial
+#' across species? (4) are microbial communities preserved across multiple spatial
 #' locations?
 #' 
 #' The main function for this package is \code{\link{modulePreservation}}. 
