@@ -1,0 +1,31 @@
+2016-10-20  Scott Ritchie <sritchie73@gmail.com>
+
+   * DESCRIPTION: Release 1.0.3
+
+   * R/NetRep.R: fixed spelling mistake in package documentation.
+   * man/NetRep.Rd: compilation of R/NetRep.R spelling fix.
+   
+   * R/check-user-input.R: in processInput() improved handling of user input 
+     arugments 'modules', 'moduleAssignments', 'backgroundLabel' and 'test'
+     to handle cases where user code has overwritten a necessary list element 
+     with 'NULL'.
+  
+   * R/check-user-input.R: numeric labels in 'modules' are now returned as 
+     "character", fixing a bug where the incorrect modules would be reported
+     in the 'contigency' table list element returned by contigencyTable() in
+     R/contingency.R
+
+   * R/contingency.R: fixed bug where ratios returned in the 'propVarsExplained'
+     list element by contingencyTable() were greater than 1 due to mismatch in
+     in module order of the vectors when calculating the ratios (one ordered 
+     as text, one numerically).
+     
+   * R/contingency.R: improved the 'contingency' table list element returned by 
+     contigencyTable() so that it now reports module sizes in their discovery
+     datasets, the number of nodes present in the other dataset in the 
+     contigency table comparison, and includes modules with no nodes present in
+     the other dataset.
+
+   * R/networkProperties.R: in netPropsInternal() improved progress reporting
+     messages so that the module discovery dataset is listed as well as the
+     dataset in which the module properties are being calculated.
