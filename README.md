@@ -1,49 +1,67 @@
 # NetRep
 ##### Fast permutation procedure for testing network module replication
 
-An R package containing functions for assessing the replication/preservation of 
-network topology for weighted gene coexpression network modules in one or more
-independent datasets through permutation testing.
+An R package containing functions for assessing the replication and 
+preservation of a network module's topology across datasets through 
+permutation testing. This is suitable for networks that can be meaningfully 
+inferred from multiple datasets. These include gene coexpression networks,
+protein-protein interaction networks, and microbial interaction
+networks. Modules within these networks consist of groups of nodes
+that are particularly interesting: for example a group of tightly
+connected genes associated with a disease, groups of genes
+annotated with the same term in the Gene Ontology database, or
+groups of interacting microbial species, i.e. communities.
+Application of this method can answer questions such as; (1) do
+the relationships between genes in a module replicate in an
+independent cohort? (2) are these gene coexpression modules
+preserved across tissues or tissue specific? (3) are these modules
+conserved across species? (4) are microbial communities preseved
+across multiple spatial locations?
 
-A preprint is available on BioRxiv: [A scalable permutation approach reveals replication and preservation patterns of gene coexpression modules](http://biorxiv.org/content/early/2015/10/21/029553)
+The main function for this package is `modulePreservation`, which 
+performs the permutation test procedure. Other useful functions include 
+`networkProperties` for calculating the topological properties of a 
+module, and `plotModule` for visualising a network module.
 
-The main function for this package is `modulePreservation`. Other
-useful functions include `networkProperties` for calculating the
-topological properties of a module, and `plotModule` for visualising a
-gene coexpression network module.
+For more information see the associated publication in Cell Systems,
+[A Scalable Permutation Approach Reveals Replication and Preservation Patterns of Network Modules in Large Datasets](http://dx.doi.org/10.1016/j.cels.2016.06.012). 
 
 ## Installation
 
-The latest stable version of this package can be installed directly from this
-Github repository:
+The latest stable version of NetRep can be installed either directly from
+CRAN or from this GitHub repository:
 
 ```{r}
+# From CRAN
+install.packages("NetRep")
+
+# Alternatively From GitHub
 library(devtools)
 install_github("InouyeLab/NetRep")
 ```
 
-If you have `rmarkdown` installed, a package vignette (tutorial) is also 
-available to install:
+Developmental / pre-release versions of NetRep can be installed from this repository:
 
 ```{r}
-install_github("InouyeLab/NetRep", build_vignettes=TRUE)
-vignette("NetRep")
+library(devtools)
+install_github("InouyeLab/NetRep", ref="devel")
 ```
-But can otherwise be read online at [vignettes/NetRep.md](vignettes/NetRep.md)
 
 Older versions of NetRep can be installed by specifying the version number in the `ref` argument:
 
 ```{r}
 install_github("InouyeLab/NetRep", ref="v0.61.0")
 ```
-### Testing the package installation
 
-To ensure the package has installed correctly and will run on your system, run the following:
+## Package Tutorial
 
-```{r}
-library(testthat)
-test_package("NetRep")
-```
+A vignette (tutorial) is available online at [vignettes/NetRep.md](vignettes/NetRep.md),
+or can be loaded directly from R by running `vignette("NetRep")` if you have installed
+the package from CRAN. 
+
+If you are installing NetRep from GitHub and wish to make the vignette available on your 
+local machine, you will need to install `rmarkdown` and specify `build_vignettes=TRUE` 
+when running `install_github`.
 
 ## Installation troubleshooting
 
