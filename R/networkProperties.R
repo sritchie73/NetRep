@@ -275,8 +275,9 @@ netPropsInternal <- function(
     
     foreach(di = discovery) %do% {
       if (ti %in% test[[di]]) {
-        vCat(verbose, 0, 'Calculating network properties in ', 
-             'dataset "', datasetNames[ti], '"...', sep="")
+        vCat(verbose, 0, 'Calculating network properties of network subsets ',
+            'from dataset "', datasetNames[di], '" in dataset "', 
+            datasetNames[ti], '"...', sep="")
         if (is.null(data[[ti]])) {
           props <- NetPropsNoData(
             deref(networkLoaded), moduleAssignments[[di]], modules[[di]]
