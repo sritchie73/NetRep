@@ -40,9 +40,8 @@ contingencyTable <- function(modAssignments, mods, tiNodelist) {
   # What proportion?
   moduleSizes <- table(modAssignments[[1]])
   moduleSizes <- moduleSizes[names(moduleSizes) %sub_in% mods]
-  propVarsPres <- varsPres / moduleSizes
-  propVarsPres <- propVarsPres[orderAsNumeric(names(propVarsPres))]
-  
+  propVarsPres <- varsPres / moduleSizes[names(varsPres)]
+
   # Calculate some basic cross-tabulation statistics so we can assess 
   # which modules in both datasets map to each other, if module
   # detection has also been performed for the test network
