@@ -1,6 +1,9 @@
 2016-10-20  Scott Ritchie <sritchie73@gmail.com>
 
    * DESCRIPTION: Release 1.0.3
+   
+   * README: updated to reflect publication in Cell Systems and package 
+     publication on CRAN (as of version 1.0.2).
 
    * R/NetRep.R: fixed spelling mistake in package documentation.
    * man/NetRep.Rd: compilation of R/NetRep.R spelling fix.
