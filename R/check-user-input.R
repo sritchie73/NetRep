@@ -153,7 +153,7 @@ processInput <- function(
     } else if (is.numeric(tv)) {
       nDatasets <- max(tv)
       matchByIndice <- TRUE
-    } else if (!is.null(tv)) {
+    } else {
       stop("unable to match 'test' to provided datasets")
     }
   }
@@ -289,6 +289,13 @@ processInput <- function(
     stop("expecting ", length(discovery), " 'moduleAssignment' vectors, ", 
          nDatasets, " provided")
   }
+  
+  # Make sure that the contents of these list entries is not 'NULL':
+  if (any(sapply(moduleAssignments[discovery], is.null))) {
+    stop("list elements of 'moduleAssignments' corresponding to 'discovery'",
+         " datasets cannot be 'NULL'")
+  }
+  
 
   # Make sure numeric labels are transformed to character labels for matching
   # with 'modules'
@@ -350,6 +357,13 @@ processInput <- function(
     stop("expecting ", length(discovery), " 'moduleAssignment' vectors, ", 
          nDatasets, " provided")
   }
+  
+  # Make sure that the contents of these list entries is not 'NULL':
+  if (any(sapply(backgroundLabel[discovery], is.null))) {
+    stop("list elements of 'backgroundLabel' corresponding to 'discovery'",
+         " datasets cannot be 'NULL'")
+  }
+  
   
   # If any nodes are missing module assignments, set them to the background 
   # label
@@ -456,6 +470,13 @@ processInput <- function(
     stop("expecting ", nDatasets, " 'modules' vectors, ", 
          length(modules), " provided")
   }
+  
+  # Make sure that the contents of these list entries is not 'NULL':
+  if (any(sapply(modules[discovery], is.null))) {
+    stop("list elements of 'modules' corresponding to 'discovery'",
+         " datasets cannot be 'NULL'")
+  }
+  
   
   # ----------------------------------------------------------------------------
   # Next, process the plot function arguments
