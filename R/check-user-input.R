@@ -477,6 +477,13 @@ processInput <- function(
          " datasets cannot be 'NULL'")
   }
   
+  # Make sure numeric labels are transformed to character labels to prevent 
+  # R treating a numeric module as an indice.
+  modules <- lapply(modules, function(vec) { 
+    if (!is.null(vec)) {
+      return(as.character(vec))
+    }  
+  })
   
   # ----------------------------------------------------------------------------
   # Next, process the plot function arguments

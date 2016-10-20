@@ -52,27 +52,54 @@ contingencyTable <- function(modAssignments, mods, tiNodelist) {
       modAssignments[[1]][overlapVars], 
       modAssignments[[2]][overlapVars]
     )
-    # filter on subsets the user cares about
-    contingency <- contingency[mods,,drop=FALSE]
     
-    # Order numerically if relevant
-    contingency <- contingency[
-      orderAsNumeric(rownames(contingency)),
-      orderAsNumeric(colnames(contingency)),
-      drop=FALSE
-    ]
+    ## Add in the sizes of each module, and the number of variables present in
+    ## the other dataset
     
-    # add in the module sizes from the respective datasets
-    contingency <- cbind(rowSums(contingency), contingency)
-    testSizes <- table(modAssignments[[2]][overlapVars])
-    testSizes <- testSizes[colnames(contingency)]
+    # Get the module sizes irrespective of dataset overlap
+    discSizes <- table(modAssignments[[1]])
+    testSizes <- table(modAssignments[[2]])
     
-    contingency <- rbind(
-      testSizes[colnames(contingency)], 
-      contingency
-    )
-    rownames(contingency)[1] <- "size"
-    colnames(contingency)[1] <- "size"
+    # The dummy row / column handles modules with no variables present
+    discInfo <- cbind(discSizes, 0)
+    testInfo <- rbind(testSizes, 0)
+    colnames(discInfo) <- c("size", "present")
+    rownames(testInfo) <- c("size", "present")
+
+    # Add the number of variables present for each module in the other dataset
+    discPresent <- table(modAssignments[[1]][overlapVars])
+    testPresent <- table(modAssignments[[2]][overlapVars])
+    discInfo[names(discPresent), "present"] <- discPresent
+    testInfo["present", names(testPresent)] <- testPresent
+    
+    # Add missing modules to the contigency table
+    discMiss <- rownames(discInfo) %sub_nin% rownames(contingency)
+    testMiss <- colnames(testInfo) %sub_nin% colnames(contingency)
+    discMissMat <- matrix(0, nrow=length(discMiss), ncol=ncol(contingency),
+                          dimnames=list(discMiss, colnames(contingency)))
+    contingency <- rbind(contingency, discMissMat)
+    testMissMat <- matrix(0, ncol=length(testMiss), nrow=nrow(contingency),
+                          dimnames=list(rownames(contingency), testMiss))
+    contingency <- cbind(contingency, testMissMat)
+    
+    # Order and filter contingency table prior to adding information
+    contingency <- contingency[mods,, drop=FALSE]
+    contingency <- contingency[orderAsNumeric(rownames(contingency)), 
+                               orderAsNumeric(colnames(contingency)),
+                               drop=FALSE]
+    
+    # Make sure the info tables are in the same order so we can add them 
+    # correctly
+    discInfo <- discInfo[rownames(contingency),, drop=FALSE]
+    testInfo <- testInfo[, colnames(contingency), drop=FALSE]
+    
+    # Create the empty upper left square
+    na_mat <- matrix(NA, nrow=2, ncol=2) 
+    dimnames(na_mat) <- list(c("size", "present"), c("size", "present"))
+    
+    # combine
+    contingency <- cbind(discInfo, contingency)
+    contingency <- rbind(cbind(na_mat, testInfo), contingency)
   }
   
   return(list(
