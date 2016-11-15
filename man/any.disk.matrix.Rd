@@ -16,4 +16,5 @@
 \description{
 Check if any objects are a 'disk.matrix'
 }
+\keyword{internal}
 

@@ -71,4 +71,5 @@ Multithreaded permutation procedure for module preservation statistics
   }
 }
 }
+\keyword{internal}
 

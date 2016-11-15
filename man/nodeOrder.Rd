@@ -195,4 +195,5 @@ nodes <- nodeOrder(
 \seealso{
 \code{\link{networkProperties}}
 }
+\keyword{utilities}
 

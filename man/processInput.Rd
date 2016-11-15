@@ -49,4 +49,5 @@ Checks user input for consistency, errors, and unifies the data structures.
 \code{\link{plotModule}}, and
 \code{\link{plotTopology}}
 }
+\keyword{internal}
 

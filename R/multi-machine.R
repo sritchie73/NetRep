@@ -83,6 +83,7 @@ combineAnalyses <- function(pres1, pres2) {
 #' @return
 #'  A combined module preservation analysis.
 #' 
+#' @keywords internal
 combineAnalysesInternal <- function(pres1, pres2) {
   msg <- "module preservation analyses differ between 'pres1' and 'pres2'"
   badInput <- FALSE

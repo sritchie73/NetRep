@@ -111,6 +111,7 @@
 #' @seealso \code{\link{networkProperties}}
 #' 
 #' @name sampleOrder
+#' @keywords utilities
 #' @export
 sampleOrder <- function(
   network, data, correlation, moduleAssignments=NULL, modules=NULL, 
@@ -192,6 +193,8 @@ sampleOrder <- function(
 #' @param na.rm logical; remove missing nodes?
 #' 
 #' @return list structure of ordered nodes.
+#' 
+#' @keywords internal
 sampleOrderInternal <- function(props, verbose, na.rm) {
   vCat(verbose, 0, "Ordering samples...")
   for (ii in seq_along(props)) {

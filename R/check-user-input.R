@@ -25,6 +25,7 @@
 #' \code{\link{plotTopology}}
 #' 
 #' @return a list of containing the formatted user input
+#' @keywords internal
 processInput <- function(
   discovery, test, network, correlation, data, moduleAssignments, modules, 
   backgroundLabel, verbose, funcType, orderNodesBy=NA, 
@@ -821,6 +822,7 @@ processInput <- function(
 #' @param nDatasets number of datasets.
 #' 
 #' @return ordered 'tocheck' by dataset.
+#' @keywords internal
 verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   # Check that we can match 'discovery' and 'test' to the provided matrices
   if(!is.null(dataNames) && is.null(names(tocheck))) {
@@ -845,6 +847,8 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
 #' 
 #' @return 
 #'   throws an error or returns silently
+#'
+#' @keywords internal
 checkIsMatrix <- function(object) {
   if (!is.null(object) && !is.matrix(object) && !is.disk.matrix(object)) { 
     stop('Input data must be a "matrix" or "disk.matrix"')
@@ -891,7 +895,8 @@ checkIsMatrix <- function(object) {
 #' @param summaryCols user input for the corresponding argument in the plot functions.
 #' @param naCol user input for the corresponding argument in the plot functions.
 #' @param dryRun user input for the corresponding argument in the plot functions.
-#' 
+#'
+#' @keywords internal
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, 

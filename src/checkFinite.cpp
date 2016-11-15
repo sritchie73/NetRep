@@ -17,6 +17,7 @@
 //'  Throws an error if any \code{NA}, \code{NaN}, \code{Inf}, or \code{-Inf}
 //'  values are found, otherwise returns silently.
 //' 
+//' @keywords internal
 // [[Rcpp::export]]
 void CheckFinite(Rcpp::NumericMatrix matPtr) {
   arma::mat mat = arma::mat(matPtr.begin(), matPtr.nrow(), matPtr.ncol(), false, true);

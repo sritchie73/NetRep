@@ -9,4 +9,5 @@ network.palette()
 \description{
 RColorBrewer palette "RdYlBu" with the middle color replaced with white.
 }
+\keyword{internal}
 

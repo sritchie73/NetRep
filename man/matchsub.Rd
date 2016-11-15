@@ -33,4 +33,5 @@ are not in \code{table}, This is the opposite of \code{\%in\%}.
 \code{\%sub_nin\%} returns the elements \code{x} that are \code{\%nin\%} 
 \code{table} rather than a logical vector.
 }
+\keyword{internal}
 

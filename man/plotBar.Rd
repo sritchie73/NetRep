@@ -60,4 +60,5 @@ drawn.}
 \description{
 Plot bars around 0
 }
+\keyword{internal}
 

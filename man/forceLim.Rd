@@ -18,4 +18,5 @@ the min and max to set for the desired plot limits
 This function tells you what limits to set so that the boundaries of the plot
 are precisely the min and max you want.
 }
+\keyword{internal}
 

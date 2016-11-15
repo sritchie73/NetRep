@@ -18,4 +18,5 @@ A combined module preservation analysis.
 This function takes the module preservation analyses for two dataset 
 comparisons and combines them.
 }
+\keyword{internal}
 

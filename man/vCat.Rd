@@ -46,4 +46,5 @@ beginning of each line, 2 for every increment in \code{ind}.
 \seealso{
 \code{\link[base]{cat}}
 }
+\keyword{internal}
 

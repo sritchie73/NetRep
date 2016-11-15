@@ -41,4 +41,5 @@ Calculate the network properties, data matrix not provided
   }
 }
 }
+\keyword{internal}
 

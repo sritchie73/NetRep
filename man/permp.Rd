@@ -26,4 +26,5 @@ libraries are not properly linked.
 In the case \code{\link[statmod]{permp}} fails, the wrapper will fall back 
 to a slightly more conservative biased estimator: (1+x)/(1+nPerm).
 }
+\keyword{internal}
 

@@ -15,4 +15,5 @@ a vector of positions on the x-axis indicating the centre of a module
 \description{
 Get module mid-points on the x-axis
 }
+\keyword{internal}
 

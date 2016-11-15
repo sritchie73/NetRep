@@ -11,6 +11,8 @@
 #'  The color for a given value.
 #'  
 #' @import utils
+#' 
+#' @keywords internal
 getColFromPalette <- function(values, palette, vlim) {
   if (missing(vlim)) {
     vlim <- range(values)
@@ -38,6 +40,8 @@ getColFromPalette <- function(values, palette, vlim) {
 #' @param dlim the limits you want to set
 #' @return
 #'  the min and max to set for the desired plot limits
+#'
+#' @keywords internal
 forceLim <- function(dlim) {
   A = matrix(c(1.04, -0.04, -0.04, 1.04), nrow=2, ncol=2)
   B = matrix(dlim, nrow=2, ncol=1)
@@ -54,6 +58,7 @@ forceLim <- function(dlim) {
 #' @param hardlim logical; if \code{TRUE}, the plot window is exactly
 #'  constrained to the specified \code{xlim} and \code{ylim}.
 #'
+#' @keywords internal
 emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
   if (!missing(xlim) && !missing(ylim)) {
     if(hardlim) {
@@ -91,6 +96,7 @@ emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
 #' This gives a nicer contrast than the "RdBu" palette
 #' 
 #' @import RColorBrewer
+#' @keywords internal
 correlation.palette <- function() {
   cols <- rev(brewer.pal(11, "RdYlBu"))
   cols[6] <- "#FFFFFF"
@@ -100,6 +106,8 @@ correlation.palette <- function() {
 #' Color palette for network heatmaps
 #'
 #' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
+#' 
+#' @keywords internal
 network.palette <- function() {
   correlation.palette()[6:11]
 }
@@ -110,6 +118,8 @@ network.palette <- function() {
 #'
 #' @return
 #'  a vector of positions on the x-axis where one module begins and another ends
+#'  
+#' @keywords internal
 getModuleBreaks <- function(mas) {
   sizes <- rle(mas)
   breaks = numeric(length(sizes$lengths) + 1)
@@ -126,6 +136,8 @@ getModuleBreaks <- function(mas) {
 #'
 #' @return
 #'  a vector of positions on the x-axis indicating the centre of a module
+#'  
+#' @keywords internal
 getModuleMidPoints <- function(mas) {
   breaks <- getModuleBreaks(mas)
   mids <- numeric(length(breaks) - 1)
@@ -141,6 +153,8 @@ getModuleMidPoints <- function(mas) {
 #' \url{http://stackoverflow.com/a/13290832/2341679}
 #' 
 #' @param colvec a character vectors of colors (hex or name) to validate.
+#' 
+#' @keywords internal
 areColors <- function(colvec) {
   sapply(colvec, function(col) {
     tryCatch(is.matrix(col2rgb(col)), error = function(e) FALSE)
@@ -165,6 +179,7 @@ areColors <- function(colvec) {
 #' @param dataLoaded currently loaded data matrix (may be NULL).
 #' @param networkLoaded currently loaded network matrix.
 #'
+#' @keywords internal
 plotProps <- function(
   network, data, moduleAssignments, modules, di, ti, orderNodesBy, 
   orderSamplesBy, orderModules, datasetNames, nDatasets, verbose, loadedIdx, 
@@ -304,4 +319,3 @@ plotProps <- function(
     presentNodes=presentNodes, presentSamples=presentSamples
   ))
 }
-

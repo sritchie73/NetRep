@@ -32,6 +32,7 @@
 #' @param verbose logical; should progress be reported? Default is \code{TRUE}.
 #' 
 #' @name common_params
+#' @keywords internal
 NULL
 
 #' Template parameters
@@ -43,6 +44,7 @@ NULL
 #'  list if possible (see Return Value).
 #'  
 #' @name simplify_param
+#' @keywords internal
 NULL
 
 #' Template parameters
@@ -55,6 +57,7 @@ NULL
 #'   provided.
 #'
 #' @name orderModules_param
+#' @keywords internal
 NULL
 
 #' Template parameters
@@ -134,5 +137,6 @@ NULL
 #'  drawed.
 #' 
 #' @name plot_params
+#' @keywords internal
 NULL
 

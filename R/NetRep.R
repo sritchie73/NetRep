@@ -24,6 +24,7 @@
 #' @name NetRep
 #' @useDynLib NetRep
 #' @importFrom Rcpp evalCpp
+#' @keywords package
 NULL
 
 .onUnload <- function (libpath) {

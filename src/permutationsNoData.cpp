@@ -134,6 +134,8 @@ void calculateNulls(
 //' 
 //' @return a list containing a matrix of observed test statistics, and an
 //'   array of null distribution observations.
+//'   
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List PermutationProcedureNoData (
     Rcpp::List discProps, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, 

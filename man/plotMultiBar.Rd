@@ -62,4 +62,5 @@ drawn.}
 \description{
 Plot multiple horizontal bar plots
 }
+\keyword{internal}
 

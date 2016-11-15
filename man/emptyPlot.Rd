@@ -23,4 +23,5 @@ constrained to the specified \code{xlim} and \code{ylim}.}
 \description{
 Create an empty plot window with the specified limits
 }
+\keyword{internal}
 

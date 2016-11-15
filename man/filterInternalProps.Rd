@@ -27,4 +27,5 @@ a nested list structure identical to that returned by
 Used in the plot functions to filter the structure to the 
 \code{'orderNodesBy'} and \code{'orderSamplesBy'} \emph{test} datasets.
 }
+\keyword{internal}
 

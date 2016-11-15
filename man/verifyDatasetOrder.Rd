@@ -21,4 +21,5 @@ ordered 'tocheck' by dataset.
 \description{
 Check and order an input list:
 }
+\keyword{internal}
 

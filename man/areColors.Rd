@@ -13,4 +13,5 @@ areColors(colvec)
 Courtesy of Josh O'Brien's stackoverflow answer at
 \url{http://stackoverflow.com/a/13290832/2341679}
 }
+\keyword{internal}
 

@@ -30,7 +30,8 @@
 #' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
-#' 
+#'
+#' @keywords internal
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
   plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.main="",
@@ -189,7 +190,8 @@ plotTriangleHeatmap <- function(
 #' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
-#'  
+#'
+#' @keywords internal
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
@@ -342,6 +344,7 @@ plotSquareHeatmap <- function(
 #' 
 #' @import graphics
 #' @import grDevices
+#' @keywords internal
 addGradientLegend <- function(
   palette, legend.vlim, horizontal, main, xlim, ylim, 
   tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt
@@ -477,7 +480,8 @@ addGradientLegend <- function(
 #' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
-#'  
+#'
+#' @keywords internal
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", main.line=0,
@@ -600,7 +604,8 @@ plotBar <- function(
 #' @param lwd line width for borders.
 #' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 #'  drawn.
-#'  
+#'
+#' @keywords internal
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="", 
   main.line=1, na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, 

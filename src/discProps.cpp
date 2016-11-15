@@ -38,7 +38,8 @@
 //' @return a list containing three lists: a list of weighted degree vectors,
 //'   a list of correlation coefficient vectors, and a list of node 
 //'   contribution vectors. There is one vector for each module in each list.
-//'   
+//' 
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List IntermediateProperties (
     Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet,
@@ -164,7 +165,8 @@ Rcpp::List IntermediateProperties (
 //' @return a list containing two lists: a list of weighted degree vectors,
 //'   and a list of correlation coefficient vectors. There is one vector for 
 //'   each module in each list.
-//'   
+//' 
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List IntermediatePropertiesNoData (
     Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet,

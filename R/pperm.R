@@ -71,7 +71,7 @@
 #' )
 #' 
 #' @aliases permutation permuted
-#' @name permutation
+#' @name permutationTest
 #' @export
 permutationTest <- function(
   nulls, observed, nVarsPresent, totalSize, alternative="greater"
@@ -184,7 +184,9 @@ permutationTest <- function(
 #' @param ... other arguments to pass to\code{\link[statmod]{permp}}.
 #' @return 
 #'  vector or array of p-values, of same dimensions as \code{x}.
+#'  
 #' @importFrom statmod permp
+#' @keywords internal
 permp <- function(x, nperm, ...) {
   tryCatch({
     return(statmod::permp(x, nperm, ...))
@@ -210,7 +212,7 @@ permp <- function(x, nperm, ...) {
 #'  associations at the provided \code{alpha}. The minimum p-value will always
 #'  be smaller than \code{alpha}.
 #'  
-#' @rdname permutation
+#' @rdname permutationTest
 #' @export
 requiredPerms <- function(alpha, alternative="greater") {
   validAlts <- c("two.sided", "less", "greater")

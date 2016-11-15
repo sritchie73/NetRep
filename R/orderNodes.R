@@ -141,6 +141,7 @@
 #' )
 #' 
 #' @name nodeOrder
+#' @keywords utilities
 #' @export
 nodeOrder <- function(
   network, data, correlation, moduleAssignments=NULL, modules=NULL, 
@@ -254,6 +255,7 @@ nodeOrder <- function(
 #' @return list structure of ordered nodes.
 #' 
 #' @import stats
+#' @keywords internal
 nodeOrderInternal <- function(
   props, orderModules, simplify, verbose, na.rm, mean
 ) {

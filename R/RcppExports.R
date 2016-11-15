@@ -12,6 +12,7 @@
 #'  Throws an error if any \code{NA}, \code{NaN}, \code{Inf}, or \code{-Inf}
 #'  values are found, otherwise returns silently.
 #' 
+#' @keywords internal
 CheckFinite <- function(matPtr) {
     invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', matPtr))
 }
@@ -53,7 +54,8 @@ CheckFinite <- function(matPtr) {
 #' @return a list containing three lists: a list of weighted degree vectors,
 #'   a list of correlation coefficient vectors, and a list of node 
 #'   contribution vectors. There is one vector for each module in each list.
-#'   
+#' 
+#' @keywords internal
 IntermediateProperties <- function(dData, dCorr, dNet, tNodeNames, moduleAssignments, modules) {
     .Call('NetRep_IntermediateProperties', PACKAGE = 'NetRep', dData, dCorr, dNet, tNodeNames, moduleAssignments, modules)
 }
@@ -92,7 +94,8 @@ IntermediateProperties <- function(dData, dCorr, dNet, tNodeNames, moduleAssignm
 #' @return a list containing two lists: a list of weighted degree vectors,
 #'   and a list of correlation coefficient vectors. There is one vector for 
 #'   each module in each list.
-#'   
+#' 
+#' @keywords internal
 IntermediatePropertiesNoData <- function(dCorr, dNet, tNodeNames, moduleAssignments, modules) {
     .Call('NetRep_IntermediatePropertiesNoData', PACKAGE = 'NetRep', dCorr, dNet, tNodeNames, moduleAssignments, modules)
 }
@@ -147,6 +150,8 @@ IntermediatePropertiesNoData <- function(dCorr, dNet, tNodeNames, moduleAssignme
 #' 
 #' @return a list containing a matrix of observed test statistics, and an
 #'   array of null distribution observations.
+#'   
+#' @keywords internal
 PermutationProcedure <- function(discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
     .Call('NetRep_PermutationProcedure', PACKAGE = 'NetRep', discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
@@ -197,6 +202,8 @@ PermutationProcedure <- function(discProps, tData, tCorr, tNet, moduleAssignment
 #' 
 #' @return a list containing a matrix of observed test statistics, and an
 #'   array of null distribution observations.
+#'   
+#' @keywords internal
 PermutationProcedureNoData <- function(discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
     .Call('NetRep_PermutationProcedureNoData', PACKAGE = 'NetRep', discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
@@ -234,6 +241,8 @@ PermutationProcedureNoData <- function(discProps, tCorr, tNet, moduleAssignments
 #' 
 #' @return a list containing the summary profile, node contribution, module
 #'   coherence, weighted degree, and average edge weight for each 'module'.
+#'   
+#' @keywords internal
 NetProps <- function(data, net, moduleAssignments, modules) {
     .Call('NetRep_NetProps', PACKAGE = 'NetRep', data, net, moduleAssignments, modules)
 }
@@ -267,6 +276,8 @@ NetProps <- function(data, net, moduleAssignments, modules) {
 #' 
 #' @return a list containing the summary profile, node contribution, module
 #'   coherence, weighted degree, and average edge weight for each 'module'.
+#'   
+#' @keywords internal
 NetPropsNoData <- function(net, moduleAssignments, modules) {
     .Call('NetRep_NetPropsNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
 }
@@ -280,6 +291,7 @@ NetPropsNoData <- function(net, moduleAssignments, modules) {
 #' @return
 #'  A scaled data matrix.
 #'
+#' @keywords internal
 Scale <- function(data) {
     .Call('NetRep_Scale', PACKAGE = 'NetRep', data)
 }

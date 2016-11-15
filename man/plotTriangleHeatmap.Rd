@@ -65,4 +65,5 @@ drawn.}
 \description{
 Plot a symmetric heatmap as a triangle
 }
+\keyword{internal}
 

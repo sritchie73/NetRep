@@ -15,4 +15,5 @@ a vector of positions on the x-axis where one module begins and another ends
 \description{
 Get module break points on the x-axis
 }
+\keyword{internal}
 

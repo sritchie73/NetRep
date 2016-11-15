@@ -73,4 +73,5 @@ drawn.}
 \description{
 Plot a square heatmap
 }
+\keyword{internal}
 

@@ -149,6 +149,7 @@
 #'   \code{\link{networkProperties}}.
 #'   
 #' @name example-data
+#' @keywords datasets
 NULL
 
 #' @rdname example-data

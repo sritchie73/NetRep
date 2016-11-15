@@ -19,4 +19,5 @@ list structure of ordered nodes.
 \description{
 Used by plotting functions: assumes user input has been sanitised already
 }
+\keyword{internal}
 

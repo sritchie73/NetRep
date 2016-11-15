@@ -17,4 +17,5 @@ Throws an error if any \code{NA}, \code{NaN}, \code{Inf}, or \code{-Inf}
 The C++ functions will not work with NA values, and the calculation of the
 summary profile will take a long time to run before crashing.
 }
+\keyword{internal}
 

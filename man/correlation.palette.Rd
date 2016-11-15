@@ -10,4 +10,5 @@ correlation.palette()
 RColorBrewer palette "RdYlBu" with the middle color replaced with white.
 This gives a nicer contrast than the "RdBu" palette
 }
+\keyword{internal}
 

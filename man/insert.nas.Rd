@@ -18,4 +18,5 @@ The vector with NAs inserted in the correct positions.
 Useful for inserting NAs into the correct positions when examining module 
 probes that do not exist in the test dataset.
 }
+\keyword{internal}
 

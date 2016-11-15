@@ -21,12 +21,15 @@
 NULL
 
 #' @rdname matchsub
+#' @keywords internal
 `%nin%` <- function(x, table) !(x %in% table)
 
 #' @rdname matchsub
+#' @keywords internal
 `%sub_in%` <- function(x, table) x[x %in% table]
 
 #' @rdname matchsub
+#' @keywords internal
 `%sub_nin%` <- function(x, table) x[x %nin% table]
 
 #' Verbose Concatenate and Print with Indentation
@@ -61,6 +64,8 @@ NULL
 #'   values are ignored, with a warning.
 #' @param labels character vector of labels for the lines printed. Ignored if 
 #'   fill is \code{FALSE}.
+#'
+#' @keywords internal
 vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
   if (!(is.vector(verbose) && !is.list(verbose) && is.logical(verbose) &&
         length(verbose) == 1 && !is.na(verbose))) {
@@ -149,6 +154,8 @@ vCat <- function(verbose, ind=0,  ..., sep=" ", fill=TRUE, labels=NULL) {
 #' 
 #' @return
 #' The vector with NAs inserted in the correct positions.
+#' 
+#' @keywords internal
 insert.nas <- function(vec, na.indices) {
   res <- vector(typeof(vec), length(vec) + length(na.indices))
   res[na.indices] <- NA
@@ -163,6 +170,8 @@ insert.nas <- function(vec, na.indices) {
 #' @param vec module vector to order
 #' 
 #' @return the order of the vector
+#' 
+#' @keywords internal
 orderAsNumeric <- function(vec) {
   tryCatch({
     order(as.integer(vec))
@@ -179,6 +188,8 @@ orderAsNumeric <- function(vec) {
 #' @param depth depth to traverse to
 #' 
 #' @return a list
+#' 
+#' @keywords internal
 simplifyList <- function(l, depth) {
   # Recursively traverse until we hit the depth requested or we cant go deeper
   stopifnot(is.numeric(depth) && depth > 0)
@@ -219,6 +230,8 @@ simplifyList <- function(l, depth) {
 #' 
 #' @param modules a vector of module labels to sort
 #' @return a sorted vector   
+#' 
+#' @keywords internal
 sortModuleNames <- function(modules) {
   tryCatch({
     modules[order(as.numeric(modules))]
@@ -235,6 +248,8 @@ sortModuleNames <- function(modules) {
 #' @param x a \code{'matrix'} or \code{'disk.matrix'}
 #' 
 #' @return a \code{'matrix'}
+#' 
+#' @keywords internal
 loadIntoRAM <- function(x) {
   if (is.null(x))
     return(NULL)
@@ -248,6 +263,8 @@ loadIntoRAM <- function(x) {
 #' @return 
 #'  \code{TRUE} if the class of any object in the list of input 
 #'  arguments is a "disk.matrix".
+#'  
+#' @keywords internal
 any.disk.matrix <- function(...) {
   any(unlist(sapply(list(...), is.disk.matrix)))
 }
@@ -257,6 +274,8 @@ any.disk.matrix <- function(...) {
 #' @param pkg name of the package to check
 #' 
 #' @return logical; \code{TRUE} if the package is installed and can be loaded.
+#' 
+#' @keywords internal
 pkgReqCheck <- function(pkg) {
   suppressMessages(suppressWarnings(requireNamespace(pkg, quietly=TRUE)))
 }
@@ -268,6 +287,8 @@ pkgReqCheck <- function(pkg) {
 #' @return
 #'  a file path relative to either the users home directory or the current 
 #'  working directory if the file is located underneath either.
+#'  
+#' @keywords internal
 prettyPath <- function(file) {
   file <- gsub("//", "/", file)
   file <- gsub(paste0(getwd(), "/?"), "", file)

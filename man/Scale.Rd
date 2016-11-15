@@ -15,4 +15,5 @@ A scaled data matrix.
 \description{
 Each node is centered by its mean and scaled by it standard deviation.
 }
+\keyword{internal}
 

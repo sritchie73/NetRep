@@ -15,4 +15,5 @@ throws an error or returns silently
 \description{
 Check whether an object is a 'matrix' or a 'disk.matrix'
 }
+\keyword{internal}
 

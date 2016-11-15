@@ -15,4 +15,5 @@ logical; \code{TRUE} if the package is installed and can be loaded.
 \description{
 Silently check and load a package into the namespace
 }
+\keyword{internal}
 

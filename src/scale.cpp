@@ -34,6 +34,7 @@ arma::mat Scale (double * dataAddr, unsigned int nSamples, unsigned int nNodes) 
 //' @return
 //'  A scaled data matrix.
 //'
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::NumericMatrix Scale(Rcpp::NumericMatrix data) {
   arma::mat scaled = Scale(data.begin(), data.nrow(), data.ncol());

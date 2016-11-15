@@ -17,4 +17,5 @@ a list
 \description{
 Removes entries that are \code{NULL} are extracts element if the length is 1.
 }
+\keyword{internal}
 

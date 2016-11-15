@@ -46,4 +46,5 @@ Calculate the network properties
   }
 }
 }
+\keyword{internal}
 

@@ -50,4 +50,5 @@ for function-specific checking (i.e. failing early where the \code{'data'} is
 required), while avoiding duplication of time-intensive checks 
 (e.g. \code{\link{CheckFinite}}).
 }
+\keyword{internal}
 

@@ -20,4 +20,5 @@ The color for a given value.
 For a color gradient mapped onto a scale of values (\code{vlim}), retrieve
 the color for any given \code{value}
 }
+\keyword{internal}
 

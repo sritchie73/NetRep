@@ -27,4 +27,5 @@ Several functions for downstream are also provided:
 \code{\link{networkProperties}} for calculating the topological properties 
 of a module, and \code{\link{plotModule}} for visualising a module.
 }
+\keyword{package}
 

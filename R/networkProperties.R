@@ -223,6 +223,8 @@ networkProperties <- function(
 #' @return
 #'  A list of network properties, and also the currently loaded dataset if
 #'  keepLast is TRUE.
+#'  
+#' @keywords internal
 netPropsInternal <- function(
   network, data, moduleAssignments, modules, discovery, test, nDatasets, 
   datasetNames, verbose, loadedIdx, dataLoaded, networkLoaded, keepLast=FALSE
@@ -326,6 +328,8 @@ netPropsInternal <- function(
 #'  \code{'netPropsInternal'}, but where only the entries for test datasets
 #'  specified by the \code{test} argument and modules specified by the 
 #'  \code{modules} argument contain non-\code{NULL} entries.
+#' 
+#' @keywords internal
 filterInternalProps <- function(props, test, discovery, modules=NULL) {
   ii <- NULL; jj <- NULL; mi <- NULL # suppress CRAN note
   fProps <- foreach(ii = seq_along(props)) %do% {

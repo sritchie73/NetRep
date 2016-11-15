@@ -36,4 +36,5 @@ multiple of \code{tck}.}
 \description{
 Add a legend to a plot window.
 }
+\keyword{internal}
 

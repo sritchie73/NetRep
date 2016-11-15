@@ -87,4 +87,5 @@ checkPlotArgs(orderModules, plotNodeNames, plotSampleNames, plotModuleNames,
 \description{
 Simple typechecking for the extensive plot arguments
 }
+\keyword{internal}
 

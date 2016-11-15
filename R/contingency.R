@@ -15,6 +15,7 @@
 #'  dataset, and the \code{modAssignments} vector containing only nodes present
 #'  in the test dataset.
 #' 
+#' @keywords internal
 contingencyTable <- function(modAssignments, mods, tiNodelist) {
   # To simplify later function calls, we need to get a vector of module
   # assignments only for (a) modules of interest and (b) the variables

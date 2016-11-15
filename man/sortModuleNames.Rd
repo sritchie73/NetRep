@@ -16,4 +16,5 @@ a sorted vector
 If module labels are numeric, sorts numerically, otherwise sorts 
 alphabetically.
 }
+\keyword{internal}
 

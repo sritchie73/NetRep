@@ -16,4 +16,5 @@ a file path relative to either the users home directory or the current
 \description{
 Convert an absolute file path to a relative one if possible
 }
+\keyword{internal}
 

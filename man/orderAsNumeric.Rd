@@ -15,4 +15,5 @@ the order of the vector
 \description{
 The module assingments may be numeric, but coded as characters.
 }
+\keyword{internal}
 

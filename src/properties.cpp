@@ -35,6 +35,8 @@
 //' 
 //' @return a list containing the summary profile, node contribution, module
 //'   coherence, weighted degree, and average edge weight for each 'module'.
+//'   
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List NetProps (
     Rcpp::NumericMatrix data, Rcpp::NumericMatrix net, 
@@ -182,6 +184,8 @@ Rcpp::List NetProps (
 //' 
 //' @return a list containing the summary profile, node contribution, module
 //'   coherence, weighted degree, and average edge weight for each 'module'.
+//'   
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List NetPropsNoData (
     Rcpp::NumericMatrix net, 

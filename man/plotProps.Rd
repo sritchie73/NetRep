@@ -42,4 +42,5 @@ plotProps(network, data, moduleAssignments, modules, di, ti, orderNodesBy,
 \description{
 Get the network properties and order for a plot
 }
+\keyword{internal}
 

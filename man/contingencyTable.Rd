@@ -27,4 +27,5 @@ A list containing a contigency table, a vector of the proportion of
 \description{
 Calculate a contigency table of module overlap between datasets
 }
+\keyword{internal}
 

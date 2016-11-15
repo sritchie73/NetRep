@@ -16,4 +16,5 @@ a \code{'matrix'}
 If \code{x} is a \code{\link{disk.matrix}} load in the matrix data at its
 associated file. If \code{x} is already a matrix, return as is.
 }
+\keyword{internal}
 
