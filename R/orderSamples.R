@@ -184,17 +184,17 @@ sampleOrder <- function(
   return(res)
 }
 
-#' Internal use function for calculating sample order
-#' 
-#' Used by plotting functions: assumes user input has been sanitised already
-#' 
-#' @param props network properties to calculate order from.
-#' @param verbose logical; is verbose printing turned on?
-#' @param na.rm logical; remove missing nodes?
-#' 
-#' @return list structure of ordered nodes.
-#' 
-#' @keywords internal
+### Internal use function for calculating sample order
+### 
+### Used by plotting functions: assumes user input has been sanitised already
+### 
+### @param props network properties to calculate order from.
+### @param verbose logical; is verbose printing turned on?
+### @param na.rm logical; remove missing nodes?
+### 
+### @return list structure of ordered nodes.
+### 
+### @keywords internal
 sampleOrderInternal <- function(props, verbose, na.rm) {
   vCat(verbose, 0, "Ordering samples...")
   for (ii in seq_along(props)) {

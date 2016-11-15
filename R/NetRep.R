@@ -24,6 +24,8 @@
 #' @name NetRep
 #' @useDynLib NetRep
 #' @importFrom Rcpp evalCpp
+#' @import stats
+#' @import utils
 #' @keywords package
 NULL
 

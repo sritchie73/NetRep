@@ -72,18 +72,18 @@ combineAnalyses <- function(pres1, pres2) {
   return(pres1)
 }
 
-#' Combine results of multiple permutation procedures
-#' 
-#' This function takes the module preservation analyses for two dataset 
-#' comparisons and combines them.
-#' 
-#' @param pres1 input from 'combineAnalyses'
-#' @param pres2 input from 'combineAnalyses'
-#' 
-#' @return
-#'  A combined module preservation analysis.
-#' 
-#' @keywords internal
+### Combine results of multiple permutation procedures
+### 
+### This function takes the module preservation analyses for two dataset 
+### comparisons and combines them.
+### 
+### @param pres1 input from 'combineAnalyses'
+### @param pres2 input from 'combineAnalyses'
+### 
+### @return
+###  A combined module preservation analysis.
+### 
+### @keywords internal
 combineAnalysesInternal <- function(pres1, pres2) {
   msg <- "module preservation analyses differ between 'pres1' and 'pres2'"
   badInput <- FALSE

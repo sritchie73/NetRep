@@ -6,18 +6,18 @@
 
 #include <RcppArmadillo.h>
 
-//' Check whether there are any non-finite values in a matrix
-//'
-//' The C++ functions will not work with NA values, and the calculation of the
-//' summary profile will take a long time to run before crashing.
-//'
-//' @param matPtr matrix to check.
-//' 
-//' @return
-//'  Throws an error if any \code{NA}, \code{NaN}, \code{Inf}, or \code{-Inf}
-//'  values are found, otherwise returns silently.
-//' 
-//' @keywords internal
+///' Check whether there are any non-finite values in a matrix
+///'
+///' The C++ functions will not work with NA values, and the calculation of the
+///' summary profile will take a long time to run before crashing.
+///'
+///' @param matPtr matrix to check.
+///' 
+///' @return
+///'  Throws an error if any \code{NA}, \code{NaN}, \code{Inf}, or \code{-Inf}
+///'  values are found, otherwise returns silently.
+///' 
+///' @keywords internal
 // [[Rcpp::export]]
 void CheckFinite(Rcpp::NumericMatrix matPtr) {
   arma::mat mat = arma::mat(matPtr.begin(), matPtr.nrow(), matPtr.ncol(), false, true);

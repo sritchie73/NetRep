@@ -194,37 +194,37 @@ networkProperties <- function(
   res
 }
 
-#' Internal function for calculating 'networkProperties'
-#' 
-#' This function is used by several package functions. It assumes that all user
-#' input has been processed already by \code{\link{processInput}}. This allows
-#' for function-specific checking (i.e. failing early where the \code{'data'} is
-#' required), while avoiding duplication of time-intensive checks 
-#' (e.g. \code{\link{CheckFinite}}).
-#' 
-#' @param network \code{'network'} after processing by \code{'processInput'}.
-#' @param data \code{'data'} after processing by \code{'processInput'}.
-#' @param moduleAssignments \code{'moduleAssignments'} after processing by
-#'   \code{'processInput'}.
-#' @param modules \code{'modules'} after processing by \code{'processInput'}.
-#' @param discovery \code{'discovery'} after processing by
-#'   \code{'processInput'}.
-#' @param test \code{'test'} after processing by \code{'processInput'}.
-#' @param nDatasets a vector containing the total number of input datasets, 
-#'  returned by \code{'processInput'}.
-#' @param datasetNames a vector of dataset names returned by
-#'   \code{'processInput'}.
-#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param loadedIdx index of the currently loaded dataset.
-#' @param dataLoaded reference to currently loaded data matrix (may be NULL).
-#' @param networkLoaded reference to currently loaded network matrix.
-#' @param keepLast logical; should the dataset processed last be kept in RAM?
-#'   
-#' @return
-#'  A list of network properties, and also the currently loaded dataset if
-#'  keepLast is TRUE.
-#'  
-#' @keywords internal
+### Internal function for calculating 'networkProperties'
+### 
+### This function is used by several package functions. It assumes that all user
+### input has been processed already by \code{\link{processInput}}. This allows
+### for function-specific checking (i.e. failing early where the \code{'data'} is
+### required), while avoiding duplication of time-intensive checks 
+### (e.g. \code{\link{CheckFinite}}).
+### 
+### @param network \code{'network'} after processing by \code{'processInput'}.
+### @param data \code{'data'} after processing by \code{'processInput'}.
+### @param moduleAssignments \code{'moduleAssignments'} after processing by
+###   \code{'processInput'}.
+### @param modules \code{'modules'} after processing by \code{'processInput'}.
+### @param discovery \code{'discovery'} after processing by
+###   \code{'processInput'}.
+### @param test \code{'test'} after processing by \code{'processInput'}.
+### @param nDatasets a vector containing the total number of input datasets, 
+###  returned by \code{'processInput'}.
+### @param datasetNames a vector of dataset names returned by
+###   \code{'processInput'}.
+### @param verbose logical; should progress be reported? Default is \code{TRUE}.
+### @param loadedIdx index of the currently loaded dataset.
+### @param dataLoaded reference to currently loaded data matrix (may be NULL).
+### @param networkLoaded reference to currently loaded network matrix.
+### @param keepLast logical; should the dataset processed last be kept in RAM?
+###   
+### @return
+###  A list of network properties, and also the currently loaded dataset if
+###  keepLast is TRUE.
+###  
+### @keywords internal
 netPropsInternal <- function(
   network, data, moduleAssignments, modules, discovery, test, nDatasets, 
   datasetNames, verbose, loadedIdx, dataLoaded, networkLoaded, keepLast=FALSE
@@ -311,25 +311,25 @@ netPropsInternal <- function(
 }
 
 
-#' Filter structure returned by 'netPropsInternal' to specified test datasets
-#' 
-#' Used in the plot functions to filter the structure to the 
-#' \code{'orderNodesBy'} and \code{'orderSamplesBy'} \emph{test} datasets.
-#' 
-#' @param props nested list returned by \code{\link{netPropsInternal}}.
-#' @param test a vector of datasets to filter to.
-#' @param discovery a vector containing a single discovery dataset specified in
-#'   the parent plot function. 
-#' @param modules a vector of modules from the specified \code{discovery} 
-#'   dataset to filter to. If \code{NULL}, then all modules are kept.
-#'   
-#' @return 
-#'  a nested list structure identical to that returned by 
-#'  \code{'netPropsInternal'}, but where only the entries for test datasets
-#'  specified by the \code{test} argument and modules specified by the 
-#'  \code{modules} argument contain non-\code{NULL} entries.
-#' 
-#' @keywords internal
+### Filter structure returned by 'netPropsInternal' to specified test datasets
+### 
+### Used in the plot functions to filter the structure to the 
+### \code{'orderNodesBy'} and \code{'orderSamplesBy'} \emph{test} datasets.
+### 
+### @param props nested list returned by \code{\link{netPropsInternal}}.
+### @param test a vector of datasets to filter to.
+### @param discovery a vector containing a single discovery dataset specified in
+###   the parent plot function. 
+### @param modules a vector of modules from the specified \code{discovery} 
+###   dataset to filter to. If \code{NULL}, then all modules are kept.
+###   
+### @return 
+###  a nested list structure identical to that returned by 
+###  \code{'netPropsInternal'}, but where only the entries for test datasets
+###  specified by the \code{test} argument and modules specified by the 
+###  \code{modules} argument contain non-\code{NULL} entries.
+### 
+### @keywords internal
 filterInternalProps <- function(props, test, discovery, modules=NULL) {
   ii <- NULL; jj <- NULL; mi <- NULL # suppress CRAN note
   fProps <- foreach(ii = seq_along(props)) %do% {

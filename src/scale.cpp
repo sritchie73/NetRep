@@ -25,16 +25,16 @@ arma::mat Scale (double * dataAddr, unsigned int nSamples, unsigned int nNodes) 
   return scaled;
 }
 
-//' Scale data across all nodes
-//' 
-//' Each node is centered by its mean and scaled by it standard deviation.
-//' 
-//' @param data matrix to scale.
-//' 
-//' @return
-//'  A scaled data matrix.
-//'
-//' @keywords internal
+///' Scale data across all nodes
+///' 
+///' Each node is centered by its mean and scaled by it standard deviation.
+///' 
+///' @param data matrix to scale.
+///' 
+///' @return
+///'  A scaled data matrix.
+///'
+///' @keywords internal
 // [[Rcpp::export]]
 Rcpp::NumericMatrix Scale(Rcpp::NumericMatrix data) {
   arma::mat scaled = Scale(data.begin(), data.nrow(), data.ncol());

@@ -1,37 +1,37 @@
-#' Plot a symmetric heatmap as a triangle
-#' 
-#' @param values values to plot on the heatmap.
-#' @param palette color palette to interpolate over.
-#' @param vlim range of values to use when mapping values to the \code{palette}.
-#' @param mas ordered subset of the moduleAssignments vector.
-#' @param na.indices indices of missing values on the x axis.
-#' @param na.col color of missing values to plot.
-#' @param xaxt character vector of names to print along the x axis.
-#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
-#'  plotted along the x axis.
-#' @param main title for the plot.
-#' @param main.line the number of lines into the top margin at which the plot
-#'  title will be drawn.
-#' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
-#'  side of the plot.
-#' @param legend.main title for the legend.
-#' @param legend.main.line distance from the legend to render the legend 
-#'  title.
-#' @param xaxt.line the number of lines into the margin at which the x axis 
-#'  labels will be drawn.
-#' @param maxt.line the number of lines into the margin at which the module 
-#'  names will be drawn.
-#' @param laxt.tck size of the ticks on the axis legend as a proportion
-#'  of the horizontal size of the plot window.
-#' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{laxt.tck}.
-#' @param legend.line the distance from the left of the plot to render the 
-#'  legend as a proportion of the horizontal size of the plot window.
-#' @param lwd line width for borders.
-#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
-#'  drawn.
-#'
-#' @keywords internal
+### Plot a symmetric heatmap as a triangle
+### 
+### @param values values to plot on the heatmap.
+### @param palette color palette to interpolate over.
+### @param vlim range of values to use when mapping values to the \code{palette}.
+### @param mas ordered subset of the moduleAssignments vector.
+### @param na.indices indices of missing values on the x axis.
+### @param na.col color of missing values to plot.
+### @param xaxt character vector of names to print along the x axis.
+### @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+###  plotted along the x axis.
+### @param main title for the plot.
+### @param main.line the number of lines into the top margin at which the plot
+###  title will be drawn.
+### @param plotLegend logical; if \code{TRUE} a legend is added to the right 
+###  side of the plot.
+### @param legend.main title for the legend.
+### @param legend.main.line distance from the legend to render the legend 
+###  title.
+### @param xaxt.line the number of lines into the margin at which the x axis 
+###  labels will be drawn.
+### @param maxt.line the number of lines into the margin at which the module 
+###  names will be drawn.
+### @param laxt.tck size of the ticks on the axis legend as a proportion
+###  of the horizontal size of the plot window.
+### @param laxt.line the distance from the legend to render the legend axis 
+###  labels, as multiple of \code{laxt.tck}.
+### @param legend.line the distance from the left of the plot to render the 
+###  legend as a proportion of the horizontal size of the plot window.
+### @param lwd line width for borders.
+### @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+###  drawn.
+###
+### @keywords internal
 plotTriangleHeatmap <- function(
   values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
   plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.main="",
@@ -153,45 +153,45 @@ plotTriangleHeatmap <- function(
   }
 }
 
-#' Plot a square heatmap
-#' 
-#' @param values values to plot on the heatmap.
-#' @param palette color palette to interpolate over.
-#' @param vlim range of values to use when mapping values to the \code{palette}.
-#' @param mas ordered subset of the moduleAssignments vector.
-#' @param na.indices.x indices of missing values on the x axis.
-#' @param na.indices.y indices of missing values on the y axis.
-#' @param na.col color of missing values to plot.
-#' @param xaxt character vector of names to print along the x axis.
-#' @param yaxt character vector of names to print along the y axis.
-#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
-#'  plotted along the x axis if \code{values} is not symmetric, and along both
-#'  axes if \code{values} is symettric.
-#' @param main title for the plot.
-#' @param main.line the number of lines into the top margin at which the plot
-#'  title will be drawn.
-#' @param plotLegend logical; if \code{TRUE} a legend is added to the right 
-#'  side of the plot.
-#' @param legend.main title for the legend.
-#' @param legend.main.line distance from the legend to render the legend 
-#'  title.
-#' @param xaxt.line the number of lines into the margin at which the x axis 
-#'  labels will be drawn.
-#' @param yaxt.line the number of lines into the margin at which the y axis 
-#'  labels will be drawn.
-#' @param maxt.line the number of lines into the margin at which the module 
-#'  names will be drawn.
-#' @param laxt.tck size of the ticks on the axis legend as a proportion
-#'  of the horizontal size of the plot window.
-#' @param laxt.line the distance from the legend to render the legend axis 
-#'  labels, as multiple of \code{laxt.tck}.
-#' @param legend.line the distance from the plot to render the legend as a 
-#'  proportion of the horizontal size of the plot window.
-#' @param lwd line width for borders.
-#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
-#'  drawn.
-#'
-#' @keywords internal
+### Plot a square heatmap
+### 
+### @param values values to plot on the heatmap.
+### @param palette color palette to interpolate over.
+### @param vlim range of values to use when mapping values to the \code{palette}.
+### @param mas ordered subset of the moduleAssignments vector.
+### @param na.indices.x indices of missing values on the x axis.
+### @param na.indices.y indices of missing values on the y axis.
+### @param na.col color of missing values to plot.
+### @param xaxt character vector of names to print along the x axis.
+### @param yaxt character vector of names to print along the y axis.
+### @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+###  plotted along the x axis if \code{values} is not symmetric, and along both
+###  axes if \code{values} is symettric.
+### @param main title for the plot.
+### @param main.line the number of lines into the top margin at which the plot
+###  title will be drawn.
+### @param plotLegend logical; if \code{TRUE} a legend is added to the right 
+###  side of the plot.
+### @param legend.main title for the legend.
+### @param legend.main.line distance from the legend to render the legend 
+###  title.
+### @param xaxt.line the number of lines into the margin at which the x axis 
+###  labels will be drawn.
+### @param yaxt.line the number of lines into the margin at which the y axis 
+###  labels will be drawn.
+### @param maxt.line the number of lines into the margin at which the module 
+###  names will be drawn.
+### @param laxt.tck size of the ticks on the axis legend as a proportion
+###  of the horizontal size of the plot window.
+### @param laxt.line the distance from the legend to render the legend axis 
+###  labels, as multiple of \code{laxt.tck}.
+### @param legend.line the distance from the plot to render the legend as a 
+###  proportion of the horizontal size of the plot window.
+### @param lwd line width for borders.
+### @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+###  drawn.
+###
+### @keywords internal
 plotSquareHeatmap <- function(
   values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
@@ -323,28 +323,28 @@ plotSquareHeatmap <- function(
   }
 }
 
-#' Plot a color palette legend
-#' 
-#' Add a legend to a plot window.
-#' 
-#' @param palette color palette.
-#' @param legend.vlim limits of the values to display on the legend
-#' @param horizontal logical; if \code{TRUE} the legend is plotted horizontally,
-#'   otherwise vertically.
-#' @param main title of the legend.
-#' @param xlim xlim relative to the plotting region of the rest of the plot.
-#' @param ylim ylim relative to the plotting region of the rest of the plot.
-#' @param tck size of the legend axis ticks relative to the size of the 
-#'  plot window.
-#' @param axis.line distance from the axis to render the axis labels as a 
-#'  multiple of \code{tck}.
-#' @param legend.main.line distance from the plot to render the legend title.
-#' @param lwd line width for borders.
-#' @param srt angle of text labels
-#' 
-#' @import graphics
-#' @import grDevices
-#' @keywords internal
+### Plot a color palette legend
+### 
+### Add a legend to a plot window.
+### 
+### @param palette color palette.
+### @param legend.vlim limits of the values to display on the legend
+### @param horizontal logical; if \code{TRUE} the legend is plotted horizontally,
+###   otherwise vertically.
+### @param main title of the legend.
+### @param xlim xlim relative to the plotting region of the rest of the plot.
+### @param ylim ylim relative to the plotting region of the rest of the plot.
+### @param tck size of the legend axis ticks relative to the size of the 
+###  plot window.
+### @param axis.line distance from the axis to render the axis labels as a 
+###  multiple of \code{tck}.
+### @param legend.main.line distance from the plot to render the legend title.
+### @param lwd line width for borders.
+### @param srt angle of text labels
+### 
+### @import graphics
+### @import grDevices
+### @keywords internal
 addGradientLegend <- function(
   palette, legend.vlim, horizontal, main, xlim, ylim, 
   tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt
@@ -448,40 +448,40 @@ addGradientLegend <- function(
   )
 }
 
-#' Custom bar plot function
-#' 
-#' Plot bars around 0
-#' 
-#' @param heights heights of the bars.
-#' @param heights.lim limits of the height axis.
-#' @param mas ordered subset of the moduleAssignments vector
-#' @param cols colors of each bar.
-#' @param bar.width value between 0 and 1 controlling the proportion of space
-#'  taken by each bar.
-#' @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
-#' @param na.col color of missing values to plot.
-#' @param xaxt logical; If \code{TRUE}, the names of \code{heights} will be 
-#'  rendered underneath the bar chart
-#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
-#'  plotted along the x axis.
-#' @param main title for the plot.
-#' @param main.line the number of lines into the top margin at which the plot
-#'  title will be drawn.
-#' @param xaxt.line the number of lines into the margin at which the x axis 
-#'  labels will be drawn.
-#' @param yaxt.line the number of lines into the margin at which the y axis
-#'  tick labels will be drawn.
-#' @param yaxt.tck the size of the y-axis tick marks.
-#' @param maxt.line the number of lines into the margin at which the module 
-#'  names will be drawn.
-#' @param ylab label for the y axis
-#' @param ylab.line the number of lines into the left margin at which the 
-#'  y axis label will be drawn. 
-#' @param lwd line width for borders.
-#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
-#'  drawn.
-#'
-#' @keywords internal
+### Custom bar plot function
+### 
+### Plot bars around 0
+### 
+### @param heights heights of the bars.
+### @param heights.lim limits of the height axis.
+### @param mas ordered subset of the moduleAssignments vector
+### @param cols colors of each bar.
+### @param bar.width value between 0 and 1 controlling the proportion of space
+###  taken by each bar.
+### @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
+### @param na.col color of missing values to plot.
+### @param xaxt logical; If \code{TRUE}, the names of \code{heights} will be 
+###  rendered underneath the bar chart
+### @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+###  plotted along the x axis.
+### @param main title for the plot.
+### @param main.line the number of lines into the top margin at which the plot
+###  title will be drawn.
+### @param xaxt.line the number of lines into the margin at which the x axis 
+###  labels will be drawn.
+### @param yaxt.line the number of lines into the margin at which the y axis
+###  tick labels will be drawn.
+### @param yaxt.tck the size of the y-axis tick marks.
+### @param maxt.line the number of lines into the margin at which the module 
+###  names will be drawn.
+### @param ylab label for the y axis
+### @param ylab.line the number of lines into the left margin at which the 
+###  y axis label will be drawn. 
+### @param lwd line width for borders.
+### @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+###  drawn.
+###
+### @keywords internal
 plotBar <- function(
   heights, heights.lim, mas, cols, bar.width=1, drawBorders=FALSE, 
   na.col="#bdbdbd", xaxt=TRUE, plotModuleNames=TRUE, main="", main.line=0,
@@ -573,39 +573,39 @@ plotBar <- function(
   mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
 }
 
-#' Plot multiple horizontal bar plots
-#' 
-#' @param lengths a matrix whose columns contain the lengths of each bar for 
-#'  the given property (e.g. each column should be a module, or phenotype).
-#' @param lengths.lim a list of limits for the lengths axes.
-#' @param cols a matrix of colors for each bar.
-#' @param bar.width value between 0 and 1 controlling the proportion of space
-#'  taken by each bar.
-#' @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
-#' @param main title for the plot
-#' @param main.line the number of lines into the top margin at which the plot
-#'  title will be drawn.  
-#' @param na.col color of missing values to plot.
-#' @param yaxt logical; If \code{TRUE}, the rownames of \code{heights} will be 
-#'  rendered to the left of the bars.
-#' @param plotModuleNames logical; if \code{TRUE} the names of the modules are
-#'  plotted along the x axis.
-#' @param yaxt.line the number of lines into the margin at which the y axis 
-#'  labels will be drawn.
-#' @param maxt.line the number of lines into the margin at which the module 
-#'  labels will be drawn.
-#' @param xaxt.line the number of lines into the margin at which the x axis
-#'  labels will be drawn
-#' @param xaxt.tck the size of the x-axis ticks.
-#' @param xlab x axis label
-#' @param xlab.line the number of lines into the bottom margin at which the 
-#'  x axis label will be drawn. 
-#' @param cex.modules relative size of module names.
-#' @param lwd line width for borders.
-#' @param dryRun logical; if \code{TRUE} only the axes and borders will be 
-#'  drawn.
-#'
-#' @keywords internal
+### Plot multiple horizontal bar plots
+### 
+### @param lengths a matrix whose columns contain the lengths of each bar for 
+###  the given property (e.g. each column should be a module, or phenotype).
+### @param lengths.lim a list of limits for the lengths axes.
+### @param cols a matrix of colors for each bar.
+### @param bar.width value between 0 and 1 controlling the proportion of space
+###  taken by each bar.
+### @param drawBorders logical; if \code{TRUE} a border is drawn around each bar.
+### @param main title for the plot
+### @param main.line the number of lines into the top margin at which the plot
+###  title will be drawn.  
+### @param na.col color of missing values to plot.
+### @param yaxt logical; If \code{TRUE}, the rownames of \code{heights} will be 
+###  rendered to the left of the bars.
+### @param plotModuleNames logical; if \code{TRUE} the names of the modules are
+###  plotted along the x axis.
+### @param yaxt.line the number of lines into the margin at which the y axis 
+###  labels will be drawn.
+### @param maxt.line the number of lines into the margin at which the module 
+###  labels will be drawn.
+### @param xaxt.line the number of lines into the margin at which the x axis
+###  labels will be drawn
+### @param xaxt.tck the size of the x-axis ticks.
+### @param xlab x axis label
+### @param xlab.line the number of lines into the bottom margin at which the 
+###  x axis label will be drawn. 
+### @param cex.modules relative size of module names.
+### @param lwd line width for borders.
+### @param dryRun logical; if \code{TRUE} only the axes and borders will be 
+###  drawn.
+###
+### @keywords internal
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="", 
   main.line=1, na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, 

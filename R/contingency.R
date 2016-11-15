@@ -1,21 +1,21 @@
-#' Calculate a contigency table of module overlap between datasets
-#' 
-#' @param modAssignments a list where the first element is the 
-#'  'moduleAssignments' vector in the discovery dataset, and the second element
-#'  is the 'moduleAssignments vector in the test dataset.
-#' @param mods the 'modules' vector for the discovery dataset.
-#' @param tiNodelist a vector of node IDs in the test dataset.
-#' 
-#' @return 
-#'  A list containing a contigency table, a vector of the proportion of
-#'  nodes present in the test dataset for each module, a vector containing
-#'  the number of nodes present in the test dataset for each module, a vector
-#'  of the node names present in both the discovery and test datasets, a vector
-#'  of modules that are both requested and have nodes present in the test 
-#'  dataset, and the \code{modAssignments} vector containing only nodes present
-#'  in the test dataset.
-#' 
-#' @keywords internal
+### Calculate a contigency table of module overlap between datasets
+### 
+### @param modAssignments a list where the first element is the 
+###  'moduleAssignments' vector in the discovery dataset, and the second element
+###  is the 'moduleAssignments vector in the test dataset.
+### @param mods the 'modules' vector for the discovery dataset.
+### @param tiNodelist a vector of node IDs in the test dataset.
+### 
+### @return 
+###  A list containing a contigency table, a vector of the proportion of
+###  nodes present in the test dataset for each module, a vector containing
+###  the number of nodes present in the test dataset for each module, a vector
+###  of the node names present in both the discovery and test datasets, a vector
+###  of modules that are both requested and have nodes present in the test 
+###  dataset, and the \code{modAssignments} vector containing only nodes present
+###  in the test dataset.
+### 
+### @keywords internal
 contingencyTable <- function(modAssignments, mods, tiNodelist) {
   # To simplify later function calls, we need to get a vector of module
   # assignments only for (a) modules of interest and (b) the variables

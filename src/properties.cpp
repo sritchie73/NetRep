@@ -2,41 +2,41 @@
 #include "netStats.h"
 #include "scale.h"
 
-//' Calculate the network properties 
-//' 
-//' @details
-//' \subsection{Input expectations:}{
-//'   Note that this function expects all inputs to be sensible, as checked by
-//'   the R function 'checkUserInput' and processed by 'networkProperties'. 
-//'   
-//'   These requirements are:
-//'   \itemize{
-//'   \item{The ordering of node names across 'data' and 'net' is consistent.}
-//'   \item{The columns of 'data' are the nodes.}
-//'   \item{'net' is a square matrix, and its rownames are identical to its 
-//'         column names.}
-//'   \item{'moduleAssigments' is a named character vector, where the names
-//'         represent node labels found in the discovery dataset. Unlike 
-//'         'PermutationProcedure', these may include nodes that are not 
-//'         present in 'data' and 'net'.}
-//'   \item{The module labels specified in 'modules' must occur in 
-//'         'moduleAssignments'.}
-//'   }
-//' }
-//' 
-//' @param data data matrix from the dataset in which to calculate the network
-//'   properties.
-//' @param net adjacency matrix of network edge weights between all pairs of 
-//'   nodes in the dataset in which to calculate the network properties.
-//' @param moduleAssignments a named character vector containing the module 
-//'   each node belongs to in the discovery dataset. 
-//' @param modules a character vector of modules for which to calculate the 
-//'   network properties for.
-//' 
-//' @return a list containing the summary profile, node contribution, module
-//'   coherence, weighted degree, and average edge weight for each 'module'.
-//'   
-//' @keywords internal
+///' Calculate the network properties 
+///' 
+///' @details
+///' \subsection{Input expectations:}{
+///'   Note that this function expects all inputs to be sensible, as checked by
+///'   the R function 'checkUserInput' and processed by 'networkProperties'. 
+///'   
+///'   These requirements are:
+///'   \itemize{
+///'   \item{The ordering of node names across 'data' and 'net' is consistent.}
+///'   \item{The columns of 'data' are the nodes.}
+///'   \item{'net' is a square matrix, and its rownames are identical to its 
+///'         column names.}
+///'   \item{'moduleAssigments' is a named character vector, where the names
+///'         represent node labels found in the discovery dataset. Unlike 
+///'         'PermutationProcedure', these may include nodes that are not 
+///'         present in 'data' and 'net'.}
+///'   \item{The module labels specified in 'modules' must occur in 
+///'         'moduleAssignments'.}
+///'   }
+///' }
+///' 
+///' @param data data matrix from the dataset in which to calculate the network
+///'   properties.
+///' @param net adjacency matrix of network edge weights between all pairs of 
+///'   nodes in the dataset in which to calculate the network properties.
+///' @param moduleAssignments a named character vector containing the module 
+///'   each node belongs to in the discovery dataset. 
+///' @param modules a character vector of modules for which to calculate the 
+///'   network properties for.
+///' 
+///' @return a list containing the summary profile, node contribution, module
+///'   coherence, weighted degree, and average edge weight for each 'module'.
+///'   
+///' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List NetProps (
     Rcpp::NumericMatrix data, Rcpp::NumericMatrix net, 
@@ -155,37 +155,37 @@ Rcpp::List NetProps (
   return(results);
 }
 
-//' Calculate the network properties, data matrix not provided
-//' 
-//' @details
-//' \subsection{Input expectations:}{
-//'   Note that this function expects all inputs to be sensible, as checked by
-//'   the R function 'checkUserInput' and processed by 'networkProperties'. 
-//'   
-//'   These requirements are:
-//'   \itemize{
-//'   \item{'net' is a square matrix, and its rownames are identical to its 
-//'         column names.}
-//'   \item{'moduleAssigments' is a named character vector, where the names
-//'         represent node labels found in the discovery dataset. Unlike 
-//'         'PermutationProcedure', these may include nodes that are not 
-//'         present in 'data' and 'net'.}
-//'   \item{The module labels specified in 'modules' must occur in 
-//'         'moduleAssignments'.}
-//'   }
-//' }
-//' 
-//' @param net adjacency matrix of network edge weights between all pairs of 
-//'   nodes in the dataset in which to calculate the network properties.
-//' @param moduleAssignments a named character vector containing the module 
-//'   each node belongs to in the discovery dataset. 
-//' @param modules a character vector of modules for which to calculate the 
-//'   network properties for.
-//' 
-//' @return a list containing the summary profile, node contribution, module
-//'   coherence, weighted degree, and average edge weight for each 'module'.
-//'   
-//' @keywords internal
+///' Calculate the network properties, data matrix not provided
+///' 
+///' @details
+///' \subsection{Input expectations:}{
+///'   Note that this function expects all inputs to be sensible, as checked by
+///'   the R function 'checkUserInput' and processed by 'networkProperties'. 
+///'   
+///'   These requirements are:
+///'   \itemize{
+///'   \item{'net' is a square matrix, and its rownames are identical to its 
+///'         column names.}
+///'   \item{'moduleAssigments' is a named character vector, where the names
+///'         represent node labels found in the discovery dataset. Unlike 
+///'         'PermutationProcedure', these may include nodes that are not 
+///'         present in 'data' and 'net'.}
+///'   \item{The module labels specified in 'modules' must occur in 
+///'         'moduleAssignments'.}
+///'   }
+///' }
+///' 
+///' @param net adjacency matrix of network edge weights between all pairs of 
+///'   nodes in the dataset in which to calculate the network properties.
+///' @param moduleAssignments a named character vector containing the module 
+///'   each node belongs to in the discovery dataset. 
+///' @param modules a character vector of modules for which to calculate the 
+///'   network properties for.
+///' 
+///' @return a list containing the summary profile, node contribution, module
+///'   coherence, weighted degree, and average edge weight for each 'module'.
+///'   
+///' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List NetPropsNoData (
     Rcpp::NumericMatrix net, 

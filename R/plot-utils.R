@@ -1,18 +1,18 @@
-#' Map a variable to a color gradient
-#'
-#' For a color gradient mapped onto a scale of values (\code{vlim}), retrieve
-#' the color for any given \code{value}
-#'
-#' @param values a vector of values to retrieve the colors for.
-#' @param palette a vector of colors
-#' @param vlim limits of the values
-#'
-#' @return
-#'  The color for a given value.
-#'  
-#' @import utils
-#' 
-#' @keywords internal
+### Map a variable to a color gradient
+###
+### For a color gradient mapped onto a scale of values (\code{vlim}), retrieve
+### the color for any given \code{value}
+###
+### @param values a vector of values to retrieve the colors for.
+### @param palette a vector of colors
+### @param vlim limits of the values
+###
+### @return
+###  The color for a given value.
+###  
+### @import utils
+### 
+### @keywords internal
 getColFromPalette <- function(values, palette, vlim) {
   if (missing(vlim)) {
     vlim <- range(values)
@@ -30,35 +30,35 @@ getColFromPalette <- function(values, palette, vlim) {
   })
 }
 
-#' Get the plot limits to set for the desired plot window
-#'
-#' \code{plot} manually adds an extra region to the plot on top of the given
-#' 'xlim' and 'ylim', amounting to 4% of the plot region in either direction.
-#' This function tells you what limits to set so that the boundaries of the plot
-#' are precisely the min and max you want.
-#'
-#' @param dlim the limits you want to set
-#' @return
-#'  the min and max to set for the desired plot limits
-#'
-#' @keywords internal
+### Get the plot limits to set for the desired plot window
+###
+### \code{plot} manually adds an extra region to the plot on top of the given
+### 'xlim' and 'ylim', amounting to 4% of the plot region in either direction.
+### This function tells you what limits to set so that the boundaries of the plot
+### are precisely the min and max you want.
+###
+### @param dlim the limits you want to set
+### @return
+###  the min and max to set for the desired plot limits
+###
+### @keywords internal
 forceLim <- function(dlim) {
   A = matrix(c(1.04, -0.04, -0.04, 1.04), nrow=2, ncol=2)
   B = matrix(dlim, nrow=2, ncol=1)
   as.vector(solve(A, B))
 }
 
-#' Create an empty plot window with the specified limits
-#'
-#' @param ... extra arguments to pass to \code{\link[graphics]{plot}}.
-#' @param xlim limits for the x axis.
-#' @param ylim limits for the y axis.
-#' @param xlab label for the x axis.
-#' @param ylab label for the y axis.
-#' @param hardlim logical; if \code{TRUE}, the plot window is exactly
-#'  constrained to the specified \code{xlim} and \code{ylim}.
-#'
-#' @keywords internal
+### Create an empty plot window with the specified limits
+###
+### @param ... extra arguments to pass to \code{\link[graphics]{plot}}.
+### @param xlim limits for the x axis.
+### @param ylim limits for the y axis.
+### @param xlab label for the x axis.
+### @param ylab label for the y axis.
+### @param hardlim logical; if \code{TRUE}, the plot window is exactly
+###  constrained to the specified \code{xlim} and \code{ylim}.
+###
+### @keywords internal
 emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
   if (!missing(xlim) && !missing(ylim)) {
     if(hardlim) {
@@ -90,36 +90,36 @@ emptyPlot <- function(..., xlim, ylim, xlab="", ylab="", hardlim=TRUE) {
   }
 }
 
-#' Color palette for correlation heatmaps
-#'
-#' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
-#' This gives a nicer contrast than the "RdBu" palette
-#' 
-#' @import RColorBrewer
-#' @keywords internal
+### Color palette for correlation heatmaps
+###
+### RColorBrewer palette "RdYlBu" with the middle color replaced with white.
+### This gives a nicer contrast than the "RdBu" palette
+### 
+### @import RColorBrewer
+### @keywords internal
 correlation.palette <- function() {
   cols <- rev(brewer.pal(11, "RdYlBu"))
   cols[6] <- "#FFFFFF"
   cols
 }
 
-#' Color palette for network heatmaps
-#'
-#' RColorBrewer palette "RdYlBu" with the middle color replaced with white.
-#' 
-#' @keywords internal
+### Color palette for network heatmaps
+###
+### RColorBrewer palette "RdYlBu" with the middle color replaced with white.
+### 
+### @keywords internal
 network.palette <- function() {
   correlation.palette()[6:11]
 }
 
-#' Get module break points on the x-axis
-#'
-#' @param mas ordered subset of the moduleAssignments vector
-#'
-#' @return
-#'  a vector of positions on the x-axis where one module begins and another ends
-#'  
-#' @keywords internal
+### Get module break points on the x-axis
+###
+### @param mas ordered subset of the moduleAssignments vector
+###
+### @return
+###  a vector of positions on the x-axis where one module begins and another ends
+###  
+### @keywords internal
 getModuleBreaks <- function(mas) {
   sizes <- rle(mas)
   breaks = numeric(length(sizes$lengths) + 1)
@@ -130,14 +130,14 @@ getModuleBreaks <- function(mas) {
   breaks
 }
 
-#' Get module mid-points on the x-axis
-#'
-#' @param mas ordered subset of the moduleAssignments vector
-#'
-#' @return
-#'  a vector of positions on the x-axis indicating the centre of a module
-#'  
-#' @keywords internal
+### Get module mid-points on the x-axis
+###
+### @param mas ordered subset of the moduleAssignments vector
+###
+### @return
+###  a vector of positions on the x-axis indicating the centre of a module
+###  
+### @keywords internal
 getModuleMidPoints <- function(mas) {
   breaks <- getModuleBreaks(mas)
   mids <- numeric(length(breaks) - 1)
@@ -147,39 +147,39 @@ getModuleMidPoints <- function(mas) {
   mids
 }
 
-#' Check if a character vector of colors is valid
-#' 
-#' Courtesy of Josh O'Brien's stackoverflow answer at
-#' \url{http://stackoverflow.com/a/13290832/2341679}
-#' 
-#' @param colvec a character vectors of colors (hex or name) to validate.
-#' 
-#' @keywords internal
+### Check if a character vector of colors is valid
+### 
+### Courtesy of Josh O'Brien's stackoverflow answer at
+### \url{http://stackoverflow.com/a/13290832/2341679}
+### 
+### @param colvec a character vectors of colors (hex or name) to validate.
+### 
+### @keywords internal
 areColors <- function(colvec) {
   sapply(colvec, function(col) {
     tryCatch(is.matrix(col2rgb(col)), error = function(e) FALSE)
   })
 }
 
-#' Get the network properties and order for a plot
-#'
-#' @param network list returned by \code{'processInput'}.
-#' @param data data returned by \code{'processInput'}.
-#' @param moduleAssignments list returned by \code{'processInput'}.
-#' @param modules vector of modules to show on the plot.
-#' @param di name of the discovery dataset.
-#' @param ti name of the test dataset.
-#' @param orderNodesBy vector returned by \code{'processInput'}.
-#' @param orderSamplesBy vector returned by \code{'processInput'}.
-#' @param orderModules vector returned by \code{'checkPlotArgs'}.
-#' @param datasetNames vector returned by \code{'processInput'}.
-#' @param nDatasets vector returned by \code{'processInput'}.
-#' @param verbose logical; turn on verbose printing.
-#' @param loadedIdx index of the currently loaded dataset.
-#' @param dataLoaded currently loaded data matrix (may be NULL).
-#' @param networkLoaded currently loaded network matrix.
-#'
-#' @keywords internal
+### Get the network properties and order for a plot
+###
+### @param network list returned by \code{'processInput'}.
+### @param data data returned by \code{'processInput'}.
+### @param moduleAssignments list returned by \code{'processInput'}.
+### @param modules vector of modules to show on the plot.
+### @param di name of the discovery dataset.
+### @param ti name of the test dataset.
+### @param orderNodesBy vector returned by \code{'processInput'}.
+### @param orderSamplesBy vector returned by \code{'processInput'}.
+### @param orderModules vector returned by \code{'checkPlotArgs'}.
+### @param datasetNames vector returned by \code{'processInput'}.
+### @param nDatasets vector returned by \code{'processInput'}.
+### @param verbose logical; turn on verbose printing.
+### @param loadedIdx index of the currently loaded dataset.
+### @param dataLoaded currently loaded data matrix (may be NULL).
+### @param networkLoaded currently loaded network matrix.
+###
+### @keywords internal
 plotProps <- function(
   network, data, moduleAssignments, modules, di, ti, orderNodesBy, 
   orderSamplesBy, orderModules, datasetNames, nDatasets, verbose, loadedIdx, 

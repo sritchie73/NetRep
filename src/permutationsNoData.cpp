@@ -88,54 +88,54 @@ void calculateNulls(
   }
 }
 
-//' Multithreaded permutation procedure for module preservation statistics
-//' 
-//' @details
-//' \subsection{Input expectations:}{
-//'   Note that this function expects all inputs to be sensible, as checked by
-//'   the R function 'checkUserInput' and processed by 'modulePreservation'. 
-//'   
-//'   These requirements are:
-//'   \itemize{
-//'   \item{The ordering of node names across 'tCorr' and 'tNet' is consistent.}
-//'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
-//'         identical to their column names.}
-//'   \item{'moduleAssigments' is a named character vector, where the names
-//'         represent node labels found in the discovery dataset (e.g. 'dNet').}
-//'   \item{'nPermutations' is a single number, greater than 0.}
-//'   \item{'nCores' is a single number, greater than 0. Note, this number must
-//'         not be larger than the number of cores on your machine, or the 
-//'         number of cores allocated to your job!}
-//'   \item{'nullHypothesis' must be a character vector of length 1, containing
-//'         either "overlap" or "all".}
-//'   \item{'verbose' must be a logical vector of length 1 containing either 
-//'         'TRUE' or 'FALSE'.}
-//'   \item{'vCat' must be the function NetRep:::vCat.}
-//'   }
-//' }
-//' 
-//' @param discProps a list of intermediate properties calculated in the 
-//'   discovery dataset by \code{\link{IntermediatePropertiesNoData}}.
-//' @param tCorr matrix of correlation coefficients between all pairs of 
-//'   variables/nodes in the \emph{test} dataset.
-//' @param tNet adjacency matrix of network edge weights between all pairs of 
-//'   nodes in the \emph{test} dataset.
-//' @param moduleAssignments a named character vector containing the module 
-//'   each node belongs to in the discovery dataset. 
-//' @param modules a character vector of modules for which to calculate the 
-//'   module preservation statistics.
-//' @param nPermutations the number of permutations from which to generate the
-//'   null distributions for each statistic.
-//' @param nCores the number of cores that the permutation procedure may use.
-//' @param nullHypothesis either "overlap" or "all".
-//' @param verbose if 'true', then progress messages are printed.
-//' @param vCat the vCat function must be passed in so that it can be called 
-//'  for output logging. 
-//' 
-//' @return a list containing a matrix of observed test statistics, and an
-//'   array of null distribution observations.
-//'   
-//' @keywords internal
+///' Multithreaded permutation procedure for module preservation statistics
+///' 
+///' @details
+///' \subsection{Input expectations:}{
+///'   Note that this function expects all inputs to be sensible, as checked by
+///'   the R function 'checkUserInput' and processed by 'modulePreservation'. 
+///'   
+///'   These requirements are:
+///'   \itemize{
+///'   \item{The ordering of node names across 'tCorr' and 'tNet' is consistent.}
+///'   \item{'tCorr' and 'tNet' are square matrices, and their rownames are 
+///'         identical to their column names.}
+///'   \item{'moduleAssigments' is a named character vector, where the names
+///'         represent node labels found in the discovery dataset (e.g. 'dNet').}
+///'   \item{'nPermutations' is a single number, greater than 0.}
+///'   \item{'nCores' is a single number, greater than 0. Note, this number must
+///'         not be larger than the number of cores on your machine, or the 
+///'         number of cores allocated to your job!}
+///'   \item{'nullHypothesis' must be a character vector of length 1, containing
+///'         either "overlap" or "all".}
+///'   \item{'verbose' must be a logical vector of length 1 containing either 
+///'         'TRUE' or 'FALSE'.}
+///'   \item{'vCat' must be the function NetRep:::vCat.}
+///'   }
+///' }
+///' 
+///' @param discProps a list of intermediate properties calculated in the 
+///'   discovery dataset by \code{\link{IntermediatePropertiesNoData}}.
+///' @param tCorr matrix of correlation coefficients between all pairs of 
+///'   variables/nodes in the \emph{test} dataset.
+///' @param tNet adjacency matrix of network edge weights between all pairs of 
+///'   nodes in the \emph{test} dataset.
+///' @param moduleAssignments a named character vector containing the module 
+///'   each node belongs to in the discovery dataset. 
+///' @param modules a character vector of modules for which to calculate the 
+///'   module preservation statistics.
+///' @param nPermutations the number of permutations from which to generate the
+///'   null distributions for each statistic.
+///' @param nCores the number of cores that the permutation procedure may use.
+///' @param nullHypothesis either "overlap" or "all".
+///' @param verbose if 'true', then progress messages are printed.
+///' @param vCat the vCat function must be passed in so that it can be called 
+///'  for output logging. 
+///' 
+///' @return a list containing a matrix of observed test statistics, and an
+///'   array of null distribution observations.
+///'   
+///' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List PermutationProcedureNoData (
     Rcpp::List discProps, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, 

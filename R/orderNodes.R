@@ -240,22 +240,22 @@ nodeOrder <- function(
   return(res)
 }
 
-#' Internal use function for calculating node order
-#' 
-#' Used by plotting functions: assumes user input has been sanitised already
-#' 
-#' @param props network properties to calculate order from.
-#' @param orderModules logical; are we ordering the modules by similarity?
-#' @param simplify logical; are we simplifying the output?
-#' @param verbose logical; is verbose printing turned on?
-#' @param na.rm logical; remove missing nodes?
-#' @param mean logical; should the node order be calculated by averaging across
-#'  test datasets?
-#' 
-#' @return list structure of ordered nodes.
-#' 
-#' @import stats
-#' @keywords internal
+### Internal use function for calculating node order
+### 
+### Used by plotting functions: assumes user input has been sanitised already
+### 
+### @param props network properties to calculate order from.
+### @param orderModules logical; are we ordering the modules by similarity?
+### @param simplify logical; are we simplifying the output?
+### @param verbose logical; is verbose printing turned on?
+### @param na.rm logical; remove missing nodes?
+### @param mean logical; should the node order be calculated by averaging across
+###  test datasets?
+### 
+### @return list structure of ordered nodes.
+### 
+### @import stats
+### @keywords internal
 nodeOrderInternal <- function(
   props, orderModules, simplify, verbose, na.rm, mean
 ) {

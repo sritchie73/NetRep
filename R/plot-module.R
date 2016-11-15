@@ -323,6 +323,10 @@
 #' )
 #' 
 #' @name plotModule
+#' 
+#' @import RColorBrewer
+#' @import grDevices
+#' @import graphics
 #' @export
 plotModule <- function(
   network, data, correlation, moduleAssignments=NULL, modules=NULL,

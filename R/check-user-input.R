@@ -1,31 +1,31 @@
-#' Process, check, and format input
-#' 
-#' Checks user input for consistency, errors, and unifies the data structures.
-#' 
-#' @param discovery user input for the 'discovery' argument.
-#' @param test user input for the 'test' argument.
-#' @param network user input for the 'network' argument.
-#' @param correlation user input for the 'correlation' argument.
-#' @param data user input for the 'data' argument.
-#' @param moduleAssignments user input for the 'moduleAssignments' argument.
-#' @param modules user input for the 'modules' argument.
-#' @param backgroundLabel user input for the 'backgroundLabel' argument.
-#' @param verbose logical; should progress be reported? Default is \code{TRUE}.
-#' @param funcType one of "preservation", "properties" or "plot".
-#' @param orderNodesBy user input for the 'orderNodesBy' argument in the 
-#'  plotting functions.
-#' @param orderSamplesBy user input for the 'orderSamplesBy' argument in the 
-#'  plotting functions.
-#' @param orderModules user input for the 'orderModules' argument in the 
-#'  plotting functions.
-#' 
-#' @seealso
-#' \code{\link{modulePreservation}}
-#' \code{\link{plotModule}}, and
-#' \code{\link{plotTopology}}
-#' 
-#' @return a list of containing the formatted user input
-#' @keywords internal
+### Process, check, and format input
+### 
+### Checks user input for consistency, errors, and unifies the data structures.
+### 
+### @param discovery user input for the 'discovery' argument.
+### @param test user input for the 'test' argument.
+### @param network user input for the 'network' argument.
+### @param correlation user input for the 'correlation' argument.
+### @param data user input for the 'data' argument.
+### @param moduleAssignments user input for the 'moduleAssignments' argument.
+### @param modules user input for the 'modules' argument.
+### @param backgroundLabel user input for the 'backgroundLabel' argument.
+### @param verbose logical; should progress be reported? Default is \code{TRUE}.
+### @param funcType one of "preservation", "properties" or "plot".
+### @param orderNodesBy user input for the 'orderNodesBy' argument in the 
+###  plotting functions.
+### @param orderSamplesBy user input for the 'orderSamplesBy' argument in the 
+###  plotting functions.
+### @param orderModules user input for the 'orderModules' argument in the 
+###  plotting functions.
+### 
+### @seealso
+### \code{\link{modulePreservation}}
+### \code{\link{plotModule}}, and
+### \code{\link{plotTopology}}
+### 
+### @return a list of containing the formatted user input
+### @keywords internal
 processInput <- function(
   discovery, test, network, correlation, data, moduleAssignments, modules, 
   backgroundLabel, verbose, funcType, orderNodesBy=NA, 
@@ -812,17 +812,17 @@ processInput <- function(
   ))
 }
 
-#' Verify a 'list' input ordering
-#' 
-#' Check and order an input list: 
-#' 
-#' @param tocheck list of data to check.
-#' @param errname name to print in error messages.
-#' @param dataNames names of the datasets.
-#' @param nDatasets number of datasets.
-#' 
-#' @return ordered 'tocheck' by dataset.
-#' @keywords internal
+### Verify a 'list' input ordering
+### 
+### Check and order an input list: 
+### 
+### @param tocheck list of data to check.
+### @param errname name to print in error messages.
+### @param dataNames names of the datasets.
+### @param nDatasets number of datasets.
+### 
+### @return ordered 'tocheck' by dataset.
+### @keywords internal
 verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   # Check that we can match 'discovery' and 'test' to the provided matrices
   if(!is.null(dataNames) && is.null(names(tocheck))) {
@@ -841,62 +841,62 @@ verifyDatasetOrder <- function(tocheck, errname, dataNames, nDatasets) {
   return(tocheck)
 }
 
-#' Check whether an object is a 'matrix' or a 'disk.matrix'
-#' 
-#' @param object object to check.
-#' 
-#' @return 
-#'   throws an error or returns silently
-#'
-#' @keywords internal
+### Check whether an object is a 'matrix' or a 'disk.matrix'
+### 
+### @param object object to check.
+### 
+### @return 
+###   throws an error or returns silently
+###
+### @keywords internal
 checkIsMatrix <- function(object) {
   if (!is.null(object) && !is.matrix(object) && !is.disk.matrix(object)) { 
     stop('Input data must be a "matrix" or "disk.matrix"')
   }
 }
   
-#' Validate plot function arguments
-#' 
-#' Simple typechecking for the extensive plot arguments
-#' 
-#' @param orderModules user input for the corresponding argument in the plot functions.
-#' @param plotNodeNames user input for the corresponding argument in the plot functions.
-#' @param plotSampleNames user input for the corresponding argument in the plot functions.
-#' @param plotModuleNames user input for the corresponding argument in the plot functions.
-#' @param main user input for the corresponding argument in the plot functions.
-#' @param drawBorders user input for the corresponding argument in the plot functions.
-#' @param lwd user input for the corresponding argument in the plot functions.
-#' @param naxt.line user input for the corresponding argument in the plot functions.
-#' @param saxt.line user input for the corresponding argument in the plot functions.
-#' @param maxt.line user input for the corresponding argument in the plot functions.
-#' @param xaxt.line user input for the corresponding argument in the plot functions.
-#' @param yaxt.line user input for the corresponding argument in the plot functions.
-#' @param laxt.line user input for the corresponding argument in the plot functions.
-#' @param xlab.line user input for the corresponding argument in the plot functions.
-#' @param ylab.line user input for the corresponding argument in the plot functions.
-#' @param main.line user input for the corresponding argument in the plot functions.
-#' @param xaxt.tck user input for the corresponding argument in the plot functions.
-#' @param yaxt.tck user input for the corresponding argument in the plot functions.
-#' @param laxt.tck user input for the corresponding argument in the plot functions.
-#' @param plotLegend user input for the corresponding argument in the plot functions.
-#' @param legend.position user input for the corresponding argument in the plot functions.
-#' @param legend.main user input for the corresponding argument in the plot functions.
-#' @param legend.main.line input for the corresponding argument in the plot functions.
-#' @param symmetric user input for the corresponding argument in the plot functions.
-#' @param horizontal user input for the corresponding argument in the plot functions.
-#' @param dataCols user input for the corresponding argument in the plot functions.
-#' @param dataRange user input for the corresponding argument in the plot functions.
-#' @param corCols user input for the corresponding argument in the plot functions.
-#' @param corRange user input for the corresponding argument in the plot functions.
-#' @param netCols user input for the corresponding argument in the plot functions.
-#' @param netRange user input for the corresponding argument in the plot functions.
-#' @param degreeCol user input for the corresponding argument in the plot functions.
-#' @param contribCols user input for the corresponding argument in the plot functions.
-#' @param summaryCols user input for the corresponding argument in the plot functions.
-#' @param naCol user input for the corresponding argument in the plot functions.
-#' @param dryRun user input for the corresponding argument in the plot functions.
-#'
-#' @keywords internal
+### Validate plot function arguments
+### 
+### Simple typechecking for the extensive plot arguments
+### 
+### @param orderModules user input for the corresponding argument in the plot functions.
+### @param plotNodeNames user input for the corresponding argument in the plot functions.
+### @param plotSampleNames user input for the corresponding argument in the plot functions.
+### @param plotModuleNames user input for the corresponding argument in the plot functions.
+### @param main user input for the corresponding argument in the plot functions.
+### @param drawBorders user input for the corresponding argument in the plot functions.
+### @param lwd user input for the corresponding argument in the plot functions.
+### @param naxt.line user input for the corresponding argument in the plot functions.
+### @param saxt.line user input for the corresponding argument in the plot functions.
+### @param maxt.line user input for the corresponding argument in the plot functions.
+### @param xaxt.line user input for the corresponding argument in the plot functions.
+### @param yaxt.line user input for the corresponding argument in the plot functions.
+### @param laxt.line user input for the corresponding argument in the plot functions.
+### @param xlab.line user input for the corresponding argument in the plot functions.
+### @param ylab.line user input for the corresponding argument in the plot functions.
+### @param main.line user input for the corresponding argument in the plot functions.
+### @param xaxt.tck user input for the corresponding argument in the plot functions.
+### @param yaxt.tck user input for the corresponding argument in the plot functions.
+### @param laxt.tck user input for the corresponding argument in the plot functions.
+### @param plotLegend user input for the corresponding argument in the plot functions.
+### @param legend.position user input for the corresponding argument in the plot functions.
+### @param legend.main user input for the corresponding argument in the plot functions.
+### @param legend.main.line input for the corresponding argument in the plot functions.
+### @param symmetric user input for the corresponding argument in the plot functions.
+### @param horizontal user input for the corresponding argument in the plot functions.
+### @param dataCols user input for the corresponding argument in the plot functions.
+### @param dataRange user input for the corresponding argument in the plot functions.
+### @param corCols user input for the corresponding argument in the plot functions.
+### @param corRange user input for the corresponding argument in the plot functions.
+### @param netCols user input for the corresponding argument in the plot functions.
+### @param netRange user input for the corresponding argument in the plot functions.
+### @param degreeCol user input for the corresponding argument in the plot functions.
+### @param contribCols user input for the corresponding argument in the plot functions.
+### @param summaryCols user input for the corresponding argument in the plot functions.
+### @param naCol user input for the corresponding argument in the plot functions.
+### @param dryRun user input for the corresponding argument in the plot functions.
+###
+### @keywords internal
 checkPlotArgs <- function(
   orderModules, plotNodeNames, plotSampleNames, plotModuleNames, main,
   drawBorders, lwd, naxt.line, saxt.line, maxt.line, xaxt.line, 

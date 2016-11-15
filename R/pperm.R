@@ -72,6 +72,7 @@
 #' 
 #' @aliases permutation permuted
 #' @name permutationTest
+#' @importFrom statmod permp
 #' @export
 permutationTest <- function(
   nulls, observed, nVarsPresent, totalSize, alternative="greater"
@@ -168,25 +169,25 @@ permutationTest <- function(
   return(p.values)
 }
 
-#' Exact permutation p-values wrapper
-#' 
-#' Wrapper for \code{\link[statmod]{permp}} from the 
-#' \code{\link[statmod]{statmod}} library, which can crash if FORTRAN 
-#' libraries are not properly linked.
-#' 
-#' @details
-#' In the case \code{\link[statmod]{permp}} fails, the wrapper will fall back 
-#' to a slightly more conservative biased estimator: (1+x)/(1+nPerm).
-#' 
-#' @param x number of permutations that yielded test statistics at least as 
-#'  extreme as the observed data. May be a vector or an array of values. 
-#' @param nperm total number of permutations performed.
-#' @param ... other arguments to pass to\code{\link[statmod]{permp}}.
-#' @return 
-#'  vector or array of p-values, of same dimensions as \code{x}.
-#'  
-#' @importFrom statmod permp
-#' @keywords internal
+### Exact permutation p-values wrapper
+### 
+### Wrapper for \code{\link[statmod]{permp}} from the 
+### \code{\link[statmod]{statmod}} library, which can crash if FORTRAN 
+### libraries are not properly linked.
+### 
+### @details
+### In the case \code{\link[statmod]{permp}} fails, the wrapper will fall back 
+### to a slightly more conservative biased estimator: (1+x)/(1+nPerm).
+### 
+### @param x number of permutations that yielded test statistics at least as 
+###  extreme as the observed data. May be a vector or an array of values. 
+### @param nperm total number of permutations performed.
+### @param ... other arguments to pass to\code{\link[statmod]{permp}}.
+### @return 
+###  vector or array of p-values, of same dimensions as \code{x}.
+###  
+### @importFrom statmod permp
+### @keywords internal
 permp <- function(x, nperm, ...) {
   tryCatch({
     return(statmod::permp(x, nperm, ...))
