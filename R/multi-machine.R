@@ -42,6 +42,7 @@
 #' combined <- combineAnalyses(pres1, pres2)
 #' 
 #' @importFrom abind abind
+#' @keywords internal
 #' @export
 combineAnalyses <- function(pres1, pres2) {
   msg <- "module preservation analyses differ between 'pres1' and 'pres2'"

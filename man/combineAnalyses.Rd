@@ -50,4 +50,5 @@ pres2 <- modulePreservation(
 combined <- combineAnalyses(pres1, pres2)
 
 }
+\keyword{internal}
 

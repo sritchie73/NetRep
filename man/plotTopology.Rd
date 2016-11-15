@@ -589,4 +589,5 @@ plotSummary(
 \code{\link{plotModule}} for a combined plot showing all topological 
 properties for a network module.
 }
+\keyword{internal}
 

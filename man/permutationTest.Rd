@@ -4,13 +4,10 @@
 \alias{permutation}
 \alias{permutationTest}
 \alias{permuted}
-\alias{requiredPerms}
 \title{Permutation test P-values for module preservation statistics}
 \usage{
 permutationTest(nulls, observed, nVarsPresent, totalSize,
   alternative = "greater")
-
-requiredPerms(alpha, alternative = "greater")
 }
 \arguments{
 \item{nulls}{a 3-dimension matrix where the columns correspond to module
@@ -33,20 +30,10 @@ Returned as a list element of the same name by
 \item{alternative}{a character string specifying the alternative hypothesis, 
 must be one of "greater" (default), "less", or "two.sided". 
 You can specify just the initial letter.}
-
-\item{alpha}{desired significance threshold.}
-}
-\value{
-The minimum number of permutations required to detect any significant
- associations at the provided \code{alpha}. The minimum p-value will always
- be smaller than \code{alpha}.
 }
 \description{
 Evaluates the statistical significance of each module preservation test 
 statistic for one or more modules.
-
-\code{requiredPerms}:  how many permutations do I need to be able to detect
- significance at a given threshold \code{alpha}?
 }
 \details{
 Calculates exact p-values for permutation tests when permutations are 
@@ -69,10 +56,6 @@ network_list <- list(discovery=discovery_network, test=test_network)
 data_list <- list(discovery=discovery_data, test=test_data)
 correlation_list <- list(discovery=discovery_correlation, test=test_correlation)
 labels_list <- list(discovery=module_labels)
-
-# How many permutations are required to Bonferroni adjust for the 4 modules 
-# in the example data? 
-nPerm <- requiredPerms(0.05/4) 
 
 # Note that we recommend running at least 10,000 permutations to make sure 
 # that the null distributions are representative.
@@ -99,4 +82,5 @@ p.values <- permutationTest(
     }
   }
 }
+\keyword{internal}
 

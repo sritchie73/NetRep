@@ -29,6 +29,7 @@
 #'   file extension must be omitted.
 #'   
 #' @rdname bigMatrix
+#' @keywords internal
 #' @export
 load.bigMatrix <- function(backingfile) {
   if (!pkgReqCheck("bigmemory")) {

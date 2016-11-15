@@ -36,4 +36,5 @@ due to consistency checks performed by the operating system. This becomes
 exponentially worse the more R sessions there are simultaneously accessing
 the shared memory segment, e.g. through parallel \pkg{foreach} loops.
 }
+\keyword{internal}
 

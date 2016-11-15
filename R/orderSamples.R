@@ -111,7 +111,7 @@
 #' @seealso \code{\link{networkProperties}}
 #' 
 #' @name sampleOrder
-#' @keywords utilities
+#' @keywords utilities internal
 #' @export
 sampleOrder <- function(
   network, data, correlation, moduleAssignments=NULL, modules=NULL, 

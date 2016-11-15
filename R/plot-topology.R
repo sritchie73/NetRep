@@ -353,6 +353,7 @@
 #' )
 #' 
 #' @name plotTopology
+#' @keywords internal
 NULL
 
 #' \code{plotData}: Plot a heatmap of the data matrix for one or more

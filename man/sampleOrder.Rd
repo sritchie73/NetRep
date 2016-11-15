@@ -158,5 +158,6 @@ samples <- sampleOrder(
 \seealso{
 \code{\link{networkProperties}}
 }
+\keyword{internal}
 \keyword{utilities}
 

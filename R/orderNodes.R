@@ -141,7 +141,7 @@
 #' )
 #' 
 #' @name nodeOrder
-#' @keywords utilities
+#' @keywords utilities internal
 #' @export
 nodeOrder <- function(
   network, data, correlation, moduleAssignments=NULL, modules=NULL, 
