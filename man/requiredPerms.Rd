@@ -8,6 +8,10 @@ requiredPerms(alpha, alternative = "greater")
 }
 \arguments{
 \item{alpha}{desired significance threshold.}
+
+\item{alternative}{a character string specifying the alternative hypothesis, 
+must be one of "greater" (default), "less", or "two.sided". 
+You can specify just the initial letter.}
 }
 \value{
 The minimum number of permutations required to detect any significant

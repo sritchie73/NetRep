@@ -62,7 +62,7 @@ labels_list <- list(discovery=module_labels)
 
 preservation <- modulePreservation(
  network=network_list, data=data_list, correlation=correlation_list, 
- moduleAssignments=labels_list, nPerm=nPerm, discovery="discovery", 
+ moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
  test="test"
 )
 

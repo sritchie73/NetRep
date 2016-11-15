@@ -56,7 +56,7 @@
 #'
 #' preservation <- modulePreservation(
 #'  network=network_list, data=data_list, correlation=correlation_list, 
-#'  moduleAssignments=labels_list, nPerm=nPerm, discovery="discovery", 
+#'  moduleAssignments=labels_list, nPerm=1000, discovery="discovery", 
 #'  test="test"
 #' )
 #' 
@@ -203,7 +203,10 @@ permp <- function(x, nperm, ...) {
 #' How many permutations do I need to test at my desired significance level?
 #' 
 #' @param alpha desired significance threshold.
-#' 
+#' @param alternative a character string specifying the alternative hypothesis, 
+#'  must be one of "greater" (default), "less", or "two.sided". 
+#'  You can specify just the initial letter.
+#'  
 #' @return The minimum number of permutations required to detect any significant
 #'  associations at the provided \code{alpha}. The minimum p-value will always
 #'  be smaller than \code{alpha}.
