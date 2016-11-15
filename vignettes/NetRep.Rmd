@@ -4,6 +4,7 @@ author: "Scott Ritchie"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_document:
+    highlight: tango
     keep_md: true
     toc: true
 vignette: >
@@ -294,7 +295,7 @@ Only modules 1 and 4 are reproducible at this significance threshold.
 So what do these statistics measure? Let's take a look at the network topology
 of Module 1 in the discovery dataset, "cohort1":
 
-![](NetRep_files/img/mod1.png)
+![Network topology of Module 1 in the discovery dataset ("cohort1").](NetRep_files/img/mod1.png)
 
 From top to bottom, the plot shows:
 
@@ -317,7 +318,7 @@ From top to bottom, the plot shows:
 Now, let's take a look at the topology of Module 1 in the discovery and the 
 test datasets side by side along with the module preservation statistics:
 
-![](NetRep_files/img/preservation.png)
+![Network topology of Module 1 in both the discovery ("cohort1") and test ("cohort2") datasets.](NetRep_files/img/preservation.png)
 
 There are seven module preservation statistics:
 
