@@ -6,7 +6,15 @@
 #' @param mods the 'modules' vector for the discovery dataset.
 #' @param tiNodelist a vector of node IDs in the test dataset.
 #' 
-#' @return a list containing a contigency table, 
+#' @return 
+#'  A list containing a contigency table, a vector of the proportion of
+#'  nodes present in the test dataset for each module, a vector containing
+#'  the number of nodes present in the test dataset for each module, a vector
+#'  of the node names present in both the discovery and test datasets, a vector
+#'  of modules that are both requested and have nodes present in the test 
+#'  dataset, and the \code{modAssignments} vector containing only nodes present
+#'  in the test dataset.
+#' 
 contingencyTable <- function(modAssignments, mods, tiNodelist) {
   # To simplify later function calls, we need to get a vector of module
   # assignments only for (a) modules of interest and (b) the variables
