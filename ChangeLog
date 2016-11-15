@@ -1,3 +1,11 @@
+2016-11-15  Scott Ritchie <sritchie73@gmail.com>
+
+   * DESCRIPTION: Release 1.0.4
+   
+   * Restructured and curated documentation: Rd files are no longer generated
+     for internal functions, and functions intended to extend basic package 
+     usage have been removed from the package manual.
+
 2016-10-20  Scott Ritchie <sritchie73@gmail.com>
 
    * DESCRIPTION: Release 1.0.3
