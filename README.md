@@ -74,23 +74,17 @@ installed. If not found, installation of the package will fail.
  
 ### OSX
 
-The necessary `fortran` and `C++11` compilers are provided with the `Xcode` 
+The necessary `C++11` compilers are provided with the `Xcode` 
 application and subsequent installation of `Command line tools`. The most
 recent version of OSX should prompt you to install these tools when 
 installing the `devtools` package from RStudio. Those with older versions of 
 OSX should be able to install these tools by typing the following command into 
 their Terminal application: `xcode-select --install`.
 
-Some users on OSX Mavericks have reported that even after this step they 
-receive errors relating to `-lgfortran` or `-lquadmath`. This is reportedly 
-solved by installing the version of `gfortran` used to compile the R binary for
-your system: `gfortran-4.8.2`, using the following commands in your `Terminal` 
-application
-
-```{r, engine="bash", eval=FALSE}
-curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
-sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
-```
+The necessary `fortran` compiler depends on both the OSX version and R version
+installed by the user. The ["R for Mac OS X" page on CRAN](https://cran.r-project.org/bin/macosx/tools/)
+provides instructions for determining the correct fortran version as well as 
+relevant download links. 
 
 ### Windows
 
