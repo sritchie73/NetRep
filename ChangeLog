@@ -1,3 +1,25 @@
+2017-07-03  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.1.0
+  
+  * R/modulePreservation.R: 'nPerm' argument may now be set to 0 to calculate
+    the module preservation statistics across two datasets while skipping 
+    the permutation test procedure.
+  
+  * src/permutations.cpp: reorganised code to return the observed test
+    statistics without performing the permutation test procedure when the
+    'nPerm' argument in modulePreservation() is set to 0.
+    
+  * src/permutationsNoData.cpp: reorganised code to return the observed test
+    statistics without performing the permutation test procedure when the
+    'nPerm' argument in modulePreservation() is set to 0.
+    
+  * man/modulePreservation.Rd: added description detailing the use case for
+    'nPerm=0'.
+    
+  * man/*: minor changes in all man files due to generation with roxygen 6.0.1
+    instead of roxygen 5.0.1.
+
 2016-11-15  Scott Ritchie <sritchie73@gmail.com>
 
    * DESCRIPTION: Release 1.0.4
