@@ -2,15 +2,15 @@
 % Please edit documentation in R/example-data.R
 \docType{data}
 \name{example-data}
-\alias{NetRep-data}
-\alias{discovery_correlation}
-\alias{discovery_data}
-\alias{discovery_network}
 \alias{example-data}
+\alias{NetRep-data}
+\alias{discovery_network}
+\alias{discovery_data}
+\alias{discovery_correlation}
 \alias{module_labels}
-\alias{test_correlation}
-\alias{test_data}
 \alias{test_network}
+\alias{test_data}
+\alias{test_correlation}
 \title{Example data}
 \format{\itemize{
   \item{\code{"discovery_network"}:}{
@@ -160,6 +160,7 @@ The \link[=modulePreservation]{preservation of network modules} in a second
 
    The random seed used for the simulations was 37.
 }
+
 \references{
 \enumerate{
     \item{
@@ -174,4 +175,3 @@ The \link[=modulePreservation]{preservation of network modules} in a second
   \code{\link{networkProperties}}.
 }
 \keyword{datasets}
-

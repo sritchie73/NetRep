@@ -2,15 +2,15 @@
 % Please edit documentation in R/disk-matrix-class.R
 \docType{class}
 \name{disk.matrix}
+\alias{disk.matrix}
+\alias{attach.disk.matrix}
+\alias{serialize.table}
+\alias{is.disk.matrix}
 \alias{as.disk.matrix}
-\alias{as.disk.matrix,ANY-method}
 \alias{as.disk.matrix,disk.matrix-method}
 \alias{as.disk.matrix,matrix-method}
+\alias{as.disk.matrix,ANY-method}
 \alias{as.matrix,disk.matrix-method}
-\alias{attach.disk.matrix}
-\alias{disk.matrix}
-\alias{is.disk.matrix}
-\alias{serialize.table}
 \alias{show,disk.matrix-method}
 \title{The 'disk.matrix' class}
 \usage{
@@ -101,6 +101,7 @@ serialized R object with the same file name, but with the ".rds" extension.
 
 \item{\code{func.args}}{a list of arguments to be supplied to the \code{'read.func'}.}
 }}
+
 \section{Warning}{
 
 \code{attach.disk.matrix} does not check whether the specified file can be

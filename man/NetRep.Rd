@@ -28,4 +28,3 @@ Several functions for downstream are also provided:
 of a module, and \code{\link{plotModule}} for visualising a module.
 }
 \keyword{package}
-

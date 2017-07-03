@@ -13,4 +13,3 @@ Template parameters to be imported into other function documentation. This
 is not intended to be a stand-alone help file.
 }
 \keyword{internal}
-

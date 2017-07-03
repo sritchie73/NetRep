@@ -484,4 +484,3 @@ plotModule(
 \code{\link{plotData}}, and
 \code{\link{plotSummary}}.
 }
-

@@ -420,4 +420,3 @@ Functions for:
   \link[=permutationTest]{calculating permutation test P-values}, and 
   \link[=combineAnalyses]{splitting computation over multiple machines}.
 }
-

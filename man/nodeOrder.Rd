@@ -197,4 +197,3 @@ nodes <- nodeOrder(
 }
 \keyword{internal}
 \keyword{utilities}
-

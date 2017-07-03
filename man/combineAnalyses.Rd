@@ -51,4 +51,3 @@ combined <- combineAnalyses(pres1, pres2)
 
 }
 \keyword{internal}
-

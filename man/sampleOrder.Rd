@@ -160,4 +160,3 @@ samples <- sampleOrder(
 }
 \keyword{internal}
 \keyword{utilities}
-

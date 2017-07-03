@@ -188,4 +188,3 @@ test_props <- networkProperties(
 \link[=nodeOrder]{Getting nodes ordered by degree.}, and
   \link[=sampleOrder]{Ordering samples by module summary}
 }
-
