@@ -170,6 +170,12 @@ Rcpp::List PermutationProcedure (
   unsigned int nSamples = tData.nrow();
   unsigned int nNodes = tData.ncol();
   
+  // Define statistic names
+  const std::vector<std::string> statnames = {
+    "avg.weight", "coherence", "cor.cor", "cor.degree", "cor.contrib", 
+    "avg.cor", "avg.contrib"
+  };
+  
   /* Next, we need to create three mappings:
    *  - From node IDs to indices in the test dataset.
    *  - From modules to all node IDs.
@@ -201,31 +207,10 @@ Rcpp::List PermutationProcedure (
   unsigned int nPerm = nPermutations[0];
   const bool verboseFlag = verbose[0];
   
-  // Initialise results containers
-  arma::mat obs (mods.size(), 7); // stores the observed test statistics
-  arma::cube nulls (mods.size(), 7, nPerm); // stores the null distributions
+  // Initialise results container for storing observed test statistics
+  arma::mat obs (mods.size(), 7);
   obs.fill(NA_REAL);
-  nulls.fill(NA_REAL);
-  
-  /* For the permutation procedure, we need to shuffle a vector of *valid*
-   * indices in the test network: if the null hypothesis is "overlap" (the
-   * default) then only nodes that are present in both the discovery and test
-   * datasets are used to generate the null distributions.
-   * 
-   * So we need:
-   *  - A *vector* of indices in the test dataset that can be shuffled
-   *  - A mapping from the valid node IDs to their indices in the vector to 
-   *    be shuffled
-   */
-  arma::uvec nullIdx;
-  namemap nullMap;
-  if (nullType == "overlap") {
-    nullMap = MakeNullMap(dNames, tIdxMap, nullIdx);
-  } else { // otherwise take all nodes
-    nullMap = MakeNullMap(tNames, tIdxMap, nullIdx);
-  }
-  R_CheckUserInterrupt(); 
-  
+
   /* We need to convert each 'discProps' list to a mapping from each module
    * to the address in memory its corresponding property vector
    */
@@ -299,6 +284,45 @@ Rcpp::List PermutationProcedure (
     obs(modIdx, 6) = SignAwareMean(addrNC[mod], tNC.memptr(), tNC.n_elem);
   }
   
+  // Just return observed statistics if no permutations requested
+  if (nPerm == 0) {
+    // Convert any NaNs or Infinites to NA_REALs
+    obs.elem(arma::find_nonfinite(obs)).fill(NA_REAL);
+    
+    // Convert matrix of observed test statistics into an R object before
+    // returning
+    Rcpp::NumericMatrix observed (obs.n_rows, obs.n_cols, obs.begin());
+    colnames(observed) = Rcpp::CharacterVector(statnames.begin(), statnames.end());
+    rownames(observed) = modules;
+    
+    return Rcpp::List::create(Rcpp::Named("observed") = observed);
+  }
+
+  // If there are permutations requested, proceed.
+  
+  // Initialise results container for storing the null distributions
+  arma::cube nulls (mods.size(), 7, nPerm); 
+  nulls.fill(NA_REAL);
+  
+  /* For the permutation procedure, we need to shuffle a vector of *valid*
+  * indices in the test network: if the null hypothesis is "overlap" (the
+  * default) then only nodes that are present in both the discovery and test
+  * datasets are used to generate the null distributions.
+  * 
+  * So we need:
+  *  - A *vector* of indices in the test dataset that can be shuffled
+  *  - A mapping from the valid node IDs to their indices in the vector to 
+  *    be shuffled
+  */
+  arma::uvec nullIdx;
+  namemap nullMap;
+  if (nullType == "overlap") {
+    nullMap = MakeNullMap(dNames, tIdxMap, nullIdx);
+  } else { // otherwise take all nodes
+    nullMap = MakeNullMap(tNames, tIdxMap, nullIdx);
+  }
+  R_CheckUserInterrupt(); 
+  
   if (nThreads == 1) {
     vCat(verbose, 1, "Generating null distributions from", nPerm, 
          "permutations using", nThreads, "thread...");
@@ -358,12 +382,6 @@ Rcpp::List PermutationProcedure (
   // Convert any NaNs or Infinites to NA_REALs
   nulls.elem(arma::find_nonfinite(nulls)).fill(NA_REAL);
   obs.elem(arma::find_nonfinite(obs)).fill(NA_REAL);
-  
-  // Construct rownames
-  const std::vector<std::string> statnames = {
-    "avg.weight", "coherence", "cor.cor", "cor.degree", "cor.contrib", 
-    "avg.cor", "avg.contrib"
-  };
   
   // Construct permutation names
   std::vector<std::string> permNames(nPerm);

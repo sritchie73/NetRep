@@ -16,7 +16,9 @@
 #'   properties over. Automatically determined as the number of cores - 1 if 
 #'   not specified.
 #' @param nPerm number of permutations to use. If not specified, the number of 
-#'  permutations will be automatically determined (see details).
+#'  permutations will be automatically determined (see details). When set to 0
+#'  the permutation procedure will be skipped and the observed module 
+#'  preservation will be returned without p-values.
 #' @param null variables to include when generating the null distributions. 
 #'  Must be either "overlap" or "all" (see details).
 #' @param alternative The type of module preservation test to perform. Must be 
@@ -398,8 +400,8 @@ modulePreservation <- function(
   
   # Validate 'nPerm'. If 'NULL', we need to process the rest of the input to
   # determine.
-  if (!is.null(nPerm) && (!is.numeric(nPerm) || length(nPerm) > 1 || nPerm < 1)) {
-    stop("'nPerm' must be a single number > 1")
+  if (!is.null(nPerm) && (!is.numeric(nPerm) || length(nPerm) > 1 || nPerm < 0)) {
+    stop("'nPerm' must be a single number >= 0")
   }
   
   # Validate 'nThreads'
@@ -623,18 +625,29 @@ modulePreservation <- function(
           )
         }
         observed <- perms$observed
-        nulls <- perms$nulls
+        
+        if (nPerm > 0) {
+          nulls <- perms$nulls
+        } else {
+          nulls <- NULL
+        }
+        
         
         #---------------------------------------------------------------------
         # Calculate permutation p-value
         #---------------------------------------------------------------------
-        vCat(verbose, 1, "Calculating P-values...")
-        if (model == 'overlap') {
-          totalSize <- length(overlapVars)
+        if (nPerm > 0) {
+          vCat(verbose, 1, "Calculating P-values...")
+          if (model == 'overlap') {
+            totalSize <- length(overlapVars)
+          } else {
+            totalSize <- ncol(correlation[[ti]])
+          }
+          p.values <- permutationTest(nulls, observed, varsPres, totalSize, alternative)
         } else {
-          totalSize <- ncol(correlation[[ti]])
+          p.values <- NULL
+          totalSize <- NULL
         }
-        p.values <- permutationTest(nulls, observed, varsPres, totalSize, alternative)
         
         #---------------------------------------------------------------------
         # Collate results

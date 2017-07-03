@@ -54,7 +54,9 @@ properties over. Automatically determined as the number of cores - 1 if
 not specified.}
 
 \item{nPerm}{number of permutations to use. If not specified, the number of 
-permutations will be automatically determined (see details).}
+permutations will be automatically determined (see details). When set to 0
+the permutation procedure will be skipped and the observed module 
+preservation will be returned without p-values.}
 
 \item{null}{variables to include when generating the null distributions. 
 Must be either "overlap" or "all" (see details).}
