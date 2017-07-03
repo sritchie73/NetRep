@@ -6,3 +6,7 @@ src/*.so
 src/*.dll
 inst/doc
 vignettes/NetRep_cache/
+^.*\.Rproj$
+^\.Rproj\.user$
+.Rbuildignore
+network-replication.Rproj
