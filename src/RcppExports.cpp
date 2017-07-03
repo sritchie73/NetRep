@@ -127,3 +127,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"NetRep_CheckFinite", (DL_FUNC) &NetRep_CheckFinite, 1},
+    {"NetRep_IntermediateProperties", (DL_FUNC) &NetRep_IntermediateProperties, 6},
+    {"NetRep_IntermediatePropertiesNoData", (DL_FUNC) &NetRep_IntermediatePropertiesNoData, 5},
+    {"NetRep_PermutationProcedure", (DL_FUNC) &NetRep_PermutationProcedure, 11},
+    {"NetRep_PermutationProcedureNoData", (DL_FUNC) &NetRep_PermutationProcedureNoData, 10},
+    {"NetRep_NetProps", (DL_FUNC) &NetRep_NetProps, 4},
+    {"NetRep_NetPropsNoData", (DL_FUNC) &NetRep_NetPropsNoData, 3},
+    {"NetRep_Scale", (DL_FUNC) &NetRep_Scale, 1},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_NetRep(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
