@@ -490,7 +490,7 @@ plotData <- function(
       dataRange <- c(-1, 1)
     }
   } else {
-    dat <- dataLoaded[presentSamples, presentNodes] # also used for actual plot
+    dat <- dataLoaded[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
     if (is.null(dataRange)) {
       dataRange <- range(dat)
       # Make sure the gradient is balanced around 0 if the default colors are
@@ -714,7 +714,7 @@ plotCorrelation <- function(
     }
     
     plotSquareHeatmap(
-      correlationLoaded[presentNodes, presentNodes], corCols, corRange, 
+      correlationLoaded[presentNodes, presentNodes, drop=FALSE], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -725,7 +725,7 @@ plotCorrelation <- function(
     )
   } else {
     plotTriangleHeatmap(
-      correlationLoaded[presentNodes, presentNodes], corCols, corRange, 
+      correlationLoaded[presentNodes, presentNodes, drop=FALSE], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
@@ -896,7 +896,7 @@ plotNetwork <- function(
     }
     
     plotSquareHeatmap(
-      networkLoaded[presentNodes, presentNodes], netCols, netRange, 
+      networkLoaded[presentNodes, presentNodes, drop=FALSE], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -907,7 +907,7 @@ plotNetwork <- function(
     )
   } else {
     plotTriangleHeatmap(
-      networkLoaded[presentNodes, presentNodes], netCols, netRange, 
+      networkLoaded[presentNodes, presentNodes, drop=FALSE], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,

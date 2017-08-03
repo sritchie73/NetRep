@@ -564,7 +564,7 @@ plotModule <- function(
       dataRange <- c(-1, 1)
     }
   } else {
-    dat <- dataLoaded[presentSamples, presentNodes] # also used for actual plot
+    dat <- dataLoaded[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
     if (is.null(dataRange)) {
       dataRange <- range(dat)
       # Make sure the gradient is balanced around 0 if the default colors are
@@ -595,7 +595,7 @@ plotModule <- function(
   # Plot correlation
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    correlationLoaded[presentNodes, presentNodes], 
+    correlationLoaded[presentNodes, presentNodes, drop=FALSE], 
     corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main=main, main.line=main.line, legend.main="Correlation", 
     plotModuleNames=FALSE, laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
@@ -606,7 +606,7 @@ plotModule <- function(
   # Plot network
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    networkLoaded[presentNodes, presentNodes], netCols, netRange,
+    networkLoaded[presentNodes, presentNodes, drop=FALSE], netCols, netRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, main="", 
     legend.main="Edge weights", plotModuleNames=FALSE, 
     laxt.tck=laxt.tck, na.col=naCol, legend.main.line=legend.main.line,
