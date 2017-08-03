@@ -1,3 +1,14 @@
+2017-08-03  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.1.1
+  
+  * R/plot-module.R: Fixed bug where 'plotModule' would crash when attempting 
+    to plot a single module where only 1 node was present in the test dataset 
+    (e.g. where only 1 of the module's genes is expressed in the test cell-line).
+    
+  * R/plot-topology.R: Fixed same bug as above for 'plotCorrelation', 
+   'plotNetwork', and 'plotData'
+    
 2017-07-03  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.1.0
