@@ -28,7 +28,8 @@ in each \code{discovery} dataset will be analysed, with the exception of
 those specified in \code{backgroundLabel} argument.}
 
 \item{backgroundLabel}{a single label given to nodes that do not belong to 
-any module in the \code{moduleAssignments} argument.}
+any module in the \code{moduleAssignments} argument. Defaults to "0". Set 
+to \code{NULL} if you do not want to skip the network background module.}
 
 \item{discovery}{a vector of names or indices denoting the \emph{discovery}
 dataset(s) in the \code{data}, \code{correlation}, \code{network}, 

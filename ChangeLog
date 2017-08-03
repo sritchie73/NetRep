@@ -1,5 +1,12 @@
 2017-08-03  Scott Ritchie <sritchie73@gmail.com>
 
+  * DESCRIPTION: Release 1.1.2
+  
+  * Clarified documentation for "backgroundLabel" argument used in many package
+    functions to describe how to disable the behaviour.
+    
+2017-08-03  Scott Ritchie <sritchie73@gmail.com>
+
   * DESCRIPTION: Release 1.1.1
   
   * R/plot-module.R: Fixed bug where 'plotModule' would crash when attempting 
