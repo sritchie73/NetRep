@@ -2,7 +2,7 @@
 ### 
 ### @param values values to plot on the heatmap.
 ### @param palette color palette to interpolate over.
-### @param vlim range of values to use when mapping values to the \code{palette}.
+### @param palette.vlim range of values to use when mapping values to the \code{palette}.
 ### @param mas ordered subset of the moduleAssignments vector.
 ### @param na.indices indices of missing values on the x axis.
 ### @param na.col color of missing values to plot.
@@ -14,6 +14,8 @@
 ###  title will be drawn.
 ### @param plotLegend logical; if \code{TRUE} a legend is added to the right 
 ###  side of the plot.
+### @param legend.vlim range of values to actually show on the legend (e.g. the whole 
+###        palette space, or just the range of values occuring in the data?)
 ### @param legend.main title for the legend.
 ### @param legend.main.line distance from the legend to render the legend 
 ###  title.
@@ -33,16 +35,16 @@
 ###
 ### @keywords internal
 plotTriangleHeatmap <- function(
-  values, palette, vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
-  plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.main="",
-  legend.main.line=1, xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, 
+  values, palette, palette.vlim, mas, na.indices=NULL, na.col="#bdbdbd", xaxt=NULL,
+  plotModuleNames=TRUE, main="", main.line=0, plotLegend=TRUE, legend.vlim=NULL, 
+  legend.main="", legend.main.line=1, xaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, 
   laxt.line=2.5, legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nNodes <- ncol(values) + length(na.indices)
   palette <- colorRampPalette(palette)(255)
   
-  if (length(vlim) == 1) {
-    vlim <- c(0, max(values[lower.tri(values)]))
+  if (length(palette.vlim) == 1) {
+    palette.vlim <- c(0, max(values[lower.tri(values)]))
   }
   
   # Map indices in the drawn matrix to indices in the value matrix
@@ -83,7 +85,7 @@ plotTriangleHeatmap <- function(
         leftx <- rightx - 1
         
         if (!is.na(map[ii]) && !is.na(map[jj])) {
-          col <- getColFromPalette(values[map[ii], map[jj]], palette, vlim)
+          col <- getColFromPalette(values[map[ii], map[jj]], palette, palette.vlim)
         } else {
           col <- na.col
         }
@@ -144,8 +146,17 @@ plotTriangleHeatmap <- function(
   
   # Add legend if specified
   if (plotLegend) {
+    if (is.null(legend.vlim)) {
+      legend.vlim <- palette.vlim
+    }
+    if (dryRun) {
+      data.vlim <- legend.vlim
+    } else {
+      data.vlim <- range(values)
+    }
     addGradientLegend(
-      palette, vlim, TRUE, legend.main, legend.main.line=legend.main.line,
+      palette, legend.vlim, palette.vlim, data.vlim, TRUE, legend.main, 
+      legend.main.line=legend.main.line,
       xlim=c(halfUnit - pw*legend.line, pw*0.25), 
       ylim=c(ph/2 + ph*0.17, ph/2 + ph*0.25), tck=laxt.tck,
       axis.line=laxt.line, lwd=lwd
@@ -157,7 +168,7 @@ plotTriangleHeatmap <- function(
 ### 
 ### @param values values to plot on the heatmap.
 ### @param palette color palette to interpolate over.
-### @param vlim range of values to use when mapping values to the \code{palette}.
+### @param palette.vlim range of values to use when mapping values to the \code{palette}.
 ### @param mas ordered subset of the moduleAssignments vector.
 ### @param na.indices.x indices of missing values on the x axis.
 ### @param na.indices.y indices of missing values on the y axis.
@@ -172,6 +183,8 @@ plotTriangleHeatmap <- function(
 ###  title will be drawn.
 ### @param plotLegend logical; if \code{TRUE} a legend is added to the right 
 ###  side of the plot.
+### @param legend.vlim range of values to actually show on the legend (e.g. the whole 
+###        palette space, or just the range of values occuring in the data?)
 ### @param legend.main title for the legend.
 ### @param legend.main.line distance from the legend to render the legend 
 ###  title.
@@ -193,18 +206,18 @@ plotTriangleHeatmap <- function(
 ###
 ### @keywords internal
 plotSquareHeatmap <- function(
-  values, palette, vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
+  values, palette, palette.vlim, mas, na.indices.x=NULL, na.indices.y=NULL,
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
-  main="", main.line=0, plotLegend=TRUE, legend.main="", legend.main.line=1,
-  xaxt.line=-0.5, yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, laxt.line=2.5, 
-  legend.line=0.1, lwd=2, dryRun=FALSE
+  main="", main.line=0, plotLegend=TRUE, legend.vlim=NULL, legend.main="", 
+  legend.main.line=1, xaxt.line=-0.5, yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, 
+  laxt.line=2.5, legend.line=0.1, lwd=2, dryRun=FALSE
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
   palette <- colorRampPalette(palette)(255)
   
-  if (length(vlim) < 2) {
-    vlim <- c(0, max(c(values[lower.tri(values)], values[upper.tri(values)])))
+  if (length(palette.vlim) < 2) {
+    palette.vlim <- c(0, max(c(values[lower.tri(values)], values[upper.tri(values)])))
   }
     
   # Use a fixed width/height for all plots so that offsets and margin lines
@@ -229,7 +242,7 @@ plotSquareHeatmap <- function(
       cj <- 1
       for (jj in 1:nX) {
         if (ii %nin% na.indices.y && jj %nin% na.indices.x) {
-          col <- getColFromPalette(values[ci, cj], palette, vlim)
+          col <- getColFromPalette(values[ci, cj], palette, palette.vlim)
           cj <- cj + 1
         } else {
           col <- na.col
@@ -314,8 +327,17 @@ plotSquareHeatmap <- function(
   
   # Add legend if specified
   if (plotLegend) {
+    if (is.null(legend.vlim)) {
+      legend.vlim <- palette.vlim
+    }
+    if (dryRun) {
+      data.vlim <- legend.vlim
+    } else {
+      data.vlim <- range(values)
+    }
     addGradientLegend(
-      palette, vlim, FALSE, legend.main, legend.main.line=legend.main.line,
+      palette, legend.vlim, palette.vlim, data.vlim, FALSE, 
+      legend.main, legend.main.line=legend.main.line,
       xlim=c(pw - xHalfUnit + pw*legend.line, pw - xHalfUnit + pw*(legend.line+0.05)), 
       ylim=c(ph/3, ph - yHalfUnit - ph*0.1), tck=laxt.tck,
       axis.line=laxt.line, lwd=lwd
@@ -329,6 +351,8 @@ plotSquareHeatmap <- function(
 ### 
 ### @param palette color palette.
 ### @param legend.vlim limits of the values to display on the legend
+### @param palette.vlim range of values the palette spans across
+### @param data.vlim actual range of values present in the corresponding heatmap
 ### @param horizontal logical; if \code{TRUE} the legend is plotted horizontally,
 ###   otherwise vertically.
 ### @param main title of the legend.
@@ -346,8 +370,8 @@ plotSquareHeatmap <- function(
 ### @import grDevices
 ### @keywords internal
 addGradientLegend <- function(
-  palette, legend.vlim, horizontal, main, xlim, ylim, 
-  tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt
+  palette, legend.vlim, palette.vlim, data.vlim, horizontal, main, xlim, 
+  ylim, tck=0.04, axis.line=3, legend.main.line=1, lwd=2, srt
 ) {
   palette <- colorRampPalette(palette)(255)
   
@@ -359,10 +383,10 @@ addGradientLegend <- function(
   # Handle legends where the range of values doesn't map to the palette range 
   plim <- c(
     head(which(palette == getColFromPalette(
-      legend.vlim[1], palette, legend.vlim
+      legend.vlim[1], palette, palette.vlim
     )), 1),
     tail(which(palette == getColFromPalette(
-      legend.vlim[2], palette, legend.vlim
+      legend.vlim[2], palette, palette.vlim
     )), 1)
   )
   palette <- palette[plim[1]:plim[2]]
@@ -402,17 +426,43 @@ addGradientLegend <- function(
   )
   
   # Make sure axis ticks are centred at 0 if within the range of legend.vlim
-  labels <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
-  labels <- format(labels, digits=2)
+  at <- seq.int(legend.vlim[1L], legend.vlim[2L], length.out=5)
+  if (legend.vlim[1L] < 0 & legend.vlim[2L] > 0) {
+    # Which axis tick is closest to zero?
+    zero_tick <- which.min(abs(at))
+    
+    # The first and last axis tick must always be at the extremeties of the range,
+    # set zero to the next closest in this case:
+    if (zero_tick == 1) {
+      zero_tick <- 2
+    } else if (zero_tick == 5) {
+      zero_tick <- 4
+    }
+    
+    # Respace axis ticks around zero accordingly
+    below_zero_ticks <- seq.int(legend.vlim[1L], 0L, length.out=length(1:zero_tick))
+    above_zero_ticks <- seq.int(0L, legend.vlim[2L], length.out=length(zero_tick:5))
+    at <- c(below_zero_ticks, above_zero_ticks[-1]) # [-1] makes sure the 0 tick isnt repeated 
+  }
+  labels <- format(at, digits=2)
+  
+  # If the legend does not span the entire range of values present in the data
+  # indicate so in the legend.
+  if (data.vlim[1] < at[1]) {
+    labels[1] <- paste("<", labels[1])
+  }
+  if (data.vlim[2] > tail(at, 1)) {
+    labels[length(labels)] <- paste(">", labels[length(labels)] )
+  } 
+  
   if (horizontal) {
     tck <- (par("usr")[4] - par("usr")[3])*tck
     
-    # for mapping from vlim to plot space
+    # Map the legend coordinate space to the plot coordinate space
     v.per.x <- (xlim[2] - xlim[1])/(legend.vlim[2] - legend.vlim[1])
-    zero <- xlim[1] +  v.per.x * (0 - legend.vlim[1])
-    
-    at <- seq.int(xlim[1L], xlim[2L], length.out=5)
-    
+    at <- at * v.per.x # scale to right width (xlim[1] -- xlim[2])
+    at <- at - at[1] + xlim[1] # shift to right starting location (xlim[1])
+
     # Now plot the lines and text
     sapply(at, function(aa) {
       lines(x=c(aa, aa), y=c(ylim[1], ylim[1]-tck), lwd=lwd, xpd=NA)
@@ -426,10 +476,10 @@ addGradientLegend <- function(
   } else {
     tck <- (par("usr")[2] - par("usr")[1])*tck
     
-    # for mapping from vlim to plot space
+    # Map the legend coordinate space to the plot coordinate space
     v.per.y <- (ylim[2] - ylim[1])/(legend.vlim[2] - legend.vlim[1])
-    zero <- ylim[1] +  v.per.y * (0 - legend.vlim[1])
-    at <- seq.int(ylim[1L], ylim[2L], length.out=5)
+    at <- at * v.per.y # scale to right width (ylim[1] -- ylim[2])
+    at <- at - at[1] + ylim[1] # shift to right starting location (ylim[1])
     
     # draw axis ticks
     sapply(at, function(aa) {

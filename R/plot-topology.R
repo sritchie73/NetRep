@@ -488,26 +488,43 @@ plotData <- function(
     dimnames(dat) <- list(presentSamples, presentNodes)
     if (is.null(dataRange)) {
       dataRange <- c(-1, 1)
-    }
+    } 
+    dataLegendRange <- dataRange
   } else {
+    # dataRange - what range of values are present in the data matrix?
+    # dataLegendRange - what range of values do you want to show on the gradient legend?
+    # dataGradientRange - what range of values should the gradient span (e.g. in the case
+    #                     of positive and negative values to keep white at 0)
+    
     dat <- dataLoaded[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
-    if (is.null(dataRange)) {
-      dataRange <- range(dat)
-      # Make sure the gradient is balanced around 0 if the default colors are
-      # requested
-      if (is.null(dataCols) && dataRange[1] < 0 && dataRange[2] > 0) {
-        dataRange <- c(-1*max(abs(dataRange)), max(abs(dataRange)))
-      }
+    
+    # The user input 'dataRange' is more accurately 'dataLegendRange' but I don't 
+    # want to change the API now the package is released
+    dataLegendRange <- dataRange
+    dataRange <- range(dat)
+    
+    # If unspecified, set automatically to the range of the data
+    if (is.null(dataLegendRange)) {
+      dataLegendRange <- dataRange
     }
   }
+  
+  # Choose color palette if not specified and set the range of values the palette
+  # should span
   if (is.null(dataCols)) {
-    if (all(dataRange >= 0)) {
+    if (all(dataLegendRange >= 0)) {
       dataCols <- c("#FFFFFF", "#1B7837")
-    } else if (all(dataRange <= 0)) {
+      dataGradientRange <- dataLegendRange
+    } else if (all(dataLegendRange <= 0)) {
       dataCols <- c("#762A83", "#FFFFFF")
+      dataGradientRange <- dataLegendRange
     } else {
       dataCols <- c("#762A83", "#FFFFFF", "#1B7837")
+      # Make sure the gradient is balanced around 0!
+      dataGradientRange <- c(-1*max(abs(dataLegendRange)), max(abs(dataLegendRange)))
     }
+  } else {
+    dataGradientRange <- dataLegendRange
   }
   
   #-----------------------------------------------------------------------------
@@ -535,13 +552,13 @@ plotData <- function(
     
   # Plot
   plotSquareHeatmap(
-    dat, dataCols, vlim=dataRange, legend.main.line=legend.main.line,
+    dat, dataCols, palette.vlim=dataGradientRange, legend.main.line=legend.main.line,
     moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.y, xaxt=xaxt, 
     yaxt=yaxt, plotLegend=plotLegend, main=main, main.line=main.line,
-    legend.main=legend.main, plotModuleNames=plotModuleNames, 
-    xaxt.line=naxt.line, yaxt.line=saxt.line, laxt.tck=laxt.tck,
-    laxt.line=laxt.line, legend.line=legend.position, maxt.line=maxt.line,
-    lwd=lwd, na.col=naCol, dryRun=dryRun
+    legend.main=legend.main, legend.vlim=dataLegendRange, 
+    plotModuleNames=plotModuleNames, xaxt.line=naxt.line, yaxt.line=saxt.line, 
+    laxt.tck=laxt.tck, laxt.line=laxt.line, legend.line=legend.position, 
+    maxt.line=maxt.line, lwd=lwd, na.col=naCol, dryRun=dryRun
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }

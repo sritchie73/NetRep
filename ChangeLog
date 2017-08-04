@@ -1,3 +1,39 @@
+2017-08-04  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.1.3
+  
+  * Fixed bug in module data heatmap legends: the range of values present on 
+    the legend is now restricted to the range of values present in the data 
+    heatmap when the data contains both positive and negative values. Previously
+    'plotModule' and 'plotData' would show legends for a range of values centered
+    at 0.
+    
+  * Fixed bug in module data heatmap legends: the range of values shown now respects
+    the values passed by the user in the 'dataRange' argument.
+    
+  * Fixed bug in gradient legends: the axis ticks at the lower or upper end of the
+    range specified by the user now have add "<" and ">" to the labels to reflect
+    values of that color may be outside the range shown.
+    
+  * R/plot-functions.R: 'addGradientLegend' now keeps separate track of the range 
+    of values present in the data, the range of values to be shown on the legend, 
+    and the range of values occupied by the color gradient used in the heatmap.
+    
+  * R/plot-functions.R: 'addGradientLegend' an axis tick will always be placed at 0
+    on the legend if the range of values on the corresponding heatmap can be both 
+    negative and positive.
+
+  * R/plot-functions.R: extra argument add to 'plotSquareHeatmap' and 'plotTriangleHeatmap'
+    to reflect separation of heatmap legend range from the range of values occupied by
+    the color palette used in the heatmap. Calls to these functions from 'plotModule',
+    'plotData', 'plotCorrelation', and 'plotNetwork' have been updated accordingly.
+    
+  * R/plot-module.R: added additional logic to 'plotModule' to separately determine the 
+    range of values present in the data, those to be shown on the data heatmap legend, and 
+    the range of values the heatmap palette occupies.
+    
+  * R/plot-topology.R: as above but for the 'plotData' function.
+    
 2017-08-03  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.1.2
