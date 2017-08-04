@@ -9,7 +9,7 @@ using namespace Rcpp;
 
 // CheckFinite
 void CheckFinite(Rcpp::NumericMatrix matPtr);
-RcppExport SEXP NetRep_CheckFinite(SEXP matPtrSEXP) {
+RcppExport SEXP _NetRep_CheckFinite(SEXP matPtrSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type matPtr(matPtrSEXP);
@@ -19,7 +19,7 @@ END_RCPP
 }
 // IntermediateProperties
 Rcpp::List IntermediateProperties(Rcpp::NumericMatrix dData, Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::CharacterVector tNodeNames, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
-RcppExport SEXP NetRep_IntermediateProperties(SEXP dDataSEXP, SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tNodeNamesSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+RcppExport SEXP _NetRep_IntermediateProperties(SEXP dDataSEXP, SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tNodeNamesSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -35,7 +35,7 @@ END_RCPP
 }
 // IntermediatePropertiesNoData
 Rcpp::List IntermediatePropertiesNoData(Rcpp::NumericMatrix dCorr, Rcpp::NumericMatrix dNet, Rcpp::CharacterVector tNodeNames, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
-RcppExport SEXP NetRep_IntermediatePropertiesNoData(SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tNodeNamesSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+RcppExport SEXP _NetRep_IntermediatePropertiesNoData(SEXP dCorrSEXP, SEXP dNetSEXP, SEXP tNodeNamesSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -50,7 +50,7 @@ END_RCPP
 }
 // PermutationProcedure
 Rcpp::List PermutationProcedure(Rcpp::List discProps, Rcpp::NumericMatrix tData, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
-RcppExport SEXP NetRep_PermutationProcedure(SEXP discPropsSEXP, SEXP tDataSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
+RcppExport SEXP _NetRep_PermutationProcedure(SEXP discPropsSEXP, SEXP tDataSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -71,7 +71,7 @@ END_RCPP
 }
 // PermutationProcedureNoData
 Rcpp::List PermutationProcedureNoData(Rcpp::List discProps, Rcpp::NumericMatrix tCorr, Rcpp::NumericMatrix tNet, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules, Rcpp::IntegerVector nPermutations, Rcpp::IntegerVector nCores, Rcpp::CharacterVector nullHypothesis, Rcpp::LogicalVector verbose, Rcpp::Function vCat);
-RcppExport SEXP NetRep_PermutationProcedureNoData(SEXP discPropsSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
+RcppExport SEXP _NetRep_PermutationProcedureNoData(SEXP discPropsSEXP, SEXP tCorrSEXP, SEXP tNetSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP, SEXP nPermutationsSEXP, SEXP nCoresSEXP, SEXP nullHypothesisSEXP, SEXP verboseSEXP, SEXP vCatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -91,7 +91,7 @@ END_RCPP
 }
 // NetProps
 Rcpp::List NetProps(Rcpp::NumericMatrix data, Rcpp::NumericMatrix net, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
-RcppExport SEXP NetRep_NetProps(SEXP dataSEXP, SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+RcppExport SEXP _NetRep_NetProps(SEXP dataSEXP, SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -105,7 +105,7 @@ END_RCPP
 }
 // NetPropsNoData
 Rcpp::List NetPropsNoData(Rcpp::NumericMatrix net, Rcpp::CharacterVector moduleAssignments, Rcpp::CharacterVector modules);
-RcppExport SEXP NetRep_NetPropsNoData(SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
+RcppExport SEXP _NetRep_NetPropsNoData(SEXP netSEXP, SEXP moduleAssignmentsSEXP, SEXP modulesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -118,7 +118,7 @@ END_RCPP
 }
 // Scale
 Rcpp::NumericMatrix Scale(Rcpp::NumericMatrix data);
-RcppExport SEXP NetRep_Scale(SEXP dataSEXP) {
+RcppExport SEXP _NetRep_Scale(SEXP dataSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -129,14 +129,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"NetRep_CheckFinite", (DL_FUNC) &NetRep_CheckFinite, 1},
-    {"NetRep_IntermediateProperties", (DL_FUNC) &NetRep_IntermediateProperties, 6},
-    {"NetRep_IntermediatePropertiesNoData", (DL_FUNC) &NetRep_IntermediatePropertiesNoData, 5},
-    {"NetRep_PermutationProcedure", (DL_FUNC) &NetRep_PermutationProcedure, 11},
-    {"NetRep_PermutationProcedureNoData", (DL_FUNC) &NetRep_PermutationProcedureNoData, 10},
-    {"NetRep_NetProps", (DL_FUNC) &NetRep_NetProps, 4},
-    {"NetRep_NetPropsNoData", (DL_FUNC) &NetRep_NetPropsNoData, 3},
-    {"NetRep_Scale", (DL_FUNC) &NetRep_Scale, 1},
+    {"_NetRep_CheckFinite", (DL_FUNC) &_NetRep_CheckFinite, 1},
+    {"_NetRep_IntermediateProperties", (DL_FUNC) &_NetRep_IntermediateProperties, 6},
+    {"_NetRep_IntermediatePropertiesNoData", (DL_FUNC) &_NetRep_IntermediatePropertiesNoData, 5},
+    {"_NetRep_PermutationProcedure", (DL_FUNC) &_NetRep_PermutationProcedure, 11},
+    {"_NetRep_PermutationProcedureNoData", (DL_FUNC) &_NetRep_PermutationProcedureNoData, 10},
+    {"_NetRep_NetProps", (DL_FUNC) &_NetRep_NetProps, 4},
+    {"_NetRep_NetPropsNoData", (DL_FUNC) &_NetRep_NetPropsNoData, 3},
+    {"_NetRep_Scale", (DL_FUNC) &_NetRep_Scale, 1},
     {NULL, NULL, 0}
 };
 

@@ -2,34 +2,34 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 CheckFinite <- function(matPtr) {
-    invisible(.Call('NetRep_CheckFinite', PACKAGE = 'NetRep', matPtr))
+    invisible(.Call('_NetRep_CheckFinite', PACKAGE = 'NetRep', matPtr))
 }
 
 IntermediateProperties <- function(dData, dCorr, dNet, tNodeNames, moduleAssignments, modules) {
-    .Call('NetRep_IntermediateProperties', PACKAGE = 'NetRep', dData, dCorr, dNet, tNodeNames, moduleAssignments, modules)
+    .Call('_NetRep_IntermediateProperties', PACKAGE = 'NetRep', dData, dCorr, dNet, tNodeNames, moduleAssignments, modules)
 }
 
 IntermediatePropertiesNoData <- function(dCorr, dNet, tNodeNames, moduleAssignments, modules) {
-    .Call('NetRep_IntermediatePropertiesNoData', PACKAGE = 'NetRep', dCorr, dNet, tNodeNames, moduleAssignments, modules)
+    .Call('_NetRep_IntermediatePropertiesNoData', PACKAGE = 'NetRep', dCorr, dNet, tNodeNames, moduleAssignments, modules)
 }
 
 PermutationProcedure <- function(discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
-    .Call('NetRep_PermutationProcedure', PACKAGE = 'NetRep', discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
+    .Call('_NetRep_PermutationProcedure', PACKAGE = 'NetRep', discProps, tData, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
 
 PermutationProcedureNoData <- function(discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat) {
-    .Call('NetRep_PermutationProcedureNoData', PACKAGE = 'NetRep', discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
+    .Call('_NetRep_PermutationProcedureNoData', PACKAGE = 'NetRep', discProps, tCorr, tNet, moduleAssignments, modules, nPermutations, nCores, nullHypothesis, verbose, vCat)
 }
 
 NetProps <- function(data, net, moduleAssignments, modules) {
-    .Call('NetRep_NetProps', PACKAGE = 'NetRep', data, net, moduleAssignments, modules)
+    .Call('_NetRep_NetProps', PACKAGE = 'NetRep', data, net, moduleAssignments, modules)
 }
 
 NetPropsNoData <- function(net, moduleAssignments, modules) {
-    .Call('NetRep_NetPropsNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
+    .Call('_NetRep_NetPropsNoData', PACKAGE = 'NetRep', net, moduleAssignments, modules)
 }
 
 Scale <- function(data) {
-    .Call('NetRep_Scale', PACKAGE = 'NetRep', data)
+    .Call('_NetRep_Scale', PACKAGE = 'NetRep', data)
 }
 
