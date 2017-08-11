@@ -775,7 +775,7 @@ plotMultiBar <- function(
   if (yaxt) {
     axis(
       side=2, tick=FALSE, las=2, at=1:nrow(lengths)-0.5,
-      labels=rownames(lengths), line=yaxt.line
+      labels=rev(rownames(lengths)), line=yaxt.line
     )
   }
 }
