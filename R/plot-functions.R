@@ -256,7 +256,7 @@ plotSquareHeatmap <- function(
         rect(xleft=xleft, xright=xright, ybottom=ybottom, ytop=ytop, col=col, 
              border=col)
       }
-      if (ii %nin% na.indices.x) {
+      if (ii %nin% na.indices.y) {
         ci <- ci + 1
       }
     }    

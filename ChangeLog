@@ -1,3 +1,14 @@
+2017-08-11  Scott Ritchie <sritchie73@gmail.com>
+  
+  * DESCRIPTION: Release 1.1.4
+  
+  * R/plot-functions.R: fixed bug in plotSquareHeatmap() that caused 'plotModule'
+   and 'plotData' to crash when specifying 'orderSamplesBy' when not all samples 
+   from the 'orderSamplesBy' dataset were present in the dataset to be rendered.
+   Similarly, this fixes bugs in 'plotCorrelation' and 'plotNetwork' arising when
+   setting 'symmetric=TRUE' when nodes from the discovery network were not present
+   in the test dataset to be rendered.
+    
 2017-08-04  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.1.3
