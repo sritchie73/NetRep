@@ -118,8 +118,11 @@
 #'   from multiple tissues samples across the same individuals. If the dataset 
 #'   specified is the \code{discovery} dataset, then missing samples will be 
 #'   displayed as horizontal grey bars. If the dataset specified is one of the 
-#'   other datasets, then only samples present in both the specified dataset 
-#'   and the \code{test} dataset will be displayed.
+#'   other datasets, samples present in both the specified dataset and the 
+#'   \code{test} dataset will be displayed first in order of the specified 
+#'   dataset, then samples present in only the test dataset will be displayed
+#'   underneath a horizontal black line ordered by their module summary vector 
+#'   in the test dataset.  
 #'    
 #'   Order of samples by \emph{module summary} can be suppressed by setting 
 #'   \code{orderSamplesBy} to \code{NA}, in which case samples will be order as
@@ -469,6 +472,7 @@ plotData <- function(
   na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
+  nNewSamples <- plotProps$nNewSamples
   
   # flag for previous on.exit
   anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
@@ -558,7 +562,7 @@ plotData <- function(
     legend.main=legend.main, legend.vlim=dataLegendRange, 
     plotModuleNames=plotModuleNames, xaxt.line=naxt.line, yaxt.line=saxt.line, 
     laxt.tck=laxt.tck, laxt.line=laxt.line, legend.line=legend.position, 
-    maxt.line=maxt.line, lwd=lwd, na.col=naCol, dryRun=dryRun
+    maxt.line=maxt.line, lwd=lwd, na.col=naCol, dryRun=dryRun, yLine=nNewSamples
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }
@@ -1334,6 +1338,7 @@ plotSummary <- function(
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
   na.pos.y <- plotProps$na.pos.y
+  nNewSamples <- plotProps$nNewSamples
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
@@ -1379,7 +1384,7 @@ plotSummary <- function(
     yaxt=plotSampleNames, plotModuleNames=plotModuleNames, yaxt.line=saxt.line, 
     xaxt.line=xaxt.line, xaxt.tck=xaxt.tck, maxt.line=maxt.line, 
     xlab="Module summary", lwd=lwd, na.col=naCol, 
-    dryRun=dryRun
+    dryRun=dryRun, yLine=nNewSamples
   )
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
 }

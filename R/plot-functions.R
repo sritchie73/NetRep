@@ -203,6 +203,7 @@ plotTriangleHeatmap <- function(
 ### @param lwd line width for borders.
 ### @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 ###  drawn.
+### @param yLine draw a line at height=yLine.
 ###
 ### @keywords internal
 plotSquareHeatmap <- function(
@@ -210,7 +211,7 @@ plotSquareHeatmap <- function(
   na.col="#bdbdbd", xaxt=NULL, yaxt=NULL, plotModuleNames=TRUE, 
   main="", main.line=0, plotLegend=TRUE, legend.vlim=NULL, legend.main="", 
   legend.main.line=1, xaxt.line=-0.5, yaxt.line=-0.5, maxt.line=3, laxt.tck=0.04, 
-  laxt.line=2.5, legend.line=0.1, lwd=2, dryRun=FALSE
+  laxt.line=2.5, legend.line=0.1, lwd=2, dryRun=FALSE, yLine=0
 ) {
   nX <- ncol(values) + length(na.indices.x)
   nY <- nrow(values) + length(na.indices.y)
@@ -324,6 +325,10 @@ plotSquareHeatmap <- function(
     )
   }
   mtext(main, side=3, cex=par("cex")*par("cex.main"), font=2, line=main.line)
+  
+  if (yLine != 0) {
+    abline(h=yLine*yUnitSize+yHalfUnit)
+  }
   
   # Add legend if specified
   if (plotLegend) {
@@ -654,13 +659,14 @@ plotBar <- function(
 ### @param lwd line width for borders.
 ### @param dryRun logical; if \code{TRUE} only the axes and borders will be 
 ###  drawn.
+### @param yLine draw a line at height=yLine.
 ###
 ### @keywords internal
 plotMultiBar <- function(
   lengths, lengths.lim, cols, bar.width=1, drawBorders=FALSE, main="", 
   main.line=1, na.col="#bdbdbd", yaxt=TRUE, plotModuleNames=TRUE, yaxt.line=0, 
   maxt.line=2.5, xaxt.line=0, xaxt.tck=-0.025, xlab="", xlab.line=2.5, 
-  cex.modules=0.7, lwd=2, dryRun=FALSE
+  cex.modules=0.7, lwd=2, dryRun=FALSE, yLine=0
 ) {
   if (!is.matrix(lengths))
     lengths <- matrix(lengths, ncol=lengths)
@@ -744,6 +750,10 @@ plotMultiBar <- function(
       }
     }
     
+    if (yLine != 0) {
+      abline(h=yLine)
+    }
+   
     # draw 0 axis
     lines(x=rep(getX(ax), 2), y=c(0, nrow(lengths)), lwd=lwd)
     

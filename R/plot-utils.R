@@ -252,12 +252,23 @@ plotProps <- function(
     }
   }
   
+  nNewSamples <- 0
   if (is.null(orderSamplesBy)) {
     sampleOrder <- NULL
   } else if (!is.na(orderSamplesBy)) {
-    orderProps <- filterInternalProps(props, orderSamplesBy, di, moduleOrder[1])
-    sampleOrder <- sampleOrderInternal(orderProps, verbose, na.rm=FALSE)
+    sampleOrderProps <- filterInternalProps(props, orderSamplesBy, di, moduleOrder[1])
+    sampleOrder <- sampleOrderInternal(sampleOrderProps, verbose, na.rm=FALSE)
     sampleOrder <- simplifyList(sampleOrder, depth=3)
+    
+    # Tack samples present in the test dataset not present in the 'orderSamplesBy'
+    # dataset -- these are important because the contribute to the calculation of
+    # the summary profiles, correlation, and network matrices!
+    testOrderProps <- filterInternalProps(props, ti, di, moduleOrder[1])
+    testSampleOrder <- sampleOrderInternal(testOrderProps, verbose, na.rm=FALSE)
+    testSampleOrder <- simplifyList(testSampleOrder, depth=3)
+    newSamples <- testSampleOrder %sub_nin% sampleOrder
+    nNewSamples <- length(newSamples)
+    sampleOrder <- c(sampleOrder, newSamples)
   } else {
     sampleOrder <- rownames(deref(dataLoaded))
   }
@@ -316,6 +327,7 @@ plotProps <- function(
   return(list(
     testProps=testProps, nodeOrder=nodeOrder, moduleOrder=moduleOrder,
     sampleOrder=sampleOrder, na.pos.x=na.pos.x, na.pos.y=na.pos.y,
-    presentNodes=presentNodes, presentSamples=presentSamples
+    presentNodes=presentNodes, presentSamples=presentSamples,
+    nNewSamples=nNewSamples
   ))
 }

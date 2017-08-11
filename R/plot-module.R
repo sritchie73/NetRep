@@ -116,8 +116,11 @@
 #'   from multiple tissues samples across the same individuals. If the dataset 
 #'   specified is the \code{discovery} dataset, then missing samples will be 
 #'   displayed as horizontal grey bars. If the dataset specified is one of the 
-#'   other datasets, then only samples present in both the specified dataset 
-#'   and the \code{test} dataset will be displayed.
+#'   other datasets, samples present in both the specified dataset and the 
+#'   \code{test} dataset will be displayed first in order of the specified 
+#'   dataset, then samples present in only the test dataset will be displayed
+#'   underneath a horizontal black line ordered by their module summary vector 
+#'   in the test dataset.
 #'    
 #'   Order of samples by \emph{module summary} can be suppressed by setting 
 #'   \code{orderSamplesBy} to \code{NA}, in which case samples will be order as
@@ -479,6 +482,7 @@ plotModule <- function(
   na.pos.y <- plotProps$na.pos.y
   presentNodes <- plotProps$presentNodes
   presentSamples <- plotProps$presentSamples
+  nNewSamples <- plotProps$nNewSamples
   
   # flag for on.exit
   anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
@@ -676,7 +680,7 @@ plotModule <- function(
       xaxt=naxt, yaxt=NULL, plotLegend=FALSE, main="",
       legend.main="", plotModuleNames=plotModuleNames,
       xaxt.line=naxt.line, maxt.line=maxt.line, lwd=lwd,
-      dryRun=dryRun
+      dryRun=dryRun, yLine=nNewSamples
     )
     
     # Plot data legend
@@ -701,7 +705,7 @@ plotModule <- function(
       yaxt=plotSampleNames, plotModuleNames=plotModuleNames, 
       yaxt.line=saxt.line, maxt.line=0, xlab=xlab, xaxt.line=xaxt.line, 
       xlab.line=xlab.line, xaxt.tck=xaxt.tck, cex.modules=par("cex.lab"), 
-      na.col=naCol, dryRun=dryRun
+      na.col=naCol, dryRun=dryRun, yLine=nNewSamples
     )
   }
   on.exit({vCat(verbose, 0, "Done!")}, add=TRUE)
