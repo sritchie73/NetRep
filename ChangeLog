@@ -1,3 +1,48 @@
+2017-08-15  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.1.5
+  
+  * Bugfix to data heatmap and module summary bar charts: sample labels 
+    previously appeared in reverse order (i.e. did not correspond to the 
+    shown data). This has now been fixed.
+    
+  * Enhancement to data heatmap and module summary bar charts: Previously,
+    when specifying 'orderSampleBy' only samples present in both the 
+    plotted 'test' dataset and the 'orderSamplesBy' dataset were shown.
+    Now, samples present in the the plotted 'test' dataset but not present
+    in the 'orderSamplesBy' dataset are also shown on the data heatmap and
+    module summary bar charts. These are shown below the samples present 
+    in both dataset on both the data heatmap and module summary bar charts,
+    separated from the samples present in both datasets by a horizontal
+    black line. These samples appear ordered by their module summary values
+    in the 'test' dataset.
+    
+  * R/plot-utils.R: plotProps() now returns an additional value indicating 
+    the number of samples present in the 'test' dataset not present in the 
+    'orderSamplesBy' dataset.
+    
+  * R/plot-functions.R: plotSquareHeatmap() and plotMultiBar() now have an
+    additional argument, 'yLine', that tells both functions where to draw
+    a horizontal black line (i.e. to indicate separation of samples present
+    in both the 'orderSamplesBy' and 'test' dataset from those present only
+    in the 'test' dataset).
+    
+  * R/plot-functions.R: plotMultiBar() now shows sample labels in the 
+    correct order.
+    
+  * R/plot-module.R: plotModule() now keeps track of number of samples 
+    present only in the 'test' dataset to pass to plotSquareHeatamp()
+    and plotMultiBar().
+    
+  * R/plot-module.R: plotModule() now keeps track of number of samples 
+    present only in the 'test' dataset to pass to plotSquareHeatamp()
+    and plotMultiBar().
+    
+  * R/plot-topology.R plotData() and plotSummary() now keep track of 
+    number of samples present in the 'test' dataset to pass to 
+    plotSquareHeatmap() and plotMultiBar() respectively.
+  
+  
 2017-08-11  Scott Ritchie <sritchie73@gmail.com>
   
   * DESCRIPTION: Release 1.1.4
