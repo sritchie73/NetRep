@@ -402,14 +402,15 @@ plotModule <- function(
   loadedIdx <- finput$loadedIdx
   
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  correlationLoaded <- finput$correlationLoaded
-  networkLoaded <- finput$networkLoaded
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  dataEnv <- finput$dataEnv
+  correlationEnv <- finput$correlationEnv
+  networkEnv <- finput$networkEnv
+  
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -417,7 +418,7 @@ plotModule <- function(
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, correlationLoaded, networkLoaded)
+    rm(dataEnv, correlationEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -473,7 +474,7 @@ plotModule <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+    verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -491,9 +492,9 @@ plotModule <- function(
     vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
          'Loading correlation matrix of dataset "', ti, '" into RAM...', 
          sep="")
-    rm(correlationLoaded)
+    correlationEnv$matrix <- NULL
     gc()
-    correlationLoaded <- loadIntoRAM(correlation[[ti]])
+    correlationEnv$matrix <- loadIntoRAM(correlation[[ti]])
   }
   
   #-----------------------------------------------------------------------------
@@ -505,7 +506,7 @@ plotModule <- function(
     # placehold vectors so that the plot functions work
     wDegreeVec <- rep(0, length(nodeOrder))
     names(wDegreeVec) <- nodeOrder
-    if (!is.null(dataLoaded)) {
+    if (!is.null(dataEnv$matrix)) {
       nodeContribVec <- rep(0, length(nodeOrder))
       names(nodeContribVec) <- nodeOrder
       
@@ -574,7 +575,7 @@ plotModule <- function(
     # dataGradientRange - what range of values should the gradient span (e.g. in the case
     #                     of positive and negative values to keep white at 0)
     
-    dat <- dataLoaded[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
+    dat <- dataEnv$matrix[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
     
     # The user input 'dataRange' is more accurately 'dataLegendRange' but I don't 
     # want to change the API now the package is released
@@ -616,7 +617,7 @@ plotModule <- function(
   # Plot correlation
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    correlationLoaded[presentNodes, presentNodes, drop=FALSE], 
+    correlationEnv$matrix[presentNodes, presentNodes, drop=FALSE], 
     corCols, corRange, moduleAssignments[[di]][nodeOrder], na.pos.x, 
     plotLegend=TRUE, main=main, main.line=main.line, legend.main="Correlation", 
     plotModuleNames=FALSE, laxt.tck=laxt.tck, laxt.line=laxt.line, na.col=naCol,
@@ -627,7 +628,7 @@ plotModule <- function(
   # Plot network
   par(mar=c(1, 1, 1, 1))
   plotTriangleHeatmap(
-    networkLoaded[presentNodes, presentNodes, drop=FALSE], netCols, netRange,
+    networkEnv$matrix[presentNodes, presentNodes, drop=FALSE], netCols, netRange,
     moduleAssignments[[di]][nodeOrder], na.pos.x, plotLegend=TRUE, main="", 
     legend.main="Edge weights", plotModuleNames=FALSE, 
     laxt.tck=laxt.tck, na.col=naCol, legend.main.line=legend.main.line,
@@ -637,7 +638,7 @@ plotModule <- function(
   
   # Plot weighted degree
   par(mar=c(1,1,1,1))
-  if (is.null(dataLoaded)) {
+  if (is.null(dataEnv$matrix)) {
     plotBar(
       wDegreeVec, c(0,1), moduleAssignments[[di]][nodeOrder], degreeCol, 
       drawBorders=drawBorders, plotModuleNames=plotModuleNames, 
@@ -655,7 +656,7 @@ plotModule <- function(
     )
   }
   
-  if (!is.null(dataLoaded)) {
+  if (!is.null(dataEnv$matrix)) {
     # Plot Module Membership
     par(mar=c(1, 1, 1, 1))
     plotBar(

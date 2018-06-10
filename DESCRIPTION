@@ -23,8 +23,7 @@ Imports:
     utils,
     stats,
     graphics,
-    grDevices,
-    ref
+    grDevices
 Suggests:
     bigmemory,
     testthat,

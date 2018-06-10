@@ -176,14 +176,14 @@ areColors <- function(colvec) {
 ### @param nDatasets vector returned by \code{'processInput'}.
 ### @param verbose logical; turn on verbose printing.
 ### @param loadedIdx index of the currently loaded dataset.
-### @param dataLoaded currently loaded data matrix (may be NULL).
-### @param networkLoaded currently loaded network matrix.
+### @param dataEnv environment containing currently loaded data matrix (may be NULL).
+### @param networkEnv environment containing currently loaded network matrix.
 ###
 ### @keywords internal
 plotProps <- function(
   network, data, moduleAssignments, modules, di, ti, orderNodesBy, 
   orderSamplesBy, orderModules, datasetNames, nDatasets, verbose, loadedIdx, 
-  dataLoaded, networkLoaded
+  dataEnv, networkEnv
 ) {
   mods <- modules[[di]]
   mi <- NULL # suppresses CRAN note
@@ -211,7 +211,7 @@ plotProps <- function(
   # Calculate the network properties for all datasets required
   res <- netPropsInternal(network, data, moduleAssignments, modules, di, 
                           plotDatasets, nDatasets, datasetNames, verbose, 
-                          loadedIdx, dataLoaded, networkLoaded, TRUE)
+                          loadedIdx, dataEnv, networkEnv, TRUE)
   props <- res$props
   loadedIdx <- res$loadedIdx
   
@@ -270,7 +270,7 @@ plotProps <- function(
     nNewSamples <- length(newSamples)
     sampleOrder <- c(sampleOrder, newSamples)
   } else {
-    sampleOrder <- rownames(deref(dataLoaded))
+    sampleOrder <- rownames(dataEnv$matrix)
   }
   
   # Just keep the properties we need for plotting
@@ -285,7 +285,7 @@ plotProps <- function(
   # 'test' dataset.
   #-----------------------------------------------------------------------------
   
-  na.pos.x <- which(nodeOrder %nin% colnames(deref(networkLoaded)))
+  na.pos.x <- which(nodeOrder %nin% colnames(networkEnv$matrix))
   if (length(na.pos.x) > 0) {
     presentNodes <- nodeOrder[-na.pos.x]
   } else {
@@ -296,7 +296,7 @@ plotProps <- function(
     na.pos.y <- NULL
     presentSamples <- NULL
   } else if (!is.numeric(sampleOrder)) {
-    na.pos.y <- which(sampleOrder %nin% rownames(deref(dataLoaded)))
+    na.pos.y <- which(sampleOrder %nin% rownames(dataEnv$matrix))
     if (length(na.pos.y) > 0) {
       presentSamples <- sampleOrder[-na.pos.y]
     } else {

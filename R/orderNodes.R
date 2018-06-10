@@ -170,14 +170,15 @@ nodeOrder <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, "props")
-  # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  networkLoaded <- finput$networkLoaded
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # Get the environments containing the loaded datasets
+  dataEnv <- finput$dataEnv
+  networkEnv <- finput$networkEnv
+
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   anyDM <- with(finput, {
     any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -185,7 +186,7 @@ nodeOrder <- function(
   })
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    rm(dataEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -210,20 +211,18 @@ nodeOrder <- function(
   # Then we can save time by not calculating the data-based network properties.
   # We can't detect this without sanity checking the user input first though, so
   # datasets may have been loaded
-  with(finput, {
-    for (di in discovery) {
-      if (length(modules[[di]]) == 1) {
-        data[di] <- list(NULL)
-        dataLoaded <- NULL
-      }
+  for (di in finput$discovery) {
+    if (length(finput$modules[[di]]) == 1) {
+      finput$data[di] <- list(NULL)
+      dataEnv$matrix <- NULL
     }
-  })
+  }
   
   # Calculate the network properties
   props <- with(finput, {
     netPropsInternal(network, data, moduleAssignments, modules, discovery, 
                      test, nDatasets, datasetNames, verbose, loadedIdx, 
-                     as.ref(dataLoaded), as.ref(networkLoaded), FALSE)
+                     dataEnv, networkEnv, FALSE)
   })
   anyDM <- FALSE
   

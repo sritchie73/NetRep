@@ -432,19 +432,19 @@ plotData <- function(
   loadedIdx <- finput$loadedIdx
   
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  networkLoaded <- finput$networkLoaded
+  dataEnv <- finput$dataEnv
+  networkEnv <- finput$networkEnv
   
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    rm(dataEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -463,7 +463,7 @@ plotData <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+    verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -500,7 +500,7 @@ plotData <- function(
     # dataGradientRange - what range of values should the gradient span (e.g. in the case
     #                     of positive and negative values to keep white at 0)
     
-    dat <- dataLoaded[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
+    dat <- dataEnv$matrix[presentSamples, presentNodes, drop=FALSE] # also used for actual plot
     
     # The user input 'dataRange' is more accurately 'dataLegendRange' but I don't 
     # want to change the API now the package is released
@@ -633,15 +633,15 @@ plotCorrelation <- function(
   loadedIdx <- finput$loadedIdx
   
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  correlationLoaded <- finput$correlationLoaded
-  networkLoaded <- finput$networkLoaded
+  dataEnv <- finput$dataEnv
+  correlationEnv <- finput$correlationEnv
+  networkEnv <- finput$networkEnv
   
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -649,7 +649,7 @@ plotCorrelation <- function(
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, correlationLoaded, networkLoaded)
+    rm(dataEnv, correlationEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -668,7 +668,7 @@ plotCorrelation <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+    verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -682,9 +682,9 @@ plotCorrelation <- function(
     vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
          'Loading correlation matrix of dataset "', ti, '" into RAM...', 
          sep="")
-    rm(correlationLoaded)
+    correlationEnv$matrix <- NULL
     gc()
-    correlationLoaded <- loadIntoRAM(correlation[[ti]])
+    correlationEnv$matrix <- loadIntoRAM(correlation[[ti]])
   }
   
   #-----------------------------------------------------------------------------
@@ -735,7 +735,7 @@ plotCorrelation <- function(
     }
     
     plotSquareHeatmap(
-      correlationLoaded[presentNodes, presentNodes, drop=FALSE], corCols, corRange, 
+      correlationEnv$matrix[presentNodes, presentNodes, drop=FALSE], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -746,7 +746,7 @@ plotCorrelation <- function(
     )
   } else {
     plotTriangleHeatmap(
-      correlationLoaded[presentNodes, presentNodes, drop=FALSE], corCols, corRange, 
+      correlationEnv$matrix[presentNodes, presentNodes, drop=FALSE], corCols, corRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
@@ -824,14 +824,14 @@ plotNetwork <- function(
   loadedIdx <- finput$loadedIdx
   
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  networkLoaded <- finput$networkLoaded
+  dataEnv <- finput$dataEnv
+  networkEnv <- finput$networkEnv
   
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -839,7 +839,7 @@ plotNetwork <- function(
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    rm(dataEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -859,7 +859,7 @@ plotNetwork <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+    verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -917,7 +917,7 @@ plotNetwork <- function(
     }
     
     plotSquareHeatmap(
-      networkLoaded[presentNodes, presentNodes, drop=FALSE], netCols, netRange, 
+      networkEnv$matrix[presentNodes, presentNodes, drop=FALSE], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x, na.pos.x, 
       xaxt=naxt, yaxt=naxt, plotLegend=plotLegend, main=main,
       legend.main=legend.main, plotModuleNames=plotModuleNames,
@@ -928,7 +928,7 @@ plotNetwork <- function(
     )
   } else {
     plotTriangleHeatmap(
-      networkLoaded[presentNodes, presentNodes, drop=FALSE], netCols, netRange, 
+      networkEnv$matrix[presentNodes, presentNodes, drop=FALSE], netCols, netRange, 
       moduleAssignments[[di]][nodeOrder], na.pos.x,xaxt=naxt, 
       plotLegend=plotLegend, main=main, legend.main=legend.main, 
       plotModuleNames=plotModuleNames, xaxt.line=naxt.line,
@@ -1006,14 +1006,14 @@ plotContribution <- function(
   loadedIdx <- finput$loadedIdx
 
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  networkLoaded <- finput$networkLoaded
+  dataEnv <- finput$dataEnv
+  networkEnv <- finput$networkEnv
   
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -1021,7 +1021,7 @@ plotContribution <- function(
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    rm(dataEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -1042,7 +1042,7 @@ plotContribution <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+    verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -1149,14 +1149,14 @@ plotDegree <- function(
   loadedIdx <- finput$loadedIdx
   
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  networkLoaded <- finput$networkLoaded
+  dataEnv <- finput$dataEnv
+  networkEnv <- finput$networkEnv
   
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -1164,7 +1164,7 @@ plotDegree <- function(
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    rm(dataEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -1184,7 +1184,7 @@ plotDegree <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
      orderNodesBy, orderSamplesBy=NULL, orderModules, datasetNames, nDatasets, 
-     verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+     verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   nodeOrder <- plotProps$nodeOrder
   moduleOrder <- plotProps$moduleOrder
@@ -1296,14 +1296,14 @@ plotSummary <- function(
   loadedIdx <- finput$loadedIdx
   
   # Get the loaded datasets
-  dataLoaded <- finput$dataLoaded
-  networkLoaded <- finput$networkLoaded
+  dataEnv <- finput$dataEnv
+  networkEnv <- finput$networkEnv
   
-  # remove from the finput list so that when we re-assign a new dataset the
-  # memory is freed.
-  finput$dataLoaded <- NULL
-  finput$correlationLoaded <- NULL
-  finput$networkLoaded <- NULL
+  # We don't want a second copy of these environments when we start 
+  # swapping datasets.
+  finput$dataEnv <- NULL
+  finput$correlationEnv <- NULL
+  finput$networkEnv <- NULL
   
   # Flag for on.exit
   anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
@@ -1311,7 +1311,7 @@ plotSummary <- function(
   
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataLoaded, networkLoaded)
+    rm(dataEnv, networkEnv)
     gc()
   }, add=TRUE)
   
@@ -1331,7 +1331,7 @@ plotSummary <- function(
   
   plotProps <- plotProps(network, data, moduleAssignments, modules, di, ti, 
     orderNodesBy, orderSamplesBy, orderModules, datasetNames, nDatasets, 
-    verbose, loadedIdx, as.ref(dataLoaded), as.ref(networkLoaded))
+    verbose, loadedIdx, dataEnv, networkEnv)
   testProps <- plotProps$testProps
   moduleOrder <- plotProps$moduleOrder
   sampleOrder <- plotProps$sampleOrder

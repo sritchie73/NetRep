@@ -680,6 +680,14 @@ processInput <- function(
     sSamples <- NULL
   }
   
+  # Create environments that contain the currently loaded data. These 
+  # will always contain one loaded disk.matrix, but the environments
+  # themselves can be passed by reference, i.e. when datasets need to 
+  # be swapped out by functions.
+  dataEnv <- new.env()
+  correlationEnv <- new.env()
+  networkEnv <- new.env()
+  
   anyDM <- do.call("any.disk.matrix", c(data[iterator], correlation[iterator], network[iterator]))
   vCat(verbose && !anyDM, 1, "Checking matrices for problems...")
   for (ii in iterator) {
@@ -688,17 +696,17 @@ processInput <- function(
     anyDM <- any.disk.matrix(data[[ii]], correlation[[ii]], network[[ii]])
     vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
          datasetNames[ii], '" into RAM...', sep="")
-    dataLoaded <- loadIntoRAM(data[[ii]])
-    correlationLoaded <- loadIntoRAM(correlation[[ii]])
-    networkLoaded <- loadIntoRAM(network[[ii]])
+    dataEnv$matrix <- loadIntoRAM(data[[ii]])
+    correlationEnv$matrix <- loadIntoRAM(correlation[[ii]])
+    networkEnv$matrix <- loadIntoRAM(network[[ii]])
     
     vCat(verbose && anyDM, 1, "Checking matrices for problems...")
     
     # If plotting, we need to check that samples from the 'orderSamplesBy' 
     # dataset are present in the 'test' dataset to be drawn.
     if (funcType == "plot") {
-      if (ii == pIdx) pSamples <- rownames(dataLoaded)
-      if (ii == sIdx) sSamples <- rownames(dataLoaded)
+      if (ii == pIdx) pSamples <- rownames(dataEnv$matrix)
+      if (ii == sIdx) sSamples <- rownames(dataEnv$matrix)
       if (!is.null(pSamples) && !is.null(sSamples)) {
         if(length(intersect(pSamples, sSamples)) == 0) {
           stop("no samples in the dataset specified by 'orderSamplesBy' ", 
@@ -709,55 +717,55 @@ processInput <- function(
     
     # Make sure matrices are (a) actually matrices, and (b) contain numeric 
     # data
-    if (!is.matrix(networkLoaded) || 
-        typeof(networkLoaded) %nin% c("double", "integer")) {
+    if (!is.matrix(networkEnv$matrix) || 
+        typeof(networkEnv$matrix) %nin% c("double", "integer")) {
       stop("'network' for dataset ", '"', ii, '"', 
            " is not a numeric matrix")
     }
-    if (!is.matrix(correlationLoaded) ||
-        typeof(correlationLoaded) %nin% c("double", "integer")) {
+    if (!is.matrix(correlationEnv$matrix) ||
+        typeof(correlationEnv$matrix) %nin% c("double", "integer")) {
       stop("'correlation' for dataset ", '"', ii, '"', 
            " is not a numeric matrix")
     }
     
-    if (!is.null(dataLoaded) && (!is.matrix(dataLoaded) || 
-                            typeof(dataLoaded) %nin% c("double", "integer"))) {
+    if (!is.null(dataEnv$matrix) && (!is.matrix(dataEnv$matrix) || 
+                            typeof(dataEnv$matrix) %nin% c("double", "integer"))) {
       stop("'data' for dataset ", '"', ii, '"', " is not a numeric matrix")
     }
     
     # Make sure the 'correlation' and 'network' matrices are square
-    if (nrow(networkLoaded) != ncol(networkLoaded)) {
+    if (nrow(networkEnv$matrix) != ncol(networkEnv$matrix)) {
       stop("'network' for dataset ", '"', ii, '"', " is not square")
     }
-    if (nrow(correlationLoaded) != ncol(correlationLoaded)) {
+    if (nrow(correlationEnv$matrix) != ncol(correlationEnv$matrix)) {
       stop("'correlation' for dataset ", '"', ii, '"', " is not square")
     }
     # And that they have the same dimensions
-    if ((nrow(correlationLoaded) != nrow(networkLoaded)) ||
-        (!is.null(dataLoaded) && (ncol(dataLoaded) != ncol(networkLoaded)))) {
+    if ((nrow(correlationEnv$matrix) != nrow(networkEnv$matrix)) ||
+        (!is.null(dataEnv$matrix) && (ncol(dataEnv$matrix) != ncol(networkEnv$matrix)))) {
       stop("'correlation', 'network', and 'data' have a different number of ",
            'nodes for dataset "', ii, '"')
     }
     
     # Make sure the matrices have dimension names
-    if (is.null(rownames(networkLoaded)) || is.null(rownames(correlationLoaded)) ||
-        (!is.null(dataLoaded) && is.null(rownames(dataLoaded)))) {
+    if (is.null(rownames(networkEnv$matrix)) || is.null(rownames(correlationEnv$matrix)) ||
+        (!is.null(dataEnv$matrix) && is.null(rownames(dataEnv$matrix)))) {
       stop("supplied matrices must have row and column names")      
     }
     
     # Make sure the 'correlation' and 'network' matrices are symmetric 
-    if (any(rownames(networkLoaded) != colnames(networkLoaded))) {
+    if (any(rownames(networkEnv$matrix) != colnames(networkEnv$matrix))) {
       stop("mismatch between row and column names in 'network' for dataset ", 
            '"', ii, '"')
     }
-    if (any(rownames(correlationLoaded) != colnames(correlationLoaded))) {
+    if (any(rownames(correlationEnv$matrix) != colnames(correlationEnv$matrix))) {
       stop("mismatch between row and column names in 'network' for dataset ",
            '"', ii, '"')
     }
     # Make sure the ordering of nodes is the same between 'correlation', 
     # 'network' and 'data'.
-    if (any(colnames(networkLoaded) != colnames(correlationLoaded)) |
-        (!is.null(dataLoaded) && any(colnames(networkLoaded) != colnames(dataLoaded)))) {
+    if (any(colnames(networkEnv$matrix) != colnames(correlationEnv$matrix)) |
+        (!is.null(dataEnv$matrix) && any(colnames(networkEnv$matrix) != colnames(dataEnv$matrix)))) {
       stop("mismatch in node order between 'data', 'correlation', and 'network'",
            ' for dataset "', ii, '"')
     }
@@ -765,7 +773,7 @@ processInput <- function(
     # Make sure the 'moduleAssignments' have the same nodes as the 'correlation'
     # etc.
     if (!is.null(moduleAssignments[[ii]])) {
-      if (any(names(moduleAssignments[[ii]]) %nin% colnames(networkLoaded))) {
+      if (any(names(moduleAssignments[[ii]]) %nin% colnames(networkEnv$matrix))) {
         stop("module assigments are present for nodes that are not in the",
              " 'network' inferred from dataset ", '"', ii, '"')
       }
@@ -785,19 +793,23 @@ processInput <- function(
     
     # Check matrices for non-finite values: these will cause the calculation
     # of network properties and module preservation statistics to hang. 
-    if (!is.null(dataLoaded))
-      CheckFinite(dataLoaded)
-    CheckFinite(correlationLoaded)
-    CheckFinite(networkLoaded)
+    if (!is.null(dataEnv$matrix))
+      CheckFinite(dataEnv$matrix)
+    CheckFinite(correlationEnv$matrix)
+    CheckFinite(networkEnv$matrix)
     
     # Store the node names for later
-    nodelist[[datasetNames[ii]]] <- colnames(networkLoaded)
+    nodelist[[datasetNames[ii]]] <- colnames(networkEnv$matrix)
     
     # Free up memory if any objects are big matrices, but return the last
-    # dataset to pass to the calling function.
+    # dataset to pass to the calling function. 
+    # 2018-06 - Is this really necessary now that we're wrapping the 
+    #           matrices in environments?
     if (ii != tokeep) {
       vCat(verbose && anyDM, 1, "Unloading dataset from RAM...")
-      rm(dataLoaded, correlationLoaded, networkLoaded)
+      dataEnv$matrix <- NULL
+      correlationEnv$matrix <- NULL
+      networkEnv$matrix <- NULL
       gc()
     }
   }
@@ -807,8 +819,8 @@ processInput <- function(
     test=test, moduleAssignments=moduleAssignments, modules=modules,
     nDatasets=nDatasets, datasetNames=datasetNames,
     orderNodesBy=orderNodesBy, orderSamplesBy=orderSamplesBy,
-    nodelist=nodelist, loadedIdx=tokeep, dataLoaded=dataLoaded, 
-    correlationLoaded=correlationLoaded, networkLoaded=networkLoaded
+    nodelist=nodelist, loadedIdx=tokeep, dataEnv=dataEnv, 
+    correlationEnv=correlationEnv, networkEnv=networkEnv
   ))
 }
 
