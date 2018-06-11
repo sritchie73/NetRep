@@ -1,3 +1,22 @@
+2018-06-11  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.0
+  
+  * Removed dependency on the ref package, which is being archived.
+    The internal representation of the data, correlation, and network
+    matrix for the dataset loaded into RAM has been changed from a 
+    matrix (previously passed by reference between some functions 
+    using the ref package) to an environment that contains a variable
+    storing the matrix. By passing these environments between functions,
+    the loaded dataset can be changed within an internal function 
+    without the callee function creating a copy of the previously loaded
+    dataset to be restored on the completion of the function call.
+    
+  * Enhanced code clarity by removing use of with(), which in many 
+    instances made it unclear what scope variables were being
+    operated on due to conflicts between process user input in an 
+    environment variable and unprocessed user input in function arguments.
+  
 2017-08-15  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.1.5

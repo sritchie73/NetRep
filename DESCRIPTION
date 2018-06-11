@@ -1,7 +1,7 @@
 Package: NetRep
 Type: Package
 Title: Permutation Testing Network Module Preservation Across Datasets
-Version: 1.1.5
+Version: 1.2.0
 Date: 2017-08-04
 Authors@R: person(given="Scott", family="Ritchie", 
                   email="sritchie73@gmail.com", 
