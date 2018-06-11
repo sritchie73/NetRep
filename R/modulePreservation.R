@@ -379,6 +379,10 @@ modulePreservation <- function(
   nThreads=NULL, nPerm=NULL, null="overlap", alternative="greater", 
   simplify=TRUE, verbose=TRUE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Input processing and sanity checking
   #-----------------------------------------------------------------------------

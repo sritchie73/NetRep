@@ -374,6 +374,10 @@ plotData <- function(
   cex.axis=0.8, cex.lab=1.2, cex.main=2, dataCols=NULL, dataRange=NULL, 
   naCol="#bdbdbd", dryRun=FALSE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE)
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
@@ -582,6 +586,10 @@ plotCorrelation <- function(
   cex.lab=1.2, cex.main=2, corCols=correlation.palette(), corRange=c(-1,1), 
   naCol="#bdbdbd", dryRun=FALSE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
@@ -773,6 +781,10 @@ plotNetwork <- function(
   cex.lab=1.2, cex.main=2, netCols=network.palette(), netRange=c(0,1), 
   naCol="#bdbdbd", dryRun=FALSE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
@@ -954,6 +966,10 @@ plotContribution <- function(
   cex.axis=0.8, cex.lab=1.2, cex.main=2, contribCols=c("#A50026", "#313695"), 
   naCol="#bdbdbd", dryRun=FALSE  
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
@@ -1100,6 +1116,10 @@ plotDegree <- function(
   cex.axis=0.8, cex.lab=1.2, cex.main=2, degreeCol="#feb24c", naCol="#bdbdbd", 
   dryRun=FALSE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
@@ -1244,6 +1264,10 @@ plotSummary <- function(
   xaxt.line=0, xaxt.tck=-0.025, cex.axis=0.8, cex.lab=1.2, cex.main=2, 
   summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd", dryRun=FALSE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------

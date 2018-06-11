@@ -344,6 +344,10 @@ plotModule <- function(
   netRange=c(0,1), degreeCol="#feb24c", contribCols=c("#A50026", "#313695"), 
   summaryCols=c("#1B7837", "#762A83"), naCol="#bdbdbd", dryRun=FALSE
 ) {
+  # always garbage collect before the function exits so any loaded 
+  # disk.matrices get unloaded as appropriate
+  on.exit({ gc() }, add = TRUE) 
+  
   #-----------------------------------------------------------------------------
   # Set graphical parameters to catch errors prior to computation
   #-----------------------------------------------------------------------------
