@@ -173,6 +173,7 @@ networkProperties <- function(
   # swapping datasets.
   finput$dataEnv <- NULL
   finput$networkEnv <- NULL
+  finput$correlationEnv <- NULL # unload the correlation matrix as well since we don't need it
   
   vCat(verbose, 0, "User input ok!")
   anyDM <- any.disk.matrix(data[[loadedIdx]], 

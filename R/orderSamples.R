@@ -148,6 +148,8 @@ sampleOrder <- function(
   # swapping datasets.
   finput$dataEnv <- NULL
   finput$networkEnv <- NULL
+  finput$correlationEnv <- NULL # unload the correlation matrix as well since we don't need it
+
   
   anyDM <- any.disk.matrix(data[[loadedIdx]], 
                            correlation[[loadedIdx]], 
