@@ -131,27 +131,31 @@ sampleOrder <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, "props")
-  # Get the environments containing the loaded datasets
+  data <- finput$data
+  correlation <- finput$correlation
+  network <- finput$network
+  loadedIdx <- finput$loadedIdx
   dataEnv <- finput$dataEnv
   networkEnv <- finput$networkEnv
-
+  discovery <- finput$discovery
+  test <- finput$test
+  modules <- finput$modules
+  moduleAssignments <- finput$moduleAssignments
+  nDatasets <- finput$nDatasets
+  datasetNames <- finput$datasetNames
+  
   # We don't want a second copy of these environments when we start 
   # swapping datasets.
   finput$dataEnv <- NULL
-  finput$correlationEnv <- NULL
   finput$networkEnv <- NULL
   
-  discovery <- finput$discovery
-  test <- finput$test
-  data <- finput$data
-  
-  anyDM <- with(finput, {
-    any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
-                    network[[loadedIdx]])
-  })
+  anyDM <- any.disk.matrix(data[[loadedIdx]], 
+                           correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataEnv, networkEnv)
+    dataEnv$matrix <- NULL
+    networkEnv$matrix <- NULL
     gc()
   }, add=TRUE)
   
@@ -167,11 +171,10 @@ sampleOrder <- function(
   vCat(verbose, 0, "User input ok!")
   
   # Calculate the network properties
-  props <- with(finput, {
-    netPropsInternal(network, data, moduleAssignments, modules, discovery, 
-                     test, nDatasets, datasetNames, verbose, loadedIdx, 
-                     dataEnv, networkEnv, FALSE)
-  })
+  props <- netPropsInternal(network, data, moduleAssignments, 
+                            modules, discovery, test,
+                            nDatasets, datasetNames, verbose,
+                            loadedIdx, dataEnv, networkEnv, FALSE)
   anyDM <- FALSE
   
   res <- sampleOrderInternal(props, verbose, na.rm)

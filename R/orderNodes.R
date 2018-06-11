@@ -170,60 +170,65 @@ nodeOrder <- function(
   finput <- processInput(discovery, test, network, correlation, data, 
                          moduleAssignments, modules, backgroundLabel,
                          verbose, "props")
-  # Get the environments containing the loaded datasets
+  data <- finput$data
+  correlation <- finput$correlation
+  network <- finput$network
+  loadedIdx <- finput$loadedIdx
   dataEnv <- finput$dataEnv
   networkEnv <- finput$networkEnv
-
+  discovery <- finput$discovery
+  test <- finput$test
+  modules <- finput$modules
+  moduleAssignments <- finput$moduleAssignments
+  nDatasets <- finput$nDatasets
+  datasetNames <- finput$datasetNames
+  
   # We don't want a second copy of these environments when we start 
   # swapping datasets.
   finput$dataEnv <- NULL
-  finput$correlationEnv <- NULL
   finput$networkEnv <- NULL
   
-  anyDM <- with(finput, {
-    any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
-                    network[[loadedIdx]])
-  })
+  anyDM <- any.disk.matrix(data[[loadedIdx]], 
+                           correlation[[loadedIdx]], 
+                           network[[loadedIdx]])
   on.exit({
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
-    rm(dataEnv, networkEnv)
+    dataEnv$matrix <- NULL
+    networkEnv$matrix <- NULL
     gc()
   }, add=TRUE)
   
   # If 'orderModules' is TRUE we need to make sure that there is data in each 
   # test dataset if there is more than one 'module'
-  with(finput, {
-    if (orderModules) {
-      for (di in discovery) {
-        for (ti in test[[di]]) {
-          if (is.null(data[[ti]]) && length(modules[[di]]) > 1) {
-            stop("'data' must be provided for all 'test' datasets ",
-                 "if 'orderModules' is TRUE")
-          }   
-        }
+  if (orderModules) {
+    for (di in discovery) {
+      for (ti in test[[di]]) {
+        if (is.null(data[[ti]]) && length(modules[[di]]) > 1) {
+          stop("'data' must be provided for all 'test' datasets ",
+               "if 'orderModules' is TRUE")
+        }   
       }
     }
-  })
-  
+  }
+
   vCat(verbose, 0, "User input ok!")
   
   # Similarly when 'orderModules = TRUE' but there is only one module (per test)
   # Then we can save time by not calculating the data-based network properties.
   # We can't detect this without sanity checking the user input first though, so
   # datasets may have been loaded
-  for (di in finput$discovery) {
-    if (length(finput$modules[[di]]) == 1) {
-      finput$data[di] <- list(NULL)
+  for (di in discovery) {
+    if (length(modules[[di]]) == 1) {
+      data[di] <- list(NULL)
       dataEnv$matrix <- NULL
     }
   }
   
   # Calculate the network properties
-  props <- with(finput, {
-    netPropsInternal(network, data, moduleAssignments, modules, discovery, 
-                     test, nDatasets, datasetNames, verbose, loadedIdx, 
-                     dataEnv, networkEnv, FALSE)
-  })
+  props <- netPropsInternal(network, data, moduleAssignments, 
+                            modules, discovery, test,
+                            nDatasets, datasetNames, verbose,
+                            loadedIdx, dataEnv, networkEnv, FALSE)
   anyDM <- FALSE
   
   res <- nodeOrderInternal(
