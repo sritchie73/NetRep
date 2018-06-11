@@ -17,6 +17,12 @@
     operated on due to conflicts between process user input in an 
     environment variable and unprocessed user input in function arguments.
   
+  * Added some minor optimisations to memory usage. The garbage collector
+    is now called at the end of each user exported function. This ensures
+    that any large matrices that have been loaded from disk are correctly
+    unloaded, even when a function returns an error due to malformed 
+    user input.
+  
 2017-08-15  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.1.5
