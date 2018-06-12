@@ -23,6 +23,8 @@
     unloaded, even when a function returns an error due to malformed 
     user input.
   
+  * Reduced vignette file size by changing images from png to jpeg.
+  
 2017-08-15  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.1.5

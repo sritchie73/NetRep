@@ -295,7 +295,7 @@ Only modules 1 and 4 are reproducible at this significance threshold.
 So what do these statistics measure? Let's take a look at the network topology
 of Module 1 in the discovery dataset, "cohort1":
 
-![Network topology of Module 1 in the discovery dataset ("cohort1").](NetRep_files/img/mod1.png)
+![Network topology of Module 1 in the discovery dataset ("cohort1").](NetRep_files/img/mod1.jpg)
 
 From top to bottom, the plot shows:
 
@@ -318,7 +318,7 @@ From top to bottom, the plot shows:
 Now, let's take a look at the topology of Module 1 in the discovery and the 
 test datasets side by side along with the module preservation statistics:
 
-![Network topology of Module 1 in both the discovery ("cohort1") and test ("cohort2") datasets.](NetRep_files/img/preservation.png)
+![Network topology of Module 1 in both the discovery ("cohort1") and test ("cohort2") datasets.](NetRep_files/img/preservation.jpg)
 
 There are seven module preservation statistics:
 
@@ -559,7 +559,7 @@ function. It takes the same input data as the `modulePreservation` function:
 
 First, let's look at the four modules in the *discovery* dataset:
 
-```{r modules_in_discovery, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r modules_in_discovery, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
@@ -581,7 +581,7 @@ order: that is, in decreasing order of *weighted degree* in the *discovery*
 dataset. This allows you to directly compare topology plots in each dataset of 
 interest:
 
-```{r modules_in_test, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r modules_in_test, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
@@ -607,7 +607,7 @@ datasets. For preserved modules, this provides a more robust estimate of
 the *weighted degree* and a more robust ordering of nodes by relative importance
 to their module, so we will plot just Modules 1 and 4. 
 
-```{r mean_degree, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r mean_degree, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4), # only the preserved modules
@@ -631,7 +631,7 @@ drawing time for the heatmaps, which may take some time for large modules.
 
 Let's tweak the previous plot:
 
-```{r dry_run, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r dry_run, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4),
@@ -643,7 +643,7 @@ plotModule(
 
 Now we can quickly iterate over parameters until we're happy with the plot:
 
-```{r dry_run_customised, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r dry_run_customised, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 # Change the margins so the plot is more compressed. Alternatively we could 
 # change the device window.
 par(mar=c(3,10,3,10)) # bottom, left, top, right margin sizes
@@ -669,7 +669,7 @@ plotModule(
 
 Once we're happy, we can turn off the `dryRun` parameter:
 
-```{r mean_degree_customised, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r mean_degree_customised, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 par(mar=c(3,10,3,10)) 
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -686,7 +686,7 @@ plotModule(
 We can also plot individual components of the plot separately. For example, 
 a heatmap of the correlation structure:
 
-```{r correlation_heatmap, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r correlation_heatmap, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 par(mar=c(5,5,4,4)) 
 plotCorrelation(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -884,7 +884,7 @@ test_correlation <- as.matrix(test_correlation)
 test_network <- as.matrix(test_network)
 ```
 
-```{r disk_matrix_dry_run, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r disk_matrix_dry_run, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 # Now we can use 'dryRun=TRUE' quickly:
 plotModule(
   data=test_data[samplesToPlot, nodesToPlot], 
@@ -894,7 +894,7 @@ plotModule(
   orderNodesBy=NA, orderSamplesBy=NA, dryRun=TRUE
 )
 ```
-```{r disk_matrix_plot, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
+```{r disk_matrix_plot, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"}
 # And draw the final plot once we determine the plot parameters 
 par(mar=c(3,10,3,10)) 
 plotModule(

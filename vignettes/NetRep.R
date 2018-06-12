@@ -58,21 +58,21 @@ max_pval
 #  nSamples <- nrow(discovery_data)
 #  discovery_data[not.present] <- runif(length(not.present), min=0, max=1/nSamples)
 
-## ----modules_in_discovery, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----modules_in_discovery, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="cohort1", test="cohort1"
 )
 
-## ----modules_in_test, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----modules_in_test, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,2,3,4),
   discovery="cohort1", test="cohort2"
 )
 
-## ----mean_degree, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----mean_degree, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4), # only the preserved modules
@@ -80,7 +80,7 @@ plotModule(
   orderNodesBy=c("cohort1", "cohort2") # this can be any number of datasets
 )
 
-## ----dry_run, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----dry_run, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
   moduleAssignments=module_labels, modules=c(1,4),
@@ -89,7 +89,7 @@ plotModule(
   dryRun=TRUE
 )
 
-## ----dry_run_customised, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----dry_run_customised, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 # Change the margins so the plot is more compressed. Alternatively we could 
 # change the device window.
 par(mar=c(3,10,3,10)) # bottom, left, top, right margin sizes
@@ -112,7 +112,7 @@ plotModule(
   legend.main.line=2
 )
 
-## ----mean_degree_customised, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----mean_degree_customised, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 par(mar=c(3,10,3,10)) 
 plotModule(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -123,7 +123,7 @@ plotModule(
   maxt.line=0, legend.main.line=2
 )
 
-## ----correlation_heatmap, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----correlation_heatmap, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 par(mar=c(5,5,4,4)) 
 plotCorrelation(
   data=data_list, correlation=correlation_list, network=network_list, 
@@ -245,7 +245,7 @@ test_data <- as.matrix(test_data)
 test_correlation <- as.matrix(test_correlation)
 test_network <- as.matrix(test_network)
 
-## ----disk_matrix_dry_run, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----disk_matrix_dry_run, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 # Now we can use 'dryRun=TRUE' quickly:
 plotModule(
   data=test_data[samplesToPlot, nodesToPlot], 
@@ -255,7 +255,7 @@ plotModule(
   orderNodesBy=NA, orderSamplesBy=NA, dryRun=TRUE
 )
 
-## ----disk_matrix_plot, dev="png", dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
+## ----disk_matrix_plot, dev="jpeg", dev.args=list(quality=50),  dpi=72, fig.height=7, fig.width=7, fig.align="center", results="hold", fig.keep="last", fig.show="hold"----
 # And draw the final plot once we determine the plot parameters 
 par(mar=c(3,10,3,10)) 
 plotModule(
