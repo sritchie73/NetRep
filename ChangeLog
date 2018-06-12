@@ -1,5 +1,11 @@
 2018-06-11  Scott Ritchie <sritchie73@gmail.com>
 
+  * DESCRIPTION: Release 1.2.1
+  
+  * Updated Date Field in DESCRIPTION.
+
+2018-06-11  Scott Ritchie <sritchie73@gmail.com>
+
   * DESCRIPTION: Release 1.2.0
   
   * Removed dependency on the ref package, which is being archived.
