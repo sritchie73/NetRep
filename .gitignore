@@ -10,3 +10,5 @@ vignettes/NetRep_cache/
 ^\.Rproj\.user$
 .Rbuildignore
 network-replication.Rproj
+NetRep.Rproj
+.gitignore
