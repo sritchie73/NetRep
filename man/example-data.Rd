@@ -12,7 +12,8 @@
 \alias{test_data}
 \alias{test_correlation}
 \title{Example data}
-\format{\itemize{
+\format{
+\itemize{
   \item{\code{"discovery_network"}:}{
      a \code{matrix} with 150 columns and 150 rows containing the network 
      edge weights encoding the interaction strength between each pair of
@@ -47,7 +48,22 @@
      correlation-coefficients between each pair of genes calculated from the
      \code{"test_data"} \code{matrix}.
   }
-}}
+}
+
+An object of class \code{matrix} (inherits from \code{array}) with 150 rows and 150 columns.
+
+An object of class \code{matrix} (inherits from \code{array}) with 30 rows and 150 columns.
+
+An object of class \code{matrix} (inherits from \code{array}) with 150 rows and 150 columns.
+
+An object of class \code{numeric} of length 150.
+
+An object of class \code{matrix} (inherits from \code{array}) with 150 rows and 150 columns.
+
+An object of class \code{matrix} (inherits from \code{array}) with 30 rows and 150 columns.
+
+An object of class \code{matrix} (inherits from \code{array}) with 150 rows and 150 columns.
+}
 \usage{
 data("NetRep")
 

@@ -4,9 +4,19 @@
 \alias{sampleOrder}
 \title{Order samples within a network.}
 \usage{
-sampleOrder(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  na.rm = FALSE, simplify = TRUE, verbose = TRUE)
+sampleOrder(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  na.rm = FALSE,
+  simplify = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{network}{a list of interaction networks, one for each dataset. Each 

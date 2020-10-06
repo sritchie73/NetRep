@@ -33,5 +33,6 @@ LinkingTo: Rcpp, BH, RcppArmadillo (>= 0.4)
 SystemRequirements:
   A compiler with C++11 support for the thread library,
   Requires Rtools >= 33 (i.e. R >= 3.3.0) to build on Windows.
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
+Encoding: UTF-8

@@ -4,9 +4,18 @@
 \alias{networkProperties}
 \title{Calculate the topological properties for a network module}
 \usage{
-networkProperties(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  simplify = TRUE, verbose = TRUE)
+networkProperties(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  simplify = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{network}{a list of interaction networks, one for each dataset. Each 

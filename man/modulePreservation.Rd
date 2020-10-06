@@ -4,11 +4,23 @@
 \alias{modulePreservation}
 \title{Replication and preservation of network modules across datasets}
 \usage{
-modulePreservation(network, data, correlation, moduleAssignments,
-  modules = NULL, backgroundLabel = "0", discovery = 1, test = 2,
-  selfPreservation = FALSE, nThreads = NULL, nPerm = NULL,
-  null = "overlap", alternative = "greater", simplify = TRUE,
-  verbose = TRUE)
+modulePreservation(
+  network,
+  data,
+  correlation,
+  moduleAssignments,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = 1,
+  test = 2,
+  selfPreservation = FALSE,
+  nThreads = NULL,
+  nPerm = NULL,
+  null = "overlap",
+  alternative = "greater",
+  simplify = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{network}{a list of interaction networks, one for each dataset. Each 

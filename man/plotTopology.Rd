@@ -10,67 +10,206 @@
 \alias{plotSummary}
 \title{Plot a topological feature of network module}
 \usage{
-plotData(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
-  orderModules = TRUE, plotNodeNames = TRUE, plotSampleNames = TRUE,
-  plotModuleNames = NULL, main = "", main.line = 1, lwd = 1,
-  plotLegend = TRUE, legend.main = "Data", legend.main.line = 1,
-  naxt.line = -0.5, saxt.line = -0.5, maxt.line = 3,
-  legend.position = 0.15, laxt.tck = 0.03, laxt.line = 3,
-  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, dataCols = NULL,
-  dataRange = NULL, naCol = "#bdbdbd", dryRun = FALSE)
+plotData(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  verbose = TRUE,
+  orderSamplesBy = NULL,
+  orderNodesBy = NULL,
+  orderModules = TRUE,
+  plotNodeNames = TRUE,
+  plotSampleNames = TRUE,
+  plotModuleNames = NULL,
+  main = "",
+  main.line = 1,
+  lwd = 1,
+  plotLegend = TRUE,
+  legend.main = "Data",
+  legend.main.line = 1,
+  naxt.line = -0.5,
+  saxt.line = -0.5,
+  maxt.line = 3,
+  legend.position = 0.15,
+  laxt.tck = 0.03,
+  laxt.line = 3,
+  cex.axis = 0.8,
+  cex.lab = 1.2,
+  cex.main = 2,
+  dataCols = NULL,
+  dataRange = NULL,
+  naCol = "#bdbdbd",
+  dryRun = FALSE
+)
 
-plotCorrelation(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
-  legend.main = "Correlation", legend.main.line = 1, naxt.line = -0.5,
-  maxt.line = 3, legend.position = NULL, laxt.tck = NULL,
-  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
-  corCols = correlation.palette(), corRange = c(-1, 1), naCol = "#bdbdbd",
-  dryRun = FALSE)
+plotCorrelation(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  verbose = TRUE,
+  orderNodesBy = NULL,
+  symmetric = FALSE,
+  orderModules = TRUE,
+  plotNodeNames = TRUE,
+  plotModuleNames = NULL,
+  main = "",
+  main.line = 1,
+  lwd = 1,
+  plotLegend = TRUE,
+  legend.main = "Correlation",
+  legend.main.line = 1,
+  naxt.line = -0.5,
+  maxt.line = 3,
+  legend.position = NULL,
+  laxt.tck = NULL,
+  laxt.line = NULL,
+  cex.axis = 0.8,
+  cex.lab = 1.2,
+  cex.main = 2,
+  corCols = correlation.palette(),
+  corRange = c(-1, 1),
+  naCol = "#bdbdbd",
+  dryRun = FALSE
+)
 
-plotNetwork(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, orderNodesBy = NULL, symmetric = FALSE,
-  orderModules = TRUE, plotNodeNames = TRUE, plotModuleNames = NULL,
-  main = "", main.line = 1, lwd = 1, plotLegend = TRUE,
-  legend.main = "Edge weight", legend.main.line = 1, naxt.line = -0.5,
-  maxt.line = 3, legend.position = NULL, laxt.tck = NULL,
-  laxt.line = NULL, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
-  netCols = network.palette(), netRange = c(0, 1), naCol = "#bdbdbd",
-  dryRun = FALSE)
+plotNetwork(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  verbose = TRUE,
+  orderNodesBy = NULL,
+  symmetric = FALSE,
+  orderModules = TRUE,
+  plotNodeNames = TRUE,
+  plotModuleNames = NULL,
+  main = "",
+  main.line = 1,
+  lwd = 1,
+  plotLegend = TRUE,
+  legend.main = "Edge weight",
+  legend.main.line = 1,
+  naxt.line = -0.5,
+  maxt.line = 3,
+  legend.position = NULL,
+  laxt.tck = NULL,
+  laxt.line = NULL,
+  cex.axis = 0.8,
+  cex.lab = 1.2,
+  cex.main = 2,
+  netCols = network.palette(),
+  netRange = c(0, 1),
+  naCol = "#bdbdbd",
+  dryRun = FALSE
+)
 
-plotContribution(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, orderNodesBy = NULL, orderModules = TRUE,
-  plotNodeNames = TRUE, plotModuleNames = NULL, main = "",
-  main.line = 1, ylab.line = 2.5, lwd = 1, drawBorders = FALSE,
-  naxt.line = -0.5, maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035,
-  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
-  contribCols = c("#A50026", "#313695"), naCol = "#bdbdbd",
-  dryRun = FALSE)
+plotContribution(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  verbose = TRUE,
+  orderNodesBy = NULL,
+  orderModules = TRUE,
+  plotNodeNames = TRUE,
+  plotModuleNames = NULL,
+  main = "",
+  main.line = 1,
+  ylab.line = 2.5,
+  lwd = 1,
+  drawBorders = FALSE,
+  naxt.line = -0.5,
+  maxt.line = 3,
+  yaxt.line = 0,
+  yaxt.tck = -0.035,
+  cex.axis = 0.8,
+  cex.lab = 1.2,
+  cex.main = 2,
+  contribCols = c("#A50026", "#313695"),
+  naCol = "#bdbdbd",
+  dryRun = FALSE
+)
 
-plotDegree(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, orderNodesBy = NULL, orderModules = TRUE,
-  plotNodeNames = TRUE, plotModuleNames = NULL, main = "",
-  main.line = 1, lwd = 1, drawBorders = FALSE, naxt.line = -0.5,
-  maxt.line = 3, yaxt.line = 0, yaxt.tck = -0.035, ylab.line = 2.5,
-  cex.axis = 0.8, cex.lab = 1.2, cex.main = 2, degreeCol = "#feb24c",
-  naCol = "#bdbdbd", dryRun = FALSE)
+plotDegree(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  verbose = TRUE,
+  orderNodesBy = NULL,
+  orderModules = TRUE,
+  plotNodeNames = TRUE,
+  plotModuleNames = NULL,
+  main = "",
+  main.line = 1,
+  lwd = 1,
+  drawBorders = FALSE,
+  naxt.line = -0.5,
+  maxt.line = 3,
+  yaxt.line = 0,
+  yaxt.tck = -0.035,
+  ylab.line = 2.5,
+  cex.axis = 0.8,
+  cex.lab = 1.2,
+  cex.main = 2,
+  degreeCol = "#feb24c",
+  naCol = "#bdbdbd",
+  dryRun = FALSE
+)
 
-plotSummary(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  verbose = TRUE, orderSamplesBy = NULL, orderNodesBy = NULL,
-  orderModules = TRUE, plotSampleNames = TRUE, plotModuleNames = NULL,
-  main = "", main.line = 1, xlab.line = 2.5, lwd = 1,
-  drawBorders = FALSE, saxt.line = -0.5, maxt.line = 0, xaxt.line = 0,
-  xaxt.tck = -0.025, cex.axis = 0.8, cex.lab = 1.2, cex.main = 2,
-  summaryCols = c("#1B7837", "#762A83"), naCol = "#bdbdbd",
-  dryRun = FALSE)
+plotSummary(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  verbose = TRUE,
+  orderSamplesBy = NULL,
+  orderNodesBy = NULL,
+  orderModules = TRUE,
+  plotSampleNames = TRUE,
+  plotModuleNames = NULL,
+  main = "",
+  main.line = 1,
+  xlab.line = 2.5,
+  lwd = 1,
+  drawBorders = FALSE,
+  saxt.line = -0.5,
+  maxt.line = 0,
+  xaxt.line = 0,
+  xaxt.tck = -0.025,
+  cex.axis = 0.8,
+  cex.lab = 1.2,
+  cex.main = 2,
+  summaryCols = c("#1B7837", "#762A83"),
+  naCol = "#bdbdbd",
+  dryRun = FALSE
+)
 }
 \arguments{
 \item{network}{a list of interaction networks, one for each dataset. Each 
@@ -234,24 +373,6 @@ plot.}
 }
 \description{
 Functions for plotting the topology of a network module.
-
-\code{plotData}: Plot a heatmap of the data matrix for one or more
-network modules.
-
-\code{plotCorrelation}: Plot a heatmap of the correlation structure for one 
-or more network modules.
-
-\code{plotNetwork}: Plot a heatmap of the edge weights for one or more
-network modules.
-
-\code{plotContribution}: Plot a bar chart of the node contribution for
-one or more network modules.
-
-\code{plotDegree:} Plot a bar chart of the scaled weighted degree 
-(see details) for one or more network modules.
-
-\code{plotSummary}: Plot bar charts of the module summary vectors of 
-one or more network modules.
 }
 \details{
 \subsection{Input data structures:}{

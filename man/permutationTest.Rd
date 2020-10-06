@@ -6,8 +6,13 @@
 \alias{permuted}
 \title{Permutation test P-values for module preservation statistics}
 \usage{
-permutationTest(nulls, observed, nVarsPresent, totalSize,
-  alternative = "greater")
+permutationTest(
+  nulls,
+  observed,
+  nVarsPresent,
+  totalSize,
+  alternative = "greater"
+)
 }
 \arguments{
 \item{nulls}{a 3-dimension matrix where the columns correspond to module

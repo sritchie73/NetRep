@@ -5,10 +5,21 @@
 \title{Order nodes in descending order of \emph{weighted degree} and order 
 modules by the similarity of their summary vectors.}
 \usage{
-nodeOrder(network, data, correlation, moduleAssignments = NULL,
-  modules = NULL, backgroundLabel = "0", discovery = NULL, test = NULL,
-  na.rm = FALSE, orderModules = TRUE, mean = FALSE, simplify = TRUE,
-  verbose = TRUE)
+nodeOrder(
+  network,
+  data,
+  correlation,
+  moduleAssignments = NULL,
+  modules = NULL,
+  backgroundLabel = "0",
+  discovery = NULL,
+  test = NULL,
+  na.rm = FALSE,
+  orderModules = TRUE,
+  mean = FALSE,
+  simplify = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{network}{a list of interaction networks, one for each dataset. Each 
