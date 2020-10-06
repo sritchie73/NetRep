@@ -128,7 +128,7 @@ The \link[=modulePreservation]{preservation of network modules} in a second
    (sampling with replacement) samples and genes from the corresponding 
    vectors in modules 63, 51, 57, and 50 discovered in the liver tissue gene 
    expression data from a 
-   \href{http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2814}{publicly 
+   \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2814}{publicly 
    available} mouse dataset (see reference \emph{(1)} for details on the 
    dataset and network discovery). The remaining 40 genes that were not part 
    of any module were simulated by randomly selecting 40 liver genes and 
