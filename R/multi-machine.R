@@ -93,8 +93,8 @@ combineAnalysesInternal <- function(pres1, pres2) {
         ncol(pres1$observed) != ncol(pres2$observed) ||
         pres1$alternative != pres2$alternative ||
         pres1$totalSize != pres2$totalSize ||
-        pres1$propVarsPresent != pres2$propVarsPresent ||
-        pres1$nVarsPresent != pres1$nVarsPresent ||
+        !all.equal(pres1$propVarsPresent, pres2$propVarsPresent) ||
+        !all.equal(pres1$nVarsPresent, pres1$nVarsPresent) ||
         (!is.null(pres1$contingency) && is.null(pres1$contingency)) ||
         (is.null(pres1$contingency) && !is.null(pres1$contingency)) ||
         (!is.null(pres1$contingency) && !is.null(pres1$contingency) && 
