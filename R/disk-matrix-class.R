@@ -124,7 +124,7 @@ serialize.table <- function(file, ...) {
 #' @rdname disk.matrix
 #' @export
 is.disk.matrix <- function(x) {
-  class(x) == "disk.matrix"
+  "disk.matrix" %in% class(x)
 }
 
 #' @rdname disk.matrix
