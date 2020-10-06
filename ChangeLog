@@ -1,3 +1,20 @@
+2020-10-06  Scott Ritchie <sritchie73@gmail.com>
+ 
+  * DESCRIPTION: Release 1.2.3
+  
+  * Minor patch to fix new package build checks introduce by CRAN from R 3.6
+    onwards.
+  
+2020-10-06  Scott Ritchie <sritchie73@gmail.com>
+ 
+  * DESCRIPTION: Release 1.2.2
+  
+  * Minor patch to remove deprecated Armadillo C++ macro which will allow
+    RcppArmadillo to update to the latest version of armadillo. As a side
+    effect, users of old compilers may see a compiler warning from 
+    RcppArmadillo when building this package (this will only affect you if
+    your compiler is too old to support R >= 4.0.0).
+
 2018-06-11  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.2.1
