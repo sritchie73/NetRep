@@ -5,7 +5,6 @@
 #define ARMA_USE_BLAS
 #define ARMA_NO_DEBUG
 #define ARMA_DONT_PRINT_ERRORS
-//#define ARMA_DONT_USE_CXX11
 
 #include <RcppArmadillo.h>
 
