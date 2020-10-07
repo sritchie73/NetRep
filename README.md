@@ -36,14 +36,14 @@ CRAN or from this GitHub repository:
 install.packages("NetRep")
 
 # Alternatively From GitHub
-library(devtools)
+library(remotes)
 install_github("InouyeLab/NetRep")
 ```
 
 Developmental / pre-release versions of NetRep can be installed from this repository:
 
 ```{r}
-library(devtools)
+library(remotes)
 install_github("InouyeLab/NetRep", ref="devel")
 ```
 
@@ -92,7 +92,7 @@ relevant download links.
 necessary `fortran` and `C++11` compilers are provided with the `Rtools` 
 program. We recommend installation of `NetRep` through `RStudio`, which should
 prompt the user and install these tools when running 
-`devtools::install_github("InouyeLab/NetRep")`. You may need to run this 
+`remotes::install_github("InouyeLab/NetRep")`. You may need to run this 
 command again after Rtools finishes installing.
 
 ### Linux

@@ -1,4 +1,13 @@
 2020-10-06  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.4
+  
+  * Added short form citation to Description field in package DESCRIPTION. A
+    full citation can still be found via citation("NetRep").
+    
+  * Removed GitHub page README.md from package bundle.
+  
+2020-10-06  Scott Ritchie <sritchie73@gmail.com>
  
   * DESCRIPTION: Release 1.2.3
   
