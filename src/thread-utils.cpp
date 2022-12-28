@@ -63,7 +63,7 @@ void MonitorProgress (
     nCompleted = sum(progress);
     if (verboseFlag) {
       percentCompleted = (unsigned int)round( (float)nCompleted / (float)nPerm * 100);
-      sprintf(formatted, "%5d", percentCompleted);
+      snprintf(formatted, sizeof(formatted), "%5d", percentCompleted);
       Rcpp::Rcout << "\r" << formatted << "% completed."; 
     }
     if (nCompleted == nPerm) {
