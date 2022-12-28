@@ -4,7 +4,6 @@
 #define ARMA_USE_LAPACK
 #define ARMA_USE_BLAS
 #define ARMA_NO_DEBUG
-#define ARMA_DONT_PRINT_ERRORS
 #define BOOST_DISABLE_ASSERTS
 
 #include <RcppArmadillo.h>
