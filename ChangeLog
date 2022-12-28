@@ -1,3 +1,10 @@
+2022-12-28  Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.5
+  
+  * Replaced sprintf with snprintf when creating progress bar, fixing compiler
+    warning on macOS 13 and above.
+  
 2020-10-06  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.2.4
