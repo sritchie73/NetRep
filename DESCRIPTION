@@ -1,7 +1,7 @@
 Package: NetRep
 Type: Package
 Title: Permutation Testing Network Module Preservation Across Datasets
-Version: 1.2.6
+Version: 1.2.7
 Authors@R: person(given="Scott", family="Ritchie", 
                   email="sritchie73@gmail.com", 
                   role=c("aut", "cre"),
@@ -12,7 +12,7 @@ Description: Functions for assessing the replication/preservation of a network
   (2015) <doi: 10.1016/j.cels.2016.06.012>.
 License: GPL-2
 Depends:
-    R (>= 3.0.2),
+    R (>= 3.6),
     methods
 Imports:
     foreach,
@@ -31,9 +31,6 @@ Suggests:
     knitr,
     rmarkdown
 LinkingTo: Rcpp, BH, RcppArmadillo (>= 0.4)
-SystemRequirements:
-  A compiler with C++11 support for the thread library,
-  Requires Rtools >= 33 (i.e. R >= 3.3.0) to build on Windows.
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Encoding: UTF-8

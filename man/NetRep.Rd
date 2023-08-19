@@ -3,6 +3,7 @@
 \docType{package}
 \name{NetRep}
 \alias{NetRep}
+\alias{NetRep-package}
 \title{Fast permutation procedure for testing network module replication}
 \description{
 Functions for assessing the replication/preservation of a network module's 
@@ -25,5 +26,16 @@ The main function for this package is \code{\link{modulePreservation}}.
 Several functions for downstream are also provided: 
 \code{\link{networkProperties}} for calculating the topological properties 
 of a module, and \code{\link{plotModule}} for visualising a module.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/sritchie73/NetRep/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Scott Ritchie \email{sritchie73@gmail.com} (0000-0002-8454-9548)
+
 }
 \keyword{package}

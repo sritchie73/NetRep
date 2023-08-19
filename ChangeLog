@@ -1,3 +1,15 @@
+2023-08-19 Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.7
+  
+  * Package overview help file is now correctly documented as requested by CRAN
+    following breaking changes in Roxygen 7.0.0 that changed the way this help 
+    file was internally tagged in the source code.
+    
+  * Resolves CRAN NOTE requesting removal of system requirements of C++11 or 
+    greater, as R has required this since R 3.6. To pass CRAN checks, NetRep 
+    will no longer support R < 3.6 going forward.
+
 2023-01-06  Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.2.6

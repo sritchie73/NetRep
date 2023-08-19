@@ -20,14 +20,13 @@
 #' \code{\link{networkProperties}} for calculating the topological properties 
 #' of a module, and \code{\link{plotModule}} for visualising a module.
 #'
-#' @docType package
 #' @name NetRep
 #' @useDynLib NetRep
 #' @importFrom Rcpp evalCpp
 #' @import stats
 #' @import utils
 #' @keywords package
-NULL
+"_PACKAGE"
 
 .onUnload <- function (libpath) {
   library.dynam.unload("NetRep", libpath)
