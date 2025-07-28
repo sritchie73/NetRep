@@ -6,7 +6,7 @@
 #' @details 
 #'  Calculates exact p-values for permutation tests when permutations are 
 #'  randomly drawn with replacement using the \code{\link[statmod]{permp}} 
-#'  function in the \code{\link{statmod}} package. 
+#'  function in the \code{\link[statmod]{statmod}} package. 
 #'  
 #'  This function may be useful for re-calculating permutation test P-values,
 #'  for example when there are missing values due to sparse data. In this case
