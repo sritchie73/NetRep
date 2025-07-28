@@ -552,7 +552,7 @@ modulePreservation <- function(
         
         if (di != loadedIdx) {
           # Unload previous dataset
-          anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+          anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                                    network[[loadedIdx]])
           vCat(verbose && anyDM, 1, "Unloading dataset from RAM...")
           dataEnv$matrix <- NULL
@@ -560,7 +560,7 @@ modulePreservation <- function(
           networkEnv$matrix <- NULL
           gc()
           
-          anyDM <- any.disk.matrix(data[[di]], correlation[[di]], network[[di]])
+          anyDM <- check.any.disk.matrix(data[[di]], correlation[[di]], network[[di]])
           vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
                datasetNames[di], '" into RAM...', sep="")
           if (!is.null(data[[di]])) {
@@ -596,7 +596,7 @@ modulePreservation <- function(
         # Load matrices into RAM if they are 'disk.matrix' objects.
         if (ti != loadedIdx) {
           # Unload previous dataset
-          anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+          anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                                    network[[loadedIdx]])
           vCat(verbose && anyDM, 1, "Unloading dataset from RAM...")
           dataEnv$matrix <- NULL
@@ -604,7 +604,7 @@ modulePreservation <- function(
           networkEnv$matrix <- NULL
           gc()
           
-          anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+          anyDM <- check.any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
           vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
                datasetNames[ti], '" into RAM...', sep="")
           if (!is.null(data[[ti]])) {
@@ -688,7 +688,7 @@ modulePreservation <- function(
     }
   }
   # Free up memory
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
   rm(dataEnv, correlationEnv, networkEnv)

@@ -479,7 +479,7 @@ plotData <- function(
   nNewSamples <- plotProps$nNewSamples
   
   # flag for previous on.exit
-  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], network[[ti]])
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -652,7 +652,7 @@ plotCorrelation <- function(
   finput$networkEnv <- NULL
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
@@ -684,7 +684,7 @@ plotCorrelation <- function(
   presentNodes <- plotProps$presentNodes
   
   # flag for on.exit
-  anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
   
   if (ti != loadedIdx) {
     vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 
@@ -846,7 +846,7 @@ plotNetwork <- function(
   finput$networkEnv <- NULL
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
@@ -879,7 +879,7 @@ plotNetwork <- function(
   presentNodes <- plotProps$presentNodes
 
   # flag for on.exit  
-  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], network[[ti]])
 
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1032,7 +1032,7 @@ plotContribution <- function(
   finput$networkEnv <- NULL
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
@@ -1064,7 +1064,7 @@ plotContribution <- function(
   moduleOrder <- plotProps$moduleOrder
   
   # flag for on.exit
-  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], network[[ti]])
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1179,7 +1179,7 @@ plotDegree <- function(
   finput$networkEnv <- NULL
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
@@ -1210,7 +1210,7 @@ plotDegree <- function(
   moduleOrder <- plotProps$moduleOrder
   
   # flag for on.exit
-  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], network[[ti]])
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments
@@ -1330,7 +1330,7 @@ plotSummary <- function(
   finput$networkEnv <- NULL
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
@@ -1365,7 +1365,7 @@ plotSummary <- function(
   nNewSamples <- plotProps$nNewSamples
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], network[[ti]])
   
   #-----------------------------------------------------------------------------
   # Set default values for 'NULL' arguments

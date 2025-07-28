@@ -417,7 +417,7 @@ plotModule <- function(
   finput$networkEnv <- NULL
   
   # Flag for on.exit
-  anyDM <- any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   
   on.exit({
@@ -490,7 +490,7 @@ plotModule <- function(
   nNewSamples <- plotProps$nNewSamples
   
   # flag for on.exit
-  anyDM <- any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
+  anyDM <- check.any.disk.matrix(data[[ti]], correlation[[ti]], network[[ti]])
   
   if (ti != loadedIdx) {
     vCat(verbose && is.disk.matrix(correlation[[ti]]), 0, 

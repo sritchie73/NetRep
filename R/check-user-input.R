@@ -688,12 +688,12 @@ processInput <- function(
   correlationEnv <- new.env()
   networkEnv <- new.env()
   
-  anyDM <- do.call("any.disk.matrix", c(data[iterator], correlation[iterator], network[iterator]))
+  anyDM <- do.call("check.any.disk.matrix", c(data[iterator], correlation[iterator], network[iterator]))
   vCat(verbose && !anyDM, 1, "Checking matrices for problems...")
   for (ii in iterator) {
     # First, we need to load in matrices into RAM if they are 'disk.matrix' 
     # objects
-    anyDM <- any.disk.matrix(data[[ii]], correlation[[ii]], network[[ii]])
+    anyDM <- check.any.disk.matrix(data[[ii]], correlation[[ii]], network[[ii]])
     vCat(verbose && anyDM, 1, 'Loading matrices of dataset "', 
          datasetNames[ii], '" into RAM...', sep="")
     dataEnv$matrix <- loadIntoRAM(data[[ii]])

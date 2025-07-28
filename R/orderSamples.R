@@ -155,7 +155,7 @@ sampleOrder <- function(
   finput$correlationEnv <- NULL # unload the correlation matrix as well since we don't need it
 
   
-  anyDM <- any.disk.matrix(data[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], 
                            correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   on.exit({

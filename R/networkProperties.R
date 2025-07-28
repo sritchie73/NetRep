@@ -180,7 +180,7 @@ networkProperties <- function(
   finput$correlationEnv <- NULL # unload the correlation matrix as well since we don't need it
   
   vCat(verbose, 0, "User input ok!")
-  anyDM <- any.disk.matrix(data[[loadedIdx]], 
+  anyDM <- check.any.disk.matrix(data[[loadedIdx]], 
                            correlation[[loadedIdx]], 
                            network[[loadedIdx]])
   on.exit({
@@ -271,14 +271,14 @@ netPropsInternal <- function(
   foreach(ti = requested) %do% {
     if (ti != loadedIdx) {
       # unload previous dataset from RAM
-      anyDM <- any.disk.matrix(data[[loadedIdx]], network[[loadedIdx]])
+      anyDM <- check.any.disk.matrix(data[[loadedIdx]], network[[loadedIdx]])
       vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
       dataEnv$matrix <- NULL 
       networkEnv$matrix <- NULL
       gc()
       
       # Load matrices into RAM if they are 'disk.matrix' objects.
-      anyDM <- any.disk.matrix(data[[ti]], network[[ti]])
+      anyDM <- check.any.disk.matrix(data[[ti]], network[[ti]])
       vCat(verbose && anyDM, 0, 'Loading matrices of dataset "',
            datasetNames[ti], '" into RAM...', sep="")
       dataEnv$matrix <- loadIntoRAM(data[[ti]])
@@ -310,7 +310,7 @@ netPropsInternal <- function(
   
   if (!keepLast) {
     # unload previous dataset from RAM
-    anyDM <- any.disk.matrix(data[[loadedIdx]], network[[loadedIdx]])
+    anyDM <- check.any.disk.matrix(data[[loadedIdx]], network[[loadedIdx]])
     vCat(verbose && anyDM, 0, "Unloading dataset from RAM...")
     dataEnv$matrix <- NULL
     networkEnv$matrix <- NULL

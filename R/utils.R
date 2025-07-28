@@ -265,7 +265,7 @@ loadIntoRAM <- function(x) {
 ###  arguments is a "disk.matrix".
 ###  
 ### @keywords internal
-any.disk.matrix <- function(...) {
+check.any.disk.matrix <- function(...) {
   any(unlist(sapply(list(...), is.disk.matrix)))
 }
 
