@@ -1,3 +1,17 @@
+2025-07-28 Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.8
+  
+  * Resolves CRAN NOTE about appropriate mechanism for formatting lists in 
+    documentation
+    
+  * Resolves CRAN NOTE about cross-linking to external packages in the 
+    documentation
+    
+  * Renamed an internal function any.disk.matrix to check.any.disk.matrix to 
+    disambiguate the function from an S3 method for any for the disk.matrix 
+    class, resolving a roxygen2 warning.
+  
 2023-08-19 Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.2.7

@@ -2,8 +2,8 @@
 % Please edit documentation in R/NetRep.R
 \docType{package}
 \name{NetRep}
-\alias{NetRep}
 \alias{NetRep-package}
+\alias{NetRep}
 \title{Fast permutation procedure for testing network module replication}
 \description{
 Functions for assessing the replication/preservation of a network module's 
