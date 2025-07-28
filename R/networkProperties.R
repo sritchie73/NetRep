@@ -16,7 +16,7 @@
 #'   gene expression data) as well as the correlation structure between 
 #'   variables/nodes. Thus, all functions in the \code{NetRep} package have the 
 #'   following arguments: 
-#'   \itemize{
+#'   \describe{
 #'     \item{\code{network}:}{
 #'       a list of interaction networks, one for each dataset.
 #'     }
@@ -73,7 +73,7 @@
 #'  dataset. Each of these elements is a list that has one element per 
 #'  \code{'modules'} specified. Each of these is a list containing the following  
 #'  objects:
-#'  \itemize{
+#'  \describe{
 #'    \item{\code{'degree'}:}{
 #'      The weighted within-module degree: the sum of edge weights for each 
 #'      node in the module.
@@ -84,7 +84,7 @@
 #'  }
 #'  If the \code{'data'} used to infer the \code{'test'} network is provided  
 #'  then the following are also returned:
-#'  \itemize{
+#'  \describe{
 #'    \item{\code{'summary'}:}{
 #'      A vector summarising the module across each sample. This is calculated 
 #'      as the first eigenvector of the module from a principal component 

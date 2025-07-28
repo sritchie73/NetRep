@@ -384,7 +384,7 @@ Functions for plotting the topology of a network module.
   gene expression data) as well as the correlation structure between 
   variables/nodes. Thus, all functions in the \code{NetRep} package have the 
   following arguments: 
-  \itemize{
+  \describe{
     \item{\code{network}:}{
       a list of interaction networks, one for each dataset.
     }
@@ -515,7 +515,7 @@ Functions for plotting the topology of a network module.
   
   The size of text labels can be modified by increasing or decreasing the
   \code{cex.main}, \code{cex.lab}, and \code{cex.axis} arguments:
-  \itemize{
+  \describe{
    \item{\code{cex.main}: }{controls the size of the plot title (specified 
                            in the \code{main} argument).}
    \item{\code{cex.lab}: }{controls the size of the axis labels on the
@@ -529,7 +529,7 @@ Functions for plotting the topology of a network module.
   
   The position of these labels can be changed through the following 
   arguments:
-  \itemize{
+  \describe{
    \item{\code{xaxt.line}: }{controls the distance from the plot the x-axis
          tick labels are drawn on the \emph{module summary} bar plot.}
    \item{\code{xlab.line}: }{controls the distance from the plot the x-axis 
@@ -560,7 +560,7 @@ Functions for plotting the topology of a network module.
   
   The size of the axis ticks can be changed by increasing or decreasing the
   following arguments:
-  \itemize{
+  \describe{
    \item{\code{xaxt.tck}: }{size of the x-axis tick labels as a multiple of
          the height of the \emph{module summary} bar plot}
    \item{\code{yaxt.tck}: }{size of the y-axis tick labels as a multiple of 
@@ -572,7 +572,7 @@ Functions for plotting the topology of a network module.
   }
   
   The placement of heatmap legends is controlled by the following arguments:
-  \itemize{
+  \describe{
    \item{\code{plotLegend}: }{if \code{FALSE} legend will not be drawn.}
    \item{\code{legend.position}: }{a multiple of the plot width, controls 
      the horizontal distance from the plot the legend is drawn.}

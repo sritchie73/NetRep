@@ -88,7 +88,7 @@ A nested list structure. At the top level, the list has one element per
  element per \code{'test'} dataset analysed for that \code{'discovery'} 
  dataset. Each of these elements is also a list, containing the following
  objects:
- \itemize{
+ \describe{
    \item{\code{observed}:}{
      A matrix of the observed values for the module preservation statistics.
      Rows correspond to modules, and columns to the module preservation
@@ -151,7 +151,7 @@ in the test dataset.
   from the data used to infer those networks (e.g. gene expression data) as
   well as the correlation structure between variables/nodes. Thus, all
   functions in the \code{NetRep} package have the following arguments:
-  \itemize{
+  \describe{
     \item{\code{network}:}{
       a list of interaction networks, one for each dataset.
     }
