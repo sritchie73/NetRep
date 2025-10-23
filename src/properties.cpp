@@ -129,7 +129,7 @@ Rcpp::List NetProps (
       // Convert NaNs to NAs
       SP.elem(arma::find_nonfinite(SP)).fill(NA_REAL);
       NC.elem(arma::find_nonfinite(NC)).fill(NA_REAL);
-      if (!arma::is_finite(coherence)) {
+      if (!std::isfinite(coherence)) {
         coherence = NA_REAL;
       }
 

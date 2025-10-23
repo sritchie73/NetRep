@@ -1,3 +1,15 @@
+2025-10-23 Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.9
+  
+  * Resolved CRAN WARNING arising from compiler warnings about use of deprecated
+    code: underlying C++ code has now been updated for compatibility with 
+    current releases of the Armadillo library by replacing the now-deprecated 
+    arma::is_finite() function with std::isfinite() as recommended by the 
+    compiler warnings.
+    
+  
+
 2025-07-28 Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.2.8

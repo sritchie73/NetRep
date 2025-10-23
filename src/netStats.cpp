@@ -48,7 +48,7 @@ arma::uvec CompleteCases(double * v1addr, double * v2addr, unsigned int size) {
   
   unsigned int counter = 0;
   for (unsigned int ii = 0; ii < size; ++ii) {
-    if (arma::is_finite(v1.at(ii)) && arma::is_finite(v2.at(ii))) {
+    if (std::isfinite(v1.at(ii)) && std::isfinite(v2.at(ii))) {
       finites.at(counter) = ii;
       counter++;
     }
