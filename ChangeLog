@@ -1,3 +1,9 @@
+2026-04-12 Scott Ritchie <sritchie73@gmail.com>
+
+  * DESCRIPTION: Release 1.2.10
+  
+  * Resolved CRAN NOTE about mis-specified Authors@R field
+    
 2025-10-23 Scott Ritchie <sritchie73@gmail.com>
 
   * DESCRIPTION: Release 1.2.9
@@ -7,8 +13,6 @@
     current releases of the Armadillo library by replacing the now-deprecated 
     arma::is_finite() function with std::isfinite() as recommended by the 
     compiler warnings.
-    
-  
 
 2025-07-28 Scott Ritchie <sritchie73@gmail.com>
 
